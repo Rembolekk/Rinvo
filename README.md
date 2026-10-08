@@ -1,0 +1,67 @@
+# Analiza rozmów z klientem: prototyp
+
+Zamienia transkrypcję rozmowy z klientem w listę zadań, decyzji, zakazów i ryzyk. Z listy powstaje czytelny raport ze szkicem maila podsumowującego.
+
+## Co robi i dlaczego tak
+
+1. **Ekstrakcja.** Komenda `/analizuj` wypisuje z rozmowy każdą pozycję: typ, właściciela, termin, warunek, status i dosłowny cytat.
+2. **Weryfikacja.** Pozycje bez dosłownego cytatu są usuwane. Gdy ktoś zmienił zdanie, zostaje ostatnia wersja. Błąd jest oddzielony od nowej funkcji, a zakazy zapisane osobno. Daty są zestawione ze sobą. To, co nie wynika wprost z cytatu, jest oznaczone jako **wniosek**. Cytaty są po to, żeby każdą pozycję dało się sprawdzić w kilka sekund i żeby model nie dopisywał ustaleń, które nie padły.
+3. **Raport.** Stały skrypt `render.py` zamienia `wynik.json` w `raport.html`. Wcześniej porównuje każdy cytat z transkrypcją i odmawia, jeśli któryś nie jest dosłowny. Stały skrypt zamiast HTML pisanego za każdym razem od nowa daje ten sam układ przy każdej rozmowie i twardą kontrolę cytatów.
+4. **Człowiek zatwierdza.** Nic nie trafia do klienta automatycznie. Szkic maila i lista zadań to propozycja do przejrzenia.
+
+```mermaid
+flowchart LR
+    A[transkrypcja .md] --> B["/analizuj<br/>ekstrakcja → weryfikacja"]
+    B --> C[wynik.json]
+    C --> D["render.py<br/>sprawdzenie cytatów"]
+    D --> E[raport.html]
+    E --> F{człowiek zatwierdza}
+    F -.następny krok.-> G[Linear / Gmail / kalendarz / CRM]
+```
+
+## Jak uruchomić
+
+1. Otwórz Claude Code w tym folderze (`C:\Users\User\analizy`).
+2. Wpisz: `/analizuj transkrypcja-spotkanie.md` (albo podaj inny plik `.md`).
+3. Wynik pojawi się w `wyniki/<nazwa transkrypcji>/`: `wynik.json` i `raport.html`.
+
+Raport można też przegenerować ręcznie:
+
+```
+python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja transkrypcja-spotkanie.md
+```
+
+## Struktura
+
+| Plik | Rola |
+|---|---|
+| `.claude/commands/analizuj.md` | instrukcja dla Claude Code (kroki, schemat JSON) |
+| `render.py` | walidacja schematu i cytatów, generowanie raportu (sama biblioteka standardowa Pythona) |
+| `transkrypcja-spotkanie.md` | przykładowa transkrypcja (fikcyjna) |
+| `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
+| `kontrola.md` | kontrola jakości na przykładowej rozmowie |
+
+## Założenia
+
+- Silnikiem jest Claude Code na subskrypcji, bez klucza API.
+- Integracje z narzędziami (Linear, Gmail, kalendarz, CRM) są opisane jako następny krok, ale nie zbudowane.
+- Nic nie wychodzi do klienta bez zatwierdzenia przez człowieka.
+- Analiza zakłada perspektywę dostawcy („nasz zespół”). Nazwy firm i osób pochodzą wyłącznie z transkrypcji.
+
+## Kontrola jakości
+
+Na przykładowej rozmowie: **19 z 20** pozycji kontrolnych znalezionych (szczegóły w [kontrola.md](kontrola.md)).
+
+Znane ograniczenia:
+- Okno testu wstępu podane tylko jako 12–16.10, bez drugiej możliwości od 26.10 (po urlopie).
+- Godzin Torunia w dni robocze nie ma w rozmowie, więc oznaczono je jako wniosek, a nie fakt.
+- Kompletność listy sprawdzana jest ręcznie. Automatycznie sprawdzana jest tylko dosłowność cytatów.
+- Daty względne („do czwartku”, „wczoraj”) są przeliczane od daty spotkania. Przeliczone daty przypomnień są oznaczone jako wnioski.
+
+## Co dalej z większą ilością czasu
+
+- **Automatyczna kontrola kompletności:** zestaw rozmów testowych z listą oczekiwanych pozycji, uruchamiany po każdej zmianie komendy.
+- **Integracje po zatwierdzeniu:** zadania do Linear, szkic maila do Gmaila (jako szkic, nie wysyłka), spotkania do kalendarza, notatka do CRM.
+- **Zatwierdzanie w raporcie:** przy każdej pozycji akceptuj, popraw albo odrzuć, a dopiero potem eksport.
+- **Historia klienta:** zakazy i ustalenia z poprzednich rozmów jako kontekst do następnej analizy, z wykrywaniem sprzeczności.
+- **Kalendarz w kodzie:** konflikty dat liczone przez skrypt, a nie przez model, żeby nie gubić okien takich jak „od 26.10”.
