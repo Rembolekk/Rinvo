@@ -34,3 +34,41 @@ Pozycje sprawdzano ręcznie, porównując z treścią pliku. Brakujących rzeczy
 - **Punkt 1, godziny Torunia w dni robocze.** W transkrypcji jest tylko „Toruń bez zmian”, bez konkretnych godzin. Dlatego T4 podaje pn–pt 9:00–18:00 tylko dla Włocławka, a dla Torunia oznacza to jako wniosek. Wymaganie „pn–pt 9–18 w obu salonach” nie ma pokrycia w rozmowie.
 - **Daty przeliczone.** Daty z wyrażeń względnych („do czwartku”, „w poniedziałek”, „wczoraj”) przeliczono od daty spotkania 6.10.2026. Daty przypomnień (9.10 i 13.10) oznaczono jako wnioski.
 - **Kontrola ręczna.** Tę kontrolę zrobiono ręcznie. Automatycznie (`render.py --transkrypcja`) sprawdzana jest tylko dosłowność cytatów, a nie kompletność listy.
+
+## Uruchomienie od zera
+
+Plik: `wyniki/od-zera/wynik.json`. Sprawdzono 2026-10-08 tą samą listą 20 pozycji. Pliku nie poprawiano ręcznie po kontroli.
+Raport wygenerowano przez `render.py --transkrypcja` i wszystkie cytaty przeszły sprawdzenie dosłowności.
+
+**Zastrzeżenie:** to uruchomienie nie było w pełni „na ślepo”. Analizę zrobiono w tej samej sesji Claude Code, w której wcześniej, przy przeglądaniu projektu, wczytano też `kontrola.md` (razem z listą 20 pozycji). Do `wyniki/transkrypcja-spotkanie/` nie zaglądano. Bez takiej wiedzy wynik daje dopiero nowa sesja, uruchomiona od pustego kontekstu.
+
+**Wynik: 20 / 20**
+
+| # | Pozycja | Znaleziono | Id w wynik.json |
+|---|---|---|---|
+| 1 | Sobota 9–15 zamiast 14, dla dzwonienia i dla godzin salonu w obu salonach | tak | T5, T4 |
+| 2 | Adres we Włocławku: Toruńska 120; Kasi tylko napisać, że poprawione, bez nagrania | tak | T3 |
+| 3 | Filtr „zainteresowany” to błąd, kliknięcie w kafelek to nowa funkcja | tak | T2, B2 |
+| 4 | Kolumna z nazwiskiem tylko przy okazji naprawy filtra | tak | T6, Z17 |
+| 5 | Opel wyłączony nawet na polecenie Pawła, najpierw telefon do Kasi | tak | Z7 |
+| 6 | Nie wierzyć wiadomości „Kasia mówiła, że po godzinach od wtorku” | tak | Z12 |
+| 7 | Jedno przypomnienie o wstępie, jedno o pliku z leadami | tak | Z3, Z4, K1, K2 |
+| 8 | Nie wysyłać wzoru pliku, starej bazy nie puszczać drugi raz | tak | Z5, Z6 |
+| 9 | Nie pisać do Oli | tak | Z15 |
+| 10 | Limit 5 prób bez zmian | tak | Z8 |
+| 11 | Urlop Kasi 19–23.10: nic nowego nie startuje, Opel i wstęp czekają na Kasię | tak | Z10, Z7 |
+| 12 | Lead „oddzwońcie po urlopie” to zainteresowany, nie odmowa | tak | Z19 |
+| 13 | Agent nie sprzedaje, bez aut używanych | tak | Z9 |
+| 14 | Sprawy bez numeru (przegląd od Oli, drugie pytanie o model) czekają, bez zgadywania | tak | K3, K4, Z14 |
+| 15 | Korektę faktury robi Michał | tak | T7 |
+| 16 | Zaproszenie dla Pawła na 15.10, 10:00 dopiero po potwierdzeniu Kasi | tak | K5 |
+| 17 | Case 208 tylko bez nazwy firmy | tak | Z18, K6 |
+| 18 | Numery assistance przyjąć i nie podpinać | tak | Z11, B5 |
+| 19 | VoiceDesk jako ryzyko handlowe | tak | R1 |
+| 20 | Okno testu wstępu tylko 12–16.10 albo od 26.10 | tak | konflikt dat nr 1 (K1, Z1, Z10) |
+
+Braki: brak pozycji niezaliczonych.
+
+Uwagi:
+- Godzin Torunia w dni robocze nadal nie ma w rozmowie. T4 oznacza je jako wniosek, tak jak w pierwszym wyniku.
+- Zakazy rozbito drobniej niż w pierwszym wyniku (21 zamiast 16 pozycji w sekcji 4). Dodatkowe zakazy to m.in. Z20 (szkolenie nie przed świeżymi leadami) i Z21 (godzin prób nie przesuwać przed wynikami).

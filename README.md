@@ -25,6 +25,14 @@ flowchart LR
 2. Wpisz: `/analizuj transkrypcja-spotkanie.md` (albo podaj inny plik `.md`).
 3. Wynik pojawi się w `wyniki/<nazwa transkrypcji>/`: `wynik.json` i `raport.html`.
 
+Jeśli komenda `/analizuj` nie pojawi się na liście, wpisz zamiast niej:
+
+```
+Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
+```
+
+(gdzie `X.md` to plik transkrypcji).
+
 Raport można też przegenerować ręcznie:
 
 ```
@@ -40,6 +48,7 @@ python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja tran
 | `transkrypcja-spotkanie.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
+| `logi/` | logi z pracy z AI (sesje Claude Code: surowe `.jsonl` i czytelne `.md`) |
 
 ## Założenia
 
@@ -50,10 +59,17 @@ python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja tran
 
 ## Kontrola jakości
 
-Na przykładowej rozmowie: **19 z 20** pozycji kontrolnych znalezionych (szczegóły w [kontrola.md](kontrola.md)).
+Na przykładowej rozmowie (szczegóły w [kontrola.md](kontrola.md)):
+
+| Wynik | Folder | Kontrola |
+|---|---|---|
+| pierwszy | `wyniki/transkrypcja-spotkanie/` | **19 / 20** |
+| od zera | `wyniki/od-zera/` | **20 / 20** |
+
+Pierwszy wynik (`wyniki/transkrypcja-spotkanie/`) był poprawiany w trakcie budowy narzędzia, więc nie pokazuje, co daje samo uruchomienie komendy. Miarodajny jest wynik od zera (`wyniki/od-zera/`), wygenerowany jednym przebiegiem komendy i niepoprawiany ręcznie. Zastrzeżenie: przebieg od zera zrobiono w sesji, która znała już listę kontrolną z `kontrola.md`. W pełni niezależny wynik da dopiero przebieg w nowej sesji.
 
 Znane ograniczenia:
-- Okno testu wstępu podane tylko jako 12–16.10, bez drugiej możliwości od 26.10 (po urlopie).
+- W pierwszym wyniku okno testu wstępu podano tylko jako 12–16.10, bez drugiej możliwości od 26.10 (po urlopie). Wynik od zera ma oba okna.
 - Godzin Torunia w dni robocze nie ma w rozmowie, więc oznaczono je jako wniosek, a nie fakt.
 - Kompletność listy sprawdzana jest ręcznie. Automatycznie sprawdzana jest tylko dosłowność cytatów.
 - Daty względne („do czwartku”, „wczoraj”) są przeliczane od daty spotkania. Przeliczone daty przypomnień są oznaczone jako wnioski.
@@ -65,3 +81,7 @@ Znane ograniczenia:
 - **Zatwierdzanie w raporcie:** przy każdej pozycji akceptuj, popraw albo odrzuć, a dopiero potem eksport.
 - **Historia klienta:** zakazy i ustalenia z poprzednich rozmów jako kontekst do następnej analizy, z wykrywaniem sprzeczności.
 - **Kalendarz w kodzie:** konflikty dat liczone przez skrypt, a nie przez model, żeby nie gubić okien takich jak „od 26.10”.
+
+## Logi
+
+Logi z pracy z AI są w folderze [logi/](logi/): surowe sesje Claude Code (`.jsonl`) i ich czytelne wersje (`.md`, tylko wiadomości użytkownika i odpowiedzi asystenta).
