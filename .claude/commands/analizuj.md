@@ -35,7 +35,7 @@ Sprawdź listę z kroku 1:
 - odróżnij błąd (coś miało działać i nie działa) od nowej funkcji (czegoś nigdy nie było),
 - zakazy i ograniczenia ("nie rób", "nie wcześniej niż", "tylko raz", "nie wierzcie") zapisz jako osobne pozycje,
 - jeśli brakuje danych do działania (numer, nagranie, plik), status = czeka, nie zgaduj,
-- zestaw ze sobą wszystkie daty (urlopy, terminy, okna testów) i zapisz konflikty. Konflikt to sytuacja, w której ustalone terminy lub zakazy się wykluczają albo zawężają okno. Zwykłe zależności („B po A") nie są konfliktami,
+- wypisz pole fakty_czasowe: każdy urlop, blokadę, termin i okno testów jako osobny wpis z polami typ (blokada/urlop/termin/start_nie_wczesniej), od i do (daty bezwzględne RRRR-MM-DD, przeliczone od daty spotkania; np. „w piątek" zamieniasz na datę), dotyczy (klucz_sprawy z sekcji 1–3 lub „wszystko_nowe" dla blokad globalnych jak urlop) i dosłowny cytat. Nie obliczaj konfliktów — zostaw konflikty_dat: []. Okna wolne oblicza skrypt daty.py po zapisaniu wynik.json,
 - każde stwierdzenie, które nie wynika wprost z cytatu (np. przeliczona data przypomnienia, domysł o intencji), przenieś do pola "wnioski",
 - połącz duplikaty.
 
@@ -71,7 +71,14 @@ Cytaty w aktualizacjach muszą być dosłowne (tak samo jak w pozycjach).
 KROK 4. WYNIK
 Folder wyników: wyniki/<klient>/<nazwa pliku transkrypcji bez rozszerzenia>/ (jeśli klient null, to wyniki/<nazwa pliku bez rozszerzenia>/). Utwórz, jeśli nie istnieje.
 
-a) Zapisz wynik.json z finalną listą, w tym schemacie:
+a) Zapisz wynik.json z finalną listą.
+
+WAŻNE — ZAPIS W CZĘŚCIACH: wynik.json zapisuj zawsze w częściach, nigdy całości jednym wywołaniem Write:
+1. Najpierw zapisz plik z nagłówkiem i pustymi listami: pozycje: [], aktualizacje_spraw: [], zmiany_zdania: [], konflikty_dat: [], fakty_czasowe: [], okna_czasowe: [], weryfikacja: {}, szkic_maila: "".
+2. Dopisuj pozycje partiami po ~8 za pomocą Edit (nie zastępuj całego pliku).
+3. Na końcu uzupełnij pozostałe pola: aktualizacje_spraw, zmiany_zdania, fakty_czasowe, weryfikacja, szkic_maila.
+
+Schemat wynik.json:
 {
   "zrodlo": "<ścieżka transkrypcji względem folderu projektu>",
   "wygenerowano": "RRRR-MM-DD",
@@ -100,15 +107,27 @@ a) Zapisz wynik.json z finalną listą, w tym schemacie:
     "pewnosc": "wysoka | niska"
   }],
   "zmiany_zdania": [{ "temat", "przed", "po", "pozycja", "cytat" }],
-  "konflikty_dat": [{ "opis", "pozycje": ["id", ...], "wnioski": [..] (opcjonalnie) }],
+  "konflikty_dat": [],          // zawsze pusta lista — konflikty liczy daty.py
+  "fakty_czasowe": [{           // fakty o datach wypisuje model
+    "typ": "blokada | urlop | termin | start_nie_wczesniej",
+    "od": "RRRR-MM-DD",
+    "do": "RRRR-MM-DD lub null",
+    "dotyczy": "klucz_sprawy lub 'wszystko_nowe'",
+    "cytat": "dosłowny cytat"
+  }],
+  "okna_czasowe": [],           // wypełnia daty.py po uruchomieniu — nie pisz tu nic
   "weryfikacja": { "usuniete_bez_cytatu": [..], "zastapione_lub_scalone": [..], "pominiete": [..] },
   "szkic_maila": "pełny tekst maila do klienta (tylko to, co faktycznie ustalono)"
 }
 
 b) Raport generuj WYŁĄCZNIE skryptem render.py z folderu projektu. Nie pisz nowego renderera i nie twórz raport.html ręcznie. Uruchom z folderu projektu:
    python -I render.py wyniki/<klient>/<nazwa>/wynik.json --transkrypcja <plik transkrypcji>
-Skrypt sprawdza schemat i dosłowność każdego cytatu (w pozycjach i w aktualizacjach), a potem zapisuje raport.html obok wynik.json. Raport ma sekcje 1–6, liczniki na górze, zmiany zdania, konflikty dat, zmiany w otwartych sprawach i oznaczone wnioski.
+Skrypt sprawdza schemat, dosłowność każdego cytatu (w pozycjach, aktualizacjach i fakty_czasowe) i zapisuje raport.html obok wynik.json. Raport ma sekcje 1–6, liczniki na górze, zmiany zdania, konflikty dat, zmiany w otwartych sprawach i oznaczone wnioski.
 Jeśli skrypt zgłosi błąd (kod 1: schemat, kod 2: cytat niedosłowny), popraw wynik.json (cytat skopiuj dokładnie albo usuń pozycję) i uruchom go ponownie. Samego render.py nie zmieniaj.
+
+Następnie uruchom daty.py, który oblicza okna robocze z fakty_czasowe i zapisuje okna_czasowe do wynik.json:
+   python -I daty.py wyniki/<klient>/<nazwa>/wynik.json
+Jeśli skrypt zgłosi błąd, popraw fakty_czasowe w wynik.json (sprawdź format dat RRRR-MM-DD i typy) i uruchom ponownie.
 
 Nie wpisuj na sztywno nazw firm ani osób. Wszystko bierz z transkrypcji.
 Niczego nie wysyłaj do klienta. Szkic maila zatwierdza człowiek.

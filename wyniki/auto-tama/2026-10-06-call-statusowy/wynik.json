@@ -49,9 +49,10 @@
       "warunek": "brak",
       "status": "zrob_teraz",
       "cytat": [
-        "Zapraszamy do salonu Peugeot i Citroën we Włocławku przy ulicy Ka",
-        "A my od sierpnia jesteśmy na Toruńskiej. Na Kapitulnej jest teraz pusty plac.",
+        "A my od sierpnia jesteśmy na Toruńskiej. Na Kapitulnej jest teraz pusty plac. Jakiś klient pojedzie i będzie stał przed płotem.",
+        "O, to jest nasz błąd, ewidentnie nieaktualna baza wiedzy. Podaj mi nowy adres, poprawię dzisiaj.",
         "Toruńska 120. Godziny bez zmian, w tygodniu dziewiąta–osiemnasta, sobota dziewiąta–czternasta. Toruń bez zmian.",
+        "Nie musisz mi wysyłać, puszczę sobie test sama. Tylko napisz, jak będzie poprawione.",
         "Dobra, napiszę."
       ],
       "wnioski": [
@@ -425,7 +426,7 @@
       "warunek": "decyzja Pawła po otrzymaniu wyceny",
       "status": "backlog",
       "cytat": [
-        "zy nie mógłby wysłać SMS-a? Coś w stylu „dzwoniliśmy w sprawie Twojego zapytania o Peugeota, oddzwoń albo kliknij tutaj”. Ludzie nie o",
+        "Jak bot dwa razy nie dodzwoni się do kogoś, to czy nie mógłby wysłać SMS-a? Coś w stylu „dzwoniliśmy w sprawie Twojego zapytania o Peugeota, oddzwoń albo kliknij tutaj”. Ludzie nie odbierają nieznanych numerów, a SMS przeczytają.",
         "Technicznie się da, ale SMS-y kosztują osobno, za każdą wiadomość."
       ],
       "klucz_sprawy": "sms-po-nieodebranym",
@@ -837,18 +838,143 @@
       "cytat": "Sobotę jednak zostaw do piętnastej, nie do czternastej. Od tego miesiąca salon w sobotę jest do piętnastej, zapomniałam."
     }
   ],
-  "konflikty_dat": [
+  "konflikty_dat": [],
+  "fakty_czasowe": [
     {
-      "opis": "Okno na test wstępu jest wąskie: zakaz uruchamiania w tygodniu 6–12.10 (odsłuch bazy) oraz zakaz nowych startów 19–23.10 (urlop Kasi). Efektywne okno to 13–18.10. Wymaga dotrzymania obu terminów: wersje tekstu do 8.10 (K1) i plik leadów do 12.10 (K2).",
-      "pozycje": [
-        "Z2",
-        "Z5",
-        "K1",
-        "K2"
+      "typ": "blokada",
+      "od": "2026-10-06",
+      "do": "2026-10-11",
+      "dotyczy": "tekst-wstepu-dwie-wersje",
+      "cytat": "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-08",
+      "do": "2026-10-08",
+      "dotyczy": "tekst-wstepu-dwie-wersje",
+      "cytat": "Jak do czwartku nie wyślę obu wersji, przypomnij mi. Raz."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-12",
+      "do": "2026-10-12",
+      "dotyczy": "swieze-leady",
+      "cytat": "Powiedzmy poniedziałek."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": "2026-10-15",
+      "dotyczy": "spotkanie-z-pawlem",
+      "cytat": "Zaproponuj przyszły czwartek o dziesiątej, on wtedy jest w Toruniu."
+    },
+    {
+      "typ": "urlop",
+      "od": "2026-10-19",
+      "do": "2026-10-23",
+      "dotyczy": "wszystko_nowe",
+      "cytat": "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień."
+    },
+    {
+      "typ": "blokada",
+      "od": "2026-10-19",
+      "do": "2026-10-23",
+      "dotyczy": "wszystko_nowe",
+      "cytat": "W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie."
+    },
+    {
+      "typ": "blokada",
+      "od": "2026-10-06",
+      "do": "2026-10-11",
+      "dotyczy": "mail-walidacji-model-salon",
+      "cytat": "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-09",
+      "do": "2026-10-09",
+      "dotyczy": "cena-smsow",
+      "cytat": "cenę wyślę w tym tygodniu."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-16",
+      "do": "2026-10-16",
+      "dotyczy": "korekta-faktury",
+      "cytat": "Korekta powinna przyjść w przyszłym tygodniu."
+    },
+    {
+      "typ": "blokada",
+      "od": "2026-10-06",
+      "do": "2026-10-31",
+      "dotyczy": "agent-po-godzinach",
+      "cytat": "Nie w tym miesiącu."
+    }
+  ],
+  "okna_czasowe": [
+    {
+      "klucz_sprawy": "agent-po-godzinach",
+      "okna": [
+        {
+          "od": "2026-11-02",
+          "do": null
+        }
       ],
-      "wnioski": [
-        "Jeśli którykolwiek z terminów nie zostanie dotrzymany, test ruszy najwcześniej 24.10 (po urlopie)."
-      ]
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "cena-smsow",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-09"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "korekta-faktury",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "mail-walidacji-model-salon",
+      "okna": [
+        {
+          "od": "2026-10-12",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "spotkanie-z-pawlem",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-15"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "swieze-leady",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-12"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
     }
   ],
   "weryfikacja": {

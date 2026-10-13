@@ -62,6 +62,9 @@ def verify_quotes(d, transcript):
     for a in d.get("aktualizacje_spraw", []):
         if a.get("cytat") and norm(a["cytat"]) not in tr:
             missing.append(f"aktualizacja '{a.get('klucz_sprawy')}': {a['cytat']}")
+    for f in d.get("fakty_czasowe", []):
+        if f.get("cytat") and norm(f["cytat"]) not in tr:
+            missing.append(f"fakty_czasowe ({f.get('typ','?')}, {f.get('dotyczy','?')}): {f['cytat']}")
     return missing
 
 
@@ -112,7 +115,17 @@ def render(d, verified):
         for z in zmiany) or "<li>Nie wykryto zmian zdania.</li>"
     conf = "".join(
         f'<li>{e(c.get("opis", ""))} <span class="refs">' + " ".join(f'<a href="#{e(i)}">{e(i)}</a>' for i in c.get("pozycje", [])) + "</span>" + wnioski(c.get("wnioski")) + "</li>"
-        for c in konflikty) or "<li>Nie wykryto konfliktów dat.</li>"
+        for c in konflikty) or "<li>Brak zidentyfikowanych konfliktów.</li>"
+
+    okna = d.get("okna_czasowe", [])
+    if okna:
+        okna_items = ""
+        for o in okna:
+            ws = "; ".join(f'{w["od"]} – {w["do"] or "→ otwarty"}' for w in o.get("okna", []))
+            okna_items += f'<li><code>{e(o["klucz_sprawy"])}</code> {e(ws)} <span class="tag">{e(o.get("adnotacja",""))}</span></li>'
+        okna_html = f'<h3 style="font-size:.95rem;margin:14px 0 6px">Okna robocze (obliczone przez daty.py)</h3><ul>{okna_items}</ul>'
+    else:
+        okna_html = ""
 
     NOWY_STATUS_LABEL = {"zrob_teraz": "zrób teraz", "zamknieta": "zamknięta", "anulowana": "anulowana"}
     aktual_html = ""
@@ -217,7 +230,7 @@ footer{{margin-top:40px;color:var(--mut);font-size:.85rem}}
 <p class="meta">{e(" · ".join(meta_bits))}</p>
 <div class="tiles">{tiles}</div>
 <div class="panel" id="zmiany"><h2>Zmiany zdania wykryte w rozmowie</h2><ol>{changes}</ol></div>
-<div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol>{conf}</ol></div>
+<div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol>{conf}</ol>{okna_html}</div>
 <div class="panel" id="aktualizacje"><h2>Zmiany w otwartych sprawach</h2><ul>{aktual_html}</ul></div>
 {secs}
 <footer><div class="panel"><h2>Weryfikacja</h2><p>{e(ver_txt)}</p>{"<ul>" + verh + "</ul>" if verh else ""}</div>

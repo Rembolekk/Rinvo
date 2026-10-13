@@ -1,12 +1,12 @@
 {
-  "2f7794f449a055cd3b88415a27afb2b200c75b6cab5da68a8b32ec17c33a6d0a": {
-    "plik": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+  "7d75db1365752827be6a870288ffec92dd37e4aae0395fe33432dee8d2815c4b": {
     "klient": "auto-tama",
-    "przetworzono": "2026-10-13"
+    "transkrypcja": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+    "przetworzone": "2026-10-13 21:39:51"
   },
-  "dc6719db85d99c772d2b08bebd83496740171409ca21a7c55ce0199387500c74": {
-    "plik": "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md",
+  "46d4fb0e479eb962d904f4a6fc1387f2174401d1f513d63ed1f582674278ae74": {
     "klient": "klinika-usmiech",
-    "przetworzono": "2026-10-13"
+    "transkrypcja": "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md",
+    "przetworzone": "2026-10-13"
   }
 }

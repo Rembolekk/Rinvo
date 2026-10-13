@@ -1,0 +1,85 @@
+=== przetworz.py ===
+Transkrypcja: ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
+Klient: auto-tama
+Start: 2026-10-13T21:16:42.424479
+
+Wszystko przeszło. Gotowe.
+
+---
+
+**Wynik:**
+
+- `wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json` — 41 pozycji, cytaty zweryfikowane
+- `wyniki/auto-tama/2026-10-06-call-statusowy/raport.html` — wygenerowany przez render.py
+
+**Struktura:**
+| Sekcja | Liczba |
+|--------|--------|
+| Do zrobienia teraz (T1–T10) | 10 |
+| Czeka na klienta (K1–K5) | 5 |
+| Backlog produktowy (B1–B9) | 9 |
+| Zakazy i ograniczenia (Z1–Z14) | 14 |
+| Ryzyka handlowe (R1–R3) | 3 |
+
+**Kluczowe ustalenia z rozmowy:**
+- Marek robi dziś: adres Włocławek (Toruńska 120), godziny dzwonienia (9–19/9–15 sob), godziny salonu (sobota do 15:00), naprawa buga podwójnego telefonu i filtra statusu, przekazanie faktury do korekty
+- Czeka na Kasię: dwie wersje wstępu do **8.10 (czwartek)**, plik świeżych leadów do **12.10 (poniedziałek)**
+- Spotkanie z Pawłem: **15.10 o 10:00** w Toruniu — agenda: VoiceDesk, brak integracji CRM, case study Peugeot 208
+- Urlop Kasi: **19–23.10** — nic nowego w tym czasie
+- Zmiana zdania: sobota do 14:00 → **do 15:00** (salon zmienił godziny od tego miesiąca)
+============================================================
+=== claude -p ===
+============================================================
+
+
+============================================================
+=== render.py ===
+============================================================
+Komenda: python3 -I render.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json --transkrypcja ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
+
+OK: /Users/mateuszrembecki/Desktop/Rinvo/wyniki/auto-tama/2026-10-06-call-statusowy/raport.html
+Cytaty sprawdzone z transkrypcją: tak
+  Do zrobienia teraz: 10
+  Czeka na klienta: 5
+  Backlog produktowy: 9
+  Zakazy i ograniczenia: 14
+  Ryzyka handlowe: 3
+
+============================================================
+=== daty.py ===
+============================================================
+Komenda: python3 -I daty.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json
+
+OK: okna_czasowe dla 6 spraw → wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json
+  agent-po-godzinach: 2026-11-02 – →
+  cena-smsow: 2026-10-07 – 2026-10-09
+  korekta-faktury: 2026-10-07 – 2026-10-16
+  mail-walidacji-model-salon: 2026-10-12 – 2026-10-16; 2026-10-26 – →
+  spotkanie-z-pawlem: 2026-10-07 – 2026-10-15
+  swieze-leady: 2026-10-07 – 2026-10-12
+
+============================================================
+=== linear_sync.py ===
+============================================================
+
+============================================================
+SYNCHRONIZACJA: wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json  →  Linear [RIN]  (klient: auto-tama)
+============================================================
+
+Zespół: Rinvo demo (RIN)
+
+Etykiety:
+
+Stany: Todo / Backlog / Done / Cancelled gotowe
+
+  ✓ karta.md: ops/klienci/auto-tama/karta.md
+
+────────────────────────────────────────────────────────────
+Podsumowanie:
+  Utworzono zgłoszeń:            0
+  Zaktualizowano (komentarz):    0
+  Pominięto (ta sama rozmowa):   27
+  Zakazy → karta.json:           0
+  Aktualizacje otwartych spraw:  0
+────────────────────────────────────────────────────────────
+

@@ -6,24 +6,46 @@ Zamienia transkrypcję rozmowy z klientem w listę zadań, decyzji, zakazów i r
 
 1. **Ekstrakcja.** Komenda `/analizuj` wypisuje z rozmowy każdą pozycję: typ, właściciela, termin, warunek, status i dosłowny cytat.
 2. **Weryfikacja.** Pozycje bez dosłownego cytatu są usuwane. Gdy ktoś zmienił zdanie, zostaje ostatnia wersja. Błąd jest oddzielony od nowej funkcji, a zakazy zapisane osobno. Daty są zestawione ze sobą. To, co nie wynika wprost z cytatu, jest oznaczone jako **wniosek**. Cytaty są po to, żeby każdą pozycję dało się sprawdzić w kilka sekund i żeby model nie dopisywał ustaleń, które nie padły.
-3. **Raport.** Stały skrypt `render.py` zamienia `wynik.json` w `raport.html`. Wcześniej porównuje każdy cytat z transkrypcją i odmawia, jeśli któryś nie jest dosłowny. Stały skrypt zamiast HTML pisanego za każdym razem od nowa daje ten sam układ przy każdej rozmowie i twardą kontrolę cytatów.
-4. **Człowiek zatwierdza.** Nic nie trafia do klienta automatycznie. Szkic maila i lista zadań to propozycja do przejrzenia.
+3. **Daty liczy kod.** Model wypisuje surowe fakty czasowe (`fakty_czasowe`): urlopy, blokady, terminy i najwcześniejsze starty z dosłownymi cytatami. Skrypt `daty.py` oblicza z nich wolne okna robocze (Pn–Pt) dla każdej sprawy, stosując blokady specyficzne i globalne (np. urlop = blokada dla wszystkich). Wynik trafia do `okna_czasowe` w `wynik.json`. Model nie liczy konfliktów sam — zamiast tego dostarcza dane, kod robi arytmetykę.
+4. **Raport.** Stały skrypt `render.py` zamienia `wynik.json` w `raport.html`. Wcześniej porównuje każdy cytat — w pozycjach, aktualizacjach i `fakty_czasowe` — z transkrypcją i odmawia, jeśli któryś nie jest dosłowny. Stały skrypt zamiast HTML pisanego za każdym razem od nowa daje ten sam układ przy każdej rozmowie i twardą kontrolę cytatów.
+5. **Człowiek zatwierdza.** Nic nie trafia do klienta automatycznie. Szkic maila i lista zadań to propozycja do przejrzenia.
 
 ```mermaid
 flowchart LR
     A[transkrypcja .md] --> B["/analizuj<br/>ekstrakcja → weryfikacja"]
-    B --> C[wynik.json]
-    C --> D["render.py<br/>sprawdzenie cytatów"]
-    D --> E[raport.html]
-    E --> F{człowiek zatwierdza}
-    F -.następny krok.-> G[Linear / Gmail / kalendarz / CRM]
+    B --> C[wynik.json\nfakty_czasowe]
+    C --> D["daty.py<br/>okna robocze"]
+    D --> C2[wynik.json\nokna_czasowe]
+    C2 --> E["render.py<br/>sprawdzenie cytatów"]
+    E --> F[raport.html]
+    F --> G{człowiek zatwierdza}
+    G -.następny krok.-> H[Linear / Gmail / kalendarz / CRM]
 ```
 
 ## Jak uruchomić
 
-1. Otwórz Claude Code w tym folderze (`C:\Users\User\analizy`).
+### Jeden przebieg end-to-end (zalecane)
+
+```bash
+python3 przetworz.py ops/transkrypcje/<klient>/<plik>.md
+```
+
+Skrypt: sprawdza rejestr (pomija, jeśli już przetworzona), uruchamia analizę Claude, render.py, daty.py, linear_sync.py, wysyła Slack i rejestruje. Wymaga `LINEAR_API_KEY` i `SLACK_WEBHOOK_URL` w `.env`.
+
+```bash
+python3 przetworz.py ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md --wymus  # wymuś ponowne przetworzenie
+```
+
+### Krok po kroku (ręcznie)
+
+1. Otwórz Claude Code w tym folderze.
 2. Wpisz: `/analizuj ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` (albo podaj inny plik `.md`).
-3. Wynik pojawi się w `wyniki/<nazwa transkrypcji>/`: `wynik.json` i `raport.html`.
+3. Po zapisaniu `wynik.json` uruchom daty.py i render.py:
+
+```bash
+python -I daty.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json
+python -I render.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json --transkrypcja ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
+```
 
 Jeśli komenda `/analizuj` nie pojawi się na liście, wpisz zamiast niej:
 
@@ -31,24 +53,59 @@ Jeśli komenda `/analizuj` nie pojawi się na liście, wpisz zamiast niej:
 Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 ```
 
-(gdzie `X.md` to plik transkrypcji).
-
-Raport można też przegenerować ręcznie:
-
-```
-python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
-```
-
 ## Struktura
 
 | Plik | Rola |
 |---|---|
-| `.claude/commands/analizuj.md` | instrukcja dla Claude Code (kroki, schemat JSON) |
-| `render.py` | walidacja schematu i cytatów, generowanie raportu (sama biblioteka standardowa Pythona) |
+| `.claude/commands/analizuj.md` | instrukcja dla Claude Code (kroki, schemat JSON, zapis w częściach) |
+| `render.py` | walidacja schematu i cytatów (w tym fakty_czasowe), generowanie raportu |
+| `daty.py` | oblicza wolne okna robocze z fakty_czasowe, zapisuje okna_czasowe do wynik.json |
+| `przetworz.py` | automat end-to-end: rejestr → Claude → daty.py → render.py → Linear → Slack |
+| `linear_sync.py` | wysyła wynik.json do Linear (team RIN); idempotentny po klucz_sprawy |
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
+| `logi/przebiegi/` | logi automatycznych przebiegów przetworz.py |
 | `logi/` | logi z pracy z AI (sesje Claude Code: surowe `.jsonl` i czytelne `.md`) |
+
+## Automat przetwarzania (`przetworz.py`)
+
+`przetworz.py` uruchamia pełen pipeline bez interakcji:
+
+```
+transkrypcja.md
+  → sha256 check (rejestr)
+  → claude --print (analizuj.md) → wynik.json
+  → render.py (sprawdzenie cytatów) → raport.html
+  → daty.py (okna robocze) → wynik.json [okna_czasowe]
+  → linear_sync.py → Linear
+  → Slack (podsumowanie z linkami)
+  → rejestr (hash transkrypcji)
+```
+
+Wymagane zmienne w `.env`:
+- `LINEAR_API_KEY` — klucz API Linear (team RIN)
+- `SLACK_WEBHOOK_URL` — webhook do kanału powiadomień
+
+Zabezpieczenia: lock file (jeden przebieg jednocześnie), rejestr rejestruje dopiero po pełnym sukcesie (retry jest bezpieczny), klucze nigdy nie trafiają do logów.
+
+Log trafia do `logi/przebiegi/<timestamp>-<klient>.log`.
+
+## Daty liczy kod (`daty.py`)
+
+```bash
+python3 -I daty.py wyniki/<klient>/<nazwa>/wynik.json
+```
+
+Czyta pole `fakty_czasowe` (ekstrahowane przez model z transkrypcji), oblicza wolne okna robocze Pn–Pt dla każdej sprawy i zapisuje wynik w `okna_czasowe`. Typy faktów:
+
+| Typ | Znaczenie |
+|---|---|
+| `urlop` / `blokada` | Okres, w którym nie można pracować nad zadaniem |
+| `termin` | Ostateczny termin dla danej sprawy |
+| `start_nie_wczesniej` | Najwcześniejsza data startu |
+
+`dotyczy: "wszystko_nowe"` = blokada globalna (np. urlop = blokuje wszystkie nowe wdrożenia).
 
 ## Synchronizacja z Linear
 
@@ -69,7 +126,7 @@ Wymaga `LINEAR_API_KEY` w `.env`. Klucz musi mieć dostęp do zespołu `RIN`.
 - Sekcja 5 (ryzyka) → **Todo** + etykieta **Ryzyko** + priorytet High; przy ≥ 2 wystąpieniach tego samego `temat_ryzyka` → etykieta **Powtarzające się ryzyko** + Urgent.
 - **Strażnik zakazów**: pozycja z `konflikt_z_zakazem` → **Backlog** + etykieta **Zablokowane przez zakaz**, bez **Dla agenta**.
 - **Pewność niska**: `pewnosc: niska` → etykieta **Do weryfikacji**.
-- **Idempotentny (sha256)**: ta sama treść `wynik.json` → pominięcie. Inne źródło dla tej samej `klucz_sprawy` → komentarz w istniejącym zgłoszeniu.
+- **Idempotentny po klucz_sprawy**: ta sama `klucz_sprawy` z innego źródła → komentarz w istniejącym zgłoszeniu. Ochrona przed duplikatami opiera się na kluczu sprawy, nie na sha256 pliku.
 - **Aktualizacje otwartych spraw**: `aktualizacje_spraw` z wynik.json → zmiana stanu istniejącego zgłoszenia w Linear (Todo/Done/Cancelled).
 - Po każdym przebiegu regeneruje `ops/klienci/<klient>/karta.md`.
 
@@ -84,7 +141,7 @@ Kontekst klienta jest przechowywany w `ops/klienci/<klient>/karta.json`:
 
 `ops/produkt/prosby.json` — globalna lista próśb o funkcje produktowe, mapowanie `klucz_funkcji → [{klient, cytat, zrodlo}]`. Przy ≥ 2 klientach → etykieta **Wielu klientów**.
 
-`ops/.przetworzone.json` — rejestr sha256 przetworzonych `wynik.json`. Zapobiega podwójnemu wysyłaniu.
+`ops/.przetworzone.json` — rejestr sha256 **transkrypcji** (nie wynik.json). `przetworz.py` pomija transkrypcje, których hash jest już w rejestrze; rejestruje dopiero po pełnym sukcesie (Linear + Slack). Flaga `--wymus` pomija sprawdzenie.
 
 ## Struktura ops/
 
@@ -96,7 +153,8 @@ ops/
     karta.md                    – czytelna wersja karty (generowana przez linear_sync.py)
   produkt/
     prosby.json                 – globalna lista próśb o funkcje (aktualizowana przez linear_sync.py)
-  .przetworzone.json            – rejestr sha256 przetworzonych wynik.json
+  .przetworzone.json            – rejestr sha256 transkrypcji (zarządza przetworz.py)
+  .przetworz.lock               – lock file (jeden przebieg jednocześnie)
 ```
 
 ## Założenia
@@ -129,7 +187,7 @@ Znane ograniczenia:
 - **Integracje po zatwierdzeniu:** zadania do Linear, szkic maila do Gmaila (jako szkic, nie wysyłka), spotkania do kalendarza, notatka do CRM.
 - **Zatwierdzanie w raporcie:** przy każdej pozycji akceptuj, popraw albo odrzuć, a dopiero potem eksport.
 - **Historia klienta:** zakazy i ustalenia z poprzednich rozmów jako kontekst do następnej analizy, z wykrywaniem sprzeczności.
-- **Kalendarz w kodzie:** konflikty dat liczone przez skrypt, a nie przez model, żeby nie gubić okien takich jak „od 26.10”.
+- ~~**Kalendarz w kodzie:**~~ Zrealizowane w `daty.py` — model dostarcza `fakty_czasowe`, kod oblicza wolne okna robocze.
 
 ## Logi
 

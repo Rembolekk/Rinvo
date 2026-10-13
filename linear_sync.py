@@ -8,7 +8,6 @@ Użycie:
   python linear_sync.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json --klient auto-tama --dry-run
 """
 
-import hashlib
 import json
 import os
 import ssl
@@ -333,21 +332,6 @@ def save_prosby(prosby):
     path.write_text(json.dumps(prosby, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-def load_przetworzone():
-    path = Path("ops/.przetworzone.json")
-    if path.exists():
-        return json.loads(path.read_text(encoding="utf-8"))
-    return {}
-
-
-def save_przetworzone(reg):
-    path = Path("ops/.przetworzone.json")
-    path.write_text(json.dumps(reg, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-
-
-def content_hash(wynik_path):
-    return hashlib.sha256(wynik_path.read_bytes()).hexdigest()
-
 
 # ── logika: etykiety i priorytety ─────────────────────────────────────────────
 
@@ -586,15 +570,6 @@ def main():
     wynik_path = Path(args.wynik)
     if not wynik_path.exists():
         sys.exit(f"Błąd: plik nie istnieje: {args.wynik}")
-
-    # Rejestr przetworzonych plików (ta sama treść → nic nie rób)
-    wynik_hash = content_hash(wynik_path)
-    przetworzone = load_przetworzone()
-    if wynik_hash in przetworzone and not args.dry_run:
-        entry = przetworzone[wynik_hash]
-        print(f"Pominięto: ta sama treść wynik.json była już przetworzona "
-              f"({entry.get('przetworzono', '?')}, {entry.get('klient', '?')}).")
-        sys.exit(0)
 
     wynik = json.loads(wynik_path.read_text(encoding="utf-8"))
     klient = args.klient
@@ -855,12 +830,6 @@ def main():
         save_karta(klient, karta)
         write_karta_md(klient, karta)
         save_prosby(prosby)
-        przetworzone[wynik_hash] = {
-            "plik": source,
-            "klient": klient,
-            "przetworzono": str(date.today()),
-        }
-        save_przetworzone(przetworzone)
 
     print(f"\n{'─'*60}")
     print(f"Podsumowanie:")
