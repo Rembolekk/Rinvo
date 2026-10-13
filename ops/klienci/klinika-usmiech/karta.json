@@ -1,0 +1,15 @@
+{
+  "klient": "klinika-usmiech",
+  "decydenci": [
+    {
+      "imie": "Ania Zielińska",
+      "rola": "kierowniczka rejestracji, kontakt główny"
+    },
+    {
+      "imie": "dr Nowak",
+      "rola": "właściciel kliniki, decyduje o kosztach i nowych usługach"
+    }
+  ],
+  "zakazy": [],
+  "otwarte_sprawy": {}
+}

@@ -22,7 +22,7 @@ flowchart LR
 ## Jak uruchomić
 
 1. Otwórz Claude Code w tym folderze (`C:\Users\User\analizy`).
-2. Wpisz: `/analizuj transkrypcja-spotkanie.md` (albo podaj inny plik `.md`).
+2. Wpisz: `/analizuj ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` (albo podaj inny plik `.md`).
 3. Wynik pojawi się w `wyniki/<nazwa transkrypcji>/`: `wynik.json` i `raport.html`.
 
 Jeśli komenda `/analizuj` nie pojawi się na liście, wpisz zamiast niej:
@@ -36,7 +36,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 Raport można też przegenerować ręcznie:
 
 ```
-python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja transkrypcja-spotkanie.md
+python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
 ```
 
 ## Struktura
@@ -45,10 +45,40 @@ python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja tran
 |---|---|
 | `.claude/commands/analizuj.md` | instrukcja dla Claude Code (kroki, schemat JSON) |
 | `render.py` | walidacja schematu i cytatów, generowanie raportu (sama biblioteka standardowa Pythona) |
-| `transkrypcja-spotkanie.md` | przykładowa transkrypcja (fikcyjna) |
+| `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
 | `logi/` | logi z pracy z AI (sesje Claude Code: surowe `.jsonl` i czytelne `.md`) |
+
+## Synchronizacja z Linear
+
+Po przejrzeniu raportu: wyślij pozycje do Linear jednym poleceniem.
+
+```bash
+python linear_sync.py wyniki/<nazwa>/wynik.json --klient <slug>
+python linear_sync.py wyniki/<nazwa>/wynik.json --klient auto-tama --dry-run
+```
+
+Wymaga `LINEAR_API_KEY` w `.env`. Klucz musi mieć dostęp do zespołu `RIN`.
+
+- Sprawdza i tworzy brakujące etykiety w zespole.
+- Sekcja 1 (zrób teraz) → stan **Todo**; typ `bug`/`zmiana_konfiguracji`/`poprawka_bazy_wiedzy` dostaje też etykietę **Dla agenta**.
+- Sekcja 2 (czeka na klienta) → **Backlog** + etykieta **Czeka na klienta**.
+- Sekcja 3 (backlog produktowy) → **Backlog** + etykieta **Produkt**.
+- Sekcja 4 (zakazy) → zapisuje do `ops/klienci/<klient>/karta.json`, **bez zgłoszenia w Linear**.
+- Sekcja 5 (ryzyka) → **Todo** + etykieta **Ryzyko** + priorytet High.
+- **Idempotentny**: przy kolejnym uruchomieniu dodaje komentarz do istniejącego zgłoszenia, nie tworzy duplikatu.
+- Po każdym przebiegu regeneruje `ops/klienci/<klient>/karta.md`.
+
+## Struktura ops/
+
+```
+ops/
+  transkrypcje/<klient>/        – transkrypcje rozmów
+  klienci/<klient>/
+    karta.json                  – zakazy, decydenci, mapowanie klucz → Linear
+    karta.md                    – czytelna wersja karty (generowana przez linear_sync.py)
+```
 
 ## Założenia
 
