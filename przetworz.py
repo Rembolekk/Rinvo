@@ -186,15 +186,20 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
     ostrzezenia = d.get("ostrzezenia_dat", [])
 
     nowe = 0
+    n_aktualizacji = 0
+    pominieto = 0
     for line in sync_stdout.splitlines():
         if "Utworzono zgłoszeń:" in line:
             try:
                 nowe = int(line.split(":")[-1].strip())
             except ValueError:
                 pass
-    pominieto = 0
-    for line in sync_stdout.splitlines():
-        if "Pominięto (ta sama rozmowa):" in line:
+        elif "Aktualizacje otwartych spraw:" in line:
+            try:
+                n_aktualizacji = int(line.split(":")[-1].strip())
+            except ValueError:
+                pass
+        elif "Pominięto (ta sama rozmowa):" in line:
             try:
                 pominieto = int(line.split(":")[-1].strip())
             except ValueError:
@@ -210,7 +215,8 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
         lines.append(f":no_entry: Zablokowane przez zakaz: {len(blocked)}")
     if niska:
         lines.append(f":warning: Do weryfikacji (pewność niska): {len(niska)}")
-    if aktualizacje:
+    # Show reopened only when linear_sync actually processed updates (not pominięte)
+    if n_aktualizacji > 0:
         reopened = [a for a in aktualizacje if a.get("nowy_status") == "zrob_teraz"]
         if reopened:
             lines.append(f":arrows_counterclockwise: Wznowione sprawy: {len(reopened)}")

@@ -10,6 +10,7 @@ Użycie:
 
 import json
 import os
+import re
 import ssl
 import sys
 import time
@@ -18,6 +19,12 @@ import urllib.request
 import urllib.error
 from datetime import date
 from pathlib import Path
+
+
+def _date_from_path(path_str):
+    """Extract YYYY-MM-DD from a transcript filename, e.g. '2026-10-06-call.md' → '2026-10-06'."""
+    m = re.search(r'(\d{4}-\d{2}-\d{2})', Path(str(path_str)).name)
+    return m.group(1) if m else ""
 
 # ── progi ────────────────────────────────────────────────────────────────────
 
@@ -471,7 +478,7 @@ def build_clients_comment(prosby, klucz):
 
 # ── aktualizacje otwartych spraw ──────────────────────────────────────────────
 
-def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run):
+def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, meeting_date=""):
     aktualizacje = wynik.get("aktualizacje_spraw", [])
     if not aktualizacje:
         return 0
@@ -513,6 +520,23 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run):
             continue
         linear_id = issue_info.get("linear_id", "")
         identifier = issue_info.get("identifier", klucz)
+
+        # Ponowna analiza tej samej rozmowy nie może aktualizować spraw, które sama utworzyła.
+        # Aktualizacja wymaga rozmowy PÓŹNIEJSZEJ niż ta, z której sprawa pochodzi.
+        issue_sources = issue_info.get("zrodla", [])
+        if source in issue_sources:
+            print(f"  [pominięto aktualizację] {identifier} ({klucz}): ta sama rozmowa ({source})")
+            continue
+        issue_date = issue_info.get("data_spotkania", "")
+        if not issue_date:
+            for s in issue_sources:
+                issue_date = _date_from_path(s)
+                if issue_date:
+                    break
+        if issue_date and meeting_date and meeting_date <= issue_date:
+            print(f"  [pominięto aktualizację] {identifier} ({klucz}): "
+                  f"data rozmowy {meeting_date} nie jest późniejsza niż data sprawy {issue_date}")
+            continue
 
         if dry_run:
             print(f"  [aktualizacja] {klucz} ({identifier}) → {nowy_status}")
@@ -575,6 +599,7 @@ def main():
     klient = args.klient
     source = wynik.get("zrodlo", str(wynik_path))
     today = wynik.get("wygenerowano", str(date.today()))
+    meeting_date = wynik.get("spotkanie", {}).get("data", "")
 
     karta = load_karta(klient)
     prosby = load_prosby()
@@ -641,13 +666,12 @@ def main():
     # ── aktualizacje otwartych spraw ──────────────────────────────────────────
 
     if args.dry_run:
-        aktualizacje_dry = wynik.get("aktualizacje_spraw", [])
-        for upd in aktualizacje_dry:
-            print(f"  [aktualizacja] {upd.get('klucz_sprawy')} → {upd.get('nowy_status')}")
-        n_upd = len(aktualizacje_dry)
+        n_upd = process_aktualizacje(
+            None, wynik, karta, state_ids, label_map, dry_run=True, meeting_date=meeting_date
+        )
     else:
         n_upd = process_aktualizacje(
-            api_key, wynik, karta, state_ids, label_map, dry_run=False
+            api_key, wynik, karta, state_ids, label_map, dry_run=False, meeting_date=meeting_date
         )
 
     if wynik.get("aktualizacje_spraw") or dodano_zakazow:
@@ -796,6 +820,7 @@ def main():
             "url": url,
             "tytul": item["tytul"],
             "zrodla": [source],
+            "data_spotkania": meeting_date,
         }
 
         print(f"  ✓ {identifier} ({klucz}): {tytul[:50]}")

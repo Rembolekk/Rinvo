@@ -14,25 +14,28 @@ from datetime import date, timedelta
 from pathlib import Path
 
 
-# Słowa sugerujące ograniczenie czasowe — siatka bezpieczeństwa
+# Frazy sugerujące ograniczenie przyszłego działania — siatka bezpieczeństwa.
+# Celowo nie zawierają samodzielnych nazw dni (wtorek, środa…) ani słów opisujących
+# przeszłość (tydzień temu, w sobotę ktoś zadzwonił), bo te wywołują fałszywe alarmy.
 TEMPORAL_WORDS = [
-    "tydzień", "tygodniu", "tygodnia", "tygodni", "tygodniow",
+    # Urlop = zawsze ograniczenie
     "urlop", "urlopu", "urlopie", "urlopem",
-    "poniedziałek", "poniedziałku",
-    "wtorek", "wtorku",
-    "środa", "środę", "środy", "środzie",
-    "czwartek", "czwartku",
-    "piątek", "piątku",
-    "sobota", "sobotę", "soboty",
-    "niedziela", "niedzielę", "niedzieli",
-    "miesiąc", "miesiącu", "miesiąca", "miesięcznie", "miesięczn",
-    "kwartał", "kwartale",
-    "termin", "terminu",
-    "wcześniej", "później",
-    "po powrocie", "po urlopie",
-    "w tym tygodniu", "przyszłym tygodniu", "następnym tygodniu",
-    "do końca", "do jutra",
-    "tego tygodnia",
+    # Frazy wskazujące na przyszłe ograniczenie
+    "po urlopie", "po powrocie",
+    "nie wcześniej",
+    # Konkretny tydzień / miesiąc / kwartał jako ograniczenie
+    "w tym tygodniu", "przyszłym tygodniu", "następnym tygodniu", "tego tygodnia",
+    "w tym miesiącu", "w tym kwartale", "w przyszłym kwartale",
+    # Terminy z przyimkiem "do" + okres (deadline)
+    "do końca tygodnia", "do końca miesiąca", "do końca dnia",
+    "do jutra",
+    "do czwartku", "do piątku", "do środy", "do wtorku", "do poniedziałku",
+    "do soboty", "do niedzieli",
+    # Starty z przyimkiem "od" + dzień tygodnia (start constraint)
+    "od wtorku", "od środy", "od czwartku", "od piątku",
+    "od poniedziałku", "od soboty",
+    # Rozliczenia cykliczne
+    "miesięcznie",
 ]
 
 
@@ -252,13 +255,19 @@ def main():
     d["okna_czasowe"] = okna_czasowe
 
     # ── ostrzezenia_dat: pozycje z cytatami o czasie bez faktu czasowego ─────
+    # Sekcja 1+2 objęte blokadą ogólną są już w okna_czasowe — nie flagujemy ich.
     keys_with_facts = keys_from_fakty  # keys that have their own fakty entry
+    has_global_blocks = len(global_blocks) > 0
     ostrzezenia = []
     for p in pozycje:
-        if p.get("sekcja") not in (1, 2, 3):
+        sekcja = p.get("sekcja")
+        if sekcja not in (1, 2, 3):
             continue
         klucz = p.get("klucz_sprawy", "")
         if klucz in keys_with_facts:
+            continue
+        # Sekcja 1+2 items covered by global blocks already have windows computed
+        if sekcja in (1, 2) and has_global_blocks:
             continue
         cytaty = " ".join(p.get("cytat", []))
         if has_temporal_word(cytaty):
