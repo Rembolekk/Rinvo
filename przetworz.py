@@ -4,14 +4,15 @@
 Użycie:
   python3 przetworz.py ops/transkrypcje/<klient>/<plik>.md
   python3 przetworz.py ops/transkrypcje/<klient>/<plik>.md --wymus
+  python3 przetworz.py --test-slack
 
 Kroki:
   a) Wyznacz klienta ze ścieżki (ops/transkrypcje/<klient>/...)
   b) Sprawdź rejestr sha256 transkrypcji — pomiń jeśli już przetworzona (--wymus pomija)
   c) Zablokuj plik lock (zapobiega równoległym przebiegom)
-  d) Uruchom claude -p z instrukcją analizuj.md (do 30 min)
+  d) Uruchom claude --print z instrukcją analizuj.md (do 30 min)
   e) Uruchom render.py → daty.py → linear_sync.py
-  f) Wyślij podsumowanie do Slack (SLACK_WEBHOOK_URL z .env)
+  f) Wyślij podsumowanie do Slack (SLACK_WEBHOOK_URL z .env) — zawsze, niezależnie od liczby nowych zgłoszeń
   g) Zarejestruj sha256 transkrypcji tylko po pełnym sukcesie
 
 Klucze API czytane z .env — nigdy nie są logowane ani drukowane.
@@ -21,6 +22,7 @@ import argparse
 import hashlib
 import json
 import os
+import re
 import subprocess
 import sys
 import time
@@ -100,12 +102,19 @@ def release_lock():
 
 # ── slack ─────────────────────────────────────────────────────────────────────
 
-def send_slack(message):
-    webhook = os.environ.get("SLACK_WEBHOOK_URL", "")
-    if not webhook:
-        return
+def send_slack(message, log_path=None):
+    """Send Slack message. Returns (ok: bool, error: str|None).
+    Logs result to log_path if provided. Never logs the webhook URL."""
     import ssl
     import urllib.request
+
+    webhook = os.environ.get("SLACK_WEBHOOK_URL", "")
+    if not webhook:
+        note = "SLACK_WEBHOOK_URL nie ustawiony w .env — pominięto Slack."
+        if log_path:
+            _log(log_path, f"Slack: {note}\n")
+        return False, note
+
     payload = json.dumps({"text": message}).encode("utf-8")
     req = urllib.request.Request(
         webhook,
@@ -114,11 +123,29 @@ def send_slack(message):
         method="POST",
     )
     try:
-        ctx = ssl.create_default_context()
-        with urllib.request.urlopen(req, timeout=30, context=ctx):
-            pass
-    except Exception:
-        pass  # Slack alert failure is not fatal
+        try:
+            import certifi
+            ctx = ssl.create_default_context(cafile=certifi.where())
+        except ImportError:
+            ctx = ssl.create_default_context()
+        with urllib.request.urlopen(req, timeout=30, context=ctx) as resp:
+            status = resp.status
+        if log_path:
+            _log(log_path, f"Slack: wysłano (HTTP {status})\n")
+        return True, None
+    except Exception as exc:
+        err = str(exc)
+        if log_path:
+            _log(log_path, f"Slack: BŁĄD wysyłki — {err}\n")
+        return False, err
+
+
+def _log(log_path, text):
+    try:
+        with open(log_path, "a", encoding="utf-8") as lf:
+            lf.write(text)
+    except OSError:
+        pass
 
 
 # ── subprocesy ────────────────────────────────────────────────────────────────
@@ -156,8 +183,8 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
     blocked = [p for p in pozycje if p.get("konflikt_z_zakazem")]
     niska = [p for p in pozycje if p.get("pewnosc") == "niska"]
     aktualizacje = d.get("aktualizacje_spraw", [])
+    ostrzezenia = d.get("ostrzezenia_dat", [])
 
-    # Parse new issue count from linear_sync output
     nowe = 0
     for line in sync_stdout.splitlines():
         if "Utworzono zgłoszeń:" in line:
@@ -165,9 +192,19 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
                 nowe = int(line.split(":")[-1].strip())
             except ValueError:
                 pass
+    pominieto = 0
+    for line in sync_stdout.splitlines():
+        if "Pominięto (ta sama rozmowa):" in line:
+            try:
+                pominieto = int(line.split(":")[-1].strip())
+            except ValueError:
+                pass
 
     lines = [f":white_check_mark: *[{klient}]* Rozmowa z {data} przetworzona"]
-    lines.append(f"Zrób teraz: {len(s1)} | Czeka: {len(s2)} | Ryzyka: {len(s5)} | Nowe w Linear: {nowe}")
+    lines.append(
+        f"Zrób teraz: {len(s1)} | Czeka: {len(s2)} | Ryzyka: {len(s5)} | "
+        f"Nowe w Linear: {nowe} | Pominięte: {pominieto}"
+    )
 
     if blocked:
         lines.append(f":no_entry: Zablokowane przez zakaz: {len(blocked)}")
@@ -177,8 +214,8 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
         reopened = [a for a in aktualizacje if a.get("nowy_status") == "zrob_teraz"]
         if reopened:
             lines.append(f":arrows_counterclockwise: Wznowione sprawy: {len(reopened)}")
-
-    # Repeat risks from linear_sync output
+    if ostrzezenia:
+        lines.append(f":clock1: Brak faktów czasowych dla {len(ostrzezenia)} pozycji z cytatami o czasie")
     if any("Powtarzające się ryzyko" in ln for ln in sync_stdout.splitlines()):
         lines.append(":rotating_light: Powtarzające się ryzyko — sprawdź Linear")
 
@@ -188,7 +225,6 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
         try:
             karta = json.loads(karta_path.read_text(encoding="utf-8"))
             otwarte = karta.get("otwarte_sprawy", {})
-            added = 0
             for p in s1[:5]:
                 klucz = p.get("klucz_sprawy", "")
                 if klucz in otwarte and isinstance(otwarte[klucz], dict):
@@ -197,7 +233,6 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
                     ident = info.get("identifier", klucz)
                     if url:
                         lines.append(f"  • <{url}|{ident}> {p['tytul'][:60]}")
-                        added += 1
             if len(s1) > 5:
                 lines.append(f"  … i {len(s1) - 5} więcej")
         except Exception:
@@ -220,10 +255,27 @@ def main():
     parser = argparse.ArgumentParser(
         description="Przetwarza transkrypcję od początku do końca."
     )
-    parser.add_argument("transkrypcja", help="Ścieżka do pliku transkrypcji .md")
+    parser.add_argument("transkrypcja", nargs="?",
+                        help="Ścieżka do pliku transkrypcji .md")
     parser.add_argument("--wymus", action="store_true",
                         help="Pomiń rejestr i przetworz ponownie")
+    parser.add_argument("--test-slack", action="store_true",
+                        help="Wyślij wiadomość testową na Slack i zakończ")
     args = parser.parse_args()
+
+    # ── --test-slack ──────────────────────────────────────────────────────────
+    if args.test_slack:
+        msg = f":test_tube: przetworz.py test Slack — {datetime.now().strftime('%Y-%m-%d %H:%M')}"
+        ok, err = send_slack(msg)
+        if ok:
+            print("OK: wiadomość testowa wysłana na Slack.")
+        else:
+            print(f"BŁĄD Slack: {err}", file=sys.stderr)
+            sys.exit(1)
+        sys.exit(0)
+
+    if not args.transkrypcja:
+        parser.error("Podaj ścieżkę do transkrypcji albo użyj --test-slack.")
 
     transkrypcja = args.transkrypcja
 
@@ -268,8 +320,12 @@ def main():
 
     def fail(step, msg):
         full = f"BŁĄD w kroku '{step}': {msg}"
+        _log(log_path, f"\n{full}\n")
         print(full, file=sys.stderr)
-        send_slack(f":x: *[{klient}]* przetworz.py — błąd w `{step}`\n{msg}\nLog: `{log_path}`")
+        send_slack(
+            f":x: *[{klient}]* przetworz.py — błąd w `{step}`\n{msg}\nLog: `{log_path}`",
+            log_path=log_path,
+        )
         release_lock()
         sys.exit(1)
 
@@ -277,15 +333,13 @@ def main():
         print(f"Przetwarzam: {transkrypcja}  (klient: {klient})")
         print(f"Log: {log_path}")
 
-        # d) claude -p
+        # d) claude --print
         cmd_file = Path(".claude/commands/analizuj.md")
         if not cmd_file.exists():
             fail("claude", f"Brak pliku komendy: {cmd_file}")
 
-        # Strip YAML frontmatter (--- ... --- block) — it's metadata for the CLI,
-        # not part of the instructions sent to the model.
-        import re
         raw = cmd_file.read_text(encoding="utf-8")
+        # Strip YAML frontmatter
         prompt = re.sub(r"^---\n.*?\n---\n", "", raw, count=1, flags=re.DOTALL)
         prompt = prompt.replace("$ARGUMENTS", transkrypcja).strip()
 
@@ -332,7 +386,7 @@ def main():
             log_path, "render.py", timeout=120
         )
         if r.returncode != 0:
-            fail("render", f"render.py zakończył się błędem (kod {r.returncode}). Log: {log_path}")
+            fail("render", f"render.py kod {r.returncode}. Log: {log_path}")
 
         # daty.py
         print("  daty.py…")
@@ -341,7 +395,7 @@ def main():
             log_path, "daty.py", timeout=60
         )
         if r.returncode != 0:
-            fail("daty", f"daty.py zakończył się błędem (kod {r.returncode}). Log: {log_path}")
+            fail("daty", f"daty.py kod {r.returncode}. Log: {log_path}")
 
         # linear_sync.py
         print("  linear_sync.py…")
@@ -360,9 +414,14 @@ def main():
         if sync_result.returncode != 0:
             fail("linear_sync", f"Kod {sync_result.returncode}. Log: {log_path}")
 
-        # f) Slack
+        # f) Slack — zawsze, niezależnie od liczby nowych zgłoszeń
         summary = build_slack_summary(klient, wynik_path, sync_stdout)
-        send_slack(summary)
+        _log(log_path, f"\n{'='*60}\n=== Slack ===\n{'='*60}\n")
+        slack_ok, slack_err = send_slack(summary, log_path=log_path)
+        if slack_ok:
+            print("  Slack: wysłano.")
+        else:
+            print(f"  Slack: BŁĄD — {slack_err}", file=sys.stderr)
         print(f"\n{summary}")
 
         # g) rejestr

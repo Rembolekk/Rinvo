@@ -5,13 +5,35 @@ Użycie:
   python -I daty.py wyniki/<klient>/<nazwa>/wynik.json
 
 Czyta pole fakty_czasowe z wynik.json, oblicza wolne okna robocze (Pn–Pt) dla każdej
-sprawy uwzględniając blokady specyficzne i globalne (dotyczy="wszystko_nowe"),
-i zapisuje wynik w polu okna_czasowe.
+sprawy z sekcji 1 i 2 (i dla każdego klucza z fakty_czasowe), uwzględniając blokady
+specyficzne i globalne (dotyczy="wszystko_nowe"). Zapisuje okna_czasowe i ostrzezenia_dat.
 """
 import json
 import sys
 from datetime import date, timedelta
 from pathlib import Path
+
+
+# Słowa sugerujące ograniczenie czasowe — siatka bezpieczeństwa
+TEMPORAL_WORDS = [
+    "tydzień", "tygodniu", "tygodnia", "tygodni", "tygodniow",
+    "urlop", "urlopu", "urlopie", "urlopem",
+    "poniedziałek", "poniedziałku",
+    "wtorek", "wtorku",
+    "środa", "środę", "środy", "środzie",
+    "czwartek", "czwartku",
+    "piątek", "piątku",
+    "sobota", "sobotę", "soboty",
+    "niedziela", "niedzielę", "niedzieli",
+    "miesiąc", "miesiącu", "miesiąca", "miesięcznie", "miesięczn",
+    "kwartał", "kwartale",
+    "termin", "terminu",
+    "wcześniej", "później",
+    "po powrocie", "po urlopie",
+    "w tym tygodniu", "przyszłym tygodniu", "następnym tygodniu",
+    "do końca", "do jutra",
+    "tego tygodnia",
+]
 
 
 def parse_date(s):
@@ -100,6 +122,11 @@ def compute_windows(start_date, blocks, deadline=None):
     return windows
 
 
+def has_temporal_word(text):
+    t = text.lower()
+    return any(w in t for w in TEMPORAL_WORDS)
+
+
 def main():
     for stream in (sys.stdout, sys.stderr):
         try:
@@ -123,13 +150,9 @@ def main():
         sys.exit(1)
 
     fakty = d.get("fakty_czasowe", [])
-    if not fakty:
-        print("Brak fakty_czasowe — okna_czasowe puste.")
-        d["okna_czasowe"] = []
-        wynik_path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-        sys.exit(0)
+    pozycje = d.get("pozycje", [])
 
-    # Validate
+    # Validate fakty
     VALID_TYPES = {"blokada", "urlop", "termin", "start_nie_wczesniej"}
     for f in fakty:
         if f.get("typ") not in VALID_TYPES:
@@ -156,16 +179,26 @@ def main():
             do = parse_date(f.get("do")) or od
             global_blocks.append((od, do))
 
-    # Collect keys referenced with specific constraints
-    keys = set()
+    # Keys from fakty_czasowe (specific constraints)
+    keys_from_fakty = set()
     for f in fakty:
         k = f.get("dotyczy", "")
         if k and k != "wszystko_nowe":
-            keys.add(k)
+            keys_from_fakty.add(k)
+
+    # Keys from pozycje sekcja 1+2 (always included when global blocks exist)
+    keys_from_pozycje = set()
+    for p in pozycje:
+        if p.get("sekcja") in (1, 2):
+            k = p.get("klucz_sprawy")
+            if k:
+                keys_from_pozycje.add(k)
+
+    all_keys = keys_from_fakty | keys_from_pozycje
 
     okna_czasowe = []
 
-    for klucz in sorted(keys):
+    for klucz in sorted(all_keys):
         specific_blocks = []
         deadlines = []
         start_nie_wczesniej = None
@@ -187,17 +220,25 @@ def main():
 
         all_blocks = global_blocks + specific_blocks
 
-        # Determine start
+        # Start date
         if start_nie_wczesniej:
             start = max(start_nie_wczesniej, meeting_date)
         else:
             start = meeting_date + timedelta(days=1)
 
-        deadline = min(deadlines) if deadlines else None
-
-        # Skip keys with no temporal constraints at all
-        if not all_blocks and deadline is None and start_nie_wczesniej is None:
+        # If there are no constraints at all, skip (nothing useful to show)
+        if not all_blocks and not deadlines and start_nie_wczesniej is None:
             continue
+
+        # Deadline: use only if it's reachable (after all blocks end).
+        # If all deadlines fall within blocks, drop them to avoid empty windows.
+        merged_for_check = merge_blocks(all_blocks)
+        reachable_deadlines = []
+        for dl in deadlines:
+            in_block = any(od <= dl <= do for od, do in merged_for_check)
+            if not in_block:
+                reachable_deadlines.append(dl)
+        deadline = min(reachable_deadlines) if reachable_deadlines else None
 
         windows = compute_windows(start, all_blocks, deadline)
 
@@ -209,6 +250,27 @@ def main():
             })
 
     d["okna_czasowe"] = okna_czasowe
+
+    # ── ostrzezenia_dat: pozycje z cytatami o czasie bez faktu czasowego ─────
+    keys_with_facts = keys_from_fakty  # keys that have their own fakty entry
+    ostrzezenia = []
+    for p in pozycje:
+        if p.get("sekcja") not in (1, 2, 3):
+            continue
+        klucz = p.get("klucz_sprawy", "")
+        if klucz in keys_with_facts:
+            continue
+        cytaty = " ".join(p.get("cytat", []))
+        if has_temporal_word(cytaty):
+            ostrzezenia.append({
+                "id": p.get("id", "?"),
+                "klucz_sprawy": klucz,
+                "tytul": p.get("tytul", ""),
+                "uwaga": "cytat zawiera słowa czasowe, brak wpisu w fakty_czasowe",
+            })
+
+    d["ostrzezenia_dat"] = ostrzezenia
+
     wynik_path.write_text(json.dumps(d, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     print(f"OK: okna_czasowe dla {len(okna_czasowe)} spraw → {wynik_path}")
@@ -217,6 +279,11 @@ def main():
             f'{w["od"]} – {w["do"] or "→"}' for w in o["okna"]
         )
         print(f"  {o['klucz_sprawy']}: {ws}")
+
+    if ostrzezenia:
+        print(f"\nOstrzeżenia (brak faktu czasowego): {len(ostrzezenia)}")
+        for w in ostrzezenia:
+            print(f"  {w['id']} {w['klucz_sprawy']}")
 
 
 if __name__ == "__main__":

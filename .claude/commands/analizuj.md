@@ -36,6 +36,7 @@ Sprawdź listę z kroku 1:
 - zakazy i ograniczenia ("nie rób", "nie wcześniej niż", "tylko raz", "nie wierzcie") zapisz jako osobne pozycje,
 - jeśli brakuje danych do działania (numer, nagranie, plik), status = czeka, nie zgaduj,
 - wypisz pole fakty_czasowe: każdy urlop, blokadę, termin i okno testów jako osobny wpis z polami typ (blokada/urlop/termin/start_nie_wczesniej), od i do (daty bezwzględne RRRR-MM-DD, przeliczone od daty spotkania; np. „w piątek" zamieniasz na datę), dotyczy (klucz_sprawy z sekcji 1–3 lub „wszystko_nowe" dla blokad globalnych jak urlop) i dosłowny cytat. Nie obliczaj konfliktów — zostaw konflikty_dat: []. Okna wolne oblicza skrypt daty.py po zapisaniu wynik.json,
+- dla każdej pozycji z sekcji 1–3: jeśli jej cytat zawiera ograniczenie czasowe odnoszące się wprost do tej sprawy (np. „tego nie robimy w tym tygodniu", „po urlopie", „do czwartku"), dodaj odpowiedni wpis do fakty_czasowe z dotyczy = klucz_sprawy tej pozycji. Jeśli jedno zdanie dotyczy wielu spraw, osobny wpis dla każdej. Urlopy i blokady globalne (dotyczy = „wszystko_nowe") wystarczą jako jeden wpis — nie trzeba ich powielać per sprawa,
 - każde stwierdzenie, które nie wynika wprost z cytatu (np. przeliczona data przypomnienia, domysł o intencji), przenieś do pola "wnioski",
 - połącz duplikaty.
 

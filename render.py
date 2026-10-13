@@ -102,11 +102,13 @@ def render(d, verified):
     zmiany = d.get("zmiany_zdania", [])
     konflikty = d.get("konflikty_dat", [])
     aktualizacje = d.get("aktualizacje_spraw", [])
+    ostrzezenia_dat = d.get("ostrzezenia_dat", [])
 
     tiles = "".join(f'<a class="tile" href="#s{k}"><b>{len(S[k])}</b><span>{e(t)}</span></a>' for k, t, _ in SECTIONS)
     tiles += f'<a class="tile alt" href="#zmiany"><b>{len(zmiany)}</b><span>Zmiany zdania</span></a>'
     tiles += f'<a class="tile alt" href="#konflikty"><b>{len(konflikty)}</b><span>Konflikty dat</span></a>'
     tiles += f'<a class="tile alt" href="#aktualizacje"><b>{len(aktualizacje)}</b><span>Zmiany w otwartych sprawach</span></a>'
+    tiles += f'<a class="tile alt" href="#ostrzezenia"><b>{len(ostrzezenia_dat)}</b><span>Ostrzeżenia dat</span></a>'
 
     changes = "".join(
         f'<li><b>{e(z.get("temat", ""))}</b>' + (f' <a href="#{e(z["pozycja"])}">{e(z["pozycja"])}</a>' if z.get("pozycja") else "") +
@@ -161,6 +163,19 @@ def render(d, verified):
     ver_txt += f" Usunięte z powodu braku cytatu: {usun}."
     n_wn = sum(len(p.get("wnioski", [])) for p in P) + sum(len(c.get("wnioski", [])) for c in konflikty)
     ver_txt += f" Wnioski, czyli stwierdzenia niewynikające wprost z cytatu, oznaczono etykietą „wniosek” ({n_wn})."
+
+    if ostrzezenia_dat:
+        ostrzez_items = "".join(
+            f'<li><code>{e(w.get("id","?"))}</code> <b>{e(w.get("klucz_sprawy",""))}</b>'
+            f' — {e(w.get("tytul",""))} <span class="tag">{e(w.get("uwaga",""))}</span></li>'
+            for w in ostrzezenia_dat
+        )
+        ostrzez_html = (
+            f'<h3 style="font-size:.95rem;margin:14px 0 6px;color:var(--wait)">'
+            f'Ostrzeżenia: cytat zawiera słowa czasowe, brak faktu w fakty_czasowe ({len(ostrzezenia_dat)})</h3>'
+            f'<ul>{ostrzez_items}</ul>')
+    else:
+        ostrzez_html = ""
 
     title = m.get("tytul", "Analiza rozmowy z klientem")
     meta_bits = [b for b in [
@@ -233,7 +248,7 @@ footer{{margin-top:40px;color:var(--mut);font-size:.85rem}}
 <div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol>{conf}</ol>{okna_html}</div>
 <div class="panel" id="aktualizacje"><h2>Zmiany w otwartych sprawach</h2><ul>{aktual_html}</ul></div>
 {secs}
-<footer><div class="panel"><h2>Weryfikacja</h2><p>{e(ver_txt)}</p>{"<ul>" + verh + "</ul>" if verh else ""}</div>
+<footer><div class="panel" id="ostrzezenia"><h2>Weryfikacja</h2><p>{e(ver_txt)}</p>{"<ul>" + verh + "</ul>" if verh else ""}{ostrzez_html}</div>
 Źródło: {e(d.get("zrodlo", ""))} · dane: wynik.json</footer>
 </div>
 <script>
