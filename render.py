@@ -59,6 +59,9 @@ def verify_quotes(d, transcript):
     for z in d.get("zmiany_zdania", []):
         if z.get("cytat") and norm(z["cytat"]) not in tr:
             missing.append(f"zmiana '{z.get('temat')}': {z['cytat']}")
+    for a in d.get("aktualizacje_spraw", []):
+        if a.get("cytat") and norm(a["cytat"]) not in tr:
+            missing.append(f"aktualizacja '{a.get('klucz_sprawy')}': {a['cytat']}")
     return missing
 
 
@@ -95,10 +98,12 @@ def render(d, verified):
     m = d.get("spotkanie", {})
     zmiany = d.get("zmiany_zdania", [])
     konflikty = d.get("konflikty_dat", [])
+    aktualizacje = d.get("aktualizacje_spraw", [])
 
     tiles = "".join(f'<a class="tile" href="#s{k}"><b>{len(S[k])}</b><span>{e(t)}</span></a>' for k, t, _ in SECTIONS)
     tiles += f'<a class="tile alt" href="#zmiany"><b>{len(zmiany)}</b><span>Zmiany zdania</span></a>'
     tiles += f'<a class="tile alt" href="#konflikty"><b>{len(konflikty)}</b><span>Konflikty dat</span></a>'
+    tiles += f'<a class="tile alt" href="#aktualizacje"><b>{len(aktualizacje)}</b><span>Zmiany w otwartych sprawach</span></a>'
 
     changes = "".join(
         f'<li><b>{e(z.get("temat", ""))}</b>' + (f' <a href="#{e(z["pozycja"])}">{e(z["pozycja"])}</a>' if z.get("pozycja") else "") +
@@ -108,6 +113,22 @@ def render(d, verified):
     conf = "".join(
         f'<li>{e(c.get("opis", ""))} <span class="refs">' + " ".join(f'<a href="#{e(i)}">{e(i)}</a>' for i in c.get("pozycje", [])) + "</span>" + wnioski(c.get("wnioski")) + "</li>"
         for c in konflikty) or "<li>Nie wykryto konfliktów dat.</li>"
+
+    NOWY_STATUS_LABEL = {"zrob_teraz": "zrób teraz", "zamknieta": "zamknięta", "anulowana": "anulowana"}
+    aktual_html = ""
+    for a in aktualizacje:
+        ns = a.get("nowy_status", "")
+        pewn = a.get("pewnosc", "")
+        pewn_tag = f' <span class="tag">{e(pewn)}</span>' if pewn == "niska" else ""
+        cyt = f'<blockquote>„{e(a["cytat"])}"</blockquote>' if a.get("cytat") else ""
+        aktual_html += (
+            f'<li><b>{e(a.get("klucz_sprawy", ""))}</b>'
+            f' <span class="tag st-{e(ns)}">{e(NOWY_STATUS_LABEL.get(ns, ns))}</span>'
+            f'{pewn_tag}'
+            f'<br>{e(a.get("uzasadnienie", ""))}'
+            f'{cyt}</li>'
+        )
+    aktual_html = aktual_html or "<li>Brak aktualizacji otwartych spraw.</li>"
 
     secs = ""
     for k, t, sub in SECTIONS:
@@ -176,6 +197,8 @@ h2 small{{color:var(--mut);font-weight:500;font-size:.95rem}}
 .st-czeka{{background:var(--waitbg);color:var(--wait);border-color:transparent;font-weight:600}}
 .st-backlog{{background:var(--backbg);color:var(--back);border-color:transparent;font-weight:600}}
 .st-nigdy{{background:var(--nobg);color:var(--no);border-color:transparent;font-weight:600}}
+.st-zamknieta{{background:var(--nowbg);color:var(--now);border-color:transparent;font-weight:600}}
+.st-anulowana{{background:var(--nobg);color:var(--no);border-color:transparent;font-weight:600}}
 .desc{{margin:6px 0}}
 .infer{{list-style:none;margin:6px 0;padding:0;font-size:.86rem;color:var(--mut)}}
 .infer li{{margin:3px 0 !important}}
@@ -195,6 +218,7 @@ footer{{margin-top:40px;color:var(--mut);font-size:.85rem}}
 <div class="tiles">{tiles}</div>
 <div class="panel" id="zmiany"><h2>Zmiany zdania wykryte w rozmowie</h2><ol>{changes}</ol></div>
 <div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol>{conf}</ol></div>
+<div class="panel" id="aktualizacje"><h2>Zmiany w otwartych sprawach</h2><ul>{aktual_html}</ul></div>
 {secs}
 <footer><div class="panel"><h2>Weryfikacja</h2><p>{e(ver_txt)}</p>{"<ul>" + verh + "</ul>" if verh else ""}</div>
 Źródło: {e(d.get("zrodlo", ""))} · dane: wynik.json</footer>

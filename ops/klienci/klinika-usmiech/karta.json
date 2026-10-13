@@ -10,6 +10,100 @@
       "rola": "właściciel kliniki, decyduje o kosztach i nowych usługach"
     }
   ],
-  "zakazy": [],
-  "otwarte_sprawy": {}
+  "zakazy": [
+    {
+      "id": "Z1",
+      "tytul": "Nie dzwonić do pacjentów ortodoncji – nawet na polecenie dr Nowaka",
+      "opis": "Ortodoncja jest wyłączona: głównie dzieci, rodzice się skarżą. Nawet jeśli dr Nowak napisze zgodę, Marek najpierw kontaktuje się z Anią.",
+      "cytat": [
+        "I nie dzwońcie do pacjentów ortodoncji. Tam są głównie dzieci i rodzice się skarżą. Nawet jak dr Nowak napisze, że można, najpierw dzwonisz do mnie.",
+        "Ortodoncji nie ruszam, dopóki ty nie powiesz."
+      ],
+      "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z2",
+      "tytul": "Nic nowego nie wdrażać podczas urlopu Ani (2–6.11)",
+      "opis": "W tygodniu urlopu Ani (2–6 listopada) żadnych nowych wdrożeń. Uwaga: Marek potwierdził 'w tym tygodniu nic nie startuje', co nie pokrywa się z podanym terminem 2–6.11.",
+      "cytat": [
+        "A, od 2 do 6 listopada mam urlop. W tym czasie nic nowego nie wdrażajcie.",
+        "Dobra, w tym tygodniu nic nie startuje."
+      ],
+      "wlasciciel": "Marek Rewoliński"
+    }
+  ],
+  "otwarte_sprawy": {
+    "godziny-sopot-piatek": {
+      "linear_id": "4c0405f9-2a42-4248-a50d-b7cfae82449e",
+      "identifier": "RIN-65",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-65/klinika-usmiech-bledne-godziny-otwarcia-sopot-w-piatek-agent-podaje-do",
+      "tytul": "Błędne godziny otwarcia Sopot w piątek (agent podaje do 18, powinno być do 16)",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    },
+    "korekta-faktury-wrzesien": {
+      "linear_id": "c23e359b-62a2-4964-aad0-d1b8907fc008",
+      "identifier": "RIN-66",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-66/klinika-usmiech-przekazanie-korekty-faktury-za-wrzesien-do-michala",
+      "tytul": "Przekazanie korekty faktury za wrzesień do Michała",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    },
+    "podwojny-telefon-godzina": {
+      "linear_id": "2f4f2a5e-640d-41e7-b01d-f643ef4949e0",
+      "identifier": "RIN-67",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-67/klinika-usmiech-numer-pacjenta-z-podwojnym-telefonem-w-ciagu-godziny",
+      "tytul": "Numer pacjenta z podwójnym telefonem w ciągu godziny (od Bartka przez Anię)",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    },
+    "grafik-lekarzy-listopad": {
+      "linear_id": "21fbddd8-2a9f-48e0-a407-0203cf8f030a",
+      "identifier": "RIN-68",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-68/klinika-usmiech-lista-lekarzy-z-grafikiem-na-listopad-do-piatku-1710",
+      "tytul": "Lista lekarzy z grafikiem na listopad (do piątku 17.10)",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    },
+    "spotkanie-dr-nowak": {
+      "linear_id": "52143bff-0c09-4969-b877-a2592d72ff06",
+      "identifier": "RIN-69",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-69/klinika-usmiech-potwierdzenie-spotkania-marek-dr-nowak-sroda-2110-900",
+      "tytul": "Potwierdzenie spotkania Marek–dr Nowak (środa 21.10, 9:00)",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    },
+    "eksport-excel-potwierdzenia": {
+      "linear_id": "28455374-9038-4079-b03d-50125d3a0811",
+      "identifier": "RIN-70",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-70/klinika-usmiech-eksport-listy-potwierdzen-do-excela",
+      "tytul": "Eksport listy potwierdzeń do Excela",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    },
+    "ryzyko-zmiana-dostawcy": {
+      "linear_id": "3d401de2-f93e-4efe-b10a-41c86fa69ab2",
+      "identifier": "RIN-71",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-71/klinika-usmiech-dr-nowak-rozwaza-zmiane-dostawcy-oferta-konkurenta-z",
+      "tytul": "Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ]
+    }
+  },
+  "ryzyka": {
+    "grozba_rezygnacji": [
+      {
+        "data": "2026-10-13",
+        "zrodlo": "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md",
+        "cytat": "I uczciwie: dr Nowak dostał ofertę od innej firmy, która integruje się z naszym systemem rezerwacji. Rozważa zmianę."
+      }
+    ]
+  }
 }

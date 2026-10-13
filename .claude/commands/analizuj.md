@@ -1,12 +1,25 @@
 ---
 description: Analiza transkrypcji rozmowy z klientem → wynik.json + raport.html
-argument-hint: <plik transkrypcji, np. transkrypcja-spotkanie.md>
+argument-hint: <plik transkrypcji, np. ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md>
 ---
 
 Przeanalizuj transkrypcję rozmowy z klientem z pliku: $ARGUMENTS
 
 Wszystkie ścieżki poniżej są względne wobec folderu projektu (tego, w którym leży `.claude/`).
-Pracuj w trzech krokach i zapisz wyniki do plików.
+Pracuj w czterech krokach i zapisz wyniki do plików.
+
+KROK 0. KONTEKST KLIENTA
+Wyznacz klienta i wczytaj jego historię:
+
+a) Klient: jeśli ścieżka ma postać ops/transkrypcje/<klient>/..., klient = <klient>. W przeciwnym razie klient = null.
+
+b) Jeśli klient != null i plik ops/klienci/<klient>/karta.json istnieje – wczytaj go:
+   - zakazy[]: lista zakazów klienta, każdy z polem "id" i "cytat",
+   - decydenci[]: lista decydentów (kto może co zmieniać),
+   - otwarte_sprawy: mapowanie klucz_sprawy → dane Linear.
+   Jeśli pliku nie ma, przyjmij puste listy.
+
+c) Wczytaj ops/produkt/prosby.json (jeśli istnieje): mapowanie klucz_funkcji → lista klientów z cytatami.
 
 KROK 1. EKSTRAKCJA
 Wypisz każdą pozycję wynikającą z rozmowy. Dla każdej podaj:
@@ -22,12 +35,41 @@ Sprawdź listę z kroku 1:
 - odróżnij błąd (coś miało działać i nie działa) od nowej funkcji (czegoś nigdy nie było),
 - zakazy i ograniczenia ("nie rób", "nie wcześniej niż", "tylko raz", "nie wierzcie") zapisz jako osobne pozycje,
 - jeśli brakuje danych do działania (numer, nagranie, plik), status = czeka, nie zgaduj,
-- zestaw ze sobą wszystkie daty (urlopy, terminy, okna testów) i zapisz konflikty. Konflikt to sytuacja, w której ustalone terminy lub zakazy się wykluczają albo zawężają okno. Zwykłe zależności („B po A”) nie są konfliktami,
+- zestaw ze sobą wszystkie daty (urlopy, terminy, okna testów) i zapisz konflikty. Konflikt to sytuacja, w której ustalone terminy lub zakazy się wykluczają albo zawężają okno. Zwykłe zależności („B po A") nie są konfliktami,
 - każde stwierdzenie, które nie wynika wprost z cytatu (np. przeliczona data przypomnienia, domysł o intencji), przenieś do pola "wnioski",
 - połącz duplikaty.
 
-KROK 3. WYNIK
-Folder wyników: wyniki/<nazwa pliku transkrypcji bez rozszerzenia>/ (utwórz, jeśli nie istnieje).
+KROK 3. WZBOGACENIE (pola dodatkowe)
+Uzupełnij każdą pozycję o cztery nowe pola:
+
+A) klucz_sprawy: stały, krótki slug (bez spacji, bez polskich znaków, myślniki zamiast spacji), np. "filtr-statusow", "korekta-faktury". Jeśli ta sprawa jest już zapisana w otwarte_sprawy z karty klienta, UŻYJ DOKŁADNIE jej klucza. Nie twórz nowego klucza dla istniejącej sprawy.
+
+B) pewnosc: "wysoka" albo "niska".
+   Niska, gdy spełniony choć jeden warunek:
+   - nie da się jednoznacznie odróżnić błędu od nowej funkcji,
+   - nie wiadomo, kto decyduje,
+   - nie wiadomo, którego klienta lub kampanii dotyczy,
+   - opis oparty tylko na jednym, niejednoznacznym cytacie.
+
+C) konflikt_z_zakazem: null albo {"zakaz": "<id zakazu>", "uzasadnienie": "..."}. Sprawdź każdą pozycję z sekcji 1 względem zakazów z karty klienta I zakazów z bieżącej rozmowy (sekcja 4). Jeśli cokolwiek z sekcji 1 wprost narusza zakaz (np. wykonanie zadania byłoby wbrew zakazowi), wypełnij to pole.
+
+D) temat_ryzyka (tylko sekcja 5): jeden z: konkurencja, grozba_rezygnacji, cena_budzet, jakosc_bota, rozliczenia, inne.
+
+E) klucz_funkcji (tylko sekcja 3): jeśli ta sama funkcja jest już zapisana w prosby.json, użyj jej klucza. W przeciwnym razie utwórz nowy slug.
+
+KROK 3b. AKTUALIZACJE OTWARTYCH SPRAW
+Sprawdź listę otwarte_sprawy z karty klienta. Dla każdej otwartej sprawy: czy w tej rozmowie pojawiły się nowe informacje zmieniające jej status?
+
+nowy_status = "zrob_teraz": klient dostarczył to, na co czekaliśmy (np. przysłał plik, dał potwierdzenie).
+nowy_status = "zamknieta": sprawa rozwiązana lub nieaktualna.
+nowy_status = "anulowana": wyraźne wycofanie przez klienta.
+
+Dotyczy też zakazów: jeśli ktoś w rozmowie uchyla zakaz, nowy_status = "anulowana". Zakaz może uchylić tylko decydent wskazany w karcie. Jeśli zrobiła to inna osoba, ustaw pewnosc = "niska" dla tej aktualizacji.
+
+Cytaty w aktualizacjach muszą być dosłowne (tak samo jak w pozycjach).
+
+KROK 4. WYNIK
+Folder wyników: wyniki/<klient>/<nazwa pliku transkrypcji bez rozszerzenia>/ (jeśli klient null, to wyniki/<nazwa pliku bez rozszerzenia>/). Utwórz, jeśli nie istnieje.
 
 a) Zapisz wynik.json z finalną listą, w tym schemacie:
 {
@@ -43,7 +85,19 @@ a) Zapisz wynik.json z finalną listą, w tym schemacie:
     "cytat": ["dosłowny fragment", ...],
     "wnioski": ["stwierdzenie, które nie wynika wprost z cytatu", ...] (opcjonalnie),
     "zmiana_zdania": "..." (opcjonalnie),
-    "przypomnienie": { "data", "limit", "uwagi" } (sekcja 2)
+    "przypomnienie": { "data", "limit", "uwagi" } (sekcja 2),
+    "klucz_sprawy": "slug-sprawy",
+    "pewnosc": "wysoka | niska",
+    "konflikt_z_zakazem": null | {"zakaz": "Z3", "uzasadnienie": "..."},
+    "temat_ryzyka": "..." (tylko sekcja 5),
+    "klucz_funkcji": "..." (tylko sekcja 3)
+  }],
+  "aktualizacje_spraw": [{
+    "klucz_sprawy": "...",
+    "nowy_status": "zrob_teraz | zamknieta | anulowana",
+    "cytat": "dosłowny cytat potwierdzający zmianę",
+    "uzasadnienie": "krótkie wyjaśnienie",
+    "pewnosc": "wysoka | niska"
   }],
   "zmiany_zdania": [{ "temat", "przed", "po", "pozycja", "cytat" }],
   "konflikty_dat": [{ "opis", "pozycje": ["id", ...], "wnioski": [..] (opcjonalnie) }],
@@ -51,13 +105,10 @@ a) Zapisz wynik.json z finalną listą, w tym schemacie:
   "szkic_maila": "pełny tekst maila do klienta (tylko to, co faktycznie ustalono)"
 }
 
-b) Raport generuj WYŁĄCZNIE skryptem render.py z folderu projektu. Nie pisz nowego
-renderera i nie twórz raport.html ręcznie. Uruchom z folderu projektu:
-   python -I render.py wyniki/<nazwa>/wynik.json --transkrypcja <plik transkrypcji>
-Skrypt sprawdza schemat i dosłowność każdego cytatu, a potem zapisuje raport.html obok wynik.json.
-Raport ma sekcje 1–6, liczniki na górze, zmiany zdania, konflikty dat i oznaczone wnioski.
-Jeśli skrypt zgłosi błąd (kod 1: schemat, kod 2: cytat niedosłowny), popraw wynik.json
-(cytat skopiuj dokładnie albo usuń pozycję) i uruchom go ponownie. Samego render.py nie zmieniaj.
+b) Raport generuj WYŁĄCZNIE skryptem render.py z folderu projektu. Nie pisz nowego renderera i nie twórz raport.html ręcznie. Uruchom z folderu projektu:
+   python -I render.py wyniki/<klient>/<nazwa>/wynik.json --transkrypcja <plik transkrypcji>
+Skrypt sprawdza schemat i dosłowność każdego cytatu (w pozycjach i w aktualizacjach), a potem zapisuje raport.html obok wynik.json. Raport ma sekcje 1–6, liczniki na górze, zmiany zdania, konflikty dat, zmiany w otwartych sprawach i oznaczone wnioski.
+Jeśli skrypt zgłosi błąd (kod 1: schemat, kod 2: cytat niedosłowny), popraw wynik.json (cytat skopiuj dokładnie albo usuń pozycję) i uruchom go ponownie. Samego render.py nie zmieniaj.
 
 Nie wpisuj na sztywno nazw firm ani osób. Wszystko bierz z transkrypcji.
 Niczego nie wysyłaj do klienta. Szkic maila zatwierdza człowiek.

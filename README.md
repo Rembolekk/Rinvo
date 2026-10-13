@@ -55,20 +55,36 @@ python -I render.py wyniki/transkrypcja-spotkanie/wynik.json --transkrypcja ops/
 Po przejrzeniu raportu: wyślij pozycje do Linear jednym poleceniem.
 
 ```bash
-python linear_sync.py wyniki/<nazwa>/wynik.json --klient <slug>
-python linear_sync.py wyniki/<nazwa>/wynik.json --klient auto-tama --dry-run
+python3 linear_sync.py wyniki/<klient>/<nazwa>/wynik.json --klient <slug>
+python3 linear_sync.py wyniki/<klient>/<nazwa>/wynik.json --klient auto-tama --dry-run
 ```
 
 Wymaga `LINEAR_API_KEY` w `.env`. Klucz musi mieć dostęp do zespołu `RIN`.
 
 - Sprawdza i tworzy brakujące etykiety w zespole.
-- Sekcja 1 (zrób teraz) → stan **Todo**; typ `bug`/`zmiana_konfiguracji`/`poprawka_bazy_wiedzy` dostaje też etykietę **Dla agenta**.
+- Sekcja 1 (zrób teraz) → stan **Todo**; `bug`/`zmiana_konfiguracji`/`poprawka_bazy_wiedzy` + `pewnosc: wysoka` + brak `konflikt_z_zakazem` → etykieta **Dla agenta**.
 - Sekcja 2 (czeka na klienta) → **Backlog** + etykieta **Czeka na klienta**.
-- Sekcja 3 (backlog produktowy) → **Backlog** + etykieta **Produkt**.
+- Sekcja 3 (backlog produktowy) → **Backlog** + etykieta **Produkt**; jeśli ta sama funkcja pojawia się u ≥ 2 klientów → etykieta **Wielu klientów**.
 - Sekcja 4 (zakazy) → zapisuje do `ops/klienci/<klient>/karta.json`, **bez zgłoszenia w Linear**.
-- Sekcja 5 (ryzyka) → **Todo** + etykieta **Ryzyko** + priorytet High.
-- **Idempotentny**: przy kolejnym uruchomieniu dodaje komentarz do istniejącego zgłoszenia, nie tworzy duplikatu.
+- Sekcja 5 (ryzyka) → **Todo** + etykieta **Ryzyko** + priorytet High; przy ≥ 2 wystąpieniach tego samego `temat_ryzyka` → etykieta **Powtarzające się ryzyko** + Urgent.
+- **Strażnik zakazów**: pozycja z `konflikt_z_zakazem` → **Backlog** + etykieta **Zablokowane przez zakaz**, bez **Dla agenta**.
+- **Pewność niska**: `pewnosc: niska` → etykieta **Do weryfikacji**.
+- **Idempotentny (sha256)**: ta sama treść `wynik.json` → pominięcie. Inne źródło dla tej samej `klucz_sprawy` → komentarz w istniejącym zgłoszeniu.
+- **Aktualizacje otwartych spraw**: `aktualizacje_spraw` z wynik.json → zmiana stanu istniejącego zgłoszenia w Linear (Todo/Done/Cancelled).
 - Po każdym przebiegu regeneruje `ops/klienci/<klient>/karta.md`.
+
+## Pamięć między rozmowami
+
+Kontekst klienta jest przechowywany w `ops/klienci/<klient>/karta.json`:
+
+- **`zakazy`** — lista aktywnych zakazów (id + cytat). Analizuj.md sprawdza każdą pozycję względem tych zakazów i ustawia `konflikt_z_zakazem`.
+- **`otwarte_sprawy`** — mapowanie `klucz_sprawy → {linear_id, identifier, url, zrodla[]}`. Używane do idempotentności i aktualizacji statusów.
+- **`ryzyka`** — historia wystąpień ryzyk (per temat, per źródło). Przy ≥ 2 unikalnych źródłach → eskalacja.
+- **`historia_zakazow`** — uchylone zakazy (zachowane dla audytu).
+
+`ops/produkt/prosby.json` — globalna lista próśb o funkcje produktowe, mapowanie `klucz_funkcji → [{klient, cytat, zrodlo}]`. Przy ≥ 2 klientach → etykieta **Wielu klientów**.
+
+`ops/.przetworzone.json` — rejestr sha256 przetworzonych `wynik.json`. Zapobiega podwójnemu wysyłaniu.
 
 ## Struktura ops/
 
@@ -76,8 +92,11 @@ Wymaga `LINEAR_API_KEY` w `.env`. Klucz musi mieć dostęp do zespołu `RIN`.
 ops/
   transkrypcje/<klient>/        – transkrypcje rozmów
   klienci/<klient>/
-    karta.json                  – zakazy, decydenci, mapowanie klucz → Linear
+    karta.json                  – zakazy, decydenci, otwarte sprawy, historia ryzyk
     karta.md                    – czytelna wersja karty (generowana przez linear_sync.py)
+  produkt/
+    prosby.json                 – globalna lista próśb o funkcje (aktualizowana przez linear_sync.py)
+  .przetworzone.json            – rejestr sha256 przetworzonych wynik.json
 ```
 
 ## Założenia

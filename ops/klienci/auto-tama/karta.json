@@ -13,357 +13,404 @@
   "zakazy": [
     {
       "id": "Z1",
-      "tytul": "Nie puszczać testu wstępu w tygodniu 5–11.10",
-      "opis": "Kasia odsłuchuje w tym tygodniu starą bazę i nie chce, żeby wyniki się zmieszały.",
+      "tytul": "Limit prób pozostaje 5 – bez schodzenia do 3",
+      "opis": "Limit pięciu prób nie jest zmieniany. Ktoś pytał Kasię o trzy próby, ale ona nie zlecała tej zmiany.",
       "cytat": [
-        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
+        "Limitu pięciu prób przy okazji nie ruszam, to inna sprawa.",
+        "Zostaw pięć. Nie kazałam schodzić do trzech. Mówiłam tylko, że ktoś mnie o to pytał."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z2",
-      "tytul": "Nie piszemy tekstów za klienta (wstęp, SMS)",
-      "opis": "Każda wersja wstępu musi zawierać informację, że to wirtualna asystentka i że rozmowa jest nagrywana.",
+      "tytul": "Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10",
+      "opis": "Kasia odsłuchuje starą bazę i nowy wstęp by się 'zlał'. Test można uruchomić dopiero po wysłaniu przez Kasię obu wersji.",
       "cytat": [
-        "Tekstu za ciebie nie piszę.",
-        "Treść napiszę sama, tak jak ze wstępem.",
-        "Druga krótsza, ale dalej ma mówić, że jest wirtualną asystentką i że rozmowa jest nagrywana."
+        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z3",
-      "tytul": "Nie włączać Opla, także na polecenie Pawła",
-      "opis": "Jeśli Paweł napisze, że kazał włączyć, najpierw dzwonimy do Kasi. Paweł nie zatwierdza ani Opla, ani tekstu wstępu.",
+      "tytul": "Nie podpinać agenta po godzinach nawet po otrzymaniu materiałów",
+      "opis": "Nawet jeśli Kasia wyśle numery assistance i listę pól, Rinvo ma je trzymać u siebie i nie podpinać. Projekt startuje tylko po wyraźnym zielonym świetle od Kasi.",
       "cytat": [
-        "Opla na to nie puszczamy.",
-        "Opla nie włączam. Nawet jak Paweł napisze, że kazał, to najpierw zadzwonię do ciebie, a nie będę tego klikał.",
-        "Ale Paweł nie zatwierdza ani Opla, ani tekstu wstępu. To czeka na mnie."
+        "Numery assistance i listę pól wam wyślę, jak znajdę chwilę, ale to nie jest zielone światło. Jak wyślę, trzymajcie u siebie, nie podpinajcie.",
+        "Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z4",
-      "tytul": "Starej bazy nie puszczać drugi raz",
-      "opis": "",
+      "tytul": "Nie włączać Opla – nawet jeśli Paweł napisze, że każe",
+      "opis": "Opel czeka na wyniki świeżych leadów. Jeśli Paweł (a nie Kasia) napisze, że Opel ma ruszyć, Marek dzwoni do Kasi i nie klika.",
       "cytat": [
-        "Starej bazy drugi raz nie puszczajcie."
+        "Opla na to nie puszczamy. Peugeot i Citroën zostają, Opel czeka, aż zobaczymy wyniki na leadach z ostatniego miesiąca.",
+        "Nawet jak Paweł napisze, że kazał, to najpierw zadzwonię do ciebie, a nie będę tego klikał."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z5",
-      "tytul": "Nie wysyłać wzoru pliku z leadami",
-      "opis": "Do startu wystarczy numer i informacja, czy Toruń, czy Włocławek (K2).",
+      "tytul": "Nic nowego nie startuje 19–23.10 (urlop Kasi)",
+      "opis": "W tygodniu urlopu Kasi nic nowego nie jest uruchamiane, nawet jeśli plik świeżych leadów już jest gotowy. Paweł odbiera pilne, ale nie zatwierdza Opla ani tekstu wstępu.",
       "cytat": [
-        "I nie przysyłaj mi wzoru pliku."
+        "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień. W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie.",
+        "Dobra. Tydzień od dziewiętnastego nic nowego nie startuje. Jak się pali, dzwonię do Pawła, ale Opel i wstęp czekają na ciebie."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z6",
-      "tytul": "Limity przypomnień: wstęp najwyżej raz, plik z leadami jeden mail",
-      "opis": "",
+      "tytul": "Agent nie sprzedaje i nie proponuje aut używanych",
+      "opis": "Agent waliduje, nie sprzedaje. Gdy ktoś mówi, że kupił lub się rozmyślił: dziękuje i rozłącza się. Zakaz proponowania aut używanych.",
       "cytat": [
-        "Jak do czwartku nie wyślę obu wersji, przypomnij mi. Raz.",
-        "Jak nie wyślę, napisz jeden mail, nie trzy."
+        "Jak zacznie sprzedawać, wyłączę go.",
+        "Nie sprzedaje. Jak ktoś mówi „już kupiłem” albo „rozmyśliłem się”, ma podziękować i się rozłączyć. Ola chciała, żeby przy odmowie proponował auto używane. Nie.",
+        "Jasne, niech nie sprzedaje. Jak ktoś mówi, że kupił, dziękujemy i koniec. Używanych nie dokładam."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z7",
-      "tytul": "Limit prób zostaje 5, nie schodzić do 3",
-      "opis": "",
+      "tytul": "Nie wysyłać Kasi wzoru pliku leadów",
+      "opis": "Kasia nie chce wzoru – eksport z panelu jest brzydki, kolumny mają techniczne nazwy. Wystarczy numer i miasto (Toruń/Włocławek).",
       "cytat": [
-        "Zostaw pięć. Nie kazałam schodzić do trzech. Mówiłam tylko, że ktoś mnie o to pytał."
+        "I nie przysyłaj mi wzoru pliku. Eksport z panelu jest brzydki, kolumny „field 1”, „field 2”, model czasem siedzi w treści wiadomości.",
+        "wzoru ci nie wysyłam."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z8",
-      "tytul": "Agent nie sprzedaje i nie proponuje aut używanych",
-      "opis": "Gdy ktoś mówi „już kupiłem” albo „rozmyśliłem się”, agent dziękuje i kończy rozmowę. Pomysł Oli, żeby przy odmowie proponować auto używane, został odrzucony.",
-      "cytat": [
-        "Nie sprzedaje. Jak ktoś mówi „już kupiłem” albo „rozmyśliłem się”, ma podziękować i się rozłączyć. Ola chciała, żeby przy odmowie proponował auto używane. Nie.",
-        "Używanych nie dokładam."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z9",
-      "tytul": "19–23.10 (urlop Kasi): nic nowego nie startuje",
-      "opis": "Nic nie startuje, nawet jeśli plik ze świeżymi leadami już będzie i coś się wysypie. W pilnej sprawie dzwonimy do Pawła, ale Opel i tekst wstępu czekają na Kasię.",
-      "cytat": [
-        "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień. W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie. Jakby się naprawdę paliło, dzwońcie do Pawła.",
-        "Ale Paweł nie zatwierdza ani Opla, ani tekstu wstępu. To czeka na mnie."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z10",
-      "tytul": "Agent po godzinach: nic nie podpinać w październiku i nie ufać informacji „od wtorku”",
-      "opis": "Numery assistance i listę pól trzymamy u siebie, niczego nie podpinamy. Na wiadomość, że Kasia zgodziła się na start, odpowiadamy, że czekamy na nią.",
-      "cytat": [
-        "Jak wyślę, trzymajcie u siebie, nie podpinajcie. I jak ktoś ode mnie napisze „Kasia mówiła, że po godzinach od wtorku”, nie wierzcie.",
-        "W tym miesiącu tego nie ruszamy. A jak ktoś napisze, że od wtorku, odpiszę, że czekam na ciebie."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z11",
-      "tytul": "Serwisu w ciągu dnia nie obsługujemy tym agentem",
-      "opis": "To osobny temat. Może wrócić za około pół roku.",
-      "cytat": [
-        "Serwisu w ciągu dnia tym agentem nie ruszamy. To osobny temat, może za pół roku."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z12",
-      "tytul": "Nie zgadywać sprawy z przeglądem i nie ruszać jej bez wiadomości od Kasi",
-      "opis": "Dotyczy pozycji K4.",
-      "cytat": [
-        "Jak nie, to nie zgadujcie, która to kampania.",
-        "A tego przeglądu, co Ola ma w skrzynce, nie ruszajcie bez wiadomości ode mnie."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z13",
-      "tytul": "Ustalenia prowadzimy tylko z Kasią, nie piszemy do Oli",
-      "opis": "",
+      "tytul": "Nie kontaktować się z Olą bezpośrednio – tylko przez Kasię",
+      "opis": "Wszystkie ustalenia idą przez Kasię. Marek nie pisze do Oli.",
       "cytat": [
         "I do Oli nie piszę, ustalam wszystko z tobą."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z9",
+      "tytul": "Stara baza leadów nie jest puszczana drugi raz",
+      "opis": "Leady ze starej bazy (sprzed 2-3 miesięcy) były uruchomione raz. Nie dzwonimy do nich ponownie.",
+      "cytat": [
+        "Starej bazy drugi raz nie puszczajcie.",
+        "Starej bazy drugi raz nie puszczam"
+      ],
+      "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z10",
+      "tytul": "Nie uruchamiać agenta po godzinach na podstawie wiadomości podszywającej się pod Kasię",
+      "opis": "Kasia ostrzegła, że ktoś może napisać nieprawdziwe upoważnienie. Zielone światło może przyjść tylko od niej bezpośrednio.",
+      "cytat": [
+        "I jak ktoś ode mnie napisze „Kasia mówiła, że po godzinach od wtorku”, nie wierzcie.",
+        "Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy. A jak ktoś napisze, że od wtorku, odpiszę, że czekam na ciebie."
+      ],
+      "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z11",
+      "tytul": "Nie modyfikować maila po walidacji w tygodniu 6–12.10",
+      "opis": "Salon zamyka miesiąc i nikt nie powie Kasi, czy nowy mail jest lepszy. Mail modyfikujemy po uruchomieniu świeżych leadów.",
+      "cytat": [
+        "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy."
+      ],
+      "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z12",
+      "tytul": "Nie ruszać sprawy przeglądu (Ola) bez wiadomości od Kasi",
+      "opis": "Bez numeru sprawy od Kasi Marek nie dotyka tematu błędnej klasyfikacji przeglądu.",
+      "cytat": [
+        "A tego przeglądu, co Ola ma w skrzynce, nie ruszajcie bez wiadomości ode mnie."
+      ],
+      "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z13",
+      "tytul": "Nie organizować szkolenia handlowców przed świeżymi leadami",
+      "opis": "Szkolenie ma sens tylko tuż po uruchomieniu świeżych leadów, żeby handlowcy nie zapomnieli statusów. Termin ustala Kasia.",
+      "cytat": [
+        "Szkolenie dopiero, jak pójdą świeże, nie wcześniej, bo zapomną. Termin ustalę ja."
+      ],
+      "wlasciciel": "Marek Rewoliński"
     },
     {
       "id": "Z14",
-      "tytul": "Case study bez nazwy firmy do czasu zgody Pawła",
-      "opis": "Bez nazwy wolno od razu: lead z lipca, telefon w piątek, sprzedaż w sobotę.",
+      "tytul": "Nie uruchamiać kampanii bez pliku leadów od Kasi",
+      "opis": "Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzielnie.",
       "cytat": [
-        "nazwę firmy musi zatwierdzić Paweł. Bez nazwy możesz od razu."
+        "Dobra. Bez pliku nic nie puszczam."
       ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z15",
-      "tytul": "„Oddzwońcie później” to lead, nie „niezainteresowany”",
-      "opis": "Jeśli bot zapytał, kiedy oddzwonić, to wystarczy. Takiej osoby nie oznaczamy jako niezainteresowanej.",
-      "cytat": [
-        "To jest lead, nie odmowa.",
-        "Jak wrzucicie ją w „niezainteresowany”, bo nie umówiła się na jutro, to źle to czytacie. Bot zapytał, kiedy zadzwonić, i to wystarczy."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
-    },
-    {
-      "id": "Z16",
-      "tytul": "Kolumny na liście kontaktów nie przestawiać jako osobnego zadania",
-      "opis": "Robimy to tylko przy okazji naprawy filtra (T6).",
-      "cytat": [
-        "Jak w tym tygodniu listy nie ruszacie, nie róbcie osobnej roboty pod kolumnę."
-      ],
-      "wlasciciel": "Marek Rewoliński (Rinvo)"
+      "wlasciciel": "Marek Rewoliński"
     }
   ],
   "otwarte_sprawy": {
-    "auto-tama:T1": {
-      "linear_id": "27da04d6-6609-4117-ab8b-d0706ba30a3d",
-      "identifier": "RIN-5",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-5/auto-tama-druga-proba-polaczenia-mimo-rozlaczenia-w-ciagu-3-sekund",
-      "tytul": "Druga próba połączenia mimo rozłączenia w ciągu 3 sekund"
+    "podwojny-telefon-po-rozlaczeniu": {
+      "linear_id": "53afb051-ae9d-4495-8251-d2d3dfb5e03b",
+      "identifier": "RIN-38",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-38/auto-tama-blad-podwojnego-telefonu-po-rozlaczeniu-w-ciagu-3-sekund",
+      "tytul": "Błąd podwójnego telefonu po rozłączeniu w ciągu 3 sekund",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T2": {
-      "linear_id": "529238ae-6e0f-4683-bcc2-393be48c7945",
-      "identifier": "RIN-6",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-6/auto-tama-filtr-statusu-zainteresowany-nie-zaweza-listy-kontaktow",
-      "tytul": "Filtr statusu „zainteresowany” nie zawęża listy kontaktów"
+    "adres-wloclawek": {
+      "linear_id": "6d340410-b31c-44ab-9657-d069f460cbea",
+      "identifier": "RIN-39",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-39/auto-tama-nieaktualny-adres-salonu-wloclawek-w-bazie-wiedzy-agenta",
+      "tytul": "Nieaktualny adres salonu Włocławek w bazie wiedzy agenta",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T3": {
-      "linear_id": "a4c59996-44f6-45e7-8f9a-4ce40c93bfb1",
-      "identifier": "RIN-7",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-7/auto-tama-adres-salonu-we-wloclawku-torunska-120-zamiast-kapitulnej",
-      "tytul": "Adres salonu we Włocławku: Toruńska 120 zamiast Kapitulnej"
+    "godziny-dzwonienia": {
+      "linear_id": "0c453a8a-d683-42c5-bf58-63f508a0ec62",
+      "identifier": "RIN-40",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-40/auto-tama-zmiana-godzin-dzwonienia-tydzien-9-19-sobota-9-15",
+      "tytul": "Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T4": {
-      "linear_id": "f58a92c3-3ddd-4c0f-8b4b-64b8734320e7",
-      "identifier": "RIN-8",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-8/auto-tama-godziny-salonow-podawane-klientom-pn-pt-900-1800-wloclawek",
-      "tytul": "Godziny salonów podawane klientom: pn–pt 9:00–18:00 (Włocławek), sobota 9:00–15:00 (oba salony)"
+    "godziny-salonu-sobota": {
+      "linear_id": "834af663-d152-47d4-aa85-94b4fd571933",
+      "identifier": "RIN-41",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-41/auto-tama-aktualizacja-godzin-otwarcia-salonu-w-sobote-oba-salony-do",
+      "tytul": "Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T5": {
-      "linear_id": "50218181-e9b4-48af-9090-c35b4e828871",
-      "identifier": "RIN-9",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-9/auto-tama-godziny-dzwonienia-agenta-pn-pt-900-1900-sobota-900-1500",
-      "tytul": "Godziny dzwonienia agenta: pn–pt 9:00–19:00, sobota 9:00–15:00, niedziela bez połączeń"
+    "filtr-statusu": {
+      "linear_id": "5bfd24f9-027c-4fca-b87c-1204e453916a",
+      "identifier": "RIN-42",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-42/auto-tama-filtr-statusu-nie-zaweza-listy-kontaktow",
+      "tytul": "Filtr statusu nie zawęża listy kontaktów",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T6": {
-      "linear_id": "37e40b7a-9b3d-47db-950a-aeb0d0164536",
-      "identifier": "RIN-10",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-10/auto-tama-lista-kontaktow-kolumna-nazwisko-zaraz-po-statusie",
-      "tytul": "Lista kontaktów: kolumna „nazwisko” zaraz po statusie"
+    "korekta-faktury": {
+      "linear_id": "09c102ac-e4f2-4f8b-b2ec-87267b5ca0e2",
+      "identifier": "RIN-43",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-43/auto-tama-przekazanie-faktury-do-korekty-bledna-nazwa-firmy-na",
+      "tytul": "Przekazanie faktury do korekty (błędna nazwa firmy na fakturze)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T7": {
-      "linear_id": "0a44703c-2602-48d5-b983-d4c36b3cda48",
-      "identifier": "RIN-11",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-11/auto-tama-korekta-faktury-za-wrzesien-nabywca-auto-tama-torun-sp-z-oo",
-      "tytul": "Korekta faktury za wrzesień: nabywca „Auto Tama Toruń sp. z o.o.”"
+    "rozliczenie-krotkich-polaczen": {
+      "linear_id": "82269a49-7b2a-40c7-bbc2-5ef11a44c7cf",
+      "identifier": "RIN-44",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-44/auto-tama-sprawdzenie-rozliczenia-krotkich-polaczen-i-blednych",
+      "tytul": "Sprawdzenie rozliczenia krótkich połączeń i błędnych podwójnych telefonów",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T8": {
-      "linear_id": "86e45196-59fe-4b89-a603-3839e7e304e9",
-      "identifier": "RIN-12",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-12/auto-tama-sprawdzic-jak-naliczamy-minuty-od-pierwszej-sekundy-czy-za",
-      "tytul": "Sprawdzić, jak naliczamy minuty: od pierwszej sekundy czy za rozpoczętą minutę"
+    "kolumna-nazwisko": {
+      "linear_id": "d177726a-4000-4689-9c0d-f8eee001e92b",
+      "identifier": "RIN-45",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-45/auto-tama-przesuniecie-kolumny-nazwisko-na-liscie-kontaktow",
+      "tytul": "Przesunięcie kolumny 'nazwisko' na liście kontaktów",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T9": {
-      "linear_id": "7ec3e1dc-5f2d-4c2d-9129-ce54a7f68dd0",
-      "identifier": "RIN-13",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-13/auto-tama-odjac-koszt-podwojnych-polaczen-i-podac-ich-liczbe",
-      "tytul": "Odjąć koszt podwójnych połączeń i podać ich liczbę"
+    "cena-smsow": {
+      "linear_id": "f442d6ba-b970-4811-a948-9a017af895a3",
+      "identifier": "RIN-46",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-46/auto-tama-wyslanie-kasi-wyceny-sms-ow-po-nieodebranych",
+      "tytul": "Wysłanie Kasi wyceny SMS-ów po nieodebranych",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T10": {
-      "linear_id": "e6f3e481-e5d0-4559-902c-baa98d81df12",
-      "identifier": "RIN-14",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-14/auto-tama-wyslac-cene-sms-a-po-dwoch-nieudanych-probach",
-      "tytul": "Wysłać cenę SMS-a po dwóch nieudanych próbach"
+    "sciga-statusow": {
+      "linear_id": "bc26d756-f162-4e8c-bc99-b78b19ae5153",
+      "identifier": "RIN-47",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-47/auto-tama-sciaga-statusow-dla-handlowcow-jedna-strona",
+      "tytul": "Ściąga statusów dla handlowców (jedna strona)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:T11": {
-      "linear_id": "d225fc06-4c8f-4e13-8130-7e425a32cfbc",
-      "identifier": "RIN-15",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-15/auto-tama-jednostronicowa-sciaga-ze-statusami-dla-handlowcow",
-      "tytul": "Jednostronicowa ściąga ze statusami dla handlowców"
+    "tekst-wstepu-dwie-wersje": {
+      "linear_id": "4e90cdf0-673f-4617-a715-08c76e4d7dc0",
+      "identifier": "RIN-48",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-48/auto-tama-dwie-wersje-tekstu-wstepu-rozmowy-od-kasi",
+      "tytul": "Dwie wersje tekstu wstępu rozmowy od Kasi",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K1": {
-      "linear_id": "042d6750-cf14-4b04-859d-d0b14ee32f41",
-      "identifier": "RIN-16",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-16/auto-tama-dwie-wersje-wstepu-do-recznego-testu",
-      "tytul": "Dwie wersje wstępu do ręcznego testu"
+    "swieze-leady": {
+      "linear_id": "d25cf1b4-dfac-474c-8042-922e43a6af20",
+      "identifier": "RIN-49",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-49/auto-tama-plik-swiezych-leadow-ostatni-miesiac-strona-facebook",
+      "tytul": "Plik świeżych leadów (ostatni miesiąc, strona + Facebook)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K2": {
-      "linear_id": "5b83b2f4-ff8a-4d2f-b992-bc732aa07809",
-      "identifier": "RIN-17",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-17/auto-tama-plik-ze-swiezymi-leadami-z-ostatniego-miesiaca-strona-i",
-      "tytul": "Plik ze świeżymi leadami z ostatniego miesiąca (strona i Facebook)"
+    "mail-przeglad-ola": {
+      "linear_id": "58401f8b-718b-4695-87da-9439a880ea5a",
+      "identifier": "RIN-50",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-50/auto-tama-numer-sprawy-z-mailem-o-przegladzie-ola-do-kasi",
+      "tytul": "Numer sprawy z mailem o przeglądzie (Ola do Kasi)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K3": {
-      "linear_id": "01816b2d-7e44-423e-a03b-7dfda4784304",
-      "identifier": "RIN-18",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-18/auto-tama-asystentka-drugi-raz-pyta-o-model-i-nie-reaguje-na-klientke",
-      "tytul": "Asystentka drugi raz pyta o model i nie reaguje na klientkę"
+    "spotkanie-z-pawlem": {
+      "linear_id": "7d8f0849-45b9-4ad5-82da-325bfb63473c",
+      "identifier": "RIN-51",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-51/auto-tama-potwierdzenie-spotkania-marek-pawel-1510-1000-torun",
+      "tytul": "Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K4": {
-      "linear_id": "52c9af34-cde0-40c6-9dca-a04c1e6ba0dc",
-      "identifier": "RIN-19",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-19/auto-tama-klient-chcial-przegladu-a-zgloszenie-wpadlo-jako-lead",
-      "tytul": "Klient chciał przeglądu, a zgłoszenie wpadło jako lead sprzedażowy"
+    "material-po-godzinach": {
+      "linear_id": "6970a064-843b-421c-9452-94064360040e",
+      "identifier": "RIN-52",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-52/auto-tama-materialy-do-projektu-po-godzinach-jesli-i-kiedy-kasia",
+      "tytul": "Materiały do projektu 'po godzinach' – jeśli i kiedy Kasia zdecyduje",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K5": {
-      "linear_id": "ad856496-d728-4b84-91b7-1742558b7992",
-      "identifier": "RIN-20",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-20/auto-tama-spotkanie-z-pawlem-czwartek-15102026-1000-30-min-pawel",
-      "tytul": "Spotkanie z Pawłem: czwartek 15.10.2026, 10:00, 30 min (Paweł będzie w Toruniu)"
+    "testy-ab-panel": {
+      "linear_id": "430db31c-1cce-4aae-b1d7-dd12460b3ab2",
+      "identifier": "RIN-53",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-53/auto-tama-testy-ab-wariantow-rozmowy-wbudowane-w-panel",
+      "tytul": "Testy A/B wariantów rozmowy wbudowane w panel",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K6": {
-      "linear_id": "151dc9e2-cb11-49a0-baea-8af622221004",
-      "identifier": "RIN-21",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-21/auto-tama-zgoda-pawla-na-nazwe-firmy-w-case-study-lead-z-lipca-peugeot",
-      "tytul": "Zgoda Pawła na nazwę firmy w case study (lead z lipca, Peugeot 208)"
+    "kafelki-klikalne": {
+      "linear_id": "913fa2f5-bcc1-4b64-82a5-c3b77e242c9f",
+      "identifier": "RIN-54",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-54/auto-tama-klikalne-kafelki-w-dashboardzie-przejscie-do-listy-osob",
+      "tytul": "Klikalne kafelki w dashboardzie (przejście do listy osób)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K7": {
-      "linear_id": "2d91f386-d3c9-49d8-be4d-5b0d0c10ed3a",
-      "identifier": "RIN-22",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-22/auto-tama-szkolenie-dla-handlowcow-ze-statusow-15-minut-online",
-      "tytul": "Szkolenie dla handlowców ze statusów (15 minut, online)"
+    "raport-mailowy-tygodniowy": {
+      "linear_id": "4d237e2b-664a-4021-a71b-79065f9f6da7",
+      "identifier": "RIN-55",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-55/auto-tama-automatyczny-raport-mailowy-z-tygodniowymi-statystykami",
+      "tytul": "Automatyczny raport mailowy z tygodniowymi statystykami",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K8": {
-      "linear_id": "028d65ad-00c9-459e-b35d-35587462f3a7",
-      "identifier": "RIN-23",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-23/auto-tama-sms-po-dwoch-nieudanych-probach-decyzja-klienta",
-      "tytul": "SMS po dwóch nieudanych próbach: decyzja klienta"
+    "mail-walidacji-model-salon": {
+      "linear_id": "62ee2ebc-3db6-46ee-b729-de8d231d2a71",
+      "identifier": "RIN-56",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-56/auto-tama-ulepszony-mail-po-walidacji-model-i-salon-na-gorze",
+      "tytul": "Ulepszony mail po walidacji: model i salon na górze",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:K9": {
-      "linear_id": "062448ed-50ff-4859-9c3a-81362b9f088f",
-      "identifier": "RIN-24",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-24/auto-tama-wlaczenie-opla",
-      "tytul": "Włączenie Opla"
+    "sms-po-nieodebranym": {
+      "linear_id": "b6e48b4e-2ce8-4b4a-a0fc-45a8733e0cbd",
+      "identifier": "RIN-57",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-57/auto-tama-sms-do-klienta-po-dwoch-nieudanych-probach-polaczenia",
+      "tytul": "SMS do klienta po dwóch nieudanych próbach połączenia",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B1": {
-      "linear_id": "f2210361-78a1-478d-a689-e2420a3d41c3",
-      "identifier": "RIN-25",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-25/auto-tama-testy-ab-w-panelu-ustawiane-i-odczytywane-przez-klienta",
-      "tytul": "Testy A/B w panelu, ustawiane i odczytywane przez klienta"
+    "integracja-crm": {
+      "linear_id": "45fda2bf-7be9-40ff-bffc-d1549b0123c4",
+      "identifier": "RIN-58",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-58/auto-tama-integracja-rinvo-z-crm-dealera",
+      "tytul": "Integracja Rinvo z CRM dealera",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B2": {
-      "linear_id": "9155ea68-4047-4d5e-b21c-654652226156",
-      "identifier": "RIN-26",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-26/auto-tama-klikalny-kafelek-zainteresowani-prowadzacy-do-listy-tych",
-      "tytul": "Klikalny kafelek „zainteresowani” prowadzący do listy tych osób"
+    "agent-po-godzinach": {
+      "linear_id": "a38ea0d3-8cbe-4f50-ad11-af0f00539e6e",
+      "identifier": "RIN-59",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-59/auto-tama-agent-po-godzinach-sprzedaz-serwis-czesci-assistance-routing",
+      "tytul": "Agent po godzinach (sprzedaż, serwis, części, assistance routing)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B3": {
-      "linear_id": "d843056f-3111-46af-9e88-e2d277f443fe",
-      "identifier": "RIN-27",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-27/auto-tama-cotygodniowy-raport-mailowy-dla-pawla-poniedzialek-rano",
-      "tytul": "Cotygodniowy raport mailowy dla Pawła (poniedziałek rano)"
+    "godziny-prob-obiadowa": {
+      "linear_id": "26130adc-ca5a-423a-80d4-a947ec8be62e",
+      "identifier": "RIN-60",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-60/auto-tama-optymalizacja-godzin-pierwszej-proby-pod-pore-obiadowa",
+      "tytul": "Optymalizacja godzin pierwszej próby pod porę obiadową",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B4": {
-      "linear_id": "a65b8482-4923-43d4-9422-1bb28ed3e990",
-      "identifier": "RIN-28",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-28/auto-tama-mail-do-handlowca-po-walidacji-model-i-salon-na-gorze",
-      "tytul": "Mail do handlowca po walidacji: model i salon na górze"
+    "szkolenie-handlowcow": {
+      "linear_id": "eac157be-09a1-46b5-bfc1-062036a694fe",
+      "identifier": "RIN-61",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-61/auto-tama-szkolenie-handlowcow-ze-statusow-kwadrans-online-po-swiezych",
+      "tytul": "Szkolenie handlowców ze statusów (kwadrans online, po świeżych leadach)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B5": {
-      "linear_id": "d8c93aba-79bf-4695-8cb2-b52a7771a75f",
-      "identifier": "RIN-29",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-29/auto-tama-agent-po-godzinach-jeden-agent-na-wszystkie-numery",
-      "tytul": "Agent po godzinach: jeden agent na wszystkie numery"
+    "ryzyko-voicedesk": {
+      "linear_id": "b28c9577-d73f-46c4-949a-30baabfe8500",
+      "identifier": "RIN-62",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-62/auto-tama-konkurent-voicedesk-tanszy-i-z-integracja-crm",
+      "tytul": "Konkurent VoiceDesk: tańszy i z integracją CRM",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B6": {
-      "linear_id": "8c4fa0db-f2fe-43eb-8aeb-29b1e51b1f76",
-      "identifier": "RIN-30",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-30/auto-tama-przesuniecie-pierwszej-proby-na-12-13-i-po-1700",
-      "tytul": "Przesunięcie pierwszej próby na 12–13 i po 17:00"
+    "ryzyko-zla-interpretacja-wynikow": {
+      "linear_id": "2876944d-6368-4174-8eaf-3863432cf454",
+      "identifier": "RIN-63",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-63/auto-tama-pawel-chcial-wylaczyc-agenta-po-zlej-interpretacji-wynikow",
+      "tytul": "Paweł chciał wyłączyć agenta po złej interpretacji wyników",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     },
-    "auto-tama:B7": {
-      "linear_id": "684b7c11-9850-4fe4-9f43-81878ad91037",
-      "identifier": "RIN-31",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-31/auto-tama-integracja-z-crm-dealera-systemem",
-      "tytul": "Integracja z CRM dealera („systemem”)"
-    },
-    "auto-tama:R1": {
-      "linear_id": "d12c5b07-bd37-45e1-a663-3be68a11ab06",
-      "identifier": "RIN-32",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-32/auto-tama-konkurent-voicedesk-podobno-ok-30percent-taniej-i-z",
-      "tytul": "Konkurent VoiceDesk: podobno ok. 30% taniej i z integracją z CRM"
-    },
-    "auto-tama:R2": {
-      "linear_id": "527f193c-6ba4-4eb5-bd9b-22cefcc84e00",
-      "identifier": "RIN-33",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-33/auto-tama-decydent-ocenia-wyniki-po-surowych-liczbach-i-chcial",
-      "tytul": "Decydent ocenia wyniki po surowych liczbach i chciał wszystko wyłączyć"
-    },
-    "auto-tama:R3": {
-      "linear_id": "e377f112-f706-484f-af81-b9279cefcda5",
-      "identifier": "RIN-34",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-34/auto-tama-jakosc-rozmow-klienci-rozpoznaja-bota-i-sie-rozlaczaja",
-      "tytul": "Jakość rozmów: klienci rozpoznają bota i się rozłączają"
-    },
-    "auto-tama:R4": {
-      "linear_id": "6db37de1-7ffe-4d12-b383-8f05fac41107",
-      "identifier": "RIN-35",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-35/auto-tama-wyrazna-grozba-wylaczenia-jesli-agent-zacznie-sprzedawac",
-      "tytul": "Wyraźna groźba wyłączenia, jeśli agent zacznie sprzedawać"
-    },
-    "auto-tama:R5": {
-      "linear_id": "75bf9a45-d903-4f03-bc26-3f47446e581b",
-      "identifier": "RIN-36",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-36/auto-tama-zaufanie-do-rozliczen-podwojne-polaczenia-i-bledna-faktura",
-      "tytul": "Zaufanie do rozliczeń: podwójne połączenia i błędna faktura"
-    },
-    "auto-tama:R6": {
-      "linear_id": "7f3231e5-8385-416b-af06-9e4b6d885055",
-      "identifier": "RIN-37",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-37/auto-tama-obawa-pawla-ze-opel-zrazi-klientow-i-zmniejszy-ruch",
-      "tytul": "Obawa Pawła, że Opel zrazi klientów i zmniejszy ruch"
+    "ryzyko-brak-integracji-crm": {
+      "linear_id": "959dca6e-e739-46d9-ba74-870dd00308d6",
+      "identifier": "RIN-64",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-64/auto-tama-brak-integracji-z-crm-jako-kluczowy-argument-konkurenta",
+      "tytul": "Brak integracji z CRM jako kluczowy argument konkurenta",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     }
+  },
+  "ryzyka": {
+    "konkurencja": [
+      {
+        "data": "2026-10-13",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "cytat": "Dwa tygodnie temu była u Pawła firma VoiceDesk. Też mają bota do leadów. Powiedzieli, że są tańsi i że łączą się z systemem, więc leady same wpadają handlowcom."
+      },
+      {
+        "data": "2026-10-13",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "cytat": "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili."
+      }
+    ],
+    "grozba_rezygnacji": [
+      {
+        "data": "2026-10-13",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "cytat": "Paweł zobaczył tylko te dziewięć na siedemdziesiąt i chciał wszystko wyłączyć. Powiedziałam mu, że to trupy, a nie świeże leady."
+      }
+    ]
   }
 }

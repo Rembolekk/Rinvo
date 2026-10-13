@@ -1,0 +1,226 @@
+{
+  "zrodlo": "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md",
+  "wygenerowano": "2026-10-13",
+  "spotkanie": {
+    "tytul": "Klinika Uśmiech × Rinvo: call statusowy",
+    "data": "2026-10-13",
+    "godziny": "10:00–10:25",
+    "uczestnicy": ["Ania Zielińska", "Marek Rewoliński"],
+    "wspominani": ["dr Nowak", "Bartek", "Michał"]
+  },
+  "pozycje": [
+    {
+      "id": "T1",
+      "sekcja": 1,
+      "typ": "poprawka_bazy_wiedzy",
+      "rodzaj": "błąd",
+      "tytul": "Błędne godziny otwarcia Sopot w piątek (agent podaje do 18, powinno być do 16)",
+      "opis": "Od października salon Sopot jest czynny w piątek do 16:00. Agent podaje godzinę 18:00. Marek poprawi dzisiaj i napisze do Ani po korekcie.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-13",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Agent działa nieźle, ale podaje złe godziny dla Sopotu. Mówi, że w piątek jesteśmy do 18, a od października jesteśmy do 16.",
+        "To nasz błąd w bazie wiedzy. Poprawię dzisiaj.",
+        "Nie, nie trzeba. Napisz tylko, jak będzie zrobione."
+      ],
+      "klucz_sprawy": "godziny-sopot-piatek",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T2",
+      "sekcja": 1,
+      "typ": "finanse",
+      "tytul": "Przekazanie korekty faktury za wrzesień do Michała",
+      "opis": "Faktura za wrzesień zawiera minuty z sierpnia – błędna kwota. Marek przekazuje Michałowi dziś.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-13",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Faktura za wrzesień ma złą kwotę, policzyliście minuty z sierpnia. Księgowa potrzebuje korekty.",
+        "Przepraszam. Faktury robi Michał, przekażę mu dziś."
+      ],
+      "klucz_sprawy": "korekta-faktury-wrzesien",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "rodzaj": "błąd",
+      "tytul": "Numer pacjenta z podwójnym telefonem w ciągu godziny (od Bartka przez Anię)",
+      "opis": "Pacjent skarżył się, że agent zadzwonił dwa razy w ciągu godziny. Bartek nie zapisał numeru ani godziny. Marek nie może zbadać sprawy bez tych danych.",
+      "wlasciciel": "Ania Zielińska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Pacjent skarżył się Bartkowi, że agent zadzwonił do niego dwa razy w ciągu godziny. Bartek nie zapisał numeru ani godziny. Jak znajdzie, prześlę.",
+        "Bez numeru nie znajdę, więc czekam na ciebie."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "Brak ustalonego terminu – Bartek musi najpierw znaleźć numer"
+      },
+      "klucz_sprawy": "podwojny-telefon-godzina",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K2",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Lista lekarzy z grafikiem na listopad (do piątku 17.10)",
+      "opis": "Ania wyśle listę lekarzy i ich grafik na listopad, żeby agent wiedział, kto przyjmuje. Jedno przypomnienie jeśli nie przyjdzie do piątku.",
+      "wlasciciel": "Ania Zielińska",
+      "termin": "2026-10-17",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Wyślę wam listę lekarzy z grafikiem na listopad, żeby agent wiedział, kto przyjmuje. Do piątku. Jak nie wyślę, przypomnij mi raz.",
+        "Jak do piątku nic nie przyjdzie, przypomnę raz."
+      ],
+      "przypomnienie": {
+        "data": "2026-10-17",
+        "limit": "1 raz",
+        "uwagi": "Jedno przypomnienie – więcej Ania nie prosiła"
+      },
+      "klucz_sprawy": "grafik-lekarzy-listopad",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K3",
+      "sekcja": 2,
+      "typ": "spotkanie",
+      "tytul": "Potwierdzenie spotkania Marek–dr Nowak (środa 21.10, 9:00)",
+      "opis": "Ania zapyta dr Nowaka i potwierdzi. Marek wysyła zaproszenie dopiero po potwierdzeniu.",
+      "wlasciciel": "Ania Zielińska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Chętnie pogadam z nim bezpośrednio. Zaproponuj środę 21.10 o 9:00.",
+        "Zapytam go i potwierdzę. Bez mojego potwierdzenia nie wysyłaj zaproszenia.",
+        "Jasne, czekam."
+      ],
+      "wnioski": ["Celem spotkania jest odpowiedź na ofertę konkurenta i pokazanie aktualnych możliwości Rinvo."],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "Spotkanie 21.10 – jeśli Ania nie potwierdzi szybko, zabraknie czasu na wysłanie zaproszenia"
+      },
+      "klucz_sprawy": "spotkanie-dr-nowak",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B1",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Eksport listy potwierdzeń do Excela",
+      "opis": "Przycisk w panelu do eksportu listy pacjentów z podziałem: kto potwierdził wizytę, a kto nie. Ania teraz przepisuje ręcznie. Inni klienci też zgłaszają tę potrzebę.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Chciałabym mieć w panelu przycisk eksportu do Excela, z listą kto potwierdził, a kto nie. Teraz przepisuję ręcznie.",
+        "Takiej funkcji nie ma. Zapisuję jako prośbę, inni klienci też o to pytają. Terminu nie podam."
+      ],
+      "klucz_sprawy": "eksport-excel-potwierdzenia",
+      "klucz_funkcji": "eksport-excel-potwierdzenia",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z1",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie dzwonić do pacjentów ortodoncji – nawet na polecenie dr Nowaka",
+      "opis": "Ortodoncja jest wyłączona: głównie dzieci, rodzice się skarżą. Nawet jeśli dr Nowak napisze zgodę, Marek najpierw kontaktuje się z Anią.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "I nie dzwońcie do pacjentów ortodoncji. Tam są głównie dzieci i rodzice się skarżą. Nawet jak dr Nowak napisze, że można, najpierw dzwonisz do mnie.",
+        "Ortodoncji nie ruszam, dopóki ty nie powiesz."
+      ],
+      "klucz_sprawy": "zakaz-ortodoncja",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z2",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nic nowego nie wdrażać podczas urlopu Ani (2–6.11)",
+      "opis": "W tygodniu urlopu Ani (2–6 listopada) żadnych nowych wdrożeń. Uwaga: Marek potwierdził 'w tym tygodniu nic nie startuje', co nie pokrywa się z podanym terminem 2–6.11.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-11-06",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "A, od 2 do 6 listopada mam urlop. W tym czasie nic nowego nie wdrażajcie.",
+        "Dobra, w tym tygodniu nic nie startuje."
+      ],
+      "wnioski": ["Marek potwierdził zakaz dla 'tego tygodnia' (13-18.10), nie dla 2–6.11. Możliwe nieporozumienie – zakaz z rozmowy obowiązuje 2–6.11."],
+      "klucz_sprawy": "zakaz-urlop-ani",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "R1",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji",
+      "opis": "Dr Nowak (właściciel, decydent budżetowy) otrzymał ofertę od firmy integrującej się z systemem rezerwacji kliniki. Rozważa zmianę.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "I uczciwie: dr Nowak dostał ofertę od innej firmy, która integruje się z naszym systemem rezerwacji. Rozważa zmianę."
+      ],
+      "wnioski": ["Spotkanie z dr Nowakiem 21.10 (K3) jest bezpośrednią odpowiedzią na to ryzyko."],
+      "klucz_sprawy": "ryzyko-zmiana-dostawcy",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "temat_ryzyka": "grozba_rezygnacji"
+    }
+  ],
+  "aktualizacje_spraw": [],
+  "zmiany_zdania": [
+    {
+      "temat": "Czas wyprzedzenia przypomnienia o wizycie",
+      "przed": "2 dni przed wizytą ('Zmieńcie na dwa dni przed, ludzie nie zdążają przełożyć')",
+      "po": "1 dzień przed – bez zmian ('Jednak zostańcie przy jednym dniu przed wizytą. Pogadałam z Bartkiem, przy dwóch dniach pacjenci zapominają. Czyli bez zmian.')",
+      "pozycja": null,
+      "cytat": "Jednak zostańcie przy jednym dniu przed wizytą. Pogadałam z Bartkiem, przy dwóch dniach pacjenci zapominają. Czyli bez zmian."
+    }
+  ],
+  "konflikty_dat": [
+    {
+      "opis": "Ania ogłosiła zakaz wdrożeń na 2–6.11 (urlop), ale Marek potwierdził 'w tym tygodniu nic nie startuje' (tydzień 13–18.10). Zakres nie pokrywa się. Marek może nie mieć świadomości zamrożenia na listopad.",
+      "pozycje": ["Z2"],
+      "wnioski": ["Wskazane doprecyzowanie z Anią przed jej urlopem, że zakaz dotyczy 2–6.11, a nie tylko bieżącego tygodnia."]
+    }
+  ],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [
+      "Zmiana czasu przypomnienia na 2 dni przed wizytą – wniosek cofnięty przez Anię przed wykonaniem. Brak zadania do zrobienia; zarejestrowano jako zmiana zdania."
+    ],
+    "pominiete": [
+      "Marek zaproponował wysłanie nagrania testowego po korekcie godzin – Ania odmówiła ('Nie, nie trzeba'). Brak zadania."
+    ]
+  },
+  "szkic_maila": "Cześć Aniu,\n\nPodsumowanie rozmowy z 13 października:\n\nCo robimy dziś:\n- Poprawiam godziny Sopotu w piątek na 16:00. Napiszę, jak będzie gotowe.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna kwota – minuty z sierpnia).\n\nCzekam od ciebie:\n- Numer pacjenta, który dostał dwa telefony w ciągu godziny – jak Bartek znajdzie, prześlij. Bez numeru nie zbadamy sprawy.\n- Lista lekarzy z grafikiem na listopad – do piątku (17.10). Jeśli nie przyjdzie, wyślę jedno przypomnienie.\n- Potwierdzenie spotkania z dr Nowakiem na środę 21.10 o 9:00. Zaproszenie wyślę dopiero po twoim potwierdzeniu.\n\nCo zostaje bez zmian:\n- Przypomnienia: zostajemy przy jednym dniu przed wizytą.\n- Ortodoncja: nie dzwonimy, dopóki ty nie powiesz. Nawet jeśli dr Nowak napisze zgodę, zadzwonię do ciebie najpierw.\n- Urlop 2–6.11: nic nowego nie wdrażamy w tym czasie.\n\nPozdrawiam,\nMarek"
+}

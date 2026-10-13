@@ -1,0 +1,866 @@
+{
+  "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+  "wygenerowano": "2026-10-13",
+  "spotkanie": {
+    "tytul": "Grupa Auto Tama × Rinvo: call statusowy",
+    "data": "2026-10-06",
+    "godziny": "11:02–11:38",
+    "uczestnicy": [
+      "Kasia Malinowska",
+      "Marek Rewoliński"
+    ],
+    "wspominani": [
+      "Paweł",
+      "Ola",
+      "Iza",
+      "pani Grażyna",
+      "Michał"
+    ]
+  },
+  "pozycje": [
+    {
+      "id": "T1",
+      "sekcja": 1,
+      "typ": "bug",
+      "rodzaj": "błąd",
+      "tytul": "Błąd podwójnego telefonu po rozłączeniu w ciągu 3 sekund",
+      "opis": "Agent dzwonił ponownie tego samego dnia do osób, które rozłączyły się w ciągu 3 sekund, mimo że miał tego nie robić. Sześć przypadków w jednej kampanii po południu.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Wczoraj i tak zadzwonił. Sześć takich przypadków, ta sama kampania, po południu. Pierwszy był o 16:40, numer kończy się na 14, słyszałam obie próby jedna po drugiej.",
+        "A, to miało nie iść drugi raz. Dobra, sprawdzę po spotkaniu na tej kampanii"
+      ],
+      "klucz_sprawy": "podwojny-telefon-po-rozlaczeniu",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T2",
+      "sekcja": 1,
+      "typ": "poprawka_bazy_wiedzy",
+      "rodzaj": "błąd",
+      "tytul": "Nieaktualny adres salonu Włocławek w bazie wiedzy agenta",
+      "opis": "Agent podaje stary adres ul. Kapitulna zamiast Toruńska 120. Salon przeprowadził się w sierpniu.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Zapraszamy do salonu Peugeot i Citroën we Włocławku przy ulicy Ka",
+        "A my od sierpnia jesteśmy na Toruńskiej. Na Kapitulnej jest teraz pusty plac.",
+        "Toruńska 120. Godziny bez zmian, w tygodniu dziewiąta–osiemnasta, sobota dziewiąta–czternasta. Toruń bez zmian.",
+        "Dobra, napiszę."
+      ],
+      "wnioski": [
+        "Marek napisze do Kasi po poprawieniu adresu. Godziny tygodnia dla Włocławka (9–18) nie wymagają zmiany."
+      ],
+      "klucz_sprawy": "adres-wloclawek",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T3",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15",
+      "opis": "Klient skarżył się, że robot dzwonił o 19:30 w sobotę. Godziny skrócone. Sobota: pierwotnie do 14:00, następnie skorygowana na 15:00.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "To skróćcie do dziewiętnastej. W sobotę pan zadzwonił do salonu z pretensjami, że robot dzwoni do niego o wpół do ósmej wieczorem. I w sobotę tylko do czternastej, jak salon.",
+        "Dobra. Tydzień dziewiąta–dziewiętnasta, sobota dziewiąta–czternasta. Zmienię po callu.",
+        "Sobotę jednak zostaw do piętnastej, nie do czternastej. Od tego miesiąca salon w sobotę jest do piętnastej, zapomniałam.",
+        "Czyli sobota dziewiąta–piętnasta, tydzień dziewiąta–dziewiętnasta."
+      ],
+      "zmiana_zdania": "Kasia zmieniła godzinę końca w sobotę z 14:00 na 15:00 – zapomniała, że salon jest do 15:00 od tego miesiąca.",
+      "klucz_sprawy": "godziny-dzwonienia",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T4",
+      "sekcja": 1,
+      "typ": "poprawka_bazy_wiedzy",
+      "rodzaj": "zmiana",
+      "tytul": "Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)",
+      "opis": "Agent podaje klientom godziny otwarcia. Sobotnie godziny wymagają aktualizacji na 15:00 dla obu salonów (Toruń i Włocławek).",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "A co z godzinami salonu, które agent podaje klientom? Też mam zmienić na piętnastą?",
+        "Tak, dla obu salonów. Dobrze, że pytasz.",
+        "Dobra, poprawię razem z adresem."
+      ],
+      "klucz_sprawy": "godziny-salonu-sobota",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T5",
+      "sekcja": 1,
+      "typ": "bug",
+      "rodzaj": "błąd",
+      "tytul": "Filtr statusu nie zawęża listy kontaktów",
+      "opis": "Filtr 'zainteresowany' na liście kontaktów nie działa – pokazuje wszystkie rekordy zamiast zawęzić do wybranego statusu. Filtr dat działa poprawnie.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Na liście kontaktów filtr „zainteresowany” też nie zawęża. Pokazuje i odebranych, i nieodebranych, i „kupiłem gdzie indziej”.",
+        "filtr statusu nie. To sprawdzę u nas po callu."
+      ],
+      "klucz_sprawy": "filtr-statusu",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T6",
+      "sekcja": 1,
+      "typ": "finanse",
+      "tytul": "Przekazanie faktury do korekty (błędna nazwa firmy na fakturze)",
+      "opis": "Faktura za wrzesień wystawiona na 'Grupa Auto Tama sp. z o.o.' zamiast 'Auto Tama Toruń sp. z o.o.', jak w umowie. Korekta przez Michała.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Faktura za wrzesień przyszła na „Grupa Auto Tama sp. z o.o.”, a umowa jest podpisana z „Auto Tama Toruń sp. z o.o.”. Ona potrzebuje korekty, inaczej tego nie zaksięguje.",
+        "Faktury wystawia Michał, przekażę mu dziś. Korekta powinna przyjść w przyszłym tygodniu."
+      ],
+      "klucz_sprawy": "korekta-faktury",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T7",
+      "sekcja": 1,
+      "typ": "finanse",
+      "tytul": "Sprawdzenie rozliczenia krótkich połączeń i błędnych podwójnych telefonów",
+      "opis": "Klient pyta, czy połączenia krótsze niż minuta liczą się jako pełna minuta. Jeśli podwójne telefony to błąd Rinvo, klient nie powinien za nie płacić – Marek odejmie je.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-06",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Szczerze, nie pamiętam, czy liczymy od pierwszej sekundy, czy za rozpoczętą minutę. Sprawdzę. A jeśli te podwójne telefony to nasz błąd, to ich nie powinniście płacić. Odejmiemy je.",
+        "Napiszę razem z informacją, co z tym błędem."
+      ],
+      "klucz_sprawy": "rozliczenie-krotkich-polaczen",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T8",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Przesunięcie kolumny 'nazwisko' na liście kontaktów",
+      "opis": "Kasia chce widzieć nazwisko zaraz po statusie, bez przewijania. Zmiana tylko jeśli Marek i tak będzie pracował przy filtrze statusu (T5).",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "naprawa filtra statusu (T5)",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Jak już będę w tej liście, to przesunę ci nazwisko. Jak się okaże, że problem z filtrem siedzi gdzie indziej, to kolumn osobno nie ruszam."
+      ],
+      "klucz_sprawy": "kolumna-nazwisko",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T9",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Wysłanie Kasi wyceny SMS-ów po nieodebranych",
+      "opis": "Marek prześle cenę SMS-ów za wiadomość. Treść pisze Kasia. Decyzja o uruchomieniu zależy od Pawła.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-11",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Mogę ci przysłać cenę i przykładowy tekst.",
+        "Przyślij cenę. Wszystko, co kosztuje, i tak musi zatwierdzić Paweł.",
+        "cenę wyślę w tym tygodniu."
+      ],
+      "wnioski": [
+        "Termin 'ten tydzień' przy rozmowie 6.10 oznacza najpóźniej 11.10 (sobota)."
+      ],
+      "klucz_sprawy": "cena-smsow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T10",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Ściąga statusów dla handlowców (jedna strona)",
+      "opis": "Przed szkoleniem Marek przygotuje jedną stronę z opisem statusów. Szkolenie online czeka na termin od Kasi po uruchomieniu świeżych leadów.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "przed uruchomieniem świeżych leadów",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Mogę też przygotować jedną stronę ze ściągą, co znaczy który status. Wtedy szkolenie może być krótsze.",
+        "Ściągę tak. Szkolenie dopiero, jak pójdą świeże, nie wcześniej, bo zapomną. Termin ustalę ja.",
+        "Dobra. Ściągę ci wyślę, a szkolenie czeka na twój termin."
+      ],
+      "klucz_sprawy": "sciga-statusow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Dwie wersje tekstu wstępu rozmowy od Kasi",
+      "opis": "Kasia pisze dwie wersje wstępu: jedna jak teraz, druga krótsza ale z informacją o wirtualnej asystentce i nagraniu. Bez wersji Marek nie uruchamia testu.",
+      "wlasciciel": "Kasia Malinowska",
+      "termin": "2026-10-08",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Jedna taka jak teraz. Druga krótsza, ale dalej ma mówić, że jest wirtualną asystentką i że rozmowa jest nagrywana.",
+        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje. Jak do czwartku nie wyślę obu wersji, przypomnij mi. Raz.",
+        "Dobra. Jak przyślesz obie, puścimy i sobie wybierzesz. Tekstu za ciebie nie piszę."
+      ],
+      "przypomnienie": {
+        "data": "2026-10-08",
+        "limit": "1 raz",
+        "uwagi": "Jedno przypomnienie – więcej Kasia nie prosiła"
+      },
+      "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K2",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Plik świeżych leadów (ostatni miesiąc, strona + Facebook)",
+      "opis": "Plik z leadami z ostatniego miesiąca, które nie zostały obsłużone. Wystarczy numer i informacja Toruń/Włocławek. Marek nie wysyła wzoru pliku.",
+      "wlasciciel": "Kasia Malinowska",
+      "termin": "2026-10-12",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Plik wyślę. Piątku nie obiecuję, bo zamykamy miesiąc. Powiedzmy poniedziałek. Jak nie wyślę, napisz jeden mail, nie trzy. I nie przysyłaj mi wzoru pliku.",
+        "Dobra. Bez pliku nic nie puszczam. Starej bazy drugi raz nie puszczam i wzoru ci nie wysyłam. Jak w poniedziałek nic nie będzie, napiszę raz."
+      ],
+      "przypomnienie": {
+        "data": "2026-10-12",
+        "limit": "1 mail",
+        "uwagi": "Jeden mail – nie trzy"
+      },
+      "klucz_sprawy": "swieze-leady",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K3",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Numer sprawy z mailem o przeglądzie (Ola do Kasi)",
+      "opis": "Ola dostała mail po walidacji dotyczący przeglądu, który wpadł jako lead sprzedażowy. Bez numeru sprawy Marek nie wie, czy agent źle zakwalifikował, czy Ola nie doczytała.",
+      "wlasciciel": "Kasia Malinowska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Powiedziała, że ma to w skrzynce i znajdzie. Jak znajdzie, prześlę. Jak nie, to nie zgadujcie, która to kampania.",
+        "Jak mi tego nie prześlesz, to nie wiem, czy agent źle to zakwalifikował, czy ona nie doczytała. Bez tego nie ruszam."
+      ],
+      "klucz_sprawy": "mail-przeglad-ola",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K4",
+      "sekcja": 2,
+      "typ": "spotkanie",
+      "tytul": "Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)",
+      "opis": "Kasia przekazuje Pawłowi propozycję i potwierdza Markowi. Marek wysyła zaproszenie dopiero po potwierdzeniu. Agenda: aktualna oferta, case study Peugeot 208, pytanie o zgodę na użycie nazwy firmy.",
+      "wlasciciel": "Kasia Malinowska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Zaproponuj przyszły czwartek o dziesiątej, on wtedy jest w Toruniu. Ja mu to przekażę i potwierdzę.",
+        "Czwartek, piętnastego, dziesiąta. Czekam na potwierdzenie od ciebie, zaproszenie wyślę dopiero wtedy."
+      ],
+      "wnioski": [
+        "Im wcześniej Kasia potwierdzi, tym więcej czasu na wysłanie zaproszenia przed 15.10."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "Brak ustalonego terminu przypomnienia"
+      },
+      "klucz_sprawy": "spotkanie-z-pawlem",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K5",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Materiały do projektu 'po godzinach' – jeśli i kiedy Kasia zdecyduje",
+      "opis": "Kasia może przesłać numery assistance i listę pól. Nawet po przesłaniu Marek trzyma materiały u siebie i nic nie podpina. Projekt startuje wyłącznie po wyraźnym zielonym świetle od Kasi.",
+      "wlasciciel": "Kasia Malinowska",
+      "termin": "brak",
+      "warunek": "Kasia sama decyduje, czy i kiedy wróci do tematu",
+      "status": "czeka",
+      "cytat": [
+        "Numery assistance i listę pól wam wyślę, jak znajdę chwilę, ale to nie jest zielone światło. Jak wyślę, trzymajcie u siebie, nie podpinajcie.",
+        "Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy."
+      ],
+      "klucz_sprawy": "material-po-godzinach",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B1",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Testy A/B wariantów rozmowy wbudowane w panel",
+      "opis": "Możliwość wrzucenia 2-3 wariantów wstępu do panelu, automatycznego podziału połączeń i odczytu wyników (więcej pełnych rozmów z telefonem, modelem i salonem).",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Chciałabym mieć w panelu coś takiego, że wrzucam dwie albo trzy wersje początku rozmowy, system sam dzieli połowę telefonów na jedną, połowę na drugą, a po tygodniu widzę, przy której ludzie rzadziej się rozłączają i częściej dochodzą do końca.",
+        "Czyli testy A/B wbudowane w panel, które sama ustawiasz i sama czytasz wyniki.",
+        "Dokładnie.",
+        "Takiej funkcji dziś nie ma. Ten jeden test ze wstępem zrobimy ręcznie, tak jak mówiłaś. A to, żebyś mogła sama, zapisuję jako prośbę."
+      ],
+      "wnioski": [
+        "Wynikiem testu dla klienta jest liczba pełnych rozmów (potwierdzony telefon, model i salon), nie sama liczba rozłączeń."
+      ],
+      "klucz_sprawy": "testy-ab-panel",
+      "klucz_funkcji": "testy-ab-panel",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B2",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Klikalne kafelki w dashboardzie (przejście do listy osób)",
+      "opis": "Kliknięcie w liczbę na kafelku (np. '9 zainteresowanych') powinno przenosić do listy tych konkretnych osób, a nie zostawać na dashboardzie.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Jest kafelek „zainteresowani”, dziewięć. Klikam w tę dziewiątkę. Nic. Zostaję na kafelku.",
+        "A to, żeby kliknięcie w dziewiątkę przenosiło cię do tych ludzi, to osobna sprawa, tego po prostu nie ma.",
+        "Na to klikanie terminu ci nie podam."
+      ],
+      "klucz_sprawy": "kafelki-klikalne",
+      "klucz_funkcji": "kafelki-klikalne",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B3",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Automatyczny raport mailowy z tygodniowymi statystykami",
+      "opis": "Cotygodniowy mail do Pawła z liczbami: ile zadzwoniliśmy, ile odebrało, ilu zainteresowanych. Eliminuje ręczne przepisywanie (~30 min tygodniowo).",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Raportu mailowego teraz nie mamy. Ale to jest coś, o co pyta więcej klientów, więc zapiszę.",
+        "Da się, żeby to samo do niego przychodziło? W poniedziałek rano, na przykład."
+      ],
+      "klucz_sprawy": "raport-mailowy-tygodniowy",
+      "klucz_funkcji": "raport-mailowy-tygodniowy",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B4",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "zmiana",
+      "tytul": "Ulepszony mail po walidacji: model i salon na górze",
+      "opis": "Aktualny mail to ściana tekstu z transkrypcją. Handlowcy nie widzą od razu, o co chodzi. Model i salon powinny być widoczne na górze maila.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "po uruchomieniu świeżych leadów",
+      "status": "backlog",
+      "cytat": [
+        "Mail, który dostaje po walidacji, to ściana tekstu z transkrypcją.",
+        "model i salon na górze, żeby nie musieli szukać w tej ścianie. To bym chciała. Ale nie w tym tygodniu.",
+        "To zostawmy na świeże."
+      ],
+      "klucz_sprawy": "mail-walidacji-model-salon",
+      "klucz_funkcji": "mail-walidacji-model-salon",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B5",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "SMS do klienta po dwóch nieudanych próbach połączenia",
+      "opis": "Gdy agent dwa razy nie dodzwoni się do klienta, wysyła SMS z informacją o próbie kontaktu. SMS-y kosztują osobno za wiadomość. Treść pisze Kasia. Decyzja Pawła.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "decyzja Pawła po otrzymaniu wyceny",
+      "status": "backlog",
+      "cytat": [
+        "zy nie mógłby wysłać SMS-a? Coś w stylu „dzwoniliśmy w sprawie Twojego zapytania o Peugeota, oddzwoń albo kliknij tutaj”. Ludzie nie o",
+        "Technicznie się da, ale SMS-y kosztują osobno, za każdą wiadomość."
+      ],
+      "klucz_sprawy": "sms-po-nieodebranym",
+      "klucz_funkcji": "sms-po-nieodebranym",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B6",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Integracja Rinvo z CRM dealera",
+      "opis": "Leady miałyby wpadać bezpośrednio do systemu handlowców, bez ręcznego przepisywania z maili. Konkurent VoiceDesk to oferuje. Rinvo nie planuje w tym kwartale.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Integracji z waszym systemem teraz nie mamy i nie chcę obiecywać, że będzie w tym kwartale.",
+        "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili."
+      ],
+      "klucz_sprawy": "integracja-crm",
+      "klucz_funkcji": "integracja-crm",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B7",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Agent po godzinach (sprzedaż, serwis, części, assistance routing)",
+      "opis": "Agent odbierający po 17:00 na wszystkie numery. Sprzedaż → lead jak walidacja; serwis → zbierz dane bez VIN, rano BOK; części → jak serwis + info o VIN; assistance → podaj numer marki i rozłącz; reszta → BOK rano.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "wyraźne zielone światło od Kasi",
+      "status": "backlog",
+      "cytat": [
+        "Paweł pyta o to co drugie spotkanie, a my tego nie mamy. Jak salon jest zamknięty, ma odbierać jeden agent, na wszystkie numery.",
+        "Nie w tym miesiącu.",
+        "To byłoby dobre, bo ja nie chcę, żeby on decydował na podstawie jednej prezentacji."
+      ],
+      "klucz_sprawy": "agent-po-godzinach",
+      "klucz_funkcji": "agent-po-godzinach",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B8",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "zmiana",
+      "tytul": "Optymalizacja godzin pierwszej próby pod porę obiadową",
+      "opis": "Na starej bazie najwięcej odebrań było ok. 12–13 i po 17:00. Można by przesunąć pierwszą próbę na przerwę obiadową. Kasia prosiła o zaczekanie na świeże leady.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "potwierdzenie wzorca na świeżych leadach",
+      "status": "backlog",
+      "cytat": [
+        "Wtedy moglibyśmy przesunąć próby tak, żeby pierwsza szła w przerwie obiadowej.",
+        "Może, ale nie teraz. To była stara baza, na świeżych może być inaczej. Najpierw zobaczmy świeże."
+      ],
+      "klucz_sprawy": "godziny-prob-obiadowa",
+      "klucz_funkcji": "godziny-prob-obiadowa",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B9",
+      "sekcja": 3,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Szkolenie handlowców ze statusów (kwadrans online, po świeżych leadach)",
+      "opis": "Po uruchomieniu świeżych leadów krótkie szkolenie online. Ściąga statusów (T10) przygotowana wcześniej. Termin szkolenia ustala Kasia.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "po uruchomieniu świeżych leadów; termin wyznacza Kasia",
+      "status": "backlog",
+      "cytat": [
+        "Moglibyście im zrobić krótkie szkolenie? Kwadrans, online.",
+        "Szkolenie dopiero, jak pójdą świeże, nie wcześniej, bo zapomną. Termin ustalę ja.",
+        "Dobra. Ściągę ci wyślę, a szkolenie czeka na twój termin."
+      ],
+      "klucz_sprawy": "szkolenie-handlowcow",
+      "klucz_funkcji": "szkolenie-handlowcow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z1",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Limit prób pozostaje 5 – bez schodzenia do 3",
+      "opis": "Limit pięciu prób nie jest zmieniany. Ktoś pytał Kasię o trzy próby, ale ona nie zlecała tej zmiany.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Limitu pięciu prób przy okazji nie ruszam, to inna sprawa.",
+        "Zostaw pięć. Nie kazałam schodzić do trzech. Mówiłam tylko, że ktoś mnie o to pytał."
+      ],
+      "klucz_sprawy": "zakaz-zmiana-limitu-prob",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z2",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10",
+      "opis": "Kasia odsłuchuje starą bazę i nowy wstęp by się 'zlał'. Test można uruchomić dopiero po wysłaniu przez Kasię obu wersji.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-12",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
+      ],
+      "klucz_sprawy": "zakaz-testy-wstepu-ten-tydzien",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z3",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie podpinać agenta po godzinach nawet po otrzymaniu materiałów",
+      "opis": "Nawet jeśli Kasia wyśle numery assistance i listę pól, Rinvo ma je trzymać u siebie i nie podpinać. Projekt startuje tylko po wyraźnym zielonym świetle od Kasi.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Numery assistance i listę pól wam wyślę, jak znajdę chwilę, ale to nie jest zielone światło. Jak wyślę, trzymajcie u siebie, nie podpinajcie.",
+        "Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy."
+      ],
+      "klucz_sprawy": "zakaz-agent-po-godzinach",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z4",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie włączać Opla – nawet jeśli Paweł napisze, że każe",
+      "opis": "Opel czeka na wyniki świeżych leadów. Jeśli Paweł (a nie Kasia) napisze, że Opel ma ruszyć, Marek dzwoni do Kasi i nie klika.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Opla na to nie puszczamy. Peugeot i Citroën zostają, Opel czeka, aż zobaczymy wyniki na leadach z ostatniego miesiąca.",
+        "Nawet jak Paweł napisze, że kazał, to najpierw zadzwonię do ciebie, a nie będę tego klikał."
+      ],
+      "klucz_sprawy": "zakaz-opel",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z5",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nic nowego nie startuje 19–23.10 (urlop Kasi)",
+      "opis": "W tygodniu urlopu Kasi nic nowego nie jest uruchamiane, nawet jeśli plik świeżych leadów już jest gotowy. Paweł odbiera pilne, ale nie zatwierdza Opla ani tekstu wstępu.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-23",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień. W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie.",
+        "Dobra. Tydzień od dziewiętnastego nic nowego nie startuje. Jak się pali, dzwonię do Pawła, ale Opel i wstęp czekają na ciebie."
+      ],
+      "klucz_sprawy": "zakaz-dzialania-urlop-kasi",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z6",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Agent nie sprzedaje i nie proponuje aut używanych",
+      "opis": "Agent waliduje, nie sprzedaje. Gdy ktoś mówi, że kupił lub się rozmyślił: dziękuje i rozłącza się. Zakaz proponowania aut używanych.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Jak zacznie sprzedawać, wyłączę go.",
+        "Nie sprzedaje. Jak ktoś mówi „już kupiłem” albo „rozmyśliłem się”, ma podziękować i się rozłączyć. Ola chciała, żeby przy odmowie proponował auto używane. Nie.",
+        "Jasne, niech nie sprzedaje. Jak ktoś mówi, że kupił, dziękujemy i koniec. Używanych nie dokładam."
+      ],
+      "klucz_sprawy": "zakaz-sprzedaz-agent",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z7",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie wysyłać Kasi wzoru pliku leadów",
+      "opis": "Kasia nie chce wzoru – eksport z panelu jest brzydki, kolumny mają techniczne nazwy. Wystarczy numer i miasto (Toruń/Włocławek).",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "I nie przysyłaj mi wzoru pliku. Eksport z panelu jest brzydki, kolumny „field 1”, „field 2”, model czasem siedzi w treści wiadomości.",
+        "wzoru ci nie wysyłam."
+      ],
+      "klucz_sprawy": "zakaz-wzor-pliku",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z8",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie kontaktować się z Olą bezpośrednio – tylko przez Kasię",
+      "opis": "Wszystkie ustalenia idą przez Kasię. Marek nie pisze do Oli.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "I do Oli nie piszę, ustalam wszystko z tobą."
+      ],
+      "klucz_sprawy": "zakaz-kontakt-z-ola",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z9",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Stara baza leadów nie jest puszczana drugi raz",
+      "opis": "Leady ze starej bazy (sprzed 2-3 miesięcy) były uruchomione raz. Nie dzwonimy do nich ponownie.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Starej bazy drugi raz nie puszczajcie.",
+        "Starej bazy drugi raz nie puszczam"
+      ],
+      "klucz_sprawy": "zakaz-stara-baza",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z10",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie uruchamiać agenta po godzinach na podstawie wiadomości podszywającej się pod Kasię",
+      "opis": "Kasia ostrzegła, że ktoś może napisać nieprawdziwe upoważnienie. Zielone światło może przyjść tylko od niej bezpośrednio.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "I jak ktoś ode mnie napisze „Kasia mówiła, że po godzinach od wtorku”, nie wierzcie.",
+        "Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy. A jak ktoś napisze, że od wtorku, odpiszę, że czekam na ciebie."
+      ],
+      "klucz_sprawy": "zakaz-falszywy-akcept-po-godzinach",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z11",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie modyfikować maila po walidacji w tygodniu 6–12.10",
+      "opis": "Salon zamyka miesiąc i nikt nie powie Kasi, czy nowy mail jest lepszy. Mail modyfikujemy po uruchomieniu świeżych leadów.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-12",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy."
+      ],
+      "klucz_sprawy": "zakaz-mail-walidacji-ten-tydzien",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z12",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie ruszać sprawy przeglądu (Ola) bez wiadomości od Kasi",
+      "opis": "Bez numeru sprawy od Kasi Marek nie dotyka tematu błędnej klasyfikacji przeglądu.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "A tego przeglądu, co Ola ma w skrzynce, nie ruszajcie bez wiadomości ode mnie."
+      ],
+      "klucz_sprawy": "zakaz-przeglad-bez-wiadomosci",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z13",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie organizować szkolenia handlowców przed świeżymi leadami",
+      "opis": "Szkolenie ma sens tylko tuż po uruchomieniu świeżych leadów, żeby handlowcy nie zapomnieli statusów. Termin ustala Kasia.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Szkolenie dopiero, jak pójdą świeże, nie wcześniej, bo zapomną. Termin ustalę ja."
+      ],
+      "klucz_sprawy": "zakaz-szkolenie-przed-swiezymi",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z14",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie uruchamiać kampanii bez pliku leadów od Kasi",
+      "opis": "Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzielnie.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Dobra. Bez pliku nic nie puszczam."
+      ],
+      "klucz_sprawy": "zakaz-kampania-bez-pliku",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "R1",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Konkurent VoiceDesk: tańszy i z integracją CRM",
+      "opis": "Firma VoiceDesk przeprowadziła prezentację u Pawła dwa tygodnie temu. Oferują bota do leadów, twierdzą że są tańsi (~30%) i łączą się z CRM dealera. Paweł zainteresowany.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Dwa tygodnie temu była u Pawła firma VoiceDesk. Też mają bota do leadów. Powiedzieli, że są tańsi i że łączą się z systemem, więc leady same wpadają handlowcom.",
+        "Paweł mówił coś o „jakieś trzydzieści procent taniej”, ale nie wiem, od czego."
+      ],
+      "wnioski": [
+        "Spotkanie z Pawłem 15.10 (K4) jest bezpośrednią odpowiedzią na to ryzyko."
+      ],
+      "klucz_sprawy": "ryzyko-voicedesk",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "temat_ryzyka": "konkurencja"
+    },
+    {
+      "id": "R2",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Paweł chciał wyłączyć agenta po złej interpretacji wyników",
+      "opis": "Paweł oceniał wyniki na bazie 9 zainteresowanych na 70 kontaktów, nie rozumiejąc, że baza była stara (trupy). Kasia go przekonała, ale ryzyko złej interpretacji świeżych wyników pozostaje.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Paweł zobaczył tylko te dziewięć na siedemdziesiąt i chciał wszystko wyłączyć. Powiedziałam mu, że to trupy, a nie świeże leady."
+      ],
+      "wnioski": [
+        "Spotkanie z Pawłem (K4) daje szansę na bezpośrednie wyjaśnienie kontekstu i oczekiwań."
+      ],
+      "klucz_sprawy": "ryzyko-zla-interpretacja-wynikow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "temat_ryzyka": "grozba_rezygnacji"
+    },
+    {
+      "id": "R3",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Brak integracji z CRM jako kluczowy argument konkurenta",
+      "opis": "Handlowcy przepisują ręcznie z maili. VoiceDesk oferuje automatyczne wpadanie leadów do systemu. Dla Pawła ważniejsze niż cena.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili.",
+        "Integracji z waszym systemem teraz nie mamy i nie chcę obiecywać, że będzie w tym kwartale."
+      ],
+      "wnioski": [
+        "Przepisywanie z maili jest codziennym bólem dla handlowców – może być decydującym argumentem przy porównaniu z VoiceDesk."
+      ],
+      "klucz_sprawy": "ryzyko-brak-integracji-crm",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "temat_ryzyka": "konkurencja"
+    }
+  ],
+  "aktualizacje_spraw": [],
+  "zmiany_zdania": [
+    {
+      "temat": "Godziny dzwonienia w sobotę",
+      "przed": "Do 14:00 ('w sobotę tylko do czternastej, jak salon')",
+      "po": "Do 15:00 ('od tego miesiąca salon w sobotę jest do piętnastej, zapomniałam')",
+      "pozycja": "T3",
+      "cytat": "Sobotę jednak zostaw do piętnastej, nie do czternastej. Od tego miesiąca salon w sobotę jest do piętnastej, zapomniałam."
+    }
+  ],
+  "konflikty_dat": [
+    {
+      "opis": "Okno na test wstępu jest wąskie: zakaz uruchamiania w tygodniu 6–12.10 (odsłuch bazy) oraz zakaz nowych startów 19–23.10 (urlop Kasi). Efektywne okno to 13–18.10. Wymaga dotrzymania obu terminów: wersje tekstu do 8.10 (K1) i plik leadów do 12.10 (K2).",
+      "pozycje": [
+        "Z2",
+        "Z5",
+        "K1",
+        "K2"
+      ],
+      "wnioski": [
+        "Jeśli którykolwiek z terminów nie zostanie dotrzymany, test ruszy najwcześniej 24.10 (po urlopie)."
+      ]
+    }
+  ],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [
+      "Zmiana godzin salonu dla klientów (T4) i zmiana godzin dzwonienia (T3) to oddzielne zadania – nie scalono, bo dotyczą różnych ustawień.",
+      "Rozliczenie błędnych połączeń połączono ze sprawdzeniem zasad naliczania minut w T7 – Marek miał odpowiedzieć na oba razem."
+    ],
+    "pominiete": [
+      "Ola chciała, żeby agent proponował auto używane przy odmowie – odrzucona propozycja Oli, nie decyzja (skutkuje zakazem Z6).",
+      "Marek zaproponował przykładowy tekst SMS – Kasia odpowiedziała 'przyślij cenę', tekst napisze sama. Przykładowy tekst nie jest do dostarczenia."
+    ]
+  },
+  "szkic_maila": "Cześć Kasiu,\n\nPodsumowanie rozmowy z 6 października:\n\nCo robimy dziś:\n- Poprawiam adres salonu we Włocławku na Toruńska 120. Napiszę, jak będzie gotowe.\n- Zmieniam godziny dzwonienia: tydzień 9:00–19:00, sobota 9:00–15:00.\n- Aktualizuję godziny otwarcia salonu podawane przez agenta: sobota do 15:00, oba salony.\n- Sprawdzam błąd podwójnego telefonu po 3-sekundowym rozłączeniu. Napiszę wynik i ile takich połączeń było (błędne odejmiemy z faktury).\n- Naprawiam filtr statusu na liście kontaktów. Przy okazji przesunę kolumnę z nazwiskiem.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna nazwa firmy). Korekta powinna przyjść w przyszłym tygodniu.\n- Sprawdzam zasady liczenia połączeń poniżej minuty i napiszę.\n- Cena SMS-ów: wyślę w tym tygodniu.\n\nCzekam od ciebie:\n- Dwie wersje tekstu wstępu – do czwartku (8.10). Jeśli do czwartku nic nie przyjdzie, wyślę jedno przypomnienie.\n- Plik świeżych leadów – do poniedziałku (12.10). Jeśli nie będzie, wyślę jeden mail. Wzoru nie wysyłam.\n- Numer maila o przeglądzie od Oli – jak znajdzie, prześlij. Bez tego nie ruszam tej sprawy.\n- Potwierdzenie spotkania z Pawłem na czwartek 15.10 o 10:00 (Toruń). Zaproszenie wyślę po twoim potwierdzeniu.\n\nCo stoi:\n- Opel: czeka na wyniki świeżych leadów. Jeśli Paweł napisze, że każe włączyć – najpierw dzwonię do ciebie.\n- Agent po godzinach: stoi. Jeśli wyślesz numery assistance, odkładam u siebie, nic nie podpinam.\n- Mail po walidacji (model i salon na górze): po świeżych leadach.\n- Szkolenie handlowców: po świeżych leadach, termin ustalasz ty. Ściągę wyślę wcześniej.\n\nTydzień 19–23.10 (twój urlop): nic nowego nie startuję. Pilne sprawy → Paweł, ale Opel i tekst wstępu czekają na ciebie.\n\nPozdrawiam,\nMarek"
+}
