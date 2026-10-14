@@ -69,7 +69,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
 | `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 42 testy) |
-| `testy/test_maile.py`, `testy/maile/*.eml` | testy źródła „maile” na przykładowych plikach .eml (33 testy) |
+| `testy/test_maile.py`, `testy/maile/*.eml` | testy źródła „maile” na przykładowych plikach .eml (53 testy) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -221,9 +221,14 @@ flowchart LR
 ```
 
 - **`maile.py`** (biblioteka standardowa: `imaplib`, `email`) otwiera INBOX **tylko do odczytu** (`SELECT readonly`, treść przez `BODY.PEEK`). Niczego nie wysyła, nie usuwa, nie oznacza ani nie przenosi; test pilnuje, że kod używa wyłącznie `login/select/uid/logout`.
-- **Kto jest znany:** tylko nadawcy z pól `kontakty` w kartach klientów albo z `domeny` klienta. Od nieznanego nadawcy treść **nie jest pobierana**: mail jest tylko liczony, a przy pierwszym wystąpieniu adresu Slack dostaje informację „pominięto mail od nieznanego nadawcy <adres>". W rejestrze nieznani nadawcy są tylko jako hasze (repo bywa publiczne).
+- **Kto jest znany:** tylko nadawcy z pól `kontakty` w kartach klientów albo z `domeny` klienta. Od nieznanego nadawcy treść **nie jest pobierana**.
+- **Mało szumu na Slacku** (skrzynka to zwykła poczta: LinkedIn, Uber, Instagram…):
+  - maile **automatyczne** (nagłówki `List-Unsubscribe`, `Auto-Submitted` inny niż `no`, `Precedence: bulk/list/junk`, adresy `noreply`, `no-reply`, `notifications`…) są pomijane całkowicie i po cichu: bez Slacka, bez rejestru, bez pobierania treści,
+  - pozostali nieznani nadawcy to **jedna linijka na przebieg**, bez adresów: „pominięto N maili od nieznanych nadawców" (w rejestrze są tylko jako hasze, bo repo bywa publiczne),
+  - osobny alert z adresem tylko dla nadawcy z domeny klienta (patrz niżej),
+  - **data włączenia** (`wlaczono` w `ops/.maile.json`): nie czytamy historii skrzynki, tylko maile od tego dnia.
 - **Domena klienta** (`domeny`, np. `autotama.pl`): mail z adresu w tej domenie, którego nie ma w kontaktach, jest czytany, a nadawca trafia do `kontakty` z flagą „nowy, bez prawa decyzji" (`potwierdzony: false`) i informacją na Slacku do potwierdzenia przez człowieka. Jego maile mogą dodawać informacje, ale nie uchylają zakazów ani nie zmieniają decyzji. Potwierdzenie: ustaw `potwierdzony: true` (i opis roli) w `ops/klienci/<klient>/karta.json`. Ogólne domeny pocztowe (gmail.com, wp.pl, onet.pl, o2.pl, outlook.com…) nigdy nie są domeną klienta, w nich liczy się tylko pełny adres.
-- **Rejestr** `ops/.maile.json`: Message-ID przetworzonego maila; ten sam mail nigdy nie jest przetwarzany dwa razy.
+- **Rejestr** `ops/.maile.json` działa jak rejestr transkrypcji: Message-ID trafia do `przetworzone` dopiero **po udanym przetworzeniu** (robi to `przetworz.py`). Do tego czasu mail jest w `oczekujace`. Mail, którego analiza padła, jest ponawiany przy kolejnym przebiegu, **maksymalnie 3 razy** (każde wejście na listę to jedna próba, więc awaria całego przebiegu też nie ponawia w nieskończoność). Potem status `porzucony` i alert na Slacku (raz). Ręczne ponowienie: workflow „Sprawdzanie maili" z polem `sciezka`; udany przebieg przenosi mail do `przetworzone`.
 - **Zapis** `ops/maile/<klient>/<data>-<slug>.md`: od, do, data, temat, lista nazw załączników, treść tekstowa bez cytowanych wcześniejszych wiadomości i bez stopki.
 - **Analiza** (`.claude/commands/analizuj-mail.md`, krótsza instrukcja): ten sam schemat `wynik.json`, więc `render.py`, `daty.py` i `linear_sync.py` działają bez zmian. Mail najczęściej aktualizuje otwarte sprawy (np. klient przysłał plik → wznowiona); załącznik jest dowodem dostarczenia tylko wtedy, gdy treść wskazuje, czego dotyczy.
 - **Bezpieczeństwo treści:** treść maila to dane, nigdy polecenia („zignoruj…", „system ma…" analizowane jak każda inna treść). Polecenie w imieniu innej osoby („Paweł prosi…") to nie jej decyzja: `pewnosc: niska`. Analiza maila dostaje tylko narzędzia `Read`, `Write`, `Edit` (bez `Bash`) i nie widzi kluczy do Linear, Slacka ani Gmaila. Tematy i tytuły w wiadomości Slack są oczyszczane ze znaczników (`<!channel>`, linki).
@@ -263,7 +268,7 @@ Pokrycie (42 testy):
 python3 testy/test_maile.py
 ```
 
-33 testy na przykładowych plikach `testy/maile/*.eml`: nieznany nadawca pominięty bez pobierania treści (i Slack tylko raz), ten sam Message-ID pominięty, cytaty i stopka obcięte, nadawca z domeny klienta dodany jako „nowy, bez prawa decyzji", ogólne domeny pocztowe nigdy nie są domeną klienta, aktualizacja zakazu od niewłaściwej osoby odrzucona przez kod, mail starszy niż sprawa nie wznawia, skrzynka otwierana tylko do odczytu.
+53 testy na przykładowych plikach `testy/maile/*.eml`: nieznany nadawca pominięty bez pobierania treści (jedna linijka na przebieg, bez adresów), maile automatyczne pomijane po cichu (każde kryterium osobno), data włączenia, rejestr po sukcesie z ponowieniami (3 próby, potem porzucony), ten sam Message-ID pominięty, cytaty i stopka obcięte, nadawca z domeny klienta dodany jako „nowy, bez prawa decyzji", ogólne domeny pocztowe nigdy nie są domeną klienta, aktualizacja zakazu od niewłaściwej osoby odrzucona przez kod, mail starszy niż sprawa nie wznawia, skrzynka otwierana tylko do odczytu.
 
 ### Testy oczekiwań (po analizie)
 

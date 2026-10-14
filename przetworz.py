@@ -31,7 +31,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
-from maile import czy_mail, wczytaj_meta_maila
+from maile import czy_mail, oznacz_przetworzony, slack_bezpiecznie, wczytaj_meta_maila
 from sekrety import NAZWY_SEKRETOW, czysc, wyczysc_srodowisko
 
 
@@ -210,12 +210,6 @@ def run_step(cmd, log_path, step_name, timeout=120):
 
 
 # ── Slack: podsumowanie ───────────────────────────────────────────────────────
-
-def slack_bezpiecznie(tekst, limit=120):
-    """Tekst z maila/transkrypcji bez znaków sterujących Slacka (<@U…>, <!channel>, linki)."""
-    t = re.sub(r"\s+", " ", str(tekst or "")).strip()[:limit]
-    return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
-
 
 def _linia_slack(emoji, nazwa, pozycje, limit=5):
     """Linia z licznikiem (także 0) i listą tytułów pod spodem."""
@@ -618,6 +612,9 @@ def main():
             "przetworzone": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
         }
         save_registry(registry)
+        # mail: Message-ID trafia do ops/.maile.json (przetworzone) dopiero po udanym przetworzeniu
+        if czy_mail(transkrypcja) and oznacz_przetworzony(transkrypcja):
+            print("  rejestr maili: oznaczono jako przetworzony")
         print(f"\nGotowe. Log: {log_path}")
 
     except Exception as exc:

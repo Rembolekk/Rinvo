@@ -76,11 +76,17 @@ class FakeSkrzynka:
         return self.pliki[uid]
 
 
-def uruchom(skrzynka, karty=None, rejestr=None, katalog=None):
+def nowy_rejestr(**extra):
+    r = {"przetworzone": {}, "oczekujace": {}, "nieznani": {}}
+    r.update(extra)
+    return r
+
+
+def uruchom(skrzynka, karty=None, rejestr=None, katalog=None, dzis="2026-10-14"):
     karty = karty if karty is not None else {"auto-tama": karta_testowa()}
-    rejestr = rejestr if rejestr is not None else {"przetworzone": {}, "nieznani": {}}
+    rejestr = rejestr if rejestr is not None else nowy_rejestr()
     slack = []
-    wynik = maile.przetworz_skrzynke(skrzynka, karty, rejestr, slack.append, "2026-10-14", katalog)
+    wynik = maile.przetworz_skrzynke(skrzynka, karty, rejestr, slack.append, dzis, katalog)
     return wynik, karty, rejestr, slack
 
 
@@ -94,18 +100,27 @@ class TestNieznanyNadawca(unittest.TestCase):
             self.assertEqual(wynik["nieznani"], 2)
             self.assertEqual(sk.pobrane, [], "od nieznanego nadawcy nie wolno pobierać treści")
             self.assertEqual(list(Path(tmp).rglob("*.md")), [])
-            self.assertIn("pominięto mail od nieznanego nadawcy jan@firma-xyz.example", slack)
 
-    def test_slack_tylko_przy_pierwszym_wystapieniu_adresu_a_licznik_rosnie(self):
+    def test_nieznani_nadawcy_jedna_linijka_na_przebieg_bez_adresow(self):
         with tempfile.TemporaryDirectory() as tmp:
-            rejestr = {"przetworzone": {}, "nieznani": {}}
-            sk1 = FakeSkrzynka(["od-nieznanego.eml"])
-            _, _, _, slack1 = uruchom(sk1, rejestr=rejestr, katalog=Path(tmp))
-            sk2 = FakeSkrzynka(["od-nieznanego.eml"], zmien_id={"od-nieznanego.eml": "obcy-druga@mail.example"})
-            _, _, _, slack2 = uruchom(sk2, rejestr=rejestr, katalog=Path(tmp))
-            self.assertEqual(len(slack1), 1)
-            self.assertEqual(slack2, [], "ten sam adres: bez drugiej informacji na Slacku")
-            self.assertEqual(list(rejestr["nieznani"].values())[0]["liczba"], 2)
+            sk = FakeSkrzynka(["od-nieznanego.eml", "od-ogolnej-domeny.eml"])
+            _, _, _, slack = uruchom(sk, katalog=Path(tmp))
+            self.assertEqual(slack, ["pominięto 2 maili od nieznanych nadawców"])
+            self.assertFalse(any("@" in m or "firma-xyz" in m or "wp.pl" in m for m in slack),
+                             "w podsumowaniu nie ma adresów")
+
+    def test_ten_sam_nieznany_mail_nie_jest_liczony_ponownie(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            uruchom(FakeSkrzynka(["od-nieznanego.eml"]), rejestr=rejestr, katalog=Path(tmp))
+            _, _, _, slack2 = uruchom(FakeSkrzynka(["od-nieznanego.eml"]), rejestr=rejestr, katalog=Path(tmp))
+            self.assertEqual(slack2, [], "ten sam mail w kolejnym przebiegu: bez Slacka")
+            self.assertEqual(list(rejestr["nieznani"].values())[0]["liczba"], 1)
+
+    def test_brak_nieznanych_to_brak_wiadomosci(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            _, _, _, slack = uruchom(FakeSkrzynka(["od-kasi-plik.eml"]), katalog=Path(tmp))
+            self.assertEqual(slack, [])
 
     def test_rejestr_nie_przechowuje_adresow_nieznanych_nadawcow(self):
         with tempfile.TemporaryDirectory() as tmp:
@@ -125,16 +140,223 @@ class TestRejestrMessageId(unittest.TestCase):
 
     def test_ten_sam_message_id_nie_jest_przetwarzany_dwa_razy(self):
         with tempfile.TemporaryDirectory() as tmp:
-            rejestr = {"przetworzone": {}, "nieznani": {}}
+            rejestr = nowy_rejestr()
             sk1 = FakeSkrzynka(["od-kasi-plik.eml"])
             w1, _, _, _ = uruchom(sk1, rejestr=rejestr, katalog=Path(tmp))
             sk2 = FakeSkrzynka(["od-kasi-plik.eml"])
             w2, _, _, _ = uruchom(sk2, rejestr=rejestr, katalog=Path(tmp))
             self.assertEqual(len(w1["nowe"]), 1)
             self.assertEqual(w2["nowe"], [])
-            self.assertEqual(sk2.pobrane, [], "przetworzony mail nie jest nawet pobierany ponownie")
+            self.assertEqual(sk2.pobrane, [], "mail już zapisany nie jest pobierany ponownie")
             self.assertEqual(len(list(Path(tmp).rglob("*.md"))), 1)
-            self.assertIn("<kasia-plik-001@mail.example>", rejestr["przetworzone"])
+
+    def test_po_sukcesie_mail_nigdy_nie_wraca(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            w, _, _, slack = uruchom(FakeSkrzynka(["od-kasi-plik.eml"]), rejestr=rejestr, katalog=Path(tmp))
+            _, sciezka, _ = w["nowe"][0]
+            rpath = Path(tmp) / ".maile.json"
+            maile.zapisz_rejestr(rejestr, rpath)
+            self.assertTrue(maile.oznacz_przetworzony(sciezka, rpath))
+            r = maile.wczytaj_rejestr(rpath)
+            self.assertIn("<kasia-plik-001@mail.example>", r["przetworzone"])
+            self.assertEqual(r["oczekujace"], {})
+            sk = FakeSkrzynka(["od-kasi-plik.eml"])
+            w2, _, _, _ = uruchom(sk, rejestr=r, katalog=Path(tmp))
+            self.assertEqual(w2["nowe"], [])
+            self.assertEqual(maile.do_przetworzenia(r, slack.append), [])
+
+
+class TestRejestrPoSukcesie(unittest.TestCase):
+    """Message-ID trafia do "przetworzone" dopiero po udanym przetworzeniu; nieudane próby są ponawiane."""
+
+    def _zapisany(self, tmp, rejestr):
+        w, _, _, slack = uruchom(FakeSkrzynka(["od-kasi-plik.eml"]), rejestr=rejestr, katalog=Path(tmp))
+        return w["nowe"][0][1], slack
+
+    def test_nowy_mail_jest_oczekujacy_a_nie_przetworzony(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            sciezka, _ = self._zapisany(tmp, rejestr)
+            self.assertEqual(rejestr["przetworzone"], {}, "przed analizą nic nie jest przetworzone")
+            wpis = rejestr["oczekujace"]["<kasia-plik-001@mail.example>"]
+            self.assertEqual((wpis["proby"], wpis["status"]), (0, "oczekuje"))
+            self.assertIn("- **Message-ID:** <kasia-plik-001@mail.example>", sciezka.read_text(encoding="utf-8"))
+
+    def test_nieudana_analiza_jest_ponawiana_maksymalnie_3_razy_potem_porzucony_z_alertem(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            sciezka, _ = self._zapisany(tmp, rejestr)
+            slack = []
+            for proba in (1, 2, 3):
+                lista = maile.do_przetworzenia(rejestr, slack.append)
+                self.assertEqual(lista, [Path(sciezka)], f"próba {proba}: mail ma być na liście")
+                # przetworz.py nie dotarł do sukcesu: rejestr bez zmian
+                self.assertEqual(rejestr["przetworzone"], {})
+                # kolejny przebieg widzi ten sam mail w skrzynce: nie zapisuje go drugi raz
+                uruchom(FakeSkrzynka(["od-kasi-plik.eml"]), rejestr=rejestr, katalog=Path(tmp))
+            self.assertEqual(slack, [], "przez 3 próby bez alertu porzucenia")
+            self.assertEqual(rejestr["oczekujace"]["<kasia-plik-001@mail.example>"]["proby"], 3)
+            self.assertEqual(maile.do_przetworzenia(rejestr, slack.append), [], "4. raz: już nie próbujemy")
+            self.assertEqual(rejestr["oczekujace"]["<kasia-plik-001@mail.example>"]["status"], "porzucony")
+            self.assertEqual(len(slack), 1)
+            self.assertIn("porzucony po 3", slack[0])
+            self.assertIn("Plik ze świeżymi leadami", slack[0])
+            self.assertEqual(maile.do_przetworzenia(rejestr, slack.append), [])
+            self.assertEqual(len(slack), 1, "alert tylko raz")
+            self.assertEqual(len(list(Path(tmp).rglob("*.md"))), 1, "plik maila nie jest zapisywany ponownie")
+
+    def test_sukces_w_trakcie_ponowien_konczy_ponawianie(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            sciezka, _ = self._zapisany(tmp, rejestr)
+            maile.do_przetworzenia(rejestr, lambda t: None)           # próba 1: porażka
+            rpath = Path(tmp) / ".maile.json"
+            maile.zapisz_rejestr(rejestr, rpath)
+            maile.oznacz_przetworzony(sciezka, rpath)                 # próba 2 zakończona sukcesem
+            r = maile.wczytaj_rejestr(rpath)
+            self.assertEqual(maile.do_przetworzenia(r, lambda t: None), [])
+            self.assertIn("<kasia-plik-001@mail.example>", r["przetworzone"])
+
+    def test_porzucony_mail_przetworzony_recznie_przechodzi_do_przetworzonych(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            sciezka, _ = self._zapisany(tmp, rejestr)
+            for _ in range(4):
+                maile.do_przetworzenia(rejestr, lambda t: None)
+            self.assertEqual(rejestr["oczekujace"]["<kasia-plik-001@mail.example>"]["status"], "porzucony")
+            rpath = Path(tmp) / ".maile.json"
+            maile.zapisz_rejestr(rejestr, rpath)
+            self.assertTrue(maile.oznacz_przetworzony(sciezka, rpath))
+            r = maile.wczytaj_rejestr(rpath)
+            self.assertEqual(r["oczekujace"], {})
+            self.assertIn("<kasia-plik-001@mail.example>", r["przetworzone"])
+
+    def test_alert_porzucenia_nie_przepuszcza_znacznikow_z_tematu(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            sciezka, _ = self._zapisany(tmp, rejestr)
+            sciezka.write_text(sciezka.read_text(encoding="utf-8").replace(
+                "- **Temat:** Re: Plik ze świeżymi leadami", "- **Temat:** <!channel> pilne"), encoding="utf-8")
+            slack = []
+            for _ in range(4):
+                maile.do_przetworzenia(rejestr, slack.append)
+            self.assertNotIn("<!channel>", slack[0])
+            self.assertIn("&lt;!channel&gt;", slack[0])
+
+    def test_oznacz_przetworzony_pomija_stare_pliki_bez_message_id(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            stary = Path(tmp) / "maile" / "auto-tama" / "2026-10-14-stary.md"
+            stary.parent.mkdir(parents=True)
+            stary.write_text("# Mail: x\n\n- **Od:** a@b.pl\n- **Data:** 2026-10-14 09:00\n- **Temat:** x\n",
+                             encoding="utf-8")
+            self.assertFalse(maile.oznacz_przetworzony(stary, Path(tmp) / ".maile.json"))
+
+    def test_przetworz_py_oznacza_mail_po_sukcesie_a_nie_przed_analiza(self):
+        kod = (Path(maile.__file__).parent / "przetworz.py").read_text(encoding="utf-8")
+        self.assertEqual(kod.count("oznacz_przetworzony("), 1)
+        self.assertGreater(kod.index("oznacz_przetworzony("), kod.index("save_registry(registry)"),
+                           "oznaczenie dopiero po udanym zakończeniu (razem z rejestrem transkrypcji)")
+
+
+class TestMaileAutomatyczne(unittest.TestCase):
+    """Newslettery i powiadomienia: pomijane całkowicie i po cichu."""
+
+    AUTO = ["auto-linkedin.eml", "auto-uber.eml", "auto-noreply.eml", "auto-bulk.eml",
+            "auto-noreply-domeny-klienta.eml"]
+
+    def test_automatyczne_pomijane_po_cichu_bez_sladu(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sk = FakeSkrzynka(self.AUTO)
+            karty = {"auto-tama": karta_testowa()}
+            przed = copy.deepcopy(karty)
+            wynik, _, rejestr, slack = uruchom(sk, karty=karty, katalog=Path(tmp))
+            self.assertEqual(wynik["automatyczne"], 5)
+            self.assertEqual(slack, [], "ani jednej wiadomości na Slacku")
+            self.assertEqual(sk.pobrane, [], "treść automatycznych maili nie jest pobierana")
+            self.assertEqual(list(Path(tmp).rglob("*.md")), [])
+            self.assertEqual(rejestr["nieznani"], {}, "nie liczą się nawet jako nieznani")
+            self.assertEqual(rejestr["oczekujace"], {})
+            self.assertEqual(karty, przed, "noreply@ z domeny klienta nie trafia do kontaktów")
+            self.assertEqual(wynik["nieznani"], 0)
+
+    def test_kazde_kryterium_osobno(self):
+        import email as em
+        from email.policy import default
+        def msg(naglowki):
+            return em.message_from_bytes(naglowki.encode() + b"\n\ntresc", policy=default)
+        ca = maile.czy_automatyczny
+        self.assertTrue(ca(msg("From: a@b.pl\nList-Unsubscribe: <https://x>"), "a@b.pl"))
+        self.assertTrue(ca(msg("From: a@b.pl\nAuto-Submitted: auto-replied"), "a@b.pl"))
+        for wartosc in ("bulk", "list", "junk", "Bulk"):
+            self.assertTrue(ca(msg(f"From: a@b.pl\nPrecedence: {wartosc}"), "a@b.pl"), wartosc)
+        for adres in ("noreply@x.pl", "no-reply@x.pl", "no_reply@x.pl", "messages-noreply@linkedin.com",
+                      "do-not-reply@x.pl", "donotreply@x.pl", "notifications@x.pl", "notification-abc@x.pl",
+                      "mailer-daemon@x.pl", "NoReply@X.PL"):
+            self.assertTrue(ca(msg("From: " + adres), adres), adres)
+
+    def test_zwykly_mail_nie_jest_automatyczny(self):
+        import email as em
+        from email.policy import default
+        def msg(naglowki):
+            return em.message_from_bytes(naglowki.encode() + b"\n\ntresc", policy=default)
+        ca = maile.czy_automatyczny
+        self.assertFalse(ca(msg("From: kasia@x.pl"), "kasia@x.pl"))
+        self.assertFalse(ca(msg("From: kasia@x.pl\nAuto-Submitted: no"), "kasia@x.pl"))
+        self.assertFalse(ca(msg("From: kasia@x.pl\nPrecedence: first-class"), "kasia@x.pl"))
+        self.assertFalse(ca(msg("From: reply@x.pl"), "reply@x.pl"), "'reply' to nie 'noreply'")
+        self.assertFalse(ca(msg("From: jan.notifier@x.pl"), "jan.notifier@x.pl"))
+
+    def test_auto_submitted_no_od_znanego_kontaktu_jest_przetwarzany(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            wynik, _, _, _ = uruchom(FakeSkrzynka(["od-kasi-auto-submitted-no.eml"]), katalog=Path(tmp))
+            self.assertEqual(len(wynik["nowe"]), 1)
+
+    def test_pobierane_naglowki_zawieraja_pola_potrzebne_do_wykrycia_automatow(self):
+        for pole in ("LIST-UNSUBSCRIBE", "AUTO-SUBMITTED", "PRECEDENCE", "FROM", "MESSAGE-ID", "DATE"):
+            self.assertIn(pole, maile.NAGLOWKI_IMAP.split())
+
+    def test_mieszana_skrzynka_automaty_nieznani_i_znany(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sk = FakeSkrzynka(self.AUTO + ["od-nieznanego.eml", "od-kasi-plik.eml"])
+            wynik, _, _, slack = uruchom(sk, katalog=Path(tmp))
+            self.assertEqual(slack, ["pominięto 1 maili od nieznanych nadawców"])
+            self.assertEqual(len(wynik["nowe"]), 1)
+            self.assertEqual(sk.pobrane, ["od-kasi-plik.eml"])
+
+
+class TestDataWlaczenia(unittest.TestCase):
+
+    def test_pierwszy_przebieg_zapisuje_date_wlaczenia_w_rejestrze(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr()
+            uruchom(FakeSkrzynka(["od-kasi-plik.eml"]), rejestr=rejestr, katalog=Path(tmp), dzis="2026-10-14")
+            self.assertEqual(rejestr["wlaczono"], "2026-10-14")
+
+    def test_maile_sprzed_wlaczenia_ignorowane_calkowicie(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            sk = FakeSkrzynka(["od-kasi-plik.eml", "od-nieznanego.eml"])   # oba z 14.10
+            rejestr = nowy_rejestr()
+            wynik, _, _, slack = uruchom(sk, rejestr=rejestr, katalog=Path(tmp), dzis="2026-10-20")
+            self.assertEqual(rejestr["wlaczono"], "2026-10-20")
+            self.assertEqual(wynik["nowe"], [])
+            self.assertEqual(wynik["nieznani"], 0, "historia nie jest nawet liczona")
+            self.assertEqual(slack, [])
+            self.assertEqual(sk.pobrane, [])
+
+    def test_istniejaca_data_wlaczenia_nie_jest_nadpisywana(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            rejestr = nowy_rejestr(wlaczono="2026-10-10")
+            wynik, _, _, _ = uruchom(FakeSkrzynka(["od-kasi-plik.eml"]), rejestr=rejestr,
+                                     katalog=Path(tmp), dzis="2026-10-20")
+            self.assertEqual(rejestr["wlaczono"], "2026-10-10")
+            self.assertEqual(len(wynik["nowe"]), 1, "mail z 14.10 jest po dacie włączenia 10.10")
+
+    def test_okno_wyszukiwania_nie_siega_przed_date_wlaczenia(self):
+        from datetime import date
+        self.assertEqual(maile.okno_od(date(2026, 10, 20), 14, "2026-10-18"), date(2026, 10, 18))
+        self.assertEqual(maile.okno_od(date(2026, 10, 20), 14, "2026-09-01"), date(2026, 10, 6))
+        self.assertEqual(maile.okno_od(date(2026, 10, 20), 14, None), date(2026, 10, 6))
 
 
 class TestTrescMaila(unittest.TestCase):
@@ -217,7 +439,7 @@ class TestDomenaKlienta(unittest.TestCase):
     def test_drugi_mail_nowego_nadawcy_nie_dubluje_kontaktu_ani_slacka(self):
         with tempfile.TemporaryDirectory() as tmp:
             karty = {"auto-tama": karta_testowa()}
-            rejestr = {"przetworzone": {}, "nieznani": {}}
+            rejestr = nowy_rejestr()
             uruchom(FakeSkrzynka(["od-domeny-klienta.eml"]), karty, rejestr, Path(tmp))
             sk2 = FakeSkrzynka(["od-domeny-klienta.eml"], zmien_id={"od-domeny-klienta.eml": "pawel-druga@x.example"})
             wynik, _, _, slack = uruchom(sk2, karty, rejestr, Path(tmp))
