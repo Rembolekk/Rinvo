@@ -109,6 +109,13 @@ class LinearAgent:
              % (linear_sync.TEAM_KEY, od_iso, self._POLA_PELNE))
         return [self._normalizuj(n) for n in linear_sync.gql(self.api_key, q)["issues"]["nodes"]]
 
+    def otwarte(self, stany):
+        """Otwarte zgłoszenia zespołu w podanych stanach (nazwy)."""
+        nazwy = ", ".join('"%s"' % n for n in stany)
+        q = ('query { issues(first: 100, filter: { and: [ { team: { key: { eq: "%s" } } }, '
+             '{ state: { name: { in: [%s] } } } ] }) { nodes { %s } } }' % (linear_sync.TEAM_KEY, nazwy, self._POLA_PELNE))
+        return [self._normalizuj(n) for n in linear_sync.gql(self.api_key, q)["issues"]["nodes"]]
+
     def komentarze(self, zg):
         q = 'query { issue(id: "%s") { comments(first: 100) { nodes { id body createdAt } } } }' % zg["id"]
         return linear_sync.gql(self.api_key, q)["issue"]["comments"]["nodes"]

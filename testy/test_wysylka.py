@@ -36,8 +36,8 @@ OPIS = ("## Cel\n\nGodziny w sobotę do 15:00.\n\n## Kontekst\n\nKlient prosi o 
 DOBRA = "Dzień dobry, Kasia,\n\nw sobotę podajemy już godziny do 15:00 w obu salonach.\n\nPozdrawiam\nMarek Rewoliński"
 
 
-def zg(numer, klient="auto-tama", labels=("Konfiguracja", "Dla agenta"), opis=OPIS, tytul="Godziny w sobotę", completed="2026-10-14T07:00:00Z", stan="Done"):
-    return {"id": f"id{numer}", "identifier": f"RIN-{numer}", "title": f"[{klient}] {tytul}", "description": opis,
+def zg(numer, klient="auto-tama", labels=("Konfiguracja", "Dla agenta"), opis=OPIS, tytul="Godziny w sobotę", completed="2026-10-14T07:00:00Z", stan="Done", created="2026-10-14T06:00:00Z"):
+    return {"createdAt": created, "id": f"id{numer}", "identifier": f"RIN-{numer}", "title": f"[{klient}] {tytul}", "description": opis,
             "url": f"https://linear.app/x/issue/RIN-{numer}/a", "state": stan, "labels": list(labels), "completedAt": completed}
 
 
@@ -56,6 +56,9 @@ class AtrapaLinear:
 
     def ukonczone(self, od):
         return [copy.deepcopy(z) for z in self.zgloszenia.values() if z["state"] == "Done"]
+
+    def otwarte(self, stany):
+        return [copy.deepcopy(z) for z in self.zgloszenia.values() if z["state"] in stany]
 
     def zgloszenie_po_numerze(self, n):
         return self.zgloszenia.get(f"RIN-{n}")
@@ -480,8 +483,8 @@ class TestSzkice(unittest.TestCase):
         bez = OPIS.replace("> Napisz mi, jak będzie poprawione.", "> Dzięki.")
         self.assertIsNone(szkice.powod_szkicu(zg(2, opis=bez), Z))
         self.assertEqual(szkice.powod_szkicu(zg(3, opis=bez, labels=("Czeka na klienta",)), Z), "do_klienta")
-        self.assertEqual(szkice.powod_szkicu(zg(4, opis=bez, tytul="Przypomnienie o pliku leadów"), Z), "do_klienta")
-        self.assertEqual(szkice.powod_szkicu(zg(5, opis=bez, tytul="Zestawienie wyników tygodnia"), Z), "do_klienta")
+        self.assertEqual(szkice.powod_szkicu(zg(4, opis=bez, tytul="Przypomnienie o pliku leadów"), Z), "wiadomosc")
+        self.assertEqual(szkice.powod_szkicu(zg(5, opis=bez, tytul="Zestawienie wyników tygodnia"), Z), "wiadomosc")
 
     def test_notatki_wewnetrzne_bez_szkicu(self):
         self.assertIsNone(szkice.powod_szkicu(zg(1, tytul="Notatka przed spotkaniem z Pawłem", labels=("Czeka na klienta",)), Z))
@@ -576,6 +579,135 @@ class TestSzkice(unittest.TestCase):
         s.sucho = True
         self.assertEqual(szkice.uruchom(s)[0]["status"], "powstalby")
         self.assertEqual((s.linear.zdarzenia, s.claude.prompty), ([], []))
+
+
+# ── prośba o informację w starszych cytatach i zgłoszenia „do klienta” w Todo ──
+
+OPIS_RIN65 = ("## Cel\n\nBaza wiedzy podaje prawidłową godzinę zamknięcia salonu Sopot w piątek.\n\n## Kontekst\n\n"
+              "Od października salon Sopot jest czynny w piątek do 16:00. Marek poprawi dzisiaj i napisze do Ani po korekcie.\n\n"
+              "**Właściciel:** Marek Rewoliński\n\n**Cytaty ze źródła:**\n\n> Agent działa nieźle, ale podaje złe godziny dla Sopotu.\n"
+              "> To nasz błąd w bazie wiedzy. Poprawię dzisiaj.\n> Nie, nie trzeba. Napisz tylko, jak będzie zrobione.\n\n"
+              "## Kryteria akceptacji\n\n- [ ] Sopot w piątek do 16:00\n\n## Czego nie ruszać\n\n- Zakaz Z2: x\n\n## Źródło\n\n`x`")
+OPIS_BEZ_PROSBY = OPIS_RIN65.replace("> Nie, nie trzeba. Napisz tylko, jak będzie zrobione.", "> Dzięki.")
+OPIS_ZAPROSZENIE = ("## Cel\n\nWysłać Kasi i Pawłowi zaproszenie na spotkanie w czwartek 15.10 o 10:00.\n\n## Kontekst\n\n"
+                    "Spotkanie potwierdzone na czwartek o 10:00.\n\n> Możesz wysłać zaproszenie.\n\n## Kryteria akceptacji\n\n"
+                    "- [ ] Zaproszenie dotyczy czwartku 15.10, godz. 10:00\n\n## Czego nie ruszać\n\n- Zakaz Z4: Nie włączać Opla\n\n## Źródło\n\n`x`")
+KARTA_KLINIKA = {"klient": "Klinika Uśmiech", "zakazy": [],
+                 "kontakty": [{"imie": "Ania Zielińska", "email": "ania@klinika.pl", "rola": "kontakt główny", "potwierdzony": True}],
+                 "otwarte_sprawy": {"godziny-sopot-piatek": {"identifier": "RIN-65", "zrodla": ["ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"]}}}
+
+
+class TestProsbaOInformacje(unittest.TestCase):
+
+    def test_cytat_napisz_tylko_jak_bedzie_zrobione_to_prosba(self):
+        z = zg(65, klient="klinika-usmiech", opis=OPIS_RIN65, tytul="Błędne godziny otwarcia Sopot w piątek", labels=("Konfiguracja", "Repo"))
+        self.assertEqual(szkice.powod_szkicu(z, Z), "prosba")
+
+    def test_napisze_marka_to_nie_prosba_klienta(self):
+        """„Marek … napisze do Ani” to obietnica Marka, nie prośba klienta."""
+        z = zg(65, klient="klinika-usmiech", opis=OPIS_BEZ_PROSBY, tytul="Błędne godziny Sopot")
+        self.assertIsNone(szkice.powod_szkicu(z, Z))
+
+    def test_nie_pisz_nie_jest_prosba(self):
+        self.assertFalse(szkice.prosba_o_informacje(["Nie napisz nic, dziękuję"], Z))
+        self.assertTrue(szkice.prosba_o_informacje(["Daj znać, jak będzie."], Z))
+        self.assertTrue(szkice.prosba_o_informacje(["Proszę, odpisz mi."], Z))
+
+    def test_starszy_wynik_bez_nowych_pol_cytat_tylko_w_wyniku_json(self):
+        """Opis zgłoszenia nie ma prośby, ale cytat w starszym wynik.json ma."""
+        z = zg(65, klient="klinika-usmiech", opis=OPIS_BEZ_PROSBY, tytul="Błędne godziny Sopot")
+        self.assertIsNone(szkice.powod_szkicu(z, Z))
+        self.assertEqual(szkice.powod_szkicu(z, Z, ["Nie, nie trzeba. Napisz tylko, jak będzie zrobione."]), "prosba")
+
+    def test_cytaty_z_prawdziwego_wyniku_kliniki_dla_rin_65(self):
+        root = Path(__file__).parent.parent
+        import os
+        cwd = os.getcwd()
+        os.chdir(root)
+        try:
+            karta = {"otwarte_sprawy": {"godziny-sopot-piatek": {"identifier": "RIN-65",
+                     "zrodla": ["ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"]}}}
+            c = szkice.cytaty_z_wynikow("klinika-usmiech", karta, "RIN-65")
+        finally:
+            os.chdir(cwd)
+        self.assertTrue(any("Napisz tylko, jak będzie zrobione" in x for x in c), c)
+        self.assertTrue(szkice.prosba_o_informacje(c, Z))
+
+    def test_rin_65_done_dostaje_szkic_do_kontaktu_kliniki(self):
+        z = zg(65, klient="klinika-usmiech", opis=OPIS_RIN65, tytul="Błędne godziny otwarcia Sopot w piątek", labels=("Konfiguracja",))
+        s = Srodowisko([z], karta=KARTA_KLINIKA, claude=AtrapaClaude('{"temat": "Godziny Sopotu", "tresc": "Dzień dobry, Ania,\\n\\ngodziny w piątek w Sopocie są już poprawione (do 16:00).\\n\\nPozdrawiam\\nMarek Rewoliński"}'))
+        w = szkice.uruchom(s)
+        self.assertEqual(w[0]["status"], "szkic")
+        self.assertEqual(w[0]["do"], "Ania Zielińska")
+        self.assertIn("Szkic gotowy", s.linear.zgloszenia["RIN-65"]["labels"])
+        self.assertEqual(s.poczta.wyslane, [])
+
+    def test_klucz_z_cytatami_ze_zrodel_jest_uzyty_przez_uruchom(self):
+        z = zg(65, klient="klinika-usmiech", opis=OPIS_BEZ_PROSBY, tytul="Błędne godziny Sopot", labels=("Konfiguracja",))
+        s = Srodowisko([z], karta=KARTA_KLINIKA, claude=AtrapaClaude('{"temat": "T", "tresc": "Dzień dobry, Ania, poprawione.\\nMarek Rewoliński"}'))
+        self.assertEqual(szkice.uruchom(s), [])
+        s.cytaty_zrodlowe = lambda zgl: ["Napisz tylko, jak będzie zrobione."]
+        self.assertEqual(szkice.uruchom(s)[0]["status"], "szkic")
+
+
+class TestWiadomoscDoKlientaWTodo(unittest.TestCase):
+
+    ZAPROSZENIE = dict(opis=OPIS_ZAPROSZENIE, tytul="Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)", labels=("Decyzja człowieka",), stan="Todo")
+
+    def _zaproszenie(self, **kw):
+        return zg(51, **{**self.ZAPROSZENIE, **kw})
+
+    def test_cel_to_wiadomosc_rozpoznany_regula_klient_z_zasad(self):
+        for tytul in ("Wysłać zaproszenie dla Pawła", "Przypomnienie o pliku", "Zestawienie wyników", "Wycena rozszerzenia", "Ściąga dla handlowców", "Potwierdzenie spotkania"):
+            z = zg(1, tytul=tytul, stan="Todo", opis="## Cel\n\nx\n\n## Kontekst\n\ny")
+            self.assertEqual(szkice.powod_szkicu(z, Z), "wiadomosc" if tytul != "Potwierdzenie spotkania" else None, tytul)
+
+    def test_ryzyko_z_oferta_konkurenta_to_nie_wiadomosc_do_klienta(self):
+        z = zg(71, tytul="Dr Nowak rozważa zmianę dostawcy – oferta konkurenta", stan="Todo", labels=("Ryzyko",), opis="## Cel\n\nx")
+        self.assertIsNone(szkice.powod_szkicu(z, Z))
+
+    def test_opis_z_regula_klient_wystarczy_gdy_tytul_nie(self):
+        z = zg(1, tytul="Potwierdzenie spotkania", stan="Todo",
+               opis="## Cel\n\nx\n\n## Dlaczego człowiek\n\n- trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic")
+        self.assertEqual(szkice.powod_szkicu(z, Z), "wiadomosc")
+
+    def test_zaproszenie_w_todo_dostaje_szkic_od_razu_bez_done(self):
+        z = self._zaproszenie()
+        s = Srodowisko([z], claude=AtrapaClaude('{"temat": "Zaproszenie na czwartek", "tresc": "Dzień dobry, Kasia,\\n\\nzapraszam na czwartek 15.10 o 10:00.\\n\\nPozdrawiam\\nMarek Rewoliński"}'))
+        w = szkice.uruchom(s)
+        self.assertEqual(w[0]["status"], "szkic")
+        self.assertEqual(s.linear.zgloszenia["RIN-51"]["state"], "Todo", "stan zgłoszenia bez zmian")
+        self.assertIn("Szkic gotowy", s.linear.zgloszenia["RIN-51"]["labels"])
+        p = wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-51"]))
+        self.assertEqual(p["do"], "Kasia Malinowska")
+        self.assertEqual(s.poczta.wyslane, [])
+
+    def test_in_progress_tez_ale_backlog_nie(self):
+        self.assertEqual(len(szkice.uruchom(Srodowisko([self._zaproszenie(stan="In Progress")]))), 1)
+        self.assertEqual(szkice.uruchom(Srodowisko([self._zaproszenie(stan="Backlog")])), [])
+
+    def test_zwykla_poprawka_w_todo_nie_dostaje_szkicu_przed_done(self):
+        z = zg(41, stan="Todo")          # prośba klienta o informację, ale praca jeszcze trwa
+        self.assertEqual(szkice.uruchom(Srodowisko([z])), [])
+
+    def test_istniejacy_szkic_z_opisu_jest_materialem_a_nie_tresciami_do_wyslania(self):
+        z = self._zaproszenie(opis=OPIS_ZAPROSZENIE + "\n\n## Szkic dla klienta (do wysłania przez człowieka)\n\n> Cześć Kasia, zapraszam.")
+        s = Srodowisko([z])
+        szkice.uruchom(s)
+        self.assertIn("Wcześniejszy szkic do poprawy", s.claude.prompty[0])
+        self.assertNotIn("Zakaz Z4", s.claude.prompty[0])
+
+    def test_otwarte_zaproszenie_nie_dostaje_drugiego_szkicu(self):
+        s = Srodowisko([self._zaproszenie(labels=("Decyzja człowieka", "Szkic gotowy"))])
+        self.assertEqual(szkice.uruchom(s), [])
+
+    def test_zaproszenie_do_zablokowanego_adresata_przejdzie_dopiero_przy_wysylce(self):
+        """Szkic powstaje, ale strażnik w wyslij.py nadal pilnuje zakazów przy wysyłce."""
+        z = self._zaproszenie(labels=("Wyślij", "Szkic gotowy"))
+        s = Srodowisko([z], {"RIN-51": [komentarz_szkicu(zgl=("RIN-51",), do="Ola Wrona", tresc="Dzień dobry, Ola, zapraszam.\nMarek Rewoliński")]})
+        w = wy.uruchom(s)
+        self.assertEqual(w[0]["status"], "wstrzymane")
+        self.assertEqual(s.poczta.wyslane, [])
 
 
 # ── workflow ──────────────────────────────────────────────────────────────────

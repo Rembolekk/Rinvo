@@ -330,14 +330,21 @@
       "napiszcie",
       "daj znać",
       "dajcie znać",
-      "dać znać",
+      "daj mi znać",
+      "dajcie mi znać",
       "poinformuj",
       "poinformujcie",
       "odpisz",
       "odpiszcie",
       "powiadom",
-      "daj mi znać",
-      "dajcie mi znać"
+      "powiadomcie",
+      "odezwij się",
+      "odezwijcie się",
+      "wróć do mnie",
+      "informuj",
+      "informujcie",
+      "proszę o informację",
+      "chcę wiedzieć"
     ],
     "slowa_tytulu": [
       "przypomnien",
@@ -356,7 +363,21 @@
       "notatki przed"
     ],
     "podpis": "Marek Rewoliński",
-    "model_pytanie_o_ton": "krótko, po ludzku, po polsku, w imieniu Marka; tylko ustalenia z rozmów"
+    "model_pytanie_o_ton": "krótko, po ludzku, po polsku, w imieniu Marka; tylko ustalenia z rozmów",
+    "_opis_prosby": "Prośba klienta o informację: słowo z listy jako CAŁY wyraz (nie „napisze”, czyli obietnica Marka), nie po „nie ”. Sprawdzane w kontekście zgłoszenia i w cytatach ze starszych wyników (wyniki/<klient>/*/wynik.json), także bez nowych pól.",
+    "_opis_wiadomosc": "Zgłoszenie, którego celem jest wiadomość do klienta (powód „klient” w czlowiek_gdy.do_klienta: zaproszenie, przypomnienie, zestawienie, wycena, ściąga…), dostaje szkic od razu w stanie Todo albo In Progress, nie dopiero po Done.",
+    "stany_otwarte": [
+      "Todo",
+      "In Progress"
+    ],
+    "slowa_wiadomosci_dodatkowe": [
+      "wycen",
+      "ściąg"
+    ],
+    "pomijaj_etykiety": [
+      "Ryzyko",
+      "Produkt"
+    ]
   },
   "wysylka": {
     "_opis": "Bezpieczniki wysyłki maili do klienta (wyslij.py). Wysyłka rusza tylko po etykiecie Wyślij dodanej przez człowieka.",

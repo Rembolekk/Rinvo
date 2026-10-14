@@ -342,6 +342,13 @@ def zbuduj_srodowisko(sucho=False):
         return out
 
     s.inni_klienci = inni
+
+    def cytaty(zg):
+        import szkice
+        klient = klient_z_tytulu(zg.get("title")) or ""
+        return szkice.cytaty_z_wynikow(klient, linear_sync.load_karta(klient), zg["identifier"])
+
+    s.cytaty_zrodlowe = cytaty
     return s
 
 
