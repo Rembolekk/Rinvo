@@ -504,5 +504,60 @@
     "_opis": "Statyczne strony dla ludzi na GitHub Pages (generuj_strony.py). Link na dole codziennego podsumowania prowadzi do index.html.",
     "url_bazowy": "https://rembolekk.github.io/Rinvo/",
     "tekst_linku": "Wszystko o klientach i prośbach: strony"
+  },
+  "glos": {
+    "_opis": "Głos klientów: tylko sygnały (max_sygnalow), od najsilniejszego. Sygnał = (1) prośba klienta z aktywnym ryzykiem utraty, gdy prośba dotyczy tego, co oferuje konkurencja z ryzyka (wspólny temat z tematy_konkurencji w prośbie i w cytatach ryzyka); (2) prosi co najmniej 2 klientów; (3) ten sam klient prosi w co najmniej 2 różnych rozmowach lub mailach. Pojedyncze prośby są zwinięte w „Pozostałe”.",
+    "max_sygnalow": 5,
+    "min_klientow": 2,
+    "min_zrodel_klienta": 2,
+    "tematy_ryzyka_utraty": [
+      "konkurencja",
+      "grozba_rezygnacji"
+    ],
+    "tematy_konkurencji": {
+      "integracja z systemem klienta": {
+        "ryzyko": [
+          "integr",
+          "łącz",
+          "połącz",
+          "systemem",
+          "crm"
+        ],
+        "prosba": [
+          "integrac",
+          "integr",
+          "crm",
+          "systemem"
+        ]
+      },
+      "cena": {
+        "ryzyko": [
+          "tańsz",
+          "taniej",
+          "cennik",
+          "cena",
+          "ceny",
+          "koszt"
+        ],
+        "prosba": [
+          "cennik",
+          "cena ",
+          "ceny ",
+          "tańsz",
+          "koszt"
+        ]
+      },
+      "raporty i statystyki": {
+        "ryzyko": [
+          "raport",
+          "statystyk"
+        ],
+        "prosba": [
+          "raport",
+          "statystyk"
+        ]
+      }
+    },
+    "_tematy": "Dla każdego tematu: słowa w cytatach RYZYKA (ryzyko) i w PROŚBIE (prosba) muszą trafić oba. Słowa prośby są wąskie, żeby np. „rozłączają” nie pasowało do „łączenia z systemem”."
   }
 }

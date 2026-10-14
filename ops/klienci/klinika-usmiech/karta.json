@@ -29,7 +29,12 @@
         "A, od 2 do 6 listopada mam urlop. W tym czasie nic nowego nie wdrażajcie.",
         "Dobra, w tym tygodniu nic nie startuje."
       ],
-      "wlasciciel": "Marek Rewoliński"
+      "wlasciciel": "Marek Rewoliński",
+      "okres": {
+        "od": "2026-11-02",
+        "do": "2026-11-06",
+        "skad": "2–6.11"
+      }
     }
   ],
   "otwarte_sprawy": {

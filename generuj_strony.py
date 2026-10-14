@@ -13,13 +13,16 @@ prośby produktowe (ops/produkt/prosby.json), stan Lineara (ops/.stan_linear.jso
 import argparse
 import html
 import json
+import re
 import sys
 from collections import defaultdict
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from zoneinfo import ZoneInfo
 
+import slack_widok as sw
 import stan_linear
+import zakazy_czas
 import zasady
 import zdarzenia
 
@@ -90,7 +93,8 @@ def wczytaj_dane(root=".", dzis=None):
         klienci[slug] = {"slug": slug, "karta": _json(p, {}), "wyniki": wyniki}
     return {"Z": Z, "klienci": klienci, "stan": stan_linear.wczytaj(root / "ops/.stan_linear.json"),
             "zdarzenia": zdarzenia.wczytaj(root / "ops/.zdarzenia.json"), "prosby": _json(root / "ops/produkt/prosby.json", {}),
-            "dzis": dzis or datetime.now(ZoneInfo("Europe/Warsaw")).date()}
+            "dzis": dzis or datetime.now(ZoneInfo("Europe/Warsaw")).date(), "root": root,
+            "sygnaly_stan": _json(root / "ops/.sygnaly.json", None)}
 
 
 def nazwa_klienta(klient):
@@ -207,7 +211,8 @@ def strona_index(dane):
 <p class="why">{e('; '.join(powody) if powody else opis_koloru)}</p></a>""")
     legenda = " · ".join(f'<span class="dot {k}" style="display:inline-block;vertical-align:middle"></span> {e(v[0])}: {e(v[1])}'
                          for k, v in SWIATLO.items())
-    tresc = f'<div class="grid">{"".join(karty) or "<p class=empty>Brak klientów.</p>"}</div><p class="sub" style="margin-top:18px">{legenda}</p>'
+    tresc = (f'<div class="grid">{"".join(karty) or "<p class=empty>Brak klientów.</p>"}</div><p class="sub" style="margin-top:18px">{legenda}</p>'
+             + sekcja_agentow(dane))
     return strona("Klienci", tresc, dane, 0, "Jedno miejsce na wszystko o kliencie: sprawy, rozmowy, zakazy, ryzyka i kontakty.")
 
 
@@ -233,19 +238,28 @@ def os_czasu(dane, klient):
         wpisy.append((str(h.get("data", "")), "Wysłany mail", e(h.get("temat", "")),
                       f'do: {e(h.get("do", ""))}' + (" · zaproszenie .ics" if h.get("zaproszenie_ics") else "")
                       + (f' · załączniki: {e(", ".join(h["zalaczniki"]))}' if h.get("zalaczniki") else "")))
+    prs = defaultdict(list)
     for z in dane["zdarzenia"]:
         if z.get("klient") != slug:
             continue
-        nazwa = NAZWY_ZDARZEN.get(z["typ"], z["typ"])
+        if z["typ"].startswith("pr_"):
+            prs[z.get("url") or z.get("zgloszenie")].append(z)
+            continue
         url = z.get("url") or ""
-        if z["typ"].startswith("pr_") or url.startswith("http"):
-            lacze = f'<a href="{e(url)}">{e(z.get("tytul", ""))}</a>'
-        elif url:
-            lacze = f'<a href="../{e(url)}">{e(z.get("tytul", ""))}</a>'
+        lacze = f'<a href="../{e(url)}">{e(z.get("tytul", ""))}</a>' if url else e(z.get("tytul", ""))
+        rodzaj = "Notatka" if z["typ"] == "notatka" else "Materiał"
+        wpisy.append((z["data"], rodzaj, lacze, f'{e(NAZWY_ZDARZEN.get(z["typ"], z["typ"]))} · zgłoszenie {e(z.get("zgloszenie", ""))}'))
+    for url, ev in prs.items():                      # jedna pozycja na PR, z końcowym statusem
+        ev = sorted(ev, key=lambda x: x["data"])
+        scalony = next((x for x in ev if x["typ"] == "pr_scalony"), None)
+        if scalony:
+            status, kiedy = "scalona", scalony["data"]
+        elif ev[-1]["typ"] == "pr_oddany":
+            status, kiedy = "oddana człowiekowi", ev[-1]["data"]
         else:
-            lacze = e(z.get("tytul", ""))
-        rodzaj = "Poprawka agenta" if z["typ"].startswith("pr_") else ("Notatka" if z["typ"] == "notatka" else "Materiał")
-        wpisy.append((z["data"], rodzaj, lacze, f'{e(nazwa)} · zgłoszenie {e(z.get("zgloszenie", ""))}'))
+            status, kiedy = "otwarta", ev[-1]["data"]
+        lacze = f'<a href="{e(url)}">{e(ev[-1].get("tytul", ""))}</a>' if str(url).startswith("http") else e(ev[-1].get("tytul", ""))
+        wpisy.append((kiedy, "Poprawka agenta", lacze, f'PR <b>{e(status)}</b> · zgłoszenie {e(ev[-1].get("zgloszenie", ""))}'))
     return sorted(wpisy, key=lambda w: w[0], reverse=True)
 
 
@@ -268,11 +282,19 @@ def strona_klienta(dane, klient):
         f'<li><time>{e(str(d)[:10])}</time><div><span class="kind">{e(r)}</span>{t}<div class="sub" style="margin:2px 0 0">{sz}</div></div></li>'
         for d, r, t, sz in ot) + "</ul>" if ot else '<p class="empty">Brak wpisów.</p>'))
 
-    zak = k.get("zakazy") or []
+    zak, wygasle = zakazy_czas.stan_zakazow(k, dzis, slug, dane.get("root", "."))
     czesci.append(f"<h2>Zakazy aktywne ({len(zak)})</h2>" + ("".join(
-        f'<div class="panel"><h3>{e(z.get("id", ""))}: {e(z.get("tytul", ""))}</h3>'
+        f'<div class="panel"><h3>{e(z.get("id", ""))}: {e(z.get("tytul", ""))}'
+        + (f' <span class="tag warn">do {e(zakazy_czas.okres_zakazu(z, slug, dane.get("root", "."), dzis)["do"].isoformat())}</span>'
+           if zakazy_czas.okres_zakazu(z, slug, dane.get("root", "."), dzis) else "") + '</h3>'
         + (f'<p class="sub" style="margin:4px 0">{e(z["opis"])}</p>' if z.get("opis") else "")
         + "".join(f"<blockquote>{e(c)}</blockquote>" for c in (z.get("cytat") or [])[:2]) + "</div>" for z in zak) if zak else '<p class="empty">Brak aktywnych zakazów.</p>'))
+    czesci.append(f"<h2>Wygasłe zakazy ({len(wygasle)})</h2>" + ("".join(
+        f'<div class="panel"><h3>{e(z.get("id", ""))}: {e(z.get("tytul", ""))} <span class="tag">wygasł {e(z.get("wygasl", ""))}</span></h3>'
+        + (f'<p class="sub" style="margin:4px 0">Okres: {e((z.get("okres") or {}).get("od", ""))} – {e((z.get("okres") or {}).get("do", ""))}'
+           f' ({e((z.get("okres") or {}).get("skad", ""))})</p>' if z.get("okres") else "")
+        + "".join(f"<blockquote>{e(c)}</blockquote>" for c in (z.get("cytat") or [])[:2]) + "</div>" for z in wygasle)
+        if wygasle else '<p class="empty">Żaden zakaz czasowy jeszcze nie wygasł.</p>'))
     hist = k.get("historia_zakazow") or []
     czesci.append(f"<h2>Uchylone zakazy ({len(hist)})</h2>" + ("".join(
         f'<div class="panel"><h3>{e(z.get("id", ""))}: {e(z.get("tytul", ""))} <span class="tag ok">uchylony {e(z.get("kiedy", ""))}</span></h3>'
@@ -343,20 +365,221 @@ def prosby_posortowane(dane):
     return wynik
 
 
+def _tekst_prosby(x, klient=None):
+    return " ".join([x["tytul"]] + [p.get("cytat", "") for p in x["prosby"] if klient in (None, p.get("klient"))]).lower()
+
+
+def sygnaly(dane):
+    """Sygnały w głosie klientów, od najsilniejszego (maks. G.max_sygnalow), oraz reszta próśb.
+
+    Typy: "uratuje" (prośba klienta z aktywnym ryzykiem utraty dotyczy tego, co oferuje konkurencja z ryzyka),
+    "wielu" (prosi co najmniej 2 klientów), "powtarza" (ten sam klient w co najmniej 2 różnych rozmowach lub mailach).
+    Zwraca (sygnały, pozostałe); każdy sygnał: klucz, tytul, typy, powod, klienci, cytat, status, zgloszenia."""
+    G = dane["Z"].get("glos", {})
+    wynik, reszta = [], []
+    for x in prosby_posortowane(dane):
+        typy, powody, ocalony = [], [], None
+        for slug in x["klienci"]:                                  # (1) może uratować klienta
+            klient = dane["klienci"].get(slug)
+            if not klient:
+                continue
+            ryzyka = [r for t, w in ryzyka_klienta(klient) if t in G.get("tematy_ryzyka_utraty", []) for r in w]
+            tekst_ryzyka = " ".join(r.get("cytat", "") for r in ryzyka).lower()
+            tekst_prosby = _tekst_prosby(x, slug)
+            for nazwa, slowa in G.get("tematy_konkurencji", {}).items():
+                if ryzyka and any(r in tekst_ryzyka for r in slowa["ryzyko"]) and any(r in tekst_prosby for r in slowa["prosba"]):
+                    ocalony = (slug, nazwa)
+                    break
+            if ocalony:
+                break
+        if ocalony:
+            typy.append("uratuje")
+            powody.append(f"może uratować klienta {nazwa_klienta(dane['klienci'][ocalony[0]])}: ma aktywne ryzyko utraty, a prośba dotyczy tego, "
+                          f"co oferuje konkurencja ({ocalony[1]})")
+        if len(x["klienci"]) >= G.get("min_klientow", 2):
+            typy.append("wielu")
+            powody.append(f"prosi {len(x['klienci'])} klientów: " + ", ".join(nazwa_klienta(dane["klienci"][k]) if k in dane["klienci"] else k for k in x["klienci"]))
+        for slug in x["klienci"]:
+            zrodla = {p.get("zrodlo") for p in x["prosby"] if p.get("klient") == slug}
+            if len(zrodla) >= G.get("min_zrodel_klienta", 2):
+                typy.append("powtarza")
+                powody.append(f"{nazwa_klienta(dane['klienci'][slug]) if slug in dane['klienci'] else slug} prosi w {len(zrodla)} różnych rozmowach lub mailach")
+                break
+        if typy:
+            # najważniejszy cytat: od klienta zagrożonego, inaczej najnowszy
+            wybor = [p for p in x["prosby"] if ocalony and p.get("klient") == ocalony[0]] or sorted(x["prosby"], key=lambda p: p.get("data", ""))[-1:]
+            wynik.append({**x, "typy": typy, "powod": "; ".join(powody[:2]), "cytat": wybor[-1] if wybor else None})
+        else:
+            reszta.append(x)
+    wynik.sort(key=lambda g: ("uratuje" in g["typy"], "wielu" in g["typy"], "powtarza" in g["typy"], len(g["klienci"]), len(g["prosby"]), g["ostatnia"]), reverse=True)
+    limit = G.get("max_sygnalow", 5)
+    return wynik[:limit], reszta + wynik[limit:]
+
+
+def klucze_sygnalow(lista):
+    """Pary „klucz|typ” – nowy sygnał to taka, której jeszcze nie widziano."""
+    return {f"{g['klucz']}|{t}" for g in lista for t in g["typy"]}
+
+
+def nowe_sygnaly(lista, stan):
+    """Sygnały, które po raz pierwszy spełniają warunek (zob. klucze_sygnalow). stan None = pierwsze uruchomienie (baza bez ogłaszania)."""
+    if stan is None:
+        return []
+    widziane = set(stan.get("widziane", []))
+    return [g for g in lista if any(f"{g['klucz']}|{t}" not in widziane for t in g["typy"])]
+
+
+def _karta_prosby(x):
+    return f'<span class="tag">{len(x["klienci"])} {"klient" if len(x["klienci"]) == 1 else "klientów"}</span>'
+
+
 def strona_glos(dane):
-    lista = prosby_posortowane(dane)
+    sygn, reszta = sygnaly(dane)
     kolory = {"zrobione": "ok", "u agenta": "warn", "backlog": "back"}
+
+    def zgl_html(x):
+        return " ".join(f'<a class="tag" href="{e(dane["stan"]["zgloszenia"].get(i, {}).get("url", "#"))}">{e(i)}</a>' for i in x["zgloszenia"])
+
     karty = []
-    for x in lista:
-        stan_url = {i: dane["stan"]["zgloszenia"].get(i, {}).get("url") for i in x["zgloszenia"]}
-        zgl = " ".join(f'<a class="tag" href="{e(u)}">{e(i)}</a>' if u else f'<span class="tag">{e(i)}</span>' for i, u in stan_url.items())
-        cytaty = "".join(f'<blockquote>{e(p.get("cytat", ""))}<br><small>{e(p.get("klient", ""))}, {e(p.get("data", ""))}</small></blockquote>' for p in x["prosby"])
-        karty.append(f"""<div class="panel"><h3>{e(x['tytul'])}</h3>
-<p class="sub" style="margin:4px 0"><span class="tag {kolory[x['status']]}">{e(x['status'])}</span>
-<span class="tag">{len(x['klienci'])} {'klient' if len(x['klienci']) == 1 else 'klientów'}</span>
-<span class="tag">pierwsza prośba {e(x['pierwsza'])}</span><span class="tag">ostatnia {e(x['ostatnia'])}</span> {zgl}</p>{cytaty}</div>""")
-    return strona("Głos klientów", "".join(karty) or '<p class="empty">Brak próśb produktowych.</p>', dane, 0,
-                  "Wszystkie prośby produktowe ze wszystkich klientów, od najczęściej zgłaszanych (liczba klientów), z cytatami.")
+    for g in sygn:
+        c = g["cytat"] or {}
+        karty.append(f"""<div class="panel"><h3>{e(g['tytul'])} <span class="tag {kolory[g['status']]}">{e(g['status'])}</span></h3>
+<p class="sub" style="margin:4px 0"><b>Dlaczego:</b> {e(g['powod'])}</p>
+<p class="sub" style="margin:4px 0">Klienci: {e(', '.join(nazwa_klienta(dane['klienci'][k]) if k in dane['klienci'] else k for k in g['klienci']))}
+· pierwsza prośba {e(g['pierwsza'])}, ostatnia {e(g['ostatnia'])} {zgl_html(g)}</p>
+<blockquote>{e(c.get('cytat', ''))}<br><small>{e(c.get('klient', ''))}, {e(c.get('data', ''))}</small></blockquote></div>""")
+    wstep = "".join(karty) or '<p class="empty">Na razie żadnych sygnałów: wszystkie prośby są pojedyncze.</p>'
+    wiersze = "".join(
+        f'<li><b>{e(x["tytul"])}</b> <span class="tag {kolory[x["status"]]}">{e(x["status"])}</span> '
+        f'<span class="tag">{e(", ".join(nazwa_klienta(dane["klienci"][k]) if k in dane["klienci"] else k for k in x["klienci"]))}</span>'
+        f'<blockquote>{e((x["prosby"][-1] if x["prosby"] else {}).get("cytat", ""))}</blockquote></li>' for x in reszta)
+    pozostale = (f'<details><summary><b>Pozostałe ({len(reszta)})</b></summary><ul style="margin-top:10px">{wiersze}</ul></details>'
+                 if reszta else "")
+    return strona("Głos klientów", f"<h2 style=\"margin-top:0\">Sygnały ({len(sygn)})</h2>{wstep}{pozostale}", dane, 0,
+                  "Tylko sygnały, najsilniejszy pierwszy: może uratować klienta, prosi co najmniej 2 klientów albo ten sam klient prosi w co najmniej 2 rozmowach lub mailach.")
+
+
+# ── agenci w tym tygodniu ─────────────────────────────────────────────────────
+
+def _godz_poczatku(wynik):
+    m = re.match(r"\s*(\d{1,2}):(\d{2})", str((wynik.get("spotkanie") or {}).get("godziny", "")))
+    return (int(m.group(1)), int(m.group(2))) if m else (0, 0)
+
+
+def czas_zrodla(dane, klient_slug, zrodla):
+    """Najwcześniejszy moment źródła (rozmowy albo maila): data z nazwy pliku + godzina spotkania z wyniku, gdy jest."""
+    najwczesniej = None
+    for z in zrodla:
+        d = zakazy_czas.data_z_nazwy(z)
+        if not d:
+            continue
+        h = m_ = 0
+        for w in dane["klienci"].get(klient_slug, {}).get("wyniki", []):
+            if str(w["dane"].get("zrodlo", "")).endswith(Path(z).name):
+                h, m_ = _godz_poczatku(w["dane"])
+        moment = datetime(d.year, d.month, d.day, h, m_, tzinfo=ZoneInfo("Europe/Warsaw"))
+        najwczesniej = moment if najwczesniej is None or moment < najwczesniej else najwczesniej
+    return najwczesniej
+
+
+def _jako_czas(txt):
+    return datetime.fromisoformat(txt.replace("Z", "+00:00")).astimezone(ZoneInfo("Europe/Warsaw"))
+
+
+def formatuj_czas(td):
+    minuty = int(td.total_seconds() // 60)
+    d, reszta = divmod(minuty, 1440)
+    h, m = divmod(reszta, 60)
+    if d:
+        return f"{d} d {h} h"
+    return f"{h} h {m} min" if h else f"{m} min"
+
+
+def statystyki_agentow(dane):
+    """Ostatnie 7 dni: liczba zamkniętych spraw, średni i najkrótszy czas od źródła do scalenia poprawki (z kart, zdarzeń i Lineara)."""
+    dzis = dane["dzis"]
+    od = datetime(dzis.year, dzis.month, dzis.day, tzinfo=ZoneInfo("Europe/Warsaw")) - timedelta(days=7)
+    do = datetime(dzis.year, dzis.month, dzis.day, tzinfo=ZoneInfo("Europe/Warsaw")) + timedelta(days=1)
+    zamkniete = [i for i, z in dane["stan"]["zgloszenia"].items()
+                 if z["stan"] == "Done" and z.get("zamknieto") and od <= _jako_czas(z["zamknieto"]) < do]
+    sprawy = {}
+    for slug, k in dane["klienci"].items():
+        for sekcja in ("otwarte_sprawy", "zamkniete_sprawy"):
+            for wpis in (k["karta"].get(sekcja) or {}).values():
+                if isinstance(wpis, dict) and wpis.get("identifier"):
+                    sprawy[wpis["identifier"]] = (slug, wpis.get("zrodla") or [])
+    pomiary = []
+    for z in dane["zdarzenia"]:
+        if z["typ"] != "pr_scalony" or z.get("zgloszenie") not in sprawy:
+            continue
+        scalono = _jako_czas(z["data"])
+        slug, zrodla = sprawy[z["zgloszenie"]]
+        start = czas_zrodla(dane, slug, zrodla)
+        if start and od <= scalono < do and scalono >= start:
+            pomiary.append({"zgloszenie": z["zgloszenie"], "tytul": z.get("tytul", ""), "url": z.get("url"), "czas": scalono - start})
+    return {"zamkniete": len(zamkniete), "scalone": len(pomiary), "pomiary": pomiary}
+
+
+def sekcja_agentow(dane):
+    st = statystyki_agentow(dane)
+    if not st["pomiary"]:
+        szczegoly = "<p class=\"empty\">W tym tygodniu agenci nie scalili jeszcze żadnej poprawki.</p>"
+    else:
+        lacznie = sum((p["czas"] for p in st["pomiary"]), timedelta())
+        sredni = lacznie / len(st["pomiary"])
+        naj = min(st["pomiary"], key=lambda p: p["czas"])
+        lacze = f'<a href="{e(naj["url"])}">{e(naj["tytul"])}</a>' if str(naj.get("url", "")).startswith("http") else e(naj["tytul"])
+        szczegoly = (f'<div class="nums"><span class="num"><b>{st["scalone"]}</b>poprawek scalonych</span>'
+                     f'<span class="num"><b>{e(formatuj_czas(sredni))}</b>średnio od źródła do scalenia</span>'
+                     f'<span class="num"><b>{e(formatuj_czas(naj["czas"]))}</b>najkrócej</span></div>'
+                     f'<p class="sub" style="margin:8px 0 0">Najszybsza: {lacze} <span class="tag">{e(naj["zgloszenie"])}</span></p>')
+    return (f'<h2>Agenci w tym tygodniu</h2><div class="panel"><div class="nums"><span class="num"><b>{st["zamkniete"]}</b>zamkniętych spraw (7 dni)</span></div>'
+            f'{szczegoly}<p class="why">Czas liczony od najwcześniejszego źródła sprawy (rozmowa lub mail, z kart klientów) do scalenia poprawki (dziennik zdarzeń). '
+            f'Zamknięte sprawy z Lineara.</p></div>')
+
+
+# ── powiadomienie o nowych sygnałach ──────────────────────────────────────────
+
+def linie_nowych_sygnalow(nowe, dane):
+    baza = dane["Z"].get("strony", {}).get("url_bazowy", "").rstrip("/")
+    url = f"{baza}/glos-klientow.html" if baza else "glos-klientow.html"
+    return [f":bulb: Nowy sygnał w głosie klientów: {sw.link(url, g['tytul'], 60)}, {g['powod'].split(':')[0] if g['powod'].startswith('prosi') else g['powod']}"
+            for g in nowe]
+
+
+def powiadom_o_sygnalach(dane, wyslij=None, root="."):
+    """Jedna linijka na Slacku dla każdego NOWEGO sygnału (pierwszy raz spełnia warunek), nie codziennie. Stan w ops/.sygnaly.json.
+    Pierwsze uruchomienie (brak pliku) tylko zapisuje bazę. Stan rośnie dopiero po udanej wysyłce, więc nieudane powiadomienie wróci.
+    Zwraca listę wysłanych linijek."""
+    plik = Path(root) / "ops/.sygnaly.json"
+    sygn, _ = sygnaly(dane)
+    stan = dane.get("sygnaly_stan")
+    teraz = {"widziane": sorted(set((stan or {}).get("widziane", [])) | klucze_sygnalow(sygn)),
+             "zainicjowano": (stan or {}).get("zainicjowano") or dane["dzis"].isoformat()}
+    nowe = nowe_sygnaly(sygn, stan)
+    wyslane = []
+    if nowe and wyslij is not None:
+        linie = linie_nowych_sygnalow(nowe, dane)
+        if wyslij("\n".join(linie), linie):
+            wyslane = linie
+        else:
+            teraz["widziane"] = sorted(set((stan or {}).get("widziane", [])))        # nie oznaczaj: spróbujemy przy następnym przebiegu
+    elif nowe:
+        teraz["widziane"] = sorted(set((stan or {}).get("widziane", [])))
+    if stan is None or teraz != stan:
+        plik.parent.mkdir(parents=True, exist_ok=True)
+        plik.write_text(json.dumps(teraz, ensure_ascii=False, indent=1) + "\n", encoding="utf-8")
+    return wyslane
+
+
+def wyslij_slack(tekst, linie):
+    """Wysyła wiadomość Slack (jeśli jest webhook). True przy sukcesie."""
+    import os
+    if not os.environ.get("SLACK_WEBHOOK_URL"):
+        return False
+    from przetworz import send_slack
+    ok, _ = send_slack(tekst, blocks=sw.bloki(linie))
+    return bool(ok)
 
 
 # ── zapis ─────────────────────────────────────────────────────────────────────
@@ -389,11 +612,15 @@ def main():
             pass
     ap = argparse.ArgumentParser(description="Generuje statyczne strony (GitHub Pages).")
     ap.add_argument("--dzien", help="udawany dzisiejszy dzień RRRR-MM-DD")
+    ap.add_argument("--bez-slacka", action="store_true", help="nie ogłaszaj nowych sygnałów na Slacku (stan sygnałów też się nie zmienia)")
     args = ap.parse_args()
     dane = wczytaj_dane(".", date.fromisoformat(args.dzien) if args.dzien else None)
     strony = buduj(dane)
     n = zapisz(strony)
     print(f"Strony: {len(strony)} ({n} zmienionych): " + ", ".join(sorted(strony)))
+    if not args.bez_slacka:
+        for l in powiadom_o_sygnalach(dane, wyslij_slack):
+            print("Slack:", l)
 
 
 if __name__ == "__main__":

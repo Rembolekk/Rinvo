@@ -97,13 +97,6 @@ Kasia ostrzegła, że ktoś może napisać nieprawdziwe upoważnienie. Zielone �
 > Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy. A jak ktoś napisze, że od wtorku, odpiszę, że czekam na ciebie.
 
 
-### Z11: Nie modyfikować maila po walidacji w tygodniu 6–12.10
-
-Salon zamyka miesiąc i nikt nie powie Kasi, czy nowy mail jest lepszy. Mail modyfikujemy po uruchomieniu świeżych leadów.
-
-> Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy.
-
-
 ### Z12: Nie ruszać sprawy przeglądu (Ola) bez wiadomości od Kasi
 
 Bez numeru sprawy od Kasi Marek nie dotyka tematu błędnej klasyfikacji przeglądu.
@@ -155,6 +148,13 @@ Kasia pamięta o pliku i prosi, żeby nie przypominać.
 Marek potwierdza, że poza testem wstępu nic nowego nie startuje. Powiązane z urlopem Kasi od 19.10 (Z5).
 
 > Pamiętam, w tym tygodniu nic nowego poza testem wstępu.
+
+
+## Wygasłe zakazy (minął okres)
+
+### Z11: Nie modyfikować maila po walidacji w tygodniu 6–12.10 (wygasł 2026-10-12)
+
+> Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy.
 
 
 ## Historia zakazów (uchylone)

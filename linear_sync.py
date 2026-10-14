@@ -25,6 +25,7 @@ import notatki
 import zasady
 from sekrety import czysc
 from podpis import podpisz_agenta
+import zakazy_czas
 
 
 def _date_from_path(path_str):
@@ -339,6 +340,15 @@ def write_karta_md(klient, karta):
                 lines.append(f"> {c}\n")
             lines.append("")
 
+    if karta.get("zakazy_wygasle"):
+        lines.append("## Wygasłe zakazy (minął okres)\n")
+        for z in karta["zakazy_wygasle"]:
+            okres = z.get("okres") or {}
+            lines.append(f"### {z['id']}: {z['tytul']} (wygasł {z.get('wygasl', okres.get('do', '?'))})\n")
+            for c in z.get("cytat", []):
+                lines.append(f"> {c}\n")
+            lines.append("")
+
     if karta.get("historia_zakazow"):
         lines.append("## Historia zakazów (uchylone)\n")
         for z in karta["historia_zakazow"]:
@@ -558,7 +568,8 @@ def update_risk_counter(karta, item, source, today):
         ryzyka[temat] = []
     cytat = item.get("cytat", [""])[0] if item.get("cytat") else ""
     if not any(r.get("zrodlo") == source and r.get("cytat") == cytat for r in ryzyka[temat]):
-        ryzyka[temat].append({"data": today, "zrodlo": source, "cytat": cytat})
+        # data = data ŹRÓDŁA (rozmowy albo maila, z nazwy pliku), a nie dzień przetwarzania
+        ryzyka[temat].append({"data": _date_from_path(source) or today, "zrodlo": source, "cytat": cytat})
     unique_sources = len({r["zrodlo"] for r in ryzyka[temat]})
     return unique_sources >= RISK_REPEAT_THRESHOLD, unique_sources
 
@@ -580,7 +591,7 @@ def update_prosby(prosby, item, klient, source, today):
     prosby[klucz]["prosby"].append({
         "klient": klient,
         "cytat": item.get("cytat", [""])[0] if item.get("cytat") else "",
-        "data": today,
+        "data": _date_from_path(source) or today,           # data ŹRÓDŁA, nie dzień przetwarzania
         "zrodlo": source,
     })
     unique_clients = len({p["klient"] for p in prosby[klucz]["prosby"]})
@@ -773,7 +784,7 @@ def zakaz_juz_w_karcie(karta, z, source):
     """Czy ten zakaz (z bieżącego wyniku) już jest w karcie: aktywny albo uchylony?
     Id NIE wystarcza: numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie."""
     cytaty = set(z.get("cytat", []))
-    for k in karta.get("zakazy", []) + karta.get("historia_zakazow", []):
+    for k in karta.get("zakazy", []) + karta.get("historia_zakazow", []) + karta.get("zakazy_wygasle", []):
         if k.get("klucz_sprawy") and k.get("zrodlo") == source and k["klucz_sprawy"] == z.get("klucz_sprawy"):
             return True
         if k.get("id") == z.get("id") and k.get("tytul") == z.get("tytul"):
@@ -785,7 +796,7 @@ def zakaz_juz_w_karcie(karta, z, source):
 
 def dodaj_zakazy(karta, nowe_zakazy, source, dry_run=False):
     """Dodaje zakazy z rozmowy do karty z unikalnymi id. Zwraca liczbę dodanych."""
-    uzyte = {z.get("id") for z in karta.get("zakazy", []) + karta.get("historia_zakazow", [])}
+    uzyte = {z.get("id") for z in karta.get("zakazy", []) + karta.get("historia_zakazow", []) + karta.get("zakazy_wygasle", [])}
     nastepny = max([_numer_zakazu(i) for i in uzyte] + [0]) + 1
     dodano = 0
     for z in nowe_zakazy:
@@ -1018,7 +1029,7 @@ def main():
     nowe_zakazy = [p for p in pozycje if p.get("sekcja") == 4]
     dodano_zakazow = dodaj_zakazy(karta, nowe_zakazy, source, dry_run=args.dry_run)
 
-    zakazy_klienta = karta.get("zakazy", [])
+    zakazy_klienta = zakazy_czas.aktywne_zakazy(karta, None, klient)       # wygasłe zakazy nie blokują nowych spraw
 
     # ── aktualizacje otwartych spraw ──────────────────────────────────────────
 

@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-14T18:44:50+00:00",
+ "zapisano": "2026-10-14T18:57:30+00:00",
  "zgloszenia": {
   "RIN-38": {
    "etykiety": [
@@ -209,14 +209,14 @@
     "Wysłano"
    ],
    "priorytet": 0,
-   "stan": "Todo",
+   "stan": "Done",
    "termin": "2026-10-15",
-   "typ_stanu": "unstarted",
+   "typ_stanu": "completed",
    "tytul": "[auto-tama] Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)",
    "url": "https://linear.app/rinvo-demo/issue/RIN-51/auto-tama-potwierdzenie-spotkania-marek-pawel-1510-1000-torun",
    "utworzono": "2026-10-13T18:47:21.226Z",
-   "zamknieto": null,
-   "zmieniono": "2026-10-14T12:36:54.087Z"
+   "zamknieto": "2026-10-14T18:53:28.783Z",
+   "zmieniono": "2026-10-14T18:53:28.794Z"
   },
   "RIN-52": {
    "etykiety": [

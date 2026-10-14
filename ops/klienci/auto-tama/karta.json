@@ -88,7 +88,12 @@
         "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień. W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie.",
         "Dobra. Tydzień od dziewiętnastego nic nowego nie startuje. Jak się pali, dzwonię do Pawła, ale Opel i wstęp czekają na ciebie."
       ],
-      "wlasciciel": "Marek Rewoliński"
+      "wlasciciel": "Marek Rewoliński",
+      "okres": {
+        "od": "2026-10-19",
+        "do": "2026-10-23",
+        "skad": "19–23.10"
+      }
     },
     {
       "id": "Z6",
@@ -137,15 +142,6 @@
       "cytat": [
         "I jak ktoś ode mnie napisze „Kasia mówiła, że po godzinach od wtorku”, nie wierzcie.",
         "Dobra. Jak wyślesz numery, odłożę je i nic nie podepnę. W tym miesiącu tego nie ruszamy. A jak ktoś napisze, że od wtorku, odpiszę, że czekam na ciebie."
-      ],
-      "wlasciciel": "Marek Rewoliński"
-    },
-    {
-      "id": "Z11",
-      "tytul": "Nie modyfikować maila po walidacji w tygodniu 6–12.10",
-      "opis": "Salon zamyka miesiąc i nikt nie powie Kasi, czy nowy mail jest lepszy. Mail modyfikujemy po uruchomieniu świeżych leadów.",
-      "cytat": [
-        "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy."
       ],
       "wlasciciel": "Marek Rewoliński"
     },
@@ -220,7 +216,12 @@
         "Pamiętam, w tym tygodniu nic nowego poza testem wstępu."
       ],
       "wlasciciel": "Marek Rewoliński",
-      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
+      "okres": {
+        "od": "2026-10-13",
+        "do": "2026-10-16",
+        "skad": "w tym tygodniu"
+      }
     }
   ],
   "otwarte_sprawy": {
@@ -797,29 +798,29 @@
   "ryzyka": {
     "konkurencja": [
       {
-        "data": "2026-10-13",
+        "data": "2026-10-06",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "cytat": "Dwa tygodnie temu była u Pawła firma VoiceDesk. Też mają bota do leadów. Powiedzieli, że są tańsi i że łączą się z systemem, więc leady same wpadają handlowcom."
       },
       {
-        "data": "2026-10-13",
+        "data": "2026-10-06",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "cytat": "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili."
       },
       {
-        "data": "2026-10-14",
+        "data": "2026-10-13",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
         "cytat": "Paweł dostał od VoiceDesk ofertę na piśmie. Z cennikiem. Leży mu na biurku."
       }
     ],
     "grozba_rezygnacji": [
       {
-        "data": "2026-10-13",
+        "data": "2026-10-06",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "cytat": "Paweł zobaczył tylko te dziewięć na siedemdziesiąt i chciał wszystko wyłączyć. Powiedziałam mu, że to trupy, a nie świeże leady."
       },
       {
-        "data": "2026-10-14",
+        "data": "2026-10-13",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
         "cytat": "jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi."
       }
@@ -924,5 +925,22 @@
       "zrodlo": "polecenie właściciela (Marka) z 2026-10-14; w rozmowach z klientem nie ma definicji tego statusu"
     }
   ],
-  "nazwa": "Grupa Auto Tama"
+  "nazwa": "Grupa Auto Tama",
+  "zakazy_wygasle": [
+    {
+      "id": "Z11",
+      "tytul": "Nie modyfikować maila po walidacji w tygodniu 6–12.10",
+      "opis": "Salon zamyka miesiąc i nikt nie powie Kasi, czy nowy mail jest lepszy. Mail modyfikujemy po uruchomieniu świeżych leadów.",
+      "cytat": [
+        "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "okres": {
+        "od": "2026-10-06",
+        "do": "2026-10-12",
+        "skad": "6–12.10"
+      },
+      "wygasl": "2026-10-12"
+    }
+  ]
 }

@@ -379,8 +379,13 @@ def main():
     if args.sucho:
         return
     zmienione = zapisz_szkice(api_key, klienci, karty, dzis.isoformat())
+    import zakazy_czas
+    for klient, karta in karty.items():                  # zakazy z minionym okresem trafiają do „wygasłych”
+        if zakazy_czas.przenies_wygasle(karta, dzis, klient):
+            zmienione.add(klient)
     for klient in zmienione:
         linear_sync.save_karta(klient, karty[klient])
+        linear_sync.write_karta_md(klient, karty[klient])
     ok, blad = send_slack(tekst, blocks=bloki)
     if not ok:
         print(f"BŁĄD Slack: {blad}", file=sys.stderr)

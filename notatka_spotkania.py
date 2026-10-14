@@ -29,6 +29,7 @@ import notatki
 import slack_widok as sw
 import stan_linear
 import wyslij as wy
+import zakazy_czas
 import zdarzenia
 from maile import slack_bezpiecznie
 
@@ -104,7 +105,7 @@ def fakty_notatki(s, klient, karta, spotkanie, najnowsze, dzis):
               "RYZYKA (omów dokładnie te):\n" + "\n".join(
                   f"- {r['id']}: {r['tytul']} | {r['opis']} | cytaty: {' // '.join(r['cytaty'])}" for r in ryzyka),
               "ZAKAZY I DECYZJE KLIENTA (nie łam, nie obiecuj ich uchylenia):\n" + "\n".join(
-                  f"- {z['id']}: {z['tytul']}" for z in karta.get("zakazy", [])),
+                  f"- {z['id']}: {z['tytul']}" for z in zakazy_czas.aktywne_zakazy(karta, None, klient)),
               "STATUSY W LINEARZE (stan z chwili pisania; ważniejsze niż opisy zgłoszeń i rozmów):\n" + "\n".join(statusy_z_linear(s, klient, dzis)),
               "KONTAKTY (adresy e-mail potwierdzonych osób klienta): " + "; ".join(f"{k['imie']} ({k.get('rola', '')}, {k.get('email', '')})" for k in karta.get("kontakty", [])),
               zrodla_klienta(klient)]

@@ -74,12 +74,14 @@ jobs:
 
       # Szkice przypomnień zwiększają licznik wykorzystanych przypomnień w karcie: zapisujemy go w repo.
       - name: Zapisz karty i stan
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         run: |
           set -uo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
-          for sciezka in ops/klienci ops/.podsumowanie.json index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/materialy; do
+          for sciezka in ops/klienci ops/.podsumowanie.json index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/.sygnaly.json ops/materialy; do
             [ -e "$sciezka" ] && git add -A -- "$sciezka"
           done
           if git diff --cached --quiet; then

@@ -78,6 +78,11 @@ class AtrapaLinear:
                     k["body"] = tresc
         self.zdarzenia.append(("edycja", komentarz_id, tresc))
 
+    def ustaw_stan(self, z, nazwa):
+        for t in (z, self.zgloszenia.get(z["identifier"], z)):
+            t["state"] = nazwa
+        self.zdarzenia.append(("stan", z["identifier"], nazwa))
+
     def dodaj_etykiete(self, z, nazwa):
         for t in (z, self.zgloszenia.get(z["identifier"], z)):
             if nazwa not in t["labels"]:
@@ -1279,6 +1284,74 @@ class TestZalacznikiWysylki(unittest.TestCase):
     def test_obietnica_zalacznika_bez_pliku_nadal_blokuje(self):
         s = self._s("Dzień dobry, Kasiu, przesyłam ściągę.\nMarek Rewoliński", [], tworz=False)
         self.assertEqual(wy.uruchom(s)[0]["status"], "wstrzymane")
+
+
+# ── Done po wysyłce i wygasłe zakazy ───────────────────────────────────────────
+
+OPIS_ZAPR = ("## Cel\n\nWysłać Kasi zaproszenie na spotkanie w czwartek.\n\n## Kontekst\n\nSpotkanie potwierdzone.\n\n## Kryteria akceptacji\n\n- [ ] x\n\n## Źródło\n\n`x`")
+
+
+class TestDonePoWyslaniu(unittest.TestCase):
+
+    def _wyslij(self, zgl, tresc=DOBRA):
+        s = Srodowisko([zgl], {zgl["identifier"]: [{"id": "c", "createdAt": "2026-10-14T07:30:00Z",
+                                                    "body": wy.format_komentarza_szkicu("Kasia Malinowska", "Zaproszenie", tresc, [zgl["identifier"]])}]})
+        return s, wy.uruchom(s)
+
+    def test_zgloszenie_ktorego_celem_bylo_wyslanie_przechodzi_na_done(self):
+        s, w = self._wyslij(zg(51, tytul="Potwierdzenie spotkania Marek–Paweł", opis=OPIS_ZAPR, stan="Todo", labels=("Wyślij", "Decyzja człowieka")))
+        self.assertEqual(w[0]["status"], "wyslane")
+        self.assertEqual(s.linear.zgloszenia["RIN-51"]["state"], "Done")
+        self.assertTrue(any("zamknięte po wysłaniu" in k[2] for k in s.linear.zdarzenia if k[0] == "komentarz"))
+
+    def test_przypomnienie_i_zestawienie_tez_ale_zwykla_poprawka_nie(self):
+        for tytul in ("Przypomnienie o pliku leadów", "Zestawienie wyników", "Wysłać ofertę"):
+            s, _ = self._wyslij(zg(52, tytul=tytul, opis="## Cel\n\nx", stan="Todo", labels=("Wyślij",)))
+            self.assertEqual(s.linear.zgloszenia["RIN-52"]["state"], "Done", tytul)
+        s, w = self._wyslij(zg(53, tytul="Poprawa godzin w bazie", opis="## Cel\n\nGodziny.\n\n## Kontekst\n\n> Daj znać.", stan="In Progress", labels=("Wyślij",)))
+        self.assertEqual(w[0]["status"], "wyslane")
+        self.assertEqual(s.linear.zgloszenia["RIN-53"]["state"], "In Progress", "mail był informacją, praca trwa")
+
+    def test_gotowe_zgloszenie_zostaje_done_a_zablokowana_wysylka_niczego_nie_zamyka(self):
+        s, w = self._wyslij(zg(54, tytul="Zaproszenie", opis=OPIS_ZAPR, stan="Todo", labels=("Wyślij",)), tresc="Dzień dobry, Kasiu, RIN-54 gotowe.\nMarek")
+        self.assertEqual(w[0]["status"], "wstrzymane")
+        self.assertEqual(s.linear.zgloszenia["RIN-54"]["state"], "Todo")
+
+    def test_czas_w_zgloszeniach_grupy_wszystkie_wiadomosci_zamkniete(self):
+        z1, z2 = zg(60, tytul="Zaproszenie", opis=OPIS_ZAPR, stan="Todo", labels=("Wyślij",)), zg(61, tytul="Ściąga statusów", opis="## Cel\n\nx", stan="Todo", labels=("Szkic gotowy",))
+        s = Srodowisko([z1, z2], {"RIN-60": [komentarz_szkicu(zgl=("RIN-60", "RIN-61"))]})
+        wy.uruchom(s)
+        self.assertEqual({s.linear.zgloszenia[n]["state"] for n in ("RIN-60", "RIN-61")}, {"Done"})
+
+
+class TestWygaslyZakazNieBlokuje(unittest.TestCase):
+
+    TRESC = "Dzień dobry, Kasia,\n\nprzypominam o pliku ze świeżymi leadami.\n\nMarek Rewoliński"
+
+    def _karta(self, tytul):
+        k = copy.deepcopy(KARTA)
+        k["zakazy"] = [{"id": "Z17", "tytul": tytul, "opis": "", "cytat": []}]
+        return k
+
+    def test_zakaz_czasowy_blokuje_w_okresie(self):
+        s, w = wyslij_jedno(tresc=self.TRESC, temat="Przypomnienie", karta=self._karta("Nie przypominać Kasi o pliku w tygodniu 12–16.10"))
+        self.assertEqual(w[0]["status"], "wstrzymane")
+        self.assertIn("Z17", w[0]["powod"])
+
+    def test_po_upływie_okresu_straznik_go_nie_stosuje(self):
+        s, w = wyslij_jedno(tresc=self.TRESC, temat="Przypomnienie", karta=self._karta("Nie przypominać Kasi o pliku w tygodniu 5–9.10"))
+        self.assertEqual(w[0]["status"], "wyslane")
+
+    def test_zakaz_bez_okresu_blokuje_zawsze(self):
+        s, w = wyslij_jedno(tresc=self.TRESC, temat="Przypomnienie", karta=self._karta("Nie przypominać Kasi o pliku"))
+        self.assertEqual(w[0]["status"], "wstrzymane")
+
+    def test_zakaz_juz_przeniesiony_do_wygaslych_nie_blokuje(self):
+        k = copy.deepcopy(KARTA)
+        k["zakazy"] = []
+        k["zakazy_wygasle"] = [{"id": "Z17", "tytul": "Nie przypominać Kasi o pliku", "opis": "", "cytat": [], "wygasl": "2026-10-09"}]
+        s, w = wyslij_jedno(tresc=self.TRESC, temat="Przypomnienie", karta=k)
+        self.assertEqual(w[0]["status"], "wyslane")
 
 
 # ── workflow ──────────────────────────────────────────────────────────────────

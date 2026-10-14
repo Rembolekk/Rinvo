@@ -28,6 +28,7 @@ from zoneinfo import ZoneInfo
 
 import slack_widok as sw
 import stan_linear
+import zakazy_czas
 import zdarzenia
 from maile import slack_bezpiecznie
 from podpis import bez_podpisu
@@ -256,11 +257,12 @@ def _pasuje_imie(osoba, imie_pelne):
     return bool(stem) and pierwsze.startswith(stem)
 
 
-def straznik_zakazow(karta, odbiorca, temat, tresc, W):
-    """Powody wynikające z zakazów w karcie (wzorce w ops/zasady.json → wysylka.wzorce_zakazow)."""
+def straznik_zakazow(karta, odbiorca, temat, tresc, W, dzis=None):
+    """Powody wynikające z AKTYWNYCH zakazów w karcie (wzorce w ops/zasady.json → wysylka.wzorce_zakazow).
+    Zakazy, którym minął okres (zakazy_czas), nie są stosowane."""
     tekst = f"{temat}\n{tresc}".lower()
     powody = []
-    for z in (karta or {}).get("zakazy", []):
+    for z in zakazy_czas.aktywne_zakazy(karta or {}, dzis, (karta or {}).get("klient")):
         for r in W["wzorce_zakazow"]:
             m = re.search(r["tytul"], z.get("tytul", ""), re.IGNORECASE)
             if not m:
@@ -326,6 +328,21 @@ def czekaj(s, zg, karta, klient, powod):
     return {"status": "czeka", "powod": powod, "zgloszenie": zg["identifier"]}
 
 
+def zamknij_po_wyslaniu(s, grupa):
+    """Zgłoszenie, którego celem było samo wysłanie (zaproszenie, przypomnienie, materiał), po udanej wysyłce przechodzi
+    na Done. Zgłoszenia, które czekały na mail jako informację o zrobionej pracy, już są Done. Zwraca identyfikatory."""
+    import materialy
+    import szkice
+    zamkniete = []
+    for g in grupa:
+        if g.get("state") in ("Done", "Canceled", "Cancelled"):
+            continue
+        if szkice.powod_szkicu(g, s.Z) == "wiadomosc" or materialy.rodzaj_materialu(g, s.Z):
+            s.linear.ustaw_stan(g, "Done")
+            zamkniete.append(g["identifier"])
+    return zamkniete
+
+
 def obsluz_zgloszenie(s, zg):
     Z, W, E = s.Z, s.Z["wysylka"], s.Z["etykiety"]
     etykiety = set(zg.get("labels", []))
@@ -364,7 +381,7 @@ def obsluz_zgloszenie(s, zg):
     frag = znajdz_placeholder(szkic["temat"], szkic["tresc"], W)
     if frag:
         powody.append(f"szkic wymaga uzupełnienia: {frag}")
-    powody += straznik_zakazow(karta, odbiorca, szkic["temat"], szkic["tresc"], W)
+    powody += straznik_zakazow(karta, odbiorca, szkic["temat"], szkic["tresc"], W, lokalnie(s.teraz(), W).date())
     powody += filtr_tresci(szkic["temat"], szkic["tresc"], karta, W, s.inni_klienci(klient))
     # zaproszenie .ics: tylko z poprawnych danych; bez niego treść nie może obiecywać zaproszenia ani załącznika
     spotkanie, ics = szkic.get("spotkanie"), None
@@ -420,6 +437,9 @@ def obsluz_zgloszenie(s, zg):
         s.linear.usun_etykiete(g, E["wyslij"])
         s.linear.usun_etykiete(g, E["szkic"])
     s.linear.komentarz(zg, f"Wysłano {data_txt}")
+    zamkniete = zamknij_po_wyslaniu(s, grupa)
+    if zamkniete:
+        s.linear.komentarz(zg, "Zgłoszenie zamknięte po wysłaniu maila (celem było samo wysłanie): " + ", ".join(zamkniete))
     _slack(s, [f":email: Wysłano do {odbiorca['imie']}: {slack_bezpiecznie(szkic['temat'], 120)}"])
     return {"status": "wyslane", "zgloszenie": zg["identifier"], "zgloszenia": identyfikatory, "do": odbiorca["imie"], "message_id": message_id}
 

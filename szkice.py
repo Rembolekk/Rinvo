@@ -227,7 +227,7 @@ def parsuj_odpowiedz(tekst):
 def sprawdz_czesc(s, temat, tresc, odbiorca, karta, klient, grupa_ids=()):
     """Powody odrzucenia: filtr treści, zakazy, miejsce do uzupełnienia. Placeholder nie jest powodem do ponawiania."""
     W = s.Z["wysylka"]
-    powody = wy.filtr_tresci(temat, tresc, karta, W, s.inni_klienci(klient)) + wy.straznik_zakazow(karta, odbiorca, temat, tresc, W)
+    powody = wy.filtr_tresci(temat, tresc, karta, W, s.inni_klienci(klient)) + wy.straznik_zakazow(karta, odbiorca, temat, tresc, W, wy.lokalnie(s.teraz(), W).date())
     return powody
 
 

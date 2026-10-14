@@ -250,48 +250,308 @@ class TestStronaKlienta(unittest.TestCase):
             self.assertIn(fraza, t)
 
 
-class TestGlosKlientow(unittest.TestCase):
+def prosba(klient, cytat, data, zrodlo):
+    return {"klient": klient, "cytat": cytat, "data": data, "zrodlo": zrodlo}
 
-    def _dane(self):
-        prosby = {
-            "excel": {"tytul": "Eksport do Excela", "prosby": [{"klient": "alfa", "cytat": "Chcemy Excela.", "data": "2026-10-13"}, {"klient": "beta", "cytat": "Też Excel.", "data": "2026-10-14"}]},
-            "kafelki": {"tytul": "Klikalne kafelki", "prosby": [{"klient": "alfa", "cytat": "Kafelek nie klika.", "data": "2026-10-06"}]},
-            "raport": {"tytul": "Raport mailowy", "prosby": [{"klient": "alfa", "cytat": "Raport proszę.", "data": "2026-10-13"}, {"klient": "alfa", "cytat": "Raport jeszcze raz.", "data": "2026-10-20"}]},
-        }
-        stan = {"RIN-10": zg("[alfa] Eksport do Excela", stan="Backlog", etykiety=["Produkt"], url="https://linear.app/ws/issue/RIN-10/x"),
-                "RIN-11": zg("[alfa] Klikalne kafelki", stan="Done"), "RIN-12": zg("[alfa] Raport mailowy", etykiety=["Dla agenta"])}
-        ka = karta("alfa", otwarte_sprawy={"excel-s": {"identifier": "RIN-10"}, "raport-s": {"identifier": "RIN-12"}},
-                   zamkniete_sprawy={"kafelki-s": {"identifier": "RIN-11"}})
-        r = Repo(stan=stan, prosby=prosby, karta_a=ka)
-        r.wynik("alfa", "x", {"pozycje": [{"klucz_funkcji": "excel", "klucz_sprawy": "excel-s"}, {"klucz_funkcji": "kafelki", "klucz_sprawy": "kafelki-s"},
-                                           {"klucz_funkcji": "raport", "klucz_sprawy": "raport-s"}]})
+
+class TestGlosKlientow(unittest.TestCase):
+    """Głos klientów: tylko sygnały (max 5), od najsilniejszego; reszta w „Pozostałe”."""
+
+    def _repo(self, prosby, karta_a=None, karta_b=None, stan=None):
+        r = Repo(stan=stan, prosby=prosby, karta_a=karta_a, karta_b=karta_b)
         return r.dane()
 
-    def test_sortowanie_wg_liczby_klientow_potem_prosb(self):
-        lista = gs.prosby_posortowane(self._dane())
-        self.assertEqual([x["klucz"] for x in lista], ["excel", "raport", "kafelki"])
+    def test_ratuje_klienta_gdy_prosba_dotyczy_tego_co_oferuje_konkurencja(self):
+        ka = karta("alfa", ryzyka={"konkurencja": [{"data": "2026-10-06", "zrodlo": "a.md", "cytat": "VoiceDesk łączy się z systemem, więc leady same wpadają."}]})
+        d = self._repo({"crm": {"tytul": "Integracja z CRM", "prosby": [prosba("alfa", "Chcemy integracji z naszym systemem.", "2026-10-06", "a.md")]}}, ka)
+        sygn, reszta = gs.sygnaly(d)
+        self.assertEqual([g["klucz"] for g in sygn], ["crm"])
+        self.assertIn("uratuje", sygn[0]["typy"])
+        self.assertIn("może uratować klienta", sygn[0]["powod"])
+        self.assertIn("integracja z systemem klienta", sygn[0]["powod"])
+        self.assertEqual(reszta, [])
 
-    def test_statusy_backlog_u_agenta_zrobione(self):
-        lista = {x["klucz"]: x for x in gs.prosby_posortowane(self._dane())}
-        self.assertEqual(lista["excel"]["status"], "backlog")
-        self.assertEqual(lista["raport"]["status"], "u agenta")
-        self.assertEqual(lista["kafelki"]["status"], "zrobione")
+    def test_bez_ryzyka_utraty_albo_bez_wspolnego_tematu_to_nie_ratunek(self):
+        ka_bez = karta("alfa")
+        d = self._repo({"crm": {"tytul": "Integracja z CRM", "prosby": [prosba("alfa", "Integracja z systemem.", "2026-10-06", "a.md")]}}, ka_bez)
+        self.assertEqual(gs.sygnaly(d)[0], [], "klient bez ryzyka utraty")
+        ka = karta("alfa", ryzyka={"konkurencja": [{"data": "2026-10-06", "zrodlo": "a.md", "cytat": "VoiceDesk łączy się z systemem."}]})
+        d2 = self._repo({"x": {"tytul": "Kolor przycisku", "prosby": [prosba("alfa", "Zmieńcie kolor.", "2026-10-06", "a.md")]}}, ka)
+        self.assertEqual(gs.sygnaly(d2)[0], [], "prośba o coś innego niż konkurencja")
 
-    def test_daty_pierwszej_i_ostatniej_prosby_oraz_cytaty_na_stronie(self):
-        d = self._dane()
-        x = next(x for x in gs.prosby_posortowane(d) if x["klucz"] == "raport")
-        self.assertEqual((x["pierwsza"], x["ostatnia"]), ("2026-10-13", "2026-10-20"))
-        t = tekst(gs.strona_glos(d))
-        self.assertIn("2 klientów", t)
-        self.assertIn("pierwsza prośba 2026-10-13", t)
-        self.assertIn("ostatnia 2026-10-20", t)
+    def test_rozlaczaja_nie_pasuje_do_laczenia_z_systemem(self):
+        """Regresja: „rozłączają” zawiera „łącz”, a prośba o testy A/B nie dotyczy integracji."""
+        ka = karta("alfa", ryzyka={"konkurencja": [{"data": "2026-10-06", "zrodlo": "a.md", "cytat": "VoiceDesk łączy się z systemem."}]})
+        d = self._repo({"ab": {"tytul": "Testy A/B", "prosby": [prosba("alfa", "Ludzie rzadziej się rozłączają i częściej dochodzą do końca.", "2026-10-06", "a.md")]}}, ka)
+        self.assertEqual(gs.sygnaly(d)[0], [])
+
+    def test_prosi_co_najmniej_dwoch_klientow(self):
+        d = self._repo({"xls": {"tytul": "Eksport do Excela", "prosby": [prosba("alfa", "Excel proszę.", "2026-10-13", "a.md"), prosba("beta", "Też Excel.", "2026-10-14", "b.md")]}})
+        sygn, _ = gs.sygnaly(d)
+        self.assertEqual(sygn[0]["typy"], ["wielu"])
+        self.assertIn("prosi 2 klientów", sygn[0]["powod"])
+
+    def test_ten_sam_klient_w_dwoch_roznych_zrodlach(self):
+        d = self._repo({"rap": {"tytul": "Raport", "prosby": [prosba("alfa", "Raport.", "2026-10-06", "a.md"), prosba("alfa", "Raport jeszcze raz.", "2026-10-13", "b.md")]}})
+        self.assertEqual(gs.sygnaly(d)[0][0]["typy"], ["powtarza"])
+        d2 = self._repo({"rap": {"tytul": "Raport", "prosby": [prosba("alfa", "Raport.", "2026-10-06", "a.md"), prosba("alfa", "Raport drugi cytat.", "2026-10-06", "a.md")]}})
+        self.assertEqual(gs.sygnaly(d2)[0], [], "dwa cytaty z jednej rozmowy to jedna prośba")
+
+    def test_pojedyncze_prosby_zwiniete_w_pozostale(self):
+        d = self._repo({"jedna": {"tytul": "Jedna prośba", "prosby": [prosba("alfa", "Cytat.", "2026-10-06", "a.md")]}})
+        sygn, reszta = gs.sygnaly(d)
+        self.assertEqual((sygn, [x["klucz"] for x in reszta]), ([], ["jedna"]))
+        h = gs.strona_glos(d)
+        self.assertIn("Pozostałe (1)", h)
+        self.assertIn("<details>", h)
+        self.assertIn("Sygnały (0)", h)
+
+    def test_maksymalnie_piec_sygnalow_najsilniejsze_pierwsze_reszta_do_pozostalych(self):
+        prosby = {}
+        for i in range(7):                                    # 7 sygnałów typu „wielu” o rosnącej liczbie próśb
+            prosby[f"f{i}"] = {"tytul": f"Funkcja {i}", "prosby": [prosba("alfa", "c", "2026-10-06", "a.md"), prosba("beta", "c", "2026-10-07", "b.md")]
+                               + [prosba("alfa", "c", "2026-10-08", f"x{i}{j}.md") for j in range(i)]}
+        ka = karta("alfa", ryzyka={"konkurencja": [{"data": "2026-10-06", "zrodlo": "a.md", "cytat": "VoiceDesk łączy się z systemem."}]})
+        prosby["crm"] = {"tytul": "Integracja", "prosby": [prosba("alfa", "Integracja z systemem.", "2026-10-06", "a.md")]}
+        d = self._repo(prosby, ka)
+        sygn, reszta = gs.sygnaly(d)
+        self.assertEqual(len(sygn), 5)
+        self.assertEqual(sygn[0]["klucz"], "crm", "ratunek jest najsilniejszy")
+        self.assertEqual([g["klucz"] for g in sygn[1:]], ["f6", "f5", "f4", "f3"], "dalej wg liczby próśb")
+        self.assertEqual({x["klucz"] for x in reszta}, {"f0", "f1", "f2"})
+
+    def test_sygnal_ma_powod_klientow_cytat_i_status(self):
+        stan = {"RIN-10": zg("[alfa] Eksport", stan="Done")}
+        ka = karta("alfa", otwarte_sprawy={"s": {"identifier": "RIN-10"}})
+        r = Repo(stan=stan, prosby={"xls": {"tytul": "Eksport do Excela", "prosby": [prosba("alfa", "Excel proszę.", "2026-10-13", "a.md"), prosba("beta", "Też Excel.", "2026-10-14", "b.md")]}}, karta_a=ka)
+        r.wynik("alfa", "x", {"pozycje": [{"klucz_funkcji": "xls", "klucz_sprawy": "s"}]})
+        h = gs.strona_glos(r.dane())
+        t = tekst(h)
+        self.assertIn("Dlaczego: prosi 2 klientów: Alfa, Beta", t)
         self.assertIn("Też Excel.", t)
-        self.assertIn('href="https://linear.app/ws/issue/RIN-10/x"', gs.strona_glos(d))
+        self.assertIn("zrobione", t)
+        self.assertIn("pierwsza prośba 2026-10-13, ostatnia 2026-10-14", t)
 
-    def test_prosba_bez_zgloszenia_w_lineara_jest_w_backlogu(self):
-        d = self._dane()
-        d["prosby"]["nowa"] = {"tytul": "Nowa", "prosby": [{"klient": "alfa", "cytat": "x", "data": "2026-10-14"}]}
-        self.assertEqual({x["klucz"]: x["status"] for x in gs.prosby_posortowane(d)}["nowa"], "backlog")
+    def test_nowe_sygnaly_pierwsze_uruchomienie_to_tylko_baza(self):
+        d = self._repo({"xls": {"tytul": "Excel", "prosby": [prosba("alfa", "c", "2026-10-13", "a.md"), prosba("beta", "c", "2026-10-14", "b.md")]}})
+        wyslane = []
+        r = Repo(prosby=d["prosby"])
+        dane = r.dane()
+        self.assertEqual(gs.powiadom_o_sygnalach(dane, lambda t, l: wyslane.append(l) or True, r.root), [])
+        self.assertEqual(wyslane, [], "pierwsze uruchomienie nie ogłasza")
+        stan = json.loads((r.root / "ops/.sygnaly.json").read_text(encoding="utf-8"))
+        self.assertEqual(stan["widziane"], ["xls|wielu"])
+
+    def test_nowy_sygnal_jedna_linijka_raz_nie_codziennie(self):
+        prosby = {"xls": {"tytul": "Excel", "prosby": [prosba("alfa", "c", "2026-10-13", "a.md"), prosba("beta", "c", "2026-10-14", "b.md")]}}
+        r = Repo(prosby=prosby)
+        r.zapisz("ops/.sygnaly.json", {"widziane": [], "zainicjowano": "2026-10-01"})
+        wyslane = []
+        wysylacz = lambda tekst_, linie: wyslane.append(linie) or True       # noqa: E731
+        w1 = gs.powiadom_o_sygnalach(r.dane(), wysylacz, r.root)
+        self.assertEqual(len(w1), 1)
+        self.assertIn("Nowy sygnał w głosie klientów", w1[0])
+        self.assertIn("Excel", w1[0])
+        self.assertIn("rembolekk.github.io/Rinvo/glos-klientow.html", w1[0])
+        w2 = gs.powiadom_o_sygnalach(r.dane(), wysylacz, r.root)             # następny przebieg: ten sam sygnał
+        self.assertEqual((w2, len(wyslane)), ([], 1), "jednorazowo, nie codziennie")
+
+    def test_nieudana_wysylka_nie_oznacza_sygnalu_jako_widzianego(self):
+        prosby = {"xls": {"tytul": "Excel", "prosby": [prosba("alfa", "c", "2026-10-13", "a.md"), prosba("beta", "c", "2026-10-14", "b.md")]}}
+        r = Repo(prosby=prosby)
+        r.zapisz("ops/.sygnaly.json", {"widziane": [], "zainicjowano": "2026-10-01"})
+        self.assertEqual(gs.powiadom_o_sygnalach(r.dane(), lambda t, l: False, r.root), [])
+        self.assertEqual(json.loads((r.root / "ops/.sygnaly.json").read_text(encoding="utf-8"))["widziane"], [])
+        self.assertEqual(len(gs.powiadom_o_sygnalach(r.dane(), lambda t, l: True, r.root)), 1, "kolejna próba się powiedzie")
+
+    def test_nowy_typ_sygnalu_dla_znanej_prosby_tez_jest_nowy(self):
+        prosby = {"xls": {"tytul": "Excel", "prosby": [prosba("alfa", "c", "2026-10-13", "a.md"), prosba("beta", "c", "2026-10-14", "b.md")]}}
+        r = Repo(prosby=prosby)
+        r.zapisz("ops/.sygnaly.json", {"widziane": ["xls|powtarza"], "zainicjowano": "2026-10-01"})
+        self.assertEqual(len(gs.powiadom_o_sygnalach(r.dane(), lambda t, l: True, r.root)), 1)
+
+    def test_bez_webhooka_stan_sie_nie_przesuwa(self):
+        prosby = {"xls": {"tytul": "Excel", "prosby": [prosba("alfa", "c", "2026-10-13", "a.md"), prosba("beta", "c", "2026-10-14", "b.md")]}}
+        r = Repo(prosby=prosby)
+        r.zapisz("ops/.sygnaly.json", {"widziane": [], "zainicjowano": "2026-10-01"})
+        gs.powiadom_o_sygnalach(r.dane(), None, r.root)
+        self.assertEqual(json.loads((r.root / "ops/.sygnaly.json").read_text(encoding="utf-8"))["widziane"], [])
+
+
+class TestOsCzasuPR(unittest.TestCase):
+
+    def test_jedna_pozycja_na_pr_ze_statusem_koncowym(self):
+        url = "https://github.com/x/y/pull/1"
+        zd = [{"data": "2026-10-14T10:00:00+00:00", "typ": "pr_otwarty", "klient": "alfa", "zgloszenie": "RIN-1", "tytul": "Poprawka", "url": url},
+              {"data": "2026-10-14T11:00:00+00:00", "typ": "pr_oddany", "klient": "alfa", "zgloszenie": "RIN-1", "tytul": "Poprawka", "url": url},
+              {"data": "2026-10-14T12:00:00+00:00", "typ": "pr_scalony", "klient": "alfa", "zgloszenie": "RIN-1", "tytul": "Poprawka", "url": url},
+              {"data": "2026-10-13T10:00:00+00:00", "typ": "pr_otwarty", "klient": "alfa", "zgloszenie": "RIN-2", "tytul": "Druga", "url": "https://github.com/x/y/pull/2"},
+              {"data": "2026-10-13T10:00:00+00:00", "typ": "pr_otwarty", "klient": "alfa", "zgloszenie": "RIN-3", "tytul": "Trzecia", "url": "https://github.com/x/y/pull/3"},
+              {"data": "2026-10-13T11:00:00+00:00", "typ": "pr_oddany", "klient": "alfa", "zgloszenie": "RIN-3", "tytul": "Trzecia", "url": "https://github.com/x/y/pull/3"}]
+        d = Repo(zdarz=zd).dane()
+        wpisy = [w for w in gs.os_czasu(d, d["klienci"]["alfa"]) if w[1] == "Poprawka agenta"]
+        self.assertEqual(len(wpisy), 3, "trzy PR-y = trzy pozycje, a nie sześć etapów")
+        po_url = {re.search(r"pull/(\d)", w[2]).group(1): w for w in wpisy}
+        self.assertIn("scalona", po_url["1"][3])
+        self.assertEqual(po_url["1"][0], "2026-10-14T12:00:00+00:00", "data scalenia")
+        self.assertIn("otwarta", po_url["2"][3])
+        self.assertIn("oddana człowiekowi", po_url["3"][3])
+
+
+class TestZakazyCzasowe(unittest.TestCase):
+
+    def test_okres_z_tytulu_i_cytatu_liczy_daty_py(self):
+        import zakazy_czas as zc
+        z = {"id": "Z11", "tytul": "Nie modyfikować maila w tygodniu 6–12.10", "cytat": []}
+        o = zc.okres(z, date(2026, 10, 6))
+        self.assertEqual((o["od"], o["do"]), (date(2026, 10, 6), date(2026, 10, 12)))
+        o = zc.okres({"tytul": "Nic nowego podczas urlopu (2–6.11)", "cytat": []}, date(2026, 10, 13))
+        self.assertEqual((o["od"], o["do"]), (date(2026, 11, 2), date(2026, 11, 6)))
+        o = zc.okres({"tytul": "W tym tygodniu nic nowego", "cytat": []}, date(2026, 10, 13))      # wtorek: tydzień do piątku
+        self.assertEqual(o["do"], date(2026, 10, 16))
+        o = zc.okres({"tytul": "Nie zmieniać", "cytat": ["A od 19 do 23 października mam urlop."]}, date(2026, 10, 6))
+        self.assertEqual((o["od"], o["do"]), (date(2026, 10, 19), date(2026, 10, 23)))
+
+    def test_zakaz_bez_okresu_obowiazuje_zawsze(self):
+        import zakazy_czas as zc
+        for tytul in ("Limit prób pozostaje 5", "Nie puszczać Opla przed czwartkową rozmową we trzech", "Nie wysyłać wzoru pliku"):
+            self.assertIsNone(zc.okres({"tytul": tytul, "cytat": ["Zostaw pięć."]}, date(2026, 10, 6)), tytul)
+
+    def test_wygasa_po_ostatnim_dniu_okresu(self):
+        import zakazy_czas as zc
+        k = karta("alfa", zakazy=[{"id": "Z11", "tytul": "Nie ruszać w tygodniu 6–12.10", "cytat": []}, {"id": "Z1", "tytul": "Stały", "cytat": []}])
+        self.assertEqual([z["id"] for z in zc.stan_zakazow(k, date(2026, 10, 12))[0]], ["Z11", "Z1"], "ostatni dzień okresu jeszcze obowiązuje")
+        aktywne, wygasle = zc.stan_zakazow(k, date(2026, 10, 13))
+        self.assertEqual(([z["id"] for z in aktywne], [z["id"] for z in wygasle]), (["Z1"], ["Z11"]))
+        self.assertEqual(wygasle[0]["wygasl"], "2026-10-12")
+
+    def test_przeniesienie_do_karty_zapisuje_okres_i_wygasle(self):
+        import zakazy_czas as zc
+        k = karta("alfa", zakazy=[{"id": "Z11", "tytul": "Nie ruszać w tygodniu 6–12.10", "cytat": []}, {"id": "Z5", "tytul": "Urlop 19–23.10", "cytat": []}])
+        self.assertEqual(zc.przenies_wygasle(k, date(2026, 10, 14)), ["Z11"])
+        self.assertEqual([z["id"] for z in k["zakazy"]], ["Z5"])
+        self.assertEqual(k["zakazy_wygasle"][0]["wygasl"], "2026-10-12")
+        self.assertEqual(k["zakazy"][0]["okres"]["do"], "2026-10-23", "okres aktywnego zakazu zapisany")
+        self.assertEqual(zc.przenies_wygasle(k, date(2026, 10, 14)), [], "idempotentnie")
+
+    def test_data_zrodla_z_nazwy_pliku_rozmowy_z_cytatem(self):
+        import zakazy_czas as zc
+        r = Repo()
+        (r.root / "ops/transkrypcje/alfa").mkdir(parents=True)
+        (r.root / "ops/transkrypcje/alfa/2026-10-13-call.md").write_text("**Kasia:** W tym tygodniu nic nowego poza testem wstępu.", encoding="utf-8")
+        self.assertEqual(zc.data_zrodla_cytatu("alfa", ["W tym tygodniu nic nowego poza testem wstępu."], r.root), date(2026, 10, 13))
+        z = {"id": "Z18", "tytul": "W tym tygodniu nic nowego", "cytat": ["W tym tygodniu nic nowego poza testem wstępu."]}
+        self.assertEqual(zc.okres_zakazu(z, "alfa", r.root)["do"], date(2026, 10, 16))
+
+    def test_strona_klienta_ma_sekcje_wygaslych_i_aktywne_bez_nich(self):
+        k = karta("alfa", zakazy=[{"id": "Z11", "tytul": "Nie ruszać w tygodniu 6–12.10", "cytat": ["Ale nie w tym tygodniu."]},
+                                   {"id": "Z1", "tytul": "Stały zakaz", "cytat": ["Tak zostaje."]}])
+        t = tekst(Repo(karta_a=k).strony()["klienci/alfa.html"])
+        self.assertIn("Zakazy aktywne (1)", t)
+        self.assertIn("Wygasłe zakazy (1)", t)
+        self.assertRegex(t, r"Wygasłe zakazy \(1\).*Z11.*wygasł 2026-10-12.*Okres: 2026-10-06 – 2026-10-12")
+        self.assertLess(t.index("Stały zakaz"), t.index("Wygasłe zakazy"))
+
+    def test_karta_z_zapisanymi_wygaslymi_pokazuje_je_na_stronie(self):
+        k = karta("alfa", zakazy=[], zakazy_wygasle=[{"id": "Z9", "tytul": "Stary", "cytat": ["x"], "wygasl": "2026-10-01", "okres": {"od": "2026-09-25", "do": "2026-10-01", "skad": "25.09–01.10"}}])
+        self.assertIn("Wygasłe zakazy (1)", tekst(Repo(karta_a=k).strony()["klienci/alfa.html"]))
+
+    def test_prawdziwa_karta_auto_tama_z11_wygasl_z5_i_z18_jeszcze_nie(self):
+        import zakazy_czas as zc
+        k = json.loads((ROOT / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        # karta w repo ma już Z11 w wygasłych; sprawdzamy stan na 14.10 i po 16.10
+        ids = lambda lista: {z["id"] for z in lista}      # noqa: E731
+        a, w = zc.stan_zakazow(k, date(2026, 10, 14), "auto-tama", ROOT)
+        self.assertIn("Z11", ids(w))
+        self.assertTrue({"Z5", "Z18", "Z1"} <= ids(a))
+        a, w = zc.stan_zakazow(k, date(2026, 10, 17), "auto-tama", ROOT)
+        self.assertIn("Z18", ids(w))
+        self.assertIn("Z5", ids(a))
+
+
+class TestDatyZrodlaRyzyk(unittest.TestCase):
+
+    def test_ryzyko_i_prosba_dostaja_date_zrodla_a_nie_przetwarzania(self):
+        import linear_sync as ls
+        karta_ = {}
+        item = {"temat_ryzyka": "konkurencja", "cytat": ["VoiceDesk jest tańszy."]}
+        ls.update_risk_counter(karta_, item, "ops/transkrypcje/alfa/2026-10-06-call.md", "2026-10-13")
+        ls.update_risk_counter(karta_, item | {"cytat": ["Oferta na piśmie."]}, "ops/transkrypcje/alfa/2026-10-13-call.md", "2026-10-14")
+        self.assertEqual([x["data"] for x in karta_["ryzyka"]["konkurencja"]], ["2026-10-06", "2026-10-13"])
+        prosby = {}
+        ls.update_prosby(prosby, {"klucz_funkcji": "xls", "tytul": "Excel", "cytat": ["Excel."]}, "alfa", "ops/transkrypcje/alfa/2026-10-06-call.md", "2026-10-13")
+        self.assertEqual(prosby["xls"]["prosby"][0]["data"], "2026-10-06")
+
+    def test_zrodlo_bez_daty_w_nazwie_uzywa_dnia_przetwarzania(self):
+        import linear_sync as ls
+        karta_ = {}
+        ls.update_risk_counter(karta_, {"temat_ryzyka": "inne", "cytat": ["x"]}, "src.md", "2026-10-13")
+        self.assertEqual(karta_["ryzyka"]["inne"][0]["data"], "2026-10-13")
+
+    def test_dane_w_repozytorium_maja_daty_zrodel_voicedesk_0610_i_1310(self):
+        k = json.loads((ROOT / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        wpisy = k["ryzyka"]["konkurencja"]
+        self.assertEqual(sorted({w["data"] for w in wpisy}), ["2026-10-06", "2026-10-13"])
+        for temat, w in k["ryzyka"].items():
+            for x in w:
+                self.assertIn(x["data"], x["zrodlo"], f"{temat}: data wpisu = data źródła")
+        for klucz, p in json.loads((ROOT / "ops/produkt/prosby.json").read_text(encoding="utf-8")).items():
+            for x in p["prosby"]:
+                self.assertIn(x["data"], x["zrodlo"], klucz)
+
+    def test_na_stronie_ryzyko_ma_daty_zrodel(self):
+        t = tekst(gs.strona_klienta(gs.wczytaj_dane(ROOT, DZIS), gs.wczytaj_dane(ROOT, DZIS)["klienci"]["auto-tama"]))
+        self.assertIn("2026-10-06, 2026-10-13", t)
+        self.assertNotIn("2026-10-13, 2026-10-14", t)
+
+
+class TestAgenciTydzien(unittest.TestCase):
+
+    def _repo(self):
+        stan = {"RIN-1": {**zg("[alfa] Szybka", stan="Done"), "zamknieto": "2026-10-14T10:00:00Z"},
+                "RIN-2": {**zg("[alfa] Wolna", stan="Done"), "zamknieto": "2026-10-13T10:00:00Z"},
+                "RIN-3": {**zg("[alfa] Stara", stan="Done"), "zamknieto": "2026-09-01T10:00:00Z"},
+                "RIN-4": zg("[alfa] Otwarta")}
+        zd = [{"data": "2026-10-14T10:00:00+00:00", "typ": "pr_scalony", "klient": "alfa", "zgloszenie": "RIN-1", "tytul": "Szybka", "url": "https://github.com/x/y/pull/1"},
+              {"data": "2026-10-14T10:00:00+00:00", "typ": "pr_scalony", "klient": "alfa", "zgloszenie": "RIN-2", "tytul": "Wolna", "url": "https://github.com/x/y/pull/2"},
+              {"data": "2026-09-02T10:00:00+00:00", "typ": "pr_scalony", "klient": "alfa", "zgloszenie": "RIN-3", "tytul": "Stara", "url": "https://github.com/x/y/pull/3"}]
+        ka = karta("alfa", otwarte_sprawy={"a": {"identifier": "RIN-1", "zrodla": ["ops/transkrypcje/alfa/2026-10-13-call.md"]},
+                                            "b": {"identifier": "RIN-2", "zrodla": ["ops/transkrypcje/alfa/2026-10-06-call.md", "ops/transkrypcje/alfa/2026-10-13-call.md"]},
+                                            "c": {"identifier": "RIN-3", "zrodla": ["ops/transkrypcje/alfa/2026-08-30-call.md"]}})
+        r = Repo(stan=stan, zdarz=zd, karta_a=ka)
+        r.wynik("alfa", "2026-10-13-call", {"zrodlo": "ops/transkrypcje/alfa/2026-10-13-call.md", "spotkanie": {"data": "2026-10-13", "godziny": "11:00–11:24"}})
+        return r
+
+    def test_zamkniete_scalone_srednia_i_najkrotszy_czas(self):
+        st = gs.statystyki_agentow(self._repo().dane())
+        self.assertEqual(st["zamkniete"], 2, "tylko ostatnie 7 dni")
+        self.assertEqual(st["scalone"], 2)
+        czasy = {p["zgloszenie"]: p["czas"] for p in st["pomiary"]}
+        # RIN-1: 13.10 11:00 → 14.10 12:00 (10:00 UTC) = 1 d 1 h; RIN-2: najwcześniejsze źródło 6.10 00:00 → 8 d 12 h
+        self.assertEqual(gs.formatuj_czas(czasy["RIN-1"]), "1 d 1 h")
+        self.assertEqual(gs.formatuj_czas(czasy["RIN-2"]), "8 d 12 h")
+
+    def test_sekcja_na_stronie_glownej_z_przykladem_najszybszej(self):
+        r = self._repo()
+        h = gs.strona_index(r.dane())
+        t = tekst(h)
+        self.assertIn("Agenci w tym tygodniu", t)
+        self.assertIn("2 zamkniętych spraw (7 dni)", t)
+        self.assertIn("2 poprawek scalonych", t)
+        self.assertIn("średnio od źródła do scalenia", t)
+        self.assertIn("4 d 18 h", t, "średnia z 1 d 1 h i 8 d 12 h")
+        self.assertIn("najkrócej", t)
+        self.assertRegex(t, r"Najszybsza: Szybka RIN-1")
+        self.assertIn('href="https://github.com/x/y/pull/1"', h)
+
+    def test_brak_scalonych_poprawek_to_czytelny_komunikat(self):
+        h = gs.strona_index(Repo().dane())
+        self.assertIn("nie scalili jeszcze żadnej poprawki", tekst(h))
+
+    def test_poprawka_bez_znanego_zrodla_nie_psuje_statystyk(self):
+        r = self._repo()
+        r.zapisz("ops/.zdarzenia.json", [{"data": "2026-10-14T10:00:00+00:00", "typ": "pr_scalony", "klient": "alfa", "zgloszenie": "RIN-99", "tytul": "?", "url": "u"}])
+        self.assertEqual(gs.statystyki_agentow(r.dane())["scalone"], 0)
 
 
 class TestStanIDziennik(unittest.TestCase):

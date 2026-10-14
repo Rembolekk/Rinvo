@@ -149,7 +149,7 @@ jobs:
           zapisz() {
             local plik="$1"
             python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
-            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json logi/przebiegi index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/materialy; do
+            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json logi/przebiegi index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/.sygnaly.json ops/materialy; do
               [ -e "$sciezka" ] && git add -A -- "$sciezka"
             done
             if git diff --cached --quiet; then
