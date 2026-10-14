@@ -79,6 +79,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
 | `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (129 testów, bez poczty) |
+| `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -350,6 +351,10 @@ Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.
 Blokada: etykieta `Do weryfikacji`, zdjęcie `Wyślij`, komentarz z powodem i Slack („Wysyłka wstrzymana: <powód>”). Oczekiwanie zostawia `Wyślij`, a Slack dostaje powód tylko raz. Po udanej wysyłce Slack: „Wysłano do <osoba>: <temat>”.
 
 Nic nie wyjdzie na prawdziwą skrzynkę, dopóki ktoś nie doda etykiety `Wyślij`. Podgląd bez zmian: `python3 wyslij.py --sucho`, `python3 szkice.py --sucho`. Testy bez sieci i poczty: `python3 testy/test_wysylka.py`.
+
+## Notatka przed spotkaniem
+
+Notatka przed spotkaniem to materiał WEWNĘTRZNY (dla Marka), nigdy mail do klienta: zadanie „Notatka przed spotkaniem…” nie dostaje szkicu ani wysyłki. `notatka_spotkania.py` (krok w workflow „Codzienne podsumowanie”, po porannym podsumowaniu) znajduje spotkania z karty klienta, które są dziś albo jutro (dzień przed), i tworzy `ops/materialy/<klient>/notatka-<data spotkania>.md` oraz `.pdf`: maksymalnie jedna strona, 3 ryzyka (każde z naszym argumentem z faktów z rozmów i kart oraz rekomendowanym stanowiskiem), 3–5 pytań do klienta i najwyżej 5 tematów ważnych dla tego spotkania. **Statusy bierze z Lineara w chwili pisania**, nie z opisu zgłoszenia (In Progress to „w toku”, nie „zrobione”). Kod odrzuca notatkę z obietnicą ceny, terminu albo integracji, z kwotą spoza faktów, z wzmianką o integracji bez uczciwego „nie mamy”, z miejscem do uzupełnienia albo z innym klientem, i prosi model o poprawę (do 3 prób; za długą najpierw zmniejsza czcionkę, potem skraca). Link do PDF trafia do komentarza zadania notatki i na Slacka („Notatka przed spotkaniem gotowa: <link>”). Idempotentne: istniejącej notatki nie nadpisuje bez `--odswiez` (odświeżenie nie powtarza powiadomień). Ręcznie: `python3 notatka_spotkania.py --dzien 2026-10-14 --klient auto-tama`; podgląd: `--sucho`. Testy: `python3 testy/test_notatka_spotkania.py`.
 
 ## Testy automatyczne
 

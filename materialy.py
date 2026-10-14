@@ -124,12 +124,12 @@ def znajdz_czcionke():
     raise RuntimeError("brak czcionki z polskimi znakami (DejaVu, Liberation albo Arial)")
 
 
-def markdown_do_pdf(tytul, tresc, sciezka):
+def markdown_do_pdf(tytul, tresc, sciezka, skala=1.0):
     """Prosty PDF z podzbioru Markdowna: #, ##, listy, **pogrubienie**, akapity. Zwraca ścieżkę."""
     from fpdf import FPDF
     zwykla, gruba = znajdz_czcionke()
     pdf = FPDF(format="A4")
-    pdf.set_margins(18, 16, 18)
+    pdf.set_margins(18 * max(skala, 0.8), 16 * max(skala, 0.8), 18 * max(skala, 0.8))
     pdf.set_auto_page_break(True, 14)
     pdf.add_font("T", "", zwykla)
     pdf.add_font("T", "B", gruba)
@@ -137,6 +137,7 @@ def markdown_do_pdf(tytul, tresc, sciezka):
     szer = pdf.w - pdf.l_margin - pdf.r_margin
 
     def akapit(tekst, rozmiar=10.5, styl="", odstep=1.6, wciecie=0):
+        rozmiar, odstep = rozmiar * skala, odstep * skala
         pdf.set_font("T", styl, rozmiar)
         pdf.set_x(pdf.l_margin + wciecie)
         pdf.multi_cell(szer - wciecie, rozmiar * 0.5 + 1.2, tekst, markdown=True, new_x="LMARGIN", new_y="NEXT")

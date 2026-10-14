@@ -182,7 +182,9 @@
     "pomijaj_spotkania_slowa": [
       "szkolen"
     ],
-    "_pomijaj_spotkania_slowa": "Spotkania, w których tytule albo opisie jest takie słowo (np. szkolenie dla handlowców), nie dostają osobnej notatki: to nie rozmowa o ryzykach z klientem."
+    "_pomijaj_spotkania_slowa": "Spotkania, w których tytule albo opisie jest takie słowo (np. szkolenie dla handlowców), nie dostają osobnej notatki: to nie rozmowa o ryzykach z klientem.",
+    "repo_github": "Rembolekk/Rinvo",
+    "_opis_wewnetrzna": "Notatka przed spotkaniem to materiał WEWNĘTRZNY: notatka_spotkania.py tworzy ją dzień przed spotkaniem jako ops/materialy/<klient>/notatka-<data>.md i .pdf (jedna strona), nigdy jako szkic maila do klienta."
   },
   "repo_etykiety": {
     "rinvo-app": "repo: rinvo-app",

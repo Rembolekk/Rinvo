@@ -33,7 +33,9 @@ jobs:
           python-version: "3.12"
 
       - name: Zależności
-        run: pip install certifi tzdata
+        run: |
+          pip install certifi tzdata fpdf2
+          sudo apt-get install -y -q fonts-dejavu-core
 
       # Ręczne uruchomienie wysyła zawsze (--wymus); cron tylko w oknie 8:00-12:00 czasu polskiego, raz dziennie.
       - name: Podsumowanie
@@ -49,13 +51,34 @@ jobs:
             python3 podsumowanie.py
           fi
 
+      # Notatka przed spotkaniem (materiał WEWNĘTRZNY): dzień przed każdym spotkaniem z karty klienta agent tworzy
+      # ops/materialy/<klient>/notatka-<data>.md i .pdf, link idzie do komentarza zadania i na Slacka. Idempotentne.
+      - name: Node.js (dla Claude Code)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Notatki przed spotkaniami
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: |
+          set -uo pipefail
+          export CLAUDE_CODE_OAUTH_TOKEN="$(python3 sekrety.py CLAUDE_CODE_OAUTH_TOKEN)"
+          python3 notatka_spotkania.py || echo "::warning::Notatka przed spotkaniem nie powstała (patrz log powyżej)"
+
       # Szkice przypomnień zwiększają licznik wykorzystanych przypomnień w karcie: zapisujemy go w repo.
       - name: Zapisz karty i stan
         run: |
           set -uo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          for sciezka in ops/klienci ops/.podsumowanie.json; do
+          for sciezka in ops/klienci ops/.podsumowanie.json ops/materialy; do
             [ -e "$sciezka" ] && git add -A -- "$sciezka"
           done
           if git diff --cached --quiet; then
