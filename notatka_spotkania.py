@@ -27,7 +27,9 @@ import agent as ag
 import materialy as mat
 import notatki
 import slack_widok as sw
+import stan_linear
 import wyslij as wy
+import zdarzenia
 from maile import slack_bezpiecznie
 
 KWOTA_RE = re.compile(r"\d[\d\s.,]*\s?(?:zł|PLN)\b", re.IGNORECASE)
@@ -224,6 +226,7 @@ def utworz_notatke(s, klient, karta, spotkanie, najnowsze, dzis):
         if liczba_stron(pdf) > 1:
             powody, limit = [f"notatka ma {liczba_stron(pdf)} strony, ma być jedna (skróć do ~{int(limit * 0.8)} słów)"], int(limit * 0.8)
             continue
+        zdarzenia.zapisz_zdarzenie(s, "notatka", klient, spotkanie.get("zadanie") or "", f"Notatka przed spotkaniem: {spotkanie['tytul']}", str(pdf))
         return {"status": "gotowa", "md": str(md), "pdf": str(pdf)}
     for p in (md, pdf):
         if p.exists():
@@ -291,6 +294,8 @@ def main():
               + (f" ({w['powod']})" if w.get("powod") else ""))
     if not wyniki:
         print("Brak spotkań dziś i jutro, dla których potrzebna jest notatka.")
+    if not args.sucho:
+        stan_linear.po_przebiegu()
     if any(w["status"] in ("blad", "odrzucona") for w in wyniki):
         sys.exit(1)
 

@@ -17,6 +17,7 @@ from pathlib import Path
 
 import agent as ag
 import wyslij as wy
+import zdarzenia
 
 KATALOG_MATERIALOW = Path("ops/materialy")
 KATALOG_DANYCH = Path("ops/dane")
@@ -224,6 +225,7 @@ def utworz_material(s, zg, klient, karta, rodzaj):
     markdown_do_pdf(tytul, md.read_text(encoding="utf-8"), pdf)
     m = {"skrot": skrot, "identyfikator": zg["identifier"], "rodzaj": rodzaj, "tytul": tytul, "luki": luki}
     meta.write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+    zdarzenia.zapisz_zdarzenie(s, "material", klient, zg["identifier"], tytul, str(pdf))
     return _wynik(m, md, pdf, W, s, klient, karta)
 
 

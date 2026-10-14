@@ -27,6 +27,8 @@ from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
 import slack_widok as sw
+import stan_linear
+import zdarzenia
 from maile import slack_bezpiecznie
 from podpis import bez_podpisu
 
@@ -463,6 +465,7 @@ def zbuduj_srodowisko(sucho=False):
     s.linear = LinearAgent(linear_sync.load_api_key(), Z)
     s.slack = SlackAgent()
     s.poczta = Poczta(Z["wysylka"])
+    s.zdarzenia = zdarzenia.Dziennik()
     s.teraz = lambda: datetime.now(timezone.utc)
     s.wczytaj_karte = linear_sync.load_karta
     s.zapisz_karte = linear_sync.save_karta
@@ -506,6 +509,8 @@ def main():
         print(f"{w['zgloszenie']}: {w['status']}" + (f" ({w['powod']})" if w.get("powod") else ""))
     if not wyniki:
         print("Brak zgłoszeń z etykietą Wyślij.")
+    if not args.sucho:
+        stan_linear.po_przebiegu()
     if any(w["status"] == "blad" for w in wyniki):
         sys.exit(1)
 

@@ -1,0 +1,90 @@
+[
+ {
+  "data": "2026-10-14T11:38:49.600Z",
+  "typ": "pr_otwarty",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-40",
+  "tytul": "Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/1"
+ },
+ {
+  "data": "2026-10-14T11:39:43.616Z",
+  "typ": "pr_oddany",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-40",
+  "tytul": "Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/1"
+ },
+ {
+  "data": "2026-10-14T18:25:51.619Z",
+  "typ": "pr_scalony",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-40",
+  "tytul": "Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/1"
+ },
+ {
+  "data": "2026-10-14T11:39:05.728Z",
+  "typ": "pr_otwarty",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-41",
+  "tytul": "Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/2"
+ },
+ {
+  "data": "2026-10-14T11:39:38.514Z",
+  "typ": "pr_oddany",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-41",
+  "tytul": "Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/2"
+ },
+ {
+  "data": "2026-10-14T18:25:44.984Z",
+  "typ": "pr_scalony",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-41",
+  "tytul": "Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/2"
+ },
+ {
+  "data": "2026-10-14T11:39:21.902Z",
+  "typ": "pr_otwarty",
+  "klient": "klinika-usmiech",
+  "zgloszenie": "RIN-65",
+  "tytul": "Błędne godziny otwarcia Sopot w piątek (agent podaje do 18, powinno być do 16)",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/3"
+ },
+ {
+  "data": "2026-10-14T11:39:31.557Z",
+  "typ": "pr_oddany",
+  "klient": "klinika-usmiech",
+  "zgloszenie": "RIN-65",
+  "tytul": "Błędne godziny otwarcia Sopot w piątek (agent podaje do 18, powinno być do 16)",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/3"
+ },
+ {
+  "data": "2026-10-14T18:25:38.600Z",
+  "typ": "pr_scalony",
+  "klient": "klinika-usmiech",
+  "zgloszenie": "RIN-65",
+  "tytul": "Błędne godziny otwarcia Sopot w piątek (agent podaje do 18, powinno być do 16)",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/3"
+ },
+ {
+  "data": "2026-10-14T18:36:00+00:00",
+  "typ": "material",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-47",
+  "tytul": "Ściąga statusów dla handlowców",
+  "url": "ops/materialy/auto-tama/rin-47-sciaga-statusow-dla-handlowcow-jedna-str.pdf"
+ },
+ {
+  "data": "2026-10-14T18:31:00+00:00",
+  "typ": "notatka",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-78",
+  "tytul": "Notatka przed spotkaniem z Pawłem (15.10)",
+  "url": "ops/materialy/auto-tama/notatka-2026-10-15.pdf"
+ }
+]

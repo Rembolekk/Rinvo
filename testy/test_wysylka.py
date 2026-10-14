@@ -1300,7 +1300,7 @@ class TestWorkflow(unittest.TestCase):
         t = (Path(__file__).parent.parent / ".github/workflows/agent.yml").read_text(encoding="utf-8")
         self.assertIn("fpdf2", t)
         self.assertIn("fonts-dejavu-core", t)
-        self.assertIn("git add -A -- ops/materialy", t)
+        self.assertRegex(t, r"for sciezka in [^\n]*ops/materialy; do")      # po dodaniu stron: pętla po ścieżkach zamiast osobnego git add
         self.assertIn("contents: write", t)
 
     def test_agent_nie_dostaje_hasla_do_poczty(self):

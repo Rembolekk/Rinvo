@@ -499,5 +499,10 @@
         ]
       }
     }
+  },
+  "strony": {
+    "_opis": "Statyczne strony dla ludzi na GitHub Pages (generuj_strony.py). Link na dole codziennego podsumowania prowadzi do index.html.",
+    "url_bazowy": "https://rembolekk.github.io/Rinvo/",
+    "tekst_linku": "Wszystko o klientach i prośbach: strony"
   }
 }

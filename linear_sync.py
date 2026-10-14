@@ -1227,6 +1227,9 @@ def main():
     print(f"  Zakazy → karta.json:           {dodano_zakazow}")
     print(f"  Aktualizacje otwartych spraw:  {n_upd}")
     print(f"{'─'*60}\n")
+    if not args.dry_run:
+        import stan_linear
+        stan_linear.po_przebiegu()          # strony generują się z pliku stanu, bez zapytań do Lineara
 
 
 if __name__ == "__main__":

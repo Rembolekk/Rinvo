@@ -21,7 +21,9 @@ import sys
 from datetime import datetime, timezone
 
 import slack_widok as sw
+import stan_linear
 import zasady
+import zdarzenia
 from agent import (NAZWY_SEKRETOW_ENV, pliki_do_commita, czy_dozwolona_sciezka, sciezki_niedozwolone, tytul_bez_prefiksu, znajdz_sekrety,
                    rozbij_opis, klient_z_tytulu)
 from agent_github import ocena_coderabbit, stan_coderabbit_ci, stan_testow
@@ -145,6 +147,7 @@ def oddaj_czlowiekowi(s, zg, pr, powod):
     pelny = f"{A['powod_przegladu']}: {powod}"
     s.linear.dodaj_etykiete(zg, s.Z["etykiety"]["czlowiek"])
     s.linear.komentarz(zg, f"**Decyzja człowieka: {A['powod_przegladu']}**\n\n{powod}\n\nPR: {pr.get('html_url', '')}")
+    zdarzenia.zapisz_zdarzenie(s, "pr_oddany", klient_z_tytulu(zg.get("title")), zg["identifier"], tytul_bez_prefiksu(zg.get("title")), pr.get("html_url"))
     s.github.komentarz(pr["number"], f"{TEKST_ODDANIA} ({pelny}). Automatyczne scalenie wstrzymane. "
                                      f"Gdy przyczyna zniknie, agent sam wznowi scalanie. {ZNACZNIK_ODDANIA}")
     _slack_oddal(s, zg, pr, powod)
@@ -232,6 +235,7 @@ def obsluz_pr(s, pr):
         return oddaj_czlowiekowi(s, zg, pr, f"scalenie nie powiodło się ({slack_bezpiecznie(str(exc), 120)})")
     s.linear.ustaw_stan(zg, "Done")
     s.linear.komentarz(zg, f"**Agent scalił PR** (squash): {pr.get('html_url', '')}\n\n{d['powod']}.")
+    zdarzenia.zapisz_zdarzenie(s, "pr_scalony", klient_z_tytulu(zg.get("title")), zg["identifier"], tytul_bez_prefiksu(zg.get("title")), pr.get("html_url"))
     _slack_naprawil(s, pr)
     return {"akcja": "scalone", "numer": pr["number"], "zgloszenie": zg["identifier"]}
 
@@ -262,6 +266,7 @@ def main():
         print(f"PR #{w.get('numer')}: {w['akcja']}" + (f" ({w['powod']})" if w.get("powod") else ""))
     if not wyniki:
         print("Brak PR agenta do obsłużenia.")
+    stan_linear.po_przebiegu()
 
 
 if __name__ == "__main__":

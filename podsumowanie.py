@@ -265,6 +265,8 @@ def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
         "czeka_n": len(grupy["czeka"]), "czeka_najblizsze": przyszle[0] if przyszle else None,
         "nowe_n": len(grupy["nowe"]),
         "widok": sw.widok_linear_url([z.get("url") for z in otwarte]),
+        "strony_url": Z.get("strony", {}).get("url_bazowy", "").rstrip("/") + "/index.html" if Z.get("strony") else None,
+        "strony_tekst": Z.get("strony", {}).get("tekst_linku", "Wszystko o klientach i prośbach: strony"),
     }
 
 
@@ -302,7 +304,9 @@ def buduj_wiadomosc(dane, dzis):
                   if naj else "najbliższy termin: brak")
         linia_czekania = f"Czekamy na klientów w {z} {'sprawie' if z == 1 else 'sprawach'}, {termin}."
     sekcje.append(linia_agentow + "\n" + linia_czekania)
-    if dane["widok"]:
+    if dane.get("strony_url"):                        # link na dole: strony z danymi o klientach, nie lista w Linearze
+        sekcje.append(f"<{dane['strony_url']}|{dane.get('strony_tekst', 'Wszystko o klientach i prośbach: strony')}>")
+    elif dane["widok"]:
         sekcje.append(f"<{dane['widok']}|Wszystkie otwarte zgłoszenia w Linearze>")
     kontekst = f"{DNI[dzis.weekday()]} {dzis.strftime('%d.%m.%Y')}"
     return sw.tekst_zapasowy(sekcje, kontekst), sw.bloki(sekcje, kontekst)
@@ -383,6 +387,8 @@ def main():
         sys.exit(1)
     stan["ostatnie_wyslane"] = czas_polski(teraz).date().isoformat()
     zapisz_stan(stan)
+    import stan_linear
+    stan_linear.po_przebiegu()
     print("Slack: wysłano.")
 
 

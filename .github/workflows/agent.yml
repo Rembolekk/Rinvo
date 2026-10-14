@@ -112,12 +112,15 @@ jobs:
           set -uo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          [ -e ops/materialy ] && git add -A -- ops/materialy
+          python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
+          for sciezka in index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/materialy; do
+            [ -e "$sciezka" ] && git add -A -- "$sciezka"
+          done
           if git diff --cached --quiet; then
             echo "Brak nowych materiałów"
             exit 0
           fi
-          git commit -q -m "[automat] materiały dla klientów [skip ci]"
+          git commit -q -m "[automat] materiały dla klientów i strony [skip ci]"
           for proba in 1 2 3; do
             git push origin HEAD:main && exit 0
             echo "Push odrzucony (próba $proba/3), pull --rebase…"

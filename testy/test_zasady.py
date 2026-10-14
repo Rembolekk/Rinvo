@@ -599,11 +599,24 @@ class TestWiadomoscPodsumowania(unittest.TestCase):
         self.assertIn("w 1 sprawie", linia, "RIN-1 jest po terminie, więc nie liczy się jako „czekamy”")
         self.assertIn("najbliższy termin: 20.10, <https://linear.app/ws/issue/RIN-5|Czeka z terminem>", linia)
 
-    def test_link_do_widoku_wszystkich_otwartych_zgloszen_na_dole(self):
+    def test_link_na_dole_prowadzi_do_stron_a_nie_do_lineara(self):
+        """ZMIANA ŚWIADOMA (widoki dla ludzi): dawniej link na dole wskazywał widok zgłoszeń w Linearze, teraz index.html na Pages."""
         tekst, bloki = self._msg()
-        self.assertIn("<https://linear.app/ws/team/RIN/active|Wszystkie otwarte zgłoszenia w Linearze>", tekst)
+        url = "https://rembolekk.github.io/Rinvo/index.html"
+        self.assertIn(f"<{url}|Wszystko o klientach i prośbach: strony>", tekst)
+        self.assertNotIn("Wszystkie otwarte zgłoszenia w Linearze", tekst)
         sekcje = [b["text"]["text"] for b in bloki if b["type"] == "section"]
-        self.assertTrue(sekcje[-1].startswith("<https://linear.app/ws/team/RIN/active|"))
+        self.assertTrue(sekcje[-1].startswith(f"<{url}|"))
+
+    def test_bez_adresu_stron_wraca_link_do_lineara(self):
+        import copy
+        Z2 = copy.deepcopy(Z)
+        Z2.pop("strony")
+        otwarte = [{"id": "i1", "identifier": "RIN-1", "title": "[k] Sprawa", "url": "https://linear.app/ws/issue/RIN-1/x", "state": {"name": "Todo", "type": "unstarted"},
+                    "labels": {"nodes": []}, "dueDate": None, "createdAt": "2026-10-01T00:00:00Z"}]
+        dane = podsumowanie.przygotuj(otwarte, [], {"k": karta()}, Z2, DZIS)
+        tekst, _ = podsumowanie.buduj_wiadomosc(dane, DZIS)
+        self.assertIn("Wszystkie otwarte zgłoszenia w Linearze", tekst)
 
     def test_bez_list_nowe_od_wczoraj_i_bez_technicznych_nazw_w_tekscie(self):
         tekst, _ = self._msg()

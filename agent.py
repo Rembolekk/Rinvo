@@ -30,7 +30,9 @@ import unicodedata
 from pathlib import Path
 
 import slack_widok as sw
+import stan_linear
 import zasady
+import zdarzenia
 from maile import slack_bezpiecznie
 
 WZORCE_SEKRETOW = [r"lin_api_\w{8,}", r"hooks\.slack\.com/services/\S+", r"sk-ant-[\w-]{8,}",
@@ -312,6 +314,7 @@ def obsluz_zgloszenie(s, zg):
         pr = s.github.utworz_pr(zg["title"], galaz, buduj_opis_pr(zg, sekcje))
         uwaga = f"\n\nCofnięto zmiany poza dozwolonymi ścieżkami: {', '.join(cofniete)}." if cofniete else ""
         s.linear.komentarz(zg, f"**Agent otworzył PR:** {pr['html_url']}{uwaga}")
+        zdarzenia.zapisz_zdarzenie(s, "pr_otwarty", klient, zg["identifier"], tytul_bez_prefiksu(zg.get("title")), pr["html_url"])
         return {"status": "pr", "pr": pr["html_url"], "numer": pr.get("number"), "zgloszenie": zg["identifier"], "galaz": galaz}
     except Exception as exc:  # noqa: BLE001  (nieoczekiwany błąd: oddajemy, nie zostawiamy w In Progress)
         return oddaj(s, zg, f"błąd wykonania: {slack_bezpiecznie(str(exc), 200)}")
@@ -361,6 +364,7 @@ def zbuduj_srodowisko():
     s.github = GitHub(token, A["repo_github"])
     s.claude = ClaudeAgent(os.environ.get("RINVO_MODEL", "").strip() or "claude-sonnet-5-5")
     s.slack = SlackAgent()
+    s.zdarzenia = zdarzenia.Dziennik()
     s.wczytaj_karte = lambda klient: linear_sync.load_karta(klient)
     return s
 
@@ -390,6 +394,7 @@ def main():
         print(f"{w['zgloszenie']}: {w['status']}" + (f" ({w.get('pr') or w.get('powod')})" if w.get("pr") or w.get("powod") else ""))
     if not wyniki:
         print("Brak zgłoszeń dla agenta (Dla agenta + repo: rinvo-app, stan Todo).")
+    stan_linear.po_przebiegu()
 
 
 if __name__ == "__main__":

@@ -80,6 +80,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
+| `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (32 testy) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -353,6 +354,16 @@ Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.
 Blokada: etykieta `Do weryfikacji`, zdjęcie `Wyślij`, komentarz z powodem i Slack („Wysyłka wstrzymana: <powód>”). Oczekiwanie zostawia `Wyślij`, a Slack dostaje powód tylko raz. Po udanej wysyłce Slack: „Wysłano do <osoba>: <temat>”.
 
 Nic nie wyjdzie na prawdziwą skrzynkę, dopóki ktoś nie doda etykiety `Wyślij`. Podgląd bez zmian: `python3 wyslij.py --sucho`, `python3 szkice.py --sucho`. Testy bez sieci i poczty: `python3 testy/test_wysylka.py`.
+
+## Strony dla ludzi (GitHub Pages)
+
+Wszystko o kliencie i o prośbach produktowych w jednym miejscu, bez szukania po plikach. `generuj_strony.py` (zwykły Python i HTML, bez modelu i bez zapytań do sieci) tworzy statyczne strony w katalogu głównym repozytorium, który serwuje GitHub Pages:
+
+- **`index.html`**: lista klientów ze „światłem” (czerwone: powtarzające się ryzyko, czyli to samo w co najmniej dwóch rozmowach lub mailach, albo sprawa po terminie; żółte: coś wymaga człowieka; zielone: reszta) i liczbami spraw u agentów, u człowieka i czekających na klienta,
+- **`klienci/<klient>.html`**: na górze „Teraz” (wymaga człowieka, u agentów, czeka na klienta, z linkami do Lineara), potem oś czasu od najnowszych (rozmowy i maile z linkiem do raportu, zmiany zdania, wysłane maile, poprawki agenta z linkiem do PR, notatki i materiały), zakazy aktywne i historia uchylonych z cytatem, ryzyka z liczbą wystąpień i datami, kontakty i decydenci,
+- **`glos-klientow.html`**: wszystkie prośby produktowe ze wszystkich klientów, od najczęściej zgłaszanych (liczba klientów), z cytatami, datą pierwszej i ostatniej prośby i statusem (backlog, u agenta, zrobione).
+
+Dane: karty klientów i wyniki w repo, **stan Lineara w `ops/.stan_linear.json`** (zapisują go na końcu przebiegu `linear_sync`, agent, szkice, wysyłka, notatki i codzienne podsumowanie; `stan_linear.py`) oraz dziennik zdarzeń agenta `ops/.zdarzenia.json` (PR-y, notatki, materiały; `zdarzenia.py`). Strony odświeżają się na końcu każdego workflow (rozmowy, maile, agent, podsumowanie) i są commitowane razem z wynikami. Adresów e-mail kontaktów na stronach nie ma (repozytorium jest publiczne), a każda strona ma dopisek „dane fikcyjne, demo”. Link na dole codziennego podsumowania na Slacku prowadzi do `index.html`. Ręcznie: `python3 generuj_strony.py`; testy: `python3 testy/test_strony.py`.
 
 ## Podpis agenta i konto bota
 

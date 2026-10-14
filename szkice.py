@@ -23,6 +23,7 @@ from datetime import timedelta
 
 import agent as ag
 import materialy as mat
+import stan_linear
 import wyslij as wy
 import zasady
 from podpis import bez_podpisu
@@ -471,6 +472,8 @@ def main():
         print(f"{w['klient']}: {w['status']} {', '.join(w.get('zgloszenia', []))}" + (f" ({w['powod']})" if w.get("powod") else ""))
     if not wyniki:
         print("Brak zgłoszeń wymagających szkicu maila.")
+    if not args.sucho:
+        stan_linear.po_przebiegu()
 
 
 if __name__ == "__main__":

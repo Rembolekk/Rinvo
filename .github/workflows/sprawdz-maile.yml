@@ -139,7 +139,8 @@ jobs:
             local plik="$1"
             local temat
             temat=$(python3 -c 'import sys,re; from maile import wczytaj_meta_maila; t=wczytaj_meta_maila(sys.argv[1]).get("temat","bez tematu"); print(re.sub(r"[^\w .,:;!?()/+-]", "", t)[:80].strip() or "bez tematu")' "$plik")
-            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json ops/.maile.json ops/maile logi/przebiegi; do
+            python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
+            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json ops/.maile.json ops/maile logi/przebiegi index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/materialy; do
               [ -e "$sciezka" ] && git add -A -- "$sciezka"
             done
             if git diff --cached --quiet; then
@@ -246,7 +247,10 @@ jobs:
         if: always()
         run: |
           set -uo pipefail
-          [ -e ops/klienci ] && git add -A -- ops/klienci
+          python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
+          for sciezka in ops/klienci index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/materialy; do
+            [ -e "$sciezka" ] && git add -A -- "$sciezka"
+          done
           if git diff --cached --quiet; then
             echo "Brak zmian do zapisania"
             exit 0
