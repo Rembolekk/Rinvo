@@ -152,6 +152,7 @@ Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzieln
 - [RIN-62](https://linear.app/rinvo-demo/issue/RIN-62/auto-tama-konkurent-voicedesk-tanszy-i-z-integracja-crm) – Konkurent VoiceDesk: tańszy i z integracją CRM
 - [RIN-63](https://linear.app/rinvo-demo/issue/RIN-63/auto-tama-pawel-chcial-wylaczyc-agenta-po-zlej-interpretacji-wynikow) – Paweł chciał wyłączyć agenta po złej interpretacji wyników
 - [RIN-64](https://linear.app/rinvo-demo/issue/RIN-64/auto-tama-brak-integracji-z-crm-jako-kluczowy-argument-konkurenta) – Brak integracji z CRM jako kluczowy argument konkurenta
+- [RIN-72](https://linear.app/rinvo-demo/issue/RIN-72/auto-tama-uzycie-case-study-peugeot-208-anonimowo-od-razu-z-nazwa-po) – Użycie case study Peugeot 208 (anonimowo od razu; z nazwą po akceptacji Pawła)
 
 ## Ryzyka powtarzające się
 

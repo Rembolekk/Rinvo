@@ -390,6 +390,15 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
       ]
+    },
+    "case-study-208": {
+      "linear_id": "14a0d331-edcd-46eb-824b-230f1172d645",
+      "identifier": "RIN-72",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-72/auto-tama-uzycie-case-study-peugeot-208-anonimowo-od-razu-z-nazwa-po",
+      "tytul": "Użycie case study Peugeot 208 (anonimowo od razu; z nazwą po akceptacji Pawła)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ]
     }
   },
   "ryzyka": {

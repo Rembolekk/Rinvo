@@ -10,3 +10,4 @@ Thumbs.db
 # lokalne dane Claude Code
 .claude/jobs/
 .claude/settings.local.json
+.env

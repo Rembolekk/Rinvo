@@ -219,6 +219,25 @@
       "konflikt_z_zakazem": null
     },
     {
+      "id": "T11",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Użycie case study Peugeot 208 (anonimowo od razu; z nazwą po akceptacji Pawła)",
+      "opis": "Marek może natychmiast użyć historii sprzedaży 208 bez nazwy firmy ('lead z lipca, telefon w piątek, sprzedaż w sobotę'). Na użycie nazwy firmy wymagana zgoda Pawła – Marek pyta na spotkaniu 15.10.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "warunek": "Na użycie z nazwą firmy: akceptacja Pawła na spotkaniu 15.10",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Mogę to wykorzystać jako przykład? Bez nazwiska, oczywiście, tylko że lead z lipca, telefon w piątek, sprzedaż w sobotę.",
+        "Mnie to nie przeszkadza, ale nazwę firmy musi zatwierdzić Paweł. Bez nazwy możesz od razu.",
+        "Dobra, na razie bez nazwy. O nazwę zapytam przy Pawle."
+      ],
+      "klucz_sprawy": "case-study-208",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
       "id": "K1",
       "sekcja": 2,
       "typ": "czeka_na_klienta",
@@ -828,7 +847,71 @@
       "temat_ryzyka": "konkurencja"
     }
   ],
-  "aktualizacje_spraw": [],
+  "aktualizacje_spraw": [
+    {
+      "klucz_sprawy": "podwojny-telefon-po-rozlaczeniu",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Dobra, sprawdzę po spotkaniu na tej kampanii, nie będziemy teraz w tym grzebać.",
+      "uzasadnienie": "Kasia potwierdziła bug i podała szczegóły do diagnozy (godzina 16:40, numer kończący się na 14). Marek sprawdza po callu.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "adres-wloclawek",
+      "nowy_status": "zrob_teraz",
+      "cytat": "O, to jest nasz błąd, ewidentnie nieaktualna baza wiedzy. Podaj mi nowy adres, poprawię dzisiaj.",
+      "uzasadnienie": "Kasia podała nowy adres (Toruńska 120). Marek potwierdził poprawkę na ten sam dzień.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "godziny-dzwonienia",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Dobra. Tydzień dziewiąta–dziewiętnasta, sobota dziewiąta–czternasta. Zmienię po callu.",
+      "uzasadnienie": "Kasia zleciła zmianę (tydzień 9-19, sobota 9-15 po późniejszej korekcie). Marek zmieni po callu.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "godziny-salonu-sobota",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Tak, dla obu salonów. Dobrze, że pytasz.",
+      "uzasadnienie": "Kasia potwierdziła aktualizację godzin otwarcia podawanych klientom — sobota do 15:00, oba salony.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "filtr-statusu",
+      "nowy_status": "zrob_teraz",
+      "cytat": "filtr statusu nie. To sprawdzę u nas po callu.",
+      "uzasadnienie": "Marek potwierdził bug filtra statusu. Sprawdza po callu.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "korekta-faktury",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Faktury wystawia Michał, przekażę mu dziś.",
+      "uzasadnienie": "Marek przekazuje sprawę Michałowi tego samego dnia. Korekta przychodzi w przyszłym tygodniu.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "rozliczenie-krotkich-polaczen",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Napiszę razem z informacją, co z tym błędem.",
+      "uzasadnienie": "Marek sprawdzi zasady naliczania i napisze do Kasi razem z wynikami diagnozy podwójnego telefonu.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "cena-smsow",
+      "nowy_status": "zrob_teraz",
+      "cytat": "cenę wyślę w tym tygodniu.",
+      "uzasadnienie": "Marek zobowiązał się wysłać wycenę SMS-ów do końca tygodnia (do 11.10).",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "sciga-statusow",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Ściągę tak. Szkolenie dopiero, jak pójdą świeże, nie wcześniej, bo zapomną. Termin ustalę ja.",
+      "uzasadnienie": "Kasia przyjęła propozycję Marka. Ściąga statusów ma być gotowa przed uruchomieniem świeżych leadów.",
+      "pewnosc": "wysoka"
+    }
+  ],
   "zmiany_zdania": [
     {
       "temat": "Godziny dzwonienia w sobotę",
@@ -913,10 +996,38 @@
   ],
   "okna_czasowe": [
     {
+      "klucz_sprawy": "adres-wloclawek",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
       "klucz_sprawy": "agent-po-godzinach",
       "okna": [
         {
           "od": "2026-11-02",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "case-study-208",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
           "do": null
         }
       ],
@@ -933,6 +1044,62 @@
       "adnotacja": "policzone przez kod"
     },
     {
+      "klucz_sprawy": "filtr-statusu",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "godziny-dzwonienia",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "godziny-salonu-sobota",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "kolumna-nazwisko",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
       "klucz_sprawy": "korekta-faktury",
       "okna": [
         {
@@ -943,10 +1110,80 @@
       "adnotacja": "policzone przez kod"
     },
     {
+      "klucz_sprawy": "mail-przeglad-ola",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
       "klucz_sprawy": "mail-walidacji-model-salon",
       "okna": [
         {
           "od": "2026-10-12",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "material-po-godzinach",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "podwojny-telefon-po-rozlaczeniu",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "rozliczenie-krotkich-polaczen",
+      "okna": [
+        {
+          "od": "2026-10-07",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "sciga-statusow",
+      "okna": [
+        {
+          "od": "2026-10-07",
           "do": "2026-10-16"
         },
         {
@@ -975,6 +1212,20 @@
         }
       ],
       "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+      "okna": [
+        {
+          "od": "2026-10-12",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
     }
   ],
   "weryfikacja": {
@@ -988,5 +1239,19 @@
       "Marek zaproponował przykładowy tekst SMS – Kasia odpowiedziała 'przyślij cenę', tekst napisze sama. Przykładowy tekst nie jest do dostarczenia."
     ]
   },
-  "szkic_maila": "Cześć Kasiu,\n\nPodsumowanie rozmowy z 6 października:\n\nCo robimy dziś:\n- Poprawiam adres salonu we Włocławku na Toruńska 120. Napiszę, jak będzie gotowe.\n- Zmieniam godziny dzwonienia: tydzień 9:00–19:00, sobota 9:00–15:00.\n- Aktualizuję godziny otwarcia salonu podawane przez agenta: sobota do 15:00, oba salony.\n- Sprawdzam błąd podwójnego telefonu po 3-sekundowym rozłączeniu. Napiszę wynik i ile takich połączeń było (błędne odejmiemy z faktury).\n- Naprawiam filtr statusu na liście kontaktów. Przy okazji przesunę kolumnę z nazwiskiem.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna nazwa firmy). Korekta powinna przyjść w przyszłym tygodniu.\n- Sprawdzam zasady liczenia połączeń poniżej minuty i napiszę.\n- Cena SMS-ów: wyślę w tym tygodniu.\n\nCzekam od ciebie:\n- Dwie wersje tekstu wstępu – do czwartku (8.10). Jeśli do czwartku nic nie przyjdzie, wyślę jedno przypomnienie.\n- Plik świeżych leadów – do poniedziałku (12.10). Jeśli nie będzie, wyślę jeden mail. Wzoru nie wysyłam.\n- Numer maila o przeglądzie od Oli – jak znajdzie, prześlij. Bez tego nie ruszam tej sprawy.\n- Potwierdzenie spotkania z Pawłem na czwartek 15.10 o 10:00 (Toruń). Zaproszenie wyślę po twoim potwierdzeniu.\n\nCo stoi:\n- Opel: czeka na wyniki świeżych leadów. Jeśli Paweł napisze, że każe włączyć – najpierw dzwonię do ciebie.\n- Agent po godzinach: stoi. Jeśli wyślesz numery assistance, odkładam u siebie, nic nie podpinam.\n- Mail po walidacji (model i salon na górze): po świeżych leadach.\n- Szkolenie handlowców: po świeżych leadach, termin ustalasz ty. Ściągę wyślę wcześniej.\n\nTydzień 19–23.10 (twój urlop): nic nowego nie startuję. Pilne sprawy → Paweł, ale Opel i tekst wstępu czekają na ciebie.\n\nPozdrawiam,\nMarek"
+  "szkic_maila": "Cześć Kasiu,\n\nPodsumowanie rozmowy z 6 października:\n\nCo robimy dziś:\n- Poprawiam adres salonu we Włocławku na Toruńska 120. Napiszę, jak będzie gotowe.\n- Zmieniam godziny dzwonienia: tydzień 9:00–19:00, sobota 9:00–15:00.\n- Aktualizuję godziny otwarcia salonu podawane przez agenta: sobota do 15:00, oba salony.\n- Sprawdzam błąd podwójnego telefonu po 3-sekundowym rozłączeniu. Napiszę wynik i ile takich połączeń było (błędne odejmiemy z faktury).\n- Naprawiam filtr statusu na liście kontaktów. Przy okazji przesunę kolumnę z nazwiskiem.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna nazwa firmy). Korekta powinna przyjść w przyszłym tygodniu.\n- Sprawdzam zasady liczenia połączeń poniżej minuty i napiszę.\n- Cena SMS-ów: wyślę w tym tygodniu.\n\nCzekam od ciebie:\n- Dwie wersje tekstu wstępu – do czwartku (8.10). Jeśli do czwartku nic nie przyjdzie, wyślę jedno przypomnienie.\n- Plik świeżych leadów – do poniedziałku (12.10). Jeśli nie będzie, wyślę jeden mail. Wzoru nie wysyłam.\n- Numer maila o przeglądzie od Oli – jak znajdzie, prześlij. Bez tego nie ruszam tej sprawy.\n- Potwierdzenie spotkania z Pawłem na czwartek 15.10 o 10:00 (Toruń). Zaproszenie wyślę po twoim potwierdzeniu.\n\nCo stoi:\n- Opel: czeka na wyniki świeżych leadów. Jeśli Paweł napisze, że każe włączyć – najpierw dzwonię do ciebie.\n- Agent po godzinach: stoi. Jeśli wyślesz numery assistance, odkładam u siebie, nic nie podpinam.\n- Mail po walidacji (model i salon na górze): po świeżych leadach.\n- Szkolenie handlowców: po świeżych leadach, termin ustalasz ty. Ściągę wyślę wcześniej.\n\nTydzień 19–23.10 (twój urlop): nic nowego nie startuję. Pilne sprawy → Paweł, ale Opel i tekst wstępu czekają na ciebie.\n\nPozdrawiam,\nMarek",
+  "ostrzezenia_dat": [
+    {
+      "id": "B6",
+      "klucz_sprawy": "integracja-crm",
+      "tytul": "Integracja Rinvo z CRM dealera",
+      "uwaga": "cytat zawiera słowa czasowe, brak wpisu w fakty_czasowe"
+    },
+    {
+      "id": "B9",
+      "klucz_sprawy": "szkolenie-handlowcow",
+      "tytul": "Szkolenie handlowców ze statusów (kwadrans online, po świeżych leadach)",
+      "uwaga": "cytat zawiera słowa czasowe, brak wpisu w fakty_czasowe"
+    }
+  ]
 }
