@@ -383,17 +383,21 @@ class TestSlack(unittest.TestCase):
         f.close()
         return Path(f.name)
 
-    def test_wszystkie_linie_obecne_nawet_gdy_zero(self):
+    def test_wiadomosc_krotka_bez_zerowych_linii(self):
+        """ZMIENIONE ŚWIADOMIE (nowy wygląd Slacka): wcześniej test wymagał stałych linii także z zerem
+        (Zamknięte: 0, Wznowione: 0…). Teraz wiadomość jest do przeczytania w 10 sekund: zdanie na górze,
+        tylko to, co wymaga człowieka, link; zera i powtórzenia zostały usunięte."""
         import przetworz
         p = self._wynik()
         try:
             msg = przetworz.build_slack_summary("klient-testowy", p, "")
         finally:
             p.unlink()
-        for nazwa in ("Zamknięte: 0", "Wznowione: 0", "Zadania dla agentów: 1", "Decyzja człowieka: 0",
-                      "Zablokowane przez zakaz: 0",
-                      "Powtarzające się ryzyka: 0", "Wielu klientów: 0", "Do weryfikacji: 0"):
-            self.assertIn(nazwa, msg)
+        self.assertTrue(msg.startswith(":white_check_mark: *klient-testowy*: rozmowa z 13.10 przetworzona."))
+        self.assertIn("Nic nie wymaga człowieka.", msg)
+        for stara_linia in ("Zamknięte: 0", "Wznowione: 0", "Zablokowane przez zakaz: 0", "Powtarzające się ryzyka: 0",
+                            "Wielu klientów: 0", "Do weryfikacji: 0", "Zadania dla agentów"):
+            self.assertNotIn(stara_linia, msg)
 
     def test_parsowanie_zdarzen_z_linear_sync(self):
         import przetworz

@@ -491,7 +491,8 @@ def zapisz_przypisanie(entry, item, Z, karta, wielu):
     """Zapamiętuje w karcie, komu przypisano zgłoszenie (do porównań i do wznowienia)."""
     sekcja = item.get("sekcja")
     p = zasady.przypisz(item, Z, karta, wielu)
-    entry["przypisanie"] = {"komu": p["komu"], "powody": zasady.powody_tekst(p)}
+    entry["przypisanie"] = {"komu": p["komu"], "powody": zasady.powody_tekst(p),
+                            "reguly": [x["regula"] for x in p["powody"]]}
     if sekcja == 2:
         w = zasady.przypisz(item, Z, karta, wielu, sekcja=1)
         entry["po_wznowieniu"] = {"komu": w["komu"], "powody": zasady.powody_tekst(w),

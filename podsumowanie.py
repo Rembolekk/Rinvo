@@ -6,8 +6,10 @@ Użycie:
   python3 podsumowanie.py --wymus      # niezależnie od godziny i od tego, czy dziś już wysłano
   python3 podsumowanie.py --sucho      # pokaż wiadomość, nic nie wysyłaj i nie zapisuj
 
-Dla każdego klienta: nowe od wczoraj, ile zadań u agentów, decyzje czekające na człowieka (z linkami),
-sprawy czekające na klienta z terminem, osobno po terminie, powtarzające się ryzyka.
+Wiadomość (Block Kit) jest do przeczytania w 10 sekund: zdanie „Dziś potrzebujemy Cię w N sprawach”,
+sekcja „Wymaga człowieka” (max 5 linijek: tytuł jako link, klient, jedno słowo powodu), „Uwaga” (powtarzające się
+ryzyka i sprawy po terminie, tylko jeśli są), linijka o agentach, linijka o czekaniu na klientów i link do widoku
+wszystkich otwartych zgłoszeń w Linearze. Bez list „nowe od wczoraj” i bez technicznych nazw w tekście.
 
 PRZYPOMNIENIA: gdy termin sprawy czekającej minął, limit przypomnień z rozmowy nie jest wyczerpany
 i klient nie prosił o brak przypomnień, podsumowanie przygotowuje SZKIC przypomnienia w komentarzu
@@ -25,6 +27,7 @@ import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+import slack_widok as sw
 import zasady
 from maile import slack_bezpiecznie
 from sekrety import wyczysc_srodowisko
@@ -91,10 +94,12 @@ def _pobierz(api_key, filtr):
 
 
 def pobierz_zgloszenia(api_key, teraz_utc, okno_h):
+    """(otwarte, skończone_przez_agentów_w_oknie)."""
     otwarte = _pobierz(api_key, 'state: { type: { nin: ["completed", "canceled"] } }')
     od = (teraz_utc - timedelta(hours=okno_h)).strftime("%Y-%m-%dT%H:%M:%SZ")
-    nowe = _pobierz(api_key, f'createdAt: {{ gte: "{od}" }}')
-    return otwarte, nowe
+    skonczone = _pobierz(api_key, f'state: {{ type: {{ eq: "completed" }} }}, completedAt: {{ gte: "{od}" }}, '
+                                  f'labels: {{ name: {{ eq: "Dla agenta" }} }}')
+    return otwarte, skonczone
 
 
 # ── logika (bez sieci) ────────────────────────────────────────────────────────
@@ -189,43 +194,94 @@ def zbierz(otwarte, nowe, karty, Z, dzis):
     return klienci
 
 
-# ── wiadomość ─────────────────────────────────────────────────────────────────
+# ── wiadomość: do przeczytania w 10 sekund ────────────────────────────────────
 
-def _link(z):
-    return f"<{z['url']}|{z['identifier']}> {slack_bezpiecznie(_tytul_bez_prefiksu(z), 70)}"
-
-
-def _lista(naglowek, zgloszenia, dopisek=None):
-    out = [f"• {naglowek}: {len(zgloszenia)}"]
-    for z in zgloszenia[:LIMIT_POZYCJI]:
-        out.append(f"    – {_link(z)}" + (f" ({dopisek(z)})" if dopisek else ""))
-    if len(zgloszenia) > LIMIT_POZYCJI:
-        out.append(f"    – … i {len(zgloszenia) - LIMIT_POZYCJI} więcej")
-    return out
+KOLEJNOSC_POWODOW = ["zakaz", "pieniądze", "decyzja", "klient", "weryfikacja"]
 
 
-def _do_terminu(z):
-    t = _data(z.get("dueDate"))
-    return f"do {t.strftime('%d.%m')}" if t else "bez terminu"
+def przygotuj(otwarte, skonczone, karty, Z, dzis):
+    """Dane do wiadomości (jedna lista dla wszystkich klientów, bez powtórzeń)."""
+    klienci = zbierz(otwarte, [], karty, Z, dzis)
+    widziane, human, uwaga, szkice = set(), [], [], []
 
+    def wpis_i_powod(klient, z):
+        _, _, wpis = szukaj_sprawy({klient: karty[klient]}, z.get("identifier"))
+        return sw.slowo_powodu((wpis or {}).get("przypisanie"), _etykiety(z), Z)
 
-def buduj_wiadomosc(klienci, dzis):
-    linie = [f":sunrise: *Codzienne podsumowanie*: {DNI[dzis.weekday()]} {dzis.strftime('%d.%m.%Y')}"]
     for klient, d in klienci.items():
-        linie.append(f"\n*[{klient}]*")
-        linie += _lista("Nowe od wczoraj", d["nowe"])
-        linie.append(f"• Zadania u agentów: {len(d['agent'])}")
-        linie += _lista("Decyzje czekające na człowieka", d["czlowiek"])
-        linie += _lista("Do weryfikacji", d["weryfikacja"])
-        linie += _lista("Czeka na klienta", d["czeka"], _do_terminu)
-        linie += _lista("Czeka na klienta, po terminie", d["po_terminie"], _do_terminu)
-        linie += _lista("Powtarzające się ryzyka", d["ryzyka"])
-        if d["szkice"]:
-            linie.append(f"• Szkice przypomnień do wysłania przez człowieka: {len(d['szkice'])}")
-            for s in d["szkice"]:
-                cytat = "\n".join("      > " + slack_bezpiecznie(l, 300) for l in s["tekst"].splitlines() if l.strip())
-                linie.append(f"    – {_link(s['zgloszenie'])}\n{cytat}")
-    return "\n".join(linie)
+        for z in d["czlowiek"] + d["weryfikacja"]:
+            if z["identifier"] in widziane:
+                continue
+            widziane.add(z["identifier"])
+            human.append({"z": z, "klient": klient, "powod": wpis_i_powod(klient, z)})
+        for sz in d["szkice"]:
+            z = sz["zgloszenie"]
+            widziane.add(z["identifier"])
+            human.append({"z": z, "klient": klient, "powod": "klient", "przypomnienie": True})
+            szkice.append({**sz, "klient": klient})
+    human.sort(key=lambda h: (KOLEJNOSC_POWODOW.index(h["powod"]) if h["powod"] in KOLEJNOSC_POWODOW else 9,
+                              h["z"]["identifier"]))
+
+    for klient, d in klienci.items():
+        for z in d["ryzyka"]:
+            if z["identifier"] not in widziane:
+                widziane.add(z["identifier"])
+                uwaga.append({"z": z, "klient": klient, "powod": "ryzyko"})
+        for z in d["po_terminie"]:
+            if z["identifier"] not in widziane:
+                widziane.add(z["identifier"])
+                uwaga.append({"z": z, "klient": klient, "powod": "po terminie",
+                              "termin": _data(z.get("dueDate"))})
+
+    agenci = {z["identifier"] for d in klienci.values() for z in d["agent"]}
+    czeka = [(klient, z) for klient, d in klienci.items() for z in d["czeka"] + d["po_terminie"]]
+    przyszle = sorted(((_data(z.get("dueDate")), klient, z) for klient, z in czeka
+                       if _data(z.get("dueDate")) and _data(z["dueDate"]) >= dzis), key=lambda x: (x[0], x[2]["identifier"]))
+    return {
+        "human": human, "uwaga": uwaga, "szkice": szkice,
+        "agenci_otwarte": len(agenci), "agenci_skonczone": len({z["identifier"] for z in skonczone}),
+        "czeka_n": len(czeka), "czeka_najblizsze": przyszle[0] if przyszle else None,
+        "widok": sw.widok_linear_url([z.get("url") for z in otwarte]),
+    }
+
+
+def buduj_wiadomosc(dane, dzis):
+    """(tekst, bloki) wiadomości Slack."""
+    n = len(dane["human"])
+    sekcje = []
+    if n == 0:
+        sekcje.append("*Dziś nic nie wymaga człowieka.*")
+    else:
+        sekcje.append(f"*Dziś potrzebujemy Cię w {n} {'sprawie' if n == 1 else 'sprawach'}*")
+        linie = [sw.linia_pozycji(h["z"].get("url"), h["z"].get("title"), h["klient"], h["powod"])
+                 for h in dane["human"]]
+        sekcje.append("*Wymaga człowieka*\n" + "\n".join(sw.ogranicz(linie)))
+    if dane["uwaga"]:
+        linie = []
+        for u in dane["uwaga"]:
+            dod = f"termin {u['termin'].strftime('%d.%m')}" if u.get("termin") else None
+            linie.append(sw.linia_pozycji(u["z"].get("url"), u["z"].get("title"), u["klient"], u["powod"], dod))
+        sekcje.append("*Uwaga*\n" + "\n".join(sw.ogranicz(linie)))
+    for sz in dane["szkice"]:
+        tresc = "\n".join("> " + slack_bezpiecznie(l, 200) for l in sz["tekst"].splitlines() if l.strip())
+        sekcje.append(f"*Szkic przypomnienia* (do wysłania przez człowieka, pełny w komentarzu): "
+                      f"{sw.link(sz['zgloszenie'].get('url'), sz['zgloszenie'].get('title'))}\n{tresc}")
+
+    x, y, z = dane["agenci_otwarte"], dane["agenci_skonczone"], dane["czeka_n"]
+    linia_agentow = (f"Agenci pracują nad {x} {sw.forma(x, 'zadaniem', 'zadaniami', 'zadaniami')}, "
+                     f"{y} {sw.forma(y, 'skończone', 'skończone', 'skończonych')} od wczoraj.")
+    if z == 0:
+        linia_czekania = "Nie czekamy teraz na żadnego klienta."
+    else:
+        naj = dane["czeka_najblizsze"]
+        termin = (f"najbliższy termin: {naj[0].strftime('%d.%m')}, {sw.link(naj[2].get('url'), naj[2].get('title'), 45)}"
+                  if naj else "najbliższy termin: brak")
+        linia_czekania = f"Czekamy na klientów w {z} {'sprawie' if z == 1 else 'sprawach'}, {termin}."
+    sekcje.append(linia_agentow + "\n" + linia_czekania)
+    if dane["widok"]:
+        sekcje.append(f"<{dane['widok']}|Wszystkie otwarte zgłoszenia w Linearze>")
+    kontekst = f"{DNI[dzis.weekday()]} {dzis.strftime('%d.%m.%Y')}"
+    return sw.tekst_zapasowy(sekcje, kontekst), sw.bloki(sekcje, kontekst)
 
 
 # ── główny przebieg ───────────────────────────────────────────────────────────
@@ -287,17 +343,17 @@ def main():
     api_key = linear_sync.load_api_key()
     karty = wczytaj_karty()
     dzis = czas_polski(teraz).date()
-    otwarte, nowe = pobierz_zgloszenia(api_key, teraz, Z["podsumowanie"].get("okno_nowych_godzin", 26))
-    klienci = zbierz(otwarte, nowe, karty, Z, dzis)
-    wiadomosc = buduj_wiadomosc(klienci, dzis)
-    print(wiadomosc)
+    otwarte, skonczone = pobierz_zgloszenia(api_key, teraz, Z["podsumowanie"].get("okno_nowych_godzin", 26))
+    klienci = zbierz(otwarte, [], karty, Z, dzis)
+    tekst, bloki = buduj_wiadomosc(przygotuj(otwarte, skonczone, karty, Z, dzis), dzis)
+    print(tekst)
 
     if args.sucho:
         return
     zmienione = zapisz_szkice(api_key, klienci, karty, dzis.isoformat())
     for klient in zmienione:
         linear_sync.save_karta(klient, karty[klient])
-    ok, blad = send_slack(wiadomosc)
+    ok, blad = send_slack(tekst, blocks=bloki)
     if not ok:
         print(f"BŁĄD Slack: {blad}", file=sys.stderr)
         sys.exit(1)

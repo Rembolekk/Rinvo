@@ -606,10 +606,11 @@ class TestBezpieczenstwoKodu(unittest.TestCase):
                                          "aktualizacje_spraw": [], "ostrzezenia_dat": []}), encoding="utf-8")
             msg = przetworz.build_slack_summary(
                 "klient-testowy", wynik, "", meta_maila={"data": "2026-10-14", "temat": "Re: Plik <!channel>"})
-        self.assertIn("Źródło: mail z 2026-10-14", msg)
-        self.assertIn("Re: Plik &lt;!channel&gt;", msg)
+        # ZMIENIONE ŚWIADOMIE (nowy wygląd Slacka): zdanie na górze mówi, że źródłem był mail, i podaje temat;
+        # wcześniejsze linie ze stałymi zerami (np. „Odrzucone (brak uprawnień): 0”) zniknęły.
+        self.assertTrue(msg.startswith(":email: *klient-testowy*: mail „Re: Plik &lt;!channel&gt;” przetworzony."))
         self.assertNotIn("<!channel>", msg)
-        self.assertIn("Odrzucone (brak uprawnień): 0", msg)
+        self.assertNotIn("Odrzucone (brak uprawnień)", msg)
 
     def test_klient_ze_sciezki_maila(self):
         import przetworz

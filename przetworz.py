@@ -31,6 +31,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+import slack_widok as sw
 import zasady
 from maile import czy_mail, oznacz_przetworzony, slack_bezpiecznie, wczytaj_meta_maila
 from sekrety import NAZWY_SEKRETOW, czysc, wyczysc_srodowisko
@@ -115,7 +116,7 @@ def release_lock():
 
 # ── slack ─────────────────────────────────────────────────────────────────────
 
-def send_slack(message, log_path=None):
+def send_slack(message, log_path=None, blocks=None):
     """Send Slack message. Returns (ok: bool, error: str|None).
     Logs result to log_path if provided. Never logs the webhook URL."""
     import ssl
@@ -128,7 +129,11 @@ def send_slack(message, log_path=None):
             _log(log_path, f"Slack: {note}\n")
         return False, note
 
-    payload = json.dumps({"text": message}).encode("utf-8")
+    # text = zapasowa treść (powiadomienia); blocks = wygląd Block Kit
+    cialo = {"text": message}
+    if blocks:
+        cialo["blocks"] = blocks
+    payload = json.dumps(cialo).encode("utf-8")
     req = urllib.request.Request(
         webhook,
         data=payload,
@@ -212,15 +217,6 @@ def run_step(cmd, log_path, step_name, timeout=120):
 
 # ── Slack: podsumowanie ───────────────────────────────────────────────────────
 
-def _linia_slack(emoji, nazwa, pozycje, limit=5):
-    """Linia z licznikiem (także 0) i listą tytułów pod spodem."""
-    out = [f"{emoji} {nazwa}: {len(pozycje)}"]
-    out += [f"  • {t}" for t in pozycje[:limit]]
-    if len(pozycje) > limit:
-        out.append(f"  … i {len(pozycje) - limit} więcej")
-    return out
-
-
 def parse_sync_zdarzenia(sync_stdout):
     """Wyciąga z wyjścia linear_sync.py to, co faktycznie zrobiono w tym przebiegu."""
     wynik = {"zamkniete": [], "wznowione": [], "ryzyka": [], "wielu_klientow": [], "odrzucone": []}
@@ -247,45 +243,32 @@ def parse_sync_zdarzenia(sync_stdout):
     return wynik
 
 
-def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model=None, meta_maila=None):
+def _data_pl(iso):
+    m = re.match(r"^\d{4}-(\d{2})-(\d{2})", str(iso or ""))
+    return f"{m.group(2)}.{m.group(1)}" if m else str(iso or "?")
+
+
+def build_slack_message(klient, wynik_path, sync_stdout, testy_wynik=None, model=None, meta_maila=None):
+    """(tekst, bloki) wiadomości po przetworzeniu rozmowy albo maila.
+
+    Na górze jedno zdanie o tym, co się zmieniło; potem tylko to, co wymaga człowieka (max 5 linijek:
+    tytuł jako link, klient, jedno słowo powodu); na dole link do widoku w Linearze. Bez technicznych nazw
+    (identyfikatory, klucze spraw) w tekście. Model i wynik testów: szara linijka na samym dole."""
     try:
         d = json.loads(wynik_path.read_text(encoding="utf-8"))
     except Exception:
-        return f":white_check_mark: *[{klient}]* Przetworzono."
-
-    spotkanie = d.get("spotkanie", {})
-    data = spotkanie.get("data", "?")
+        t = f"*{klient}*: przetworzono."
+        return t, sw.bloki([t])
+    data = d.get("spotkanie", {}).get("data", "?")
     pozycje = d.get("pozycje", [])
 
-    s1 = [p for p in pozycje if p.get("sekcja") == 1]
-    s2 = [p for p in pozycje if p.get("sekcja") == 2]
-    s5 = [p for p in pozycje if p.get("sekcja") == 5]
-    blocked = [p for p in pozycje if p.get("konflikt_z_zakazem")]
-    niska = [p for p in pozycje if p.get("pewnosc") == "niska"]
-    aktualizacje = d.get("aktualizacje_spraw", [])
-    ostrzezenia = d.get("ostrzezenia_dat", [])
-
     nowe = 0
-    n_aktualizacji = 0
-    pominieto = 0
     for line in sync_stdout.splitlines():
         if "Utworzono zgłoszeń:" in line:
             try:
                 nowe = int(line.split(":")[-1].strip())
             except ValueError:
                 pass
-        elif "Aktualizacje otwartych spraw:" in line:
-            try:
-                n_aktualizacji = int(line.split(":")[-1].strip())
-            except ValueError:
-                pass
-        elif "Pominięto (ta sama rozmowa):" in line:
-            try:
-                pominieto = int(line.split(":")[-1].strip())
-            except ValueError:
-                pass
-
-    # karta klienta: tytuły i linki do spraw, o których mówi sync
     karta = {}
     karta_path = Path("ops") / "klienci" / klient / "karta.json"
     if karta_path.exists():
@@ -295,83 +278,74 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
             karta = {}
     zdarzenia = parse_sync_zdarzenia(sync_stdout)
 
-    def sprawa(ident, klucz, tytul=""):
-        info = (karta.get("otwarte_sprawy", {}).get(klucz)
-                or karta.get("zamkniete_sprawy", {}).get(klucz) or {})
-        tytul = slack_bezpiecznie(tytul or info.get("tytul", "") or klucz, 70)
-        url = info.get("url", "") if isinstance(info, dict) else ""
-        etykieta = f"<{url}|{ident}>" if url else ident
-        return f"{etykieta} {tytul}"
+    # 1) jedno zdanie: co się zmieniło
+    czesci = []
+    if nowe:
+        czesci.append(f"nowych zgłoszeń: {nowe}")
+    if zdarzenia["zamkniete"]:
+        czesci.append(f"zamkniętych: {len(zdarzenia['zamkniete'])}")
+    if zdarzenia["wznowione"]:
+        czesci.append(f"wznowionych: {len(zdarzenia['wznowione'])}")
+    zmiany = ", ".join(czesci) or "bez zmian w zgłoszeniach"
+    zmiany = zmiany[0].upper() + zmiany[1:] + "."
+    if meta_maila is not None:
+        # źródłem był mail: mówimy to wprost i podajemy temat
+        zdanie = (f":email: *{slack_bezpiecznie(klient, 40)}*: mail „{slack_bezpiecznie(meta_maila.get('temat', '(bez tematu)'), 80)}” "
+                  f"przetworzony. {zmiany}")
+    else:
+        zdanie = f":white_check_mark: *{slack_bezpiecznie(klient, 40)}*: rozmowa z {_data_pl(data)} przetworzona. {zmiany}"
 
-    zamkniete = [sprawa(i, k) for i, k in zdarzenia["zamkniete"]]
-    wznowione = [sprawa(i, k) for i, k in zdarzenia["wznowione"]]
-    ryzyka_powt = [sprawa(i, k, t) for i, k, t in zdarzenia["ryzyka"]]
-    wielu = [sprawa(i, k, t) for i, k, t in zdarzenia["wielu_klientow"]]
-    zablokowane = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in blocked]
-    # kto dostaje pozycje wg ops/zasady.json (domyślnie agent, człowiek tylko wg reguł)
+    # 2) tylko to, co wymaga człowieka (kto dostaje pozycję: ops/zasady.json)
     try:
-        Z, prosby_wszystkie = zasady.wczytaj_zasady(), zasady.wczytaj_prosby()
+        Z, prosby = zasady.wczytaj_zasady(), zasady.wczytaj_prosby()
     except OSError:
-        Z, prosby_wszystkie = None, {}
-    agent_poz, czlowiek_poz, weryfikacja_poz = [], [], []
+        Z, prosby = None, {}
+    otwarte = karta.get("otwarte_sprawy", {})
+
+    def url_sprawy(klucz):
+        info = otwarte.get(klucz) or karta.get("zamkniete_sprawy", {}).get(klucz) or {}
+        return info.get("url") if isinstance(info, dict) else None
+
+    pozycje_czlowieka, widziane = [], set()
     for p in pozycje:
         if Z is None or p.get("sekcja") not in (1, 3):
             continue
-        wk = p.get("sekcja") == 3 and zasady.wielu_klientow(prosby_wszystkie, Z, p, klient)
-        komu = zasady.przypisz(p, Z, karta, wk)["komu"]
-        {"agent": agent_poz, "czlowiek": czlowiek_poz, "weryfikacja": weryfikacja_poz}.get(komu, []).append(p)
-    ids_weryf = {id(p) for p in weryfikacja_poz} | {id(p) for p in niska}
-    do_weryfikacji = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}"
-                      for p in pozycje if id(p) in ids_weryf]
-    dla_agentow = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in agent_poz]
-    decyzje = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in czlowiek_poz]
-    odrzucone = [f"{slack_bezpiecznie(k, 40)} → {st}: {slack_bezpiecznie(pow, 110)}"
-                 for k, st, pow in zdarzenia["odrzucone"]]
+        wk = p.get("sekcja") == 3 and zasady.wielu_klientow(prosby, Z, p, klient)
+        przyp = zasady.przypisz(p, Z, karta, wk)
+        if przyp["komu"] in ("czlowiek", "weryfikacja") and p.get("klucz_sprawy") not in widziane:
+            widziane.add(p.get("klucz_sprawy"))
+            powod = sw.slowo_powodu({"reguly": [x["regula"] for x in przyp["powody"]]}, [], Z)
+            pozycje_czlowieka.append((powod, sw.linia_pozycji(url_sprawy(p.get("klucz_sprawy")), p.get("tytul"), klient, powod)))
+    for ident, klucz, tytul in zdarzenia["ryzyka"]:
+        if klucz not in widziane:
+            widziane.add(klucz)
+            pozycje_czlowieka.append(("ryzyko", sw.linia_pozycji(url_sprawy(klucz), tytul, klient, "powtarzające się ryzyko")))
+    for klucz, status, powod in zdarzenia["odrzucone"]:
+        pozycje_czlowieka.append(("weryfikacja", sw.linia_pozycji(
+            url_sprawy(klucz), (otwarte.get(klucz) or {}).get("tytul") or "Odrzucona zmiana zakazu lub decyzji",
+            klient, "weryfikacja", "odrzucono: brak uprawnień")))
+    if testy_wynik and not str(testy_wynik).startswith("PASS"):
+        pozycje_czlowieka.append(("weryfikacja", f"• Testy oczekiwań nie przeszły ({slack_bezpiecznie(testy_wynik, 40)}) · {slack_bezpiecznie(klient, 40)} · weryfikacja"))
+    kolejnosc = ["zakaz", "pieniądze", "decyzja", "klient", "weryfikacja", "ryzyko"]
+    pozycje_czlowieka.sort(key=lambda x: kolejnosc.index(x[0]) if x[0] in kolejnosc else 9)
+    linie = [l for _, l in pozycje_czlowieka]
 
-    if meta_maila is not None:
-        # źródłem był mail: Slack mówi to wprost i podaje temat
-        lines = [f":email: *[{klient}]* Źródło: mail z {meta_maila.get('data', data)}, "
-                 f"temat: „{slack_bezpiecznie(meta_maila.get('temat', '(bez tematu)'))}” przetworzony"]
-    else:
-        lines = [f":white_check_mark: *[{klient}]* Rozmowa z {data} przetworzona"]
-    lines.append(
-        f"Zrób teraz: {len(s1)} | Czeka: {len(s2)} | Ryzyka: {len(s5)} | "
-        f"Nowe w Linear: {nowe} | Pominięte: {pominieto}"
-    )
+    sekcje = [zdanie]
+    sekcje.append("*Wymaga człowieka*\n" + "\n".join(sw.ogranicz(linie)) if linie else "Nic nie wymaga człowieka.")
 
-    # Te linie są zawsze, także gdy wynoszą 0 (brak linii wyglądałby jak brak informacji).
-    lines += _linia_slack(":white_check_mark:", "Zamknięte", zamkniete)
-    lines += _linia_slack(":arrows_counterclockwise:", "Wznowione", wznowione)
-    lines += _linia_slack(":gear:", "Zadania dla agentów", dla_agentow)
-    lines += _linia_slack(":raising_hand:", "Decyzja człowieka", decyzje)
-    lines += _linia_slack(":no_entry:", "Zablokowane przez zakaz", zablokowane)
-    lines += _linia_slack(":rotating_light:", "Powtarzające się ryzyka", ryzyka_powt)
-    lines += _linia_slack(":busts_in_silhouette:", "Wielu klientów", wielu)
-    lines += _linia_slack(":warning:", "Do weryfikacji", do_weryfikacji)
-    lines += _linia_slack(":no_good:", "Odrzucone (brak uprawnień)", odrzucone)
+    # 3) link do widoku wszystkich otwartych zgłoszeń
+    widok = sw.widok_linear_url([i.get("url") for i in otwarte.values() if isinstance(i, dict)])
+    if widok:
+        sekcje.append(f"<{widok}|Wszystkie otwarte zgłoszenia w Linearze>")
 
-    if ostrzezenia:
-        lines.append(f":clock1: Brak faktów czasowych dla {len(ostrzezenia)} pozycji z cytatami o czasie")
-    if model:
-        lines.append(f":robot_face: Model analizy: {model}")
-    if testy_wynik:
-        icon = ":white_check_mark:" if testy_wynik.startswith("PASS") else ":x:"
-        lines.append(f"{icon} Testy oczekiwań: {testy_wynik}")
+    kontekst = " · ".join(x for x in ([f"model: {slack_bezpiecznie(model, 40)}"] if model else []) +
+                          ([f"testy oczekiwań: {slack_bezpiecznie(testy_wynik, 40)}"] if testy_wynik else []) if x) or None
+    return sw.tekst_zapasowy(sekcje, kontekst), sw.bloki(sekcje, kontekst)
 
-    # Linki do spraw z sekcji 1
-    otwarte = karta.get("otwarte_sprawy", {})
-    if s1:
-        lines.append(f":pushpin: Zrób teraz ({len(s1)}):")
-    for p in s1[:5]:
-        klucz = p.get("klucz_sprawy", "")
-        info = otwarte.get(klucz)
-        if isinstance(info, dict) and info.get("url"):
-            lines.append(f"  • <{info['url']}|{info.get('identifier', klucz)}> "
-                         f"{slack_bezpiecznie(p['tytul'], 60)}")
-    if len(s1) > 5:
-        lines.append(f"  … i {len(s1) - 5} więcej")
 
-    return "\n".join(lines)
+def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model=None, meta_maila=None):
+    """Zwykły tekst tej samej wiadomości (zapas dla powiadomień i terminal)."""
+    return build_slack_message(klient, wynik_path, sync_stdout, testy_wynik, model, meta_maila)[0]
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
@@ -614,10 +588,10 @@ def main():
 
         # f) Slack — zawsze, niezależnie od liczby nowych zgłoszeń
         meta_maila = wczytaj_meta_maila(transkrypcja) if czy_mail(transkrypcja) else None
-        summary = build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik,
-                                      model=model, meta_maila=meta_maila)
+        summary, slack_bloki = build_slack_message(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik,
+                                                    model=model, meta_maila=meta_maila)
         _log(log_path, f"\n{'='*60}\n=== Slack ===\n{'='*60}\n")
-        slack_ok, slack_err = send_slack(summary, log_path=log_path)
+        slack_ok, slack_err = send_slack(summary, log_path=log_path, blocks=slack_bloki)
         if slack_ok:
             print("  Slack: wysłano.")
         else:

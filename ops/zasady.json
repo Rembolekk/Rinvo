@@ -1,8 +1,6 @@
 {
   "_opis": "AI-first: kto robi co. Domyślnie każda pozycja idzie do agenta (Dla agenta). Do człowieka (Decyzja człowieka + komentarz z powodem) trafia tylko pozycja, która spełnia choć jedną regułę z czlowiek_gdy. Edytujesz ten plik, kod nie wymaga zmian. Słowa są dopasowywane od początku wyrazu, bez rozróżniania wielkości liter.",
-
   "domyslnie": "agent",
-
   "etykiety": {
     "agent": "Dla agenta",
     "czlowiek": "Decyzja człowieka",
@@ -13,21 +11,62 @@
     "produkt": "Produkt",
     "wielu_klientow": "Wielu klientów"
   },
-
   "czlowiek_gdy": {
     "pieniadze": {
       "powod": "kosztuje pieniądze albo dotyczy cen i umów",
-      "typy": ["finanse"],
-      "szukaj_w": ["tytul", "opis"],
-      "slowa": ["cena", "cenę", "cenie", "ceny", "cenami", "cennik", "wycen", "koszt", "płatn", "zapłat", "opłat",
-                "sms", "rabat", "faktur", "kwot", "umow", "abonament", "budżet", "rozlicz", "naliczan"]
+      "typy": [
+        "finanse"
+      ],
+      "szukaj_w": [
+        "tytul",
+        "opis"
+      ],
+      "slowa": [
+        "cena",
+        "cenę",
+        "cenie",
+        "ceny",
+        "cenami",
+        "cennik",
+        "wycen",
+        "koszt",
+        "płatn",
+        "zapłat",
+        "opłat",
+        "sms",
+        "rabat",
+        "faktur",
+        "kwot",
+        "umow",
+        "abonament",
+        "budżet",
+        "rozlicz",
+        "naliczan"
+      ]
     },
     "do_klienta": {
       "powod": "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła",
-      "szukaj_w": ["tytul"],
-      "slowa": ["wysłać", "wysłanie", "wyślij", "prześlij", "przesłać", "napisać do", "mail do", "maila do",
-                "zaproszeni", "przypomnie", "ofert", "odpowiedzieć", "odpowiedź", "poinformować", "powiadomić",
-                "zestawienie"],
+      "szukaj_w": [
+        "tytul"
+      ],
+      "slowa": [
+        "wysłać",
+        "wysłanie",
+        "wyślij",
+        "prześlij",
+        "przesłać",
+        "napisać do",
+        "mail do",
+        "maila do",
+        "zaproszeni",
+        "przypomnie",
+        "ofert",
+        "odpowiedzieć",
+        "odpowiedź",
+        "poinformować",
+        "powiadomić",
+        "zestawienie"
+      ],
       "wymaga_szkicu": true
     },
     "zakaz": {
@@ -41,27 +80,42 @@
     },
     "nieodwracalne": {
       "powod": "jest nieodwracalna (wyłączenie usługi, usunięcie danych, zmiana umowy)",
-      "szukaj_w": ["tytul", "opis"],
-      "slowa": ["wyłącz", "usun", "usuń", "skasow", "kasowan", "wypowiedz", "rezygnacj", "zmiana umow", "zmian umow",
-                "zamknięcie konta"]
+      "szukaj_w": [
+        "tytul",
+        "opis"
+      ],
+      "slowa": [
+        "wyłącz",
+        "usun",
+        "usuń",
+        "skasow",
+        "kasowan",
+        "wypowiedz",
+        "rezygnacj",
+        "zmiana umow",
+        "zmian umow",
+        "zamknięcie konta"
+      ]
     }
   },
-
   "produkt": {
     "_opis": "Prośby produktowe (sekcja 3): do agenta dopiero gdy mają etykietę Wielu klientów albo to drobna zmiana z wysoką pewnością. Pojedyncza duża funkcja od jednego klienta idzie do człowieka.",
-    "typy": ["pomysl_produktowy"],
+    "typy": [
+      "pomysl_produktowy"
+    ],
     "wielu_klientow_od": 2,
-    "drobna_rodzaje": ["zmiana", "błąd"],
+    "drobna_rodzaje": [
+      "zmiana",
+      "błąd"
+    ],
     "drobna_wymaga_pewnosci": "wysoka",
     "powod_czlowieka": "priorytet produktowy"
   },
-
   "agent": {
     "_opis": "Zadanie dla agenta bez kryteriów akceptacji nie dostaje Dla agenta, tylko Do weryfikacji.",
     "wymagaj_kryteriow": true,
     "powod_braku_kryteriow": "brak kryteriów"
   },
-
   "ryzyka": {
     "_opis": "Samo ryzyko ma etykietę Ryzyko (dla ludzi). Agent dostaje osobne zadanie przygotowawcze.",
     "zadanie_przygotowawcze": {
@@ -78,28 +132,40 @@
       "repo": "rinvo-ops"
     }
   },
-
   "repo": {
     "rinvo": "kod aplikacji",
     "rinvo-ops": "wiedza, dokumenty i konfiguracja klienta",
     "brak": "zadanie nie wymaga zmian w repozytorium"
   },
-
   "przypomnienia": {
     "_opis": "Podsumowanie przygotowuje szkic przypomnienia w komentarzu zgłoszenia i podaje go na Slacku. Nigdy nie wysyła do klienta. Każdy szkic liczy się jako wykorzystane przypomnienie w karcie.",
     "domyslny_limit": 1,
-    "slowa_zakazu": ["nie przypomina", "bez przypomnień", "nie przypominać"],
+    "slowa_zakazu": [
+      "nie przypomina",
+      "bez przypomnień",
+      "nie przypominać"
+    ],
     "szablon": "Cześć {imie},\n\nprzypominam o: {tytul}. Uzgodniony termin ({termin}) już minął, a nadal na to czekamy. Czy możesz dać znać, kiedy będzie to możliwe?\n\nDziękuję,\nZespół Rinvo"
   },
-
   "podsumowanie": {
     "godzina": 8,
     "strefa": "Europe/Warsaw",
     "okno_nowych_godzin": 26
   },
-
   "nadpisania": {
     "_opis": "Ręczne wyjątki: klucz_sprawy → agent albo czlowiek. Mają pierwszeństwo przed regułami (poza brakiem kryteriów dla agenta).",
     "przyklad-klucz-sprawy": null
+  },
+  "slowa_powodow": {
+    "_opis": "Jedno słowo powodu w krótkich wiadomościach na Slacku (reguła z czlowiek_gdy → słowo).",
+    "pieniadze": "pieniądze",
+    "do_klienta": "klient",
+    "zakaz": "zakaz",
+    "decyzja_zastrzezona": "decyzja",
+    "nieodwracalne": "decyzja",
+    "produkt": "decyzja",
+    "nadpisanie": "decyzja",
+    "pewnosc_niska": "weryfikacja",
+    "brak_kryteriow": "weryfikacja"
   }
 }

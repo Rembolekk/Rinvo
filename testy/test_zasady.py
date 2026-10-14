@@ -9,6 +9,7 @@ import contextlib
 import copy
 import io
 import json
+import re
 import sys
 import unittest
 from datetime import date, datetime, timezone
@@ -303,7 +304,7 @@ class TestPrzypomnieniaStan(unittest.TestCase):
 
 
 def zgl(ident, tytul, etykiety, termin=None, klient="k"):
-    return {"id": f"id-{ident}", "identifier": ident, "url": f"https://l/{ident}", "title": f"[{klient}] {tytul}",
+    return {"id": f"id-{ident}", "identifier": ident, "url": f"https://linear.app/ws/issue/{ident}", "title": f"[{klient}] {tytul}",
             "createdAt": "2026-10-14T05:00:00Z", "dueDate": termin, "state": {"name": "Todo", "type": "unstarted"},
             "labels": {"nodes": [{"name": n} for n in etykiety]}}
 
@@ -453,64 +454,262 @@ class TestStrefaCzasowa(unittest.TestCase):
         self.assertEqual(Z["podsumowanie"]["strefa"], "Europe/Warsaw")
 
 
-class TestWiadomoscPodsumowania(unittest.TestCase):
+def tekst_widoczny(tekst):
+    """Tekst bez adresów w linkach <url|tekst>: to, co człowiek widzi w Slacku."""
+    return re.sub(r"<[^|>]+\|([^>]*)>", r"\1", tekst)
 
-    def _dane(self):
+
+class TestWiadomoscPodsumowania(unittest.TestCase):
+    """ZMIENIONE ŚWIADOMIE (nowy wygląd): zamiast list per klient wiadomość do przeczytania w 10 sekund:
+    zdanie na górze, „Wymaga człowieka” (max 5), „Uwaga” tylko gdy są, linijka o agentach, o czekaniu
+    i link do Lineara. Bez „nowe od wczoraj” i bez technicznych nazw w tekście."""
+
+    def _dane(self, dodatkowe=None, ryzyka=True):
         karty = {"k": karta_z_czekajacym({"limit": 1, "wykorzystane": 0, "nie_przypominac": False}),
                  "pusty": karta()}
+        karty["k"]["otwarte_sprawy"]["sms"] = {"identifier": "RIN-8", "linear_id": "x",
+                                               "przypisanie": {"komu": "czlowiek", "reguly": ["pieniadze"]}}
         otwarte = [
             zgl("RIN-1", "Plik leadów", ["Czeka na klienta"], "2026-10-15"),
-            zgl("RIN-2", "Wycena SMS <!channel>", ["Decyzja człowieka"]),
+            zgl("RIN-2", "Decyzja o integracji <!channel>", ["Decyzja człowieka"]),
             zgl("RIN-3", "Naprawa", ["Dla agenta"]),
             zgl("RIN-4", "Druga naprawa", ["Dla agenta"]),
             zgl("RIN-5", "Czeka z terminem", ["Czeka na klienta"], "2026-10-20"),
-            zgl("RIN-6", "VoiceDesk", ["Ryzyko", "Powtarzające się ryzyko"]),
             zgl("RIN-7", "Brak kryteriów", ["Do weryfikacji"]),
+            zgl("RIN-8", "Wycena SMS-ów", ["Decyzja człowieka"]),
         ]
-        nowe = [zgl("RIN-3", "Naprawa", ["Dla agenta"])]
-        return podsumowanie.zbierz(otwarte, nowe, karty, Z, DZIS), karty
+        if ryzyka:
+            otwarte.append(zgl("RIN-6", "VoiceDesk", ["Ryzyko", "Powtarzające się ryzyko"]))
+        otwarte += dodatkowe or []
+        skonczone = [zgl("RIN-30", "Zrobione przez agenta", ["Dla agenta"])]
+        return podsumowanie.przygotuj(otwarte, skonczone, karty, Z, DZIS), karty
 
-    def test_kategorie_per_klient(self):
-        klienci, _ = self._dane()
-        d = klienci["k"]
-        self.assertEqual(len(d["nowe"]), 1)
-        self.assertEqual(len(d["agent"]), 2)
-        self.assertEqual(len(d["czlowiek"]), 1)
-        self.assertEqual(len(d["czeka"]), 1)
-        self.assertEqual(len(d["po_terminie"]), 1)
-        self.assertEqual(len(d["ryzyka"]), 1)
-        self.assertEqual(len(d["weryfikacja"]), 1)
+    def _msg(self, **kw):
+        dane, _ = self._dane(**kw)
+        return podsumowanie.buduj_wiadomosc(dane, DZIS)
 
-    def test_wiadomosc_ma_wszystkie_linie_z_linkami_i_szkicem(self):
-        klienci, _ = self._dane()
-        msg = podsumowanie.buduj_wiadomosc(klienci, DZIS)
-        self.assertIn("*[k]*", msg)
-        self.assertIn("Zadania u agentów: 2", msg)
-        for linia in ("Nowe od wczoraj: 1", "Decyzje czekające na człowieka: 1",
-                      "Czeka na klienta: 1", "Czeka na klienta, po terminie: 1", "Powtarzające się ryzyka: 1",
-                      "Szkice przypomnień do wysłania przez człowieka: 1"):
-            self.assertIn(linia, msg)
-        self.assertIn("<https://l/RIN-1|RIN-1>", msg, "linki do zgłoszeń")
-        self.assertIn("do 15.10", msg)
-        self.assertIn("> Cześć Kasia,", msg, "szkic przypomnienia na Slacku")
+    def test_pierwsza_linijka_liczy_sprawy_wymagajace_czlowieka(self):
+        tekst, _ = self._msg()
+        # 3 decyzje/weryfikacje + 1 szkic przypomnienia (RIN-1 po terminie)
+        self.assertEqual(tekst.splitlines()[0], "*Dziś potrzebujemy Cię w 4 sprawach*")
 
-    def test_pusty_klient_ma_linie_z_zerami(self):
-        klienci, _ = self._dane()
-        msg = podsumowanie.buduj_wiadomosc(klienci, DZIS)
-        czesc = msg.split("*[pusty]*")[1]
-        self.assertIn("Zadania u agentów: 0", czesc)
-        self.assertIn("Decyzje czekające na człowieka: 0", czesc)
-        self.assertIn("Czeka na klienta, po terminie: 0", czesc)
+    def test_forma_dla_jednej_sprawy_i_dla_zera(self):
+        karty = {"k": karta()}
+        dane = podsumowanie.przygotuj([zgl("RIN-2", "Jedna", ["Decyzja człowieka"])], [], karty, Z, DZIS)
+        self.assertEqual(podsumowanie.buduj_wiadomosc(dane, DZIS)[0].splitlines()[0],
+                         "*Dziś potrzebujemy Cię w 1 sprawie*")
+        dane = podsumowanie.przygotuj([zgl("RIN-3", "Agent", ["Dla agenta"])], [], karty, Z, DZIS)
+        self.assertEqual(podsumowanie.buduj_wiadomosc(dane, DZIS)[0].splitlines()[0],
+                         "*Dziś nic nie wymaga człowieka.*")
+        self.assertNotIn("Wymaga człowieka", podsumowanie.buduj_wiadomosc(dane, DZIS)[0])
 
-    def test_slack_nie_przepuszcza_znacznikow_z_tytulow(self):
-        klienci, _ = self._dane()
-        msg = podsumowanie.buduj_wiadomosc(klienci, DZIS)
-        self.assertNotIn("<!channel>", msg)
-        self.assertIn("&lt;!channel&gt;", msg)
+    def test_wymaga_czlowieka_jedna_linijka_na_pozycje_z_linkiem_klientem_i_slowem_powodu(self):
+        tekst, _ = self._msg()
+        sekcja = tekst.split("*Wymaga człowieka*\n")[1].split("\n\n")[0].splitlines()
+        self.assertTrue(all(l.startswith("• <https://linear.app/ws/issue/") for l in sekcja), sekcja)
+        sms = next(l for l in sekcja if "Wycena SMS-ów" in l)
+        self.assertTrue(sms.endswith("· k · pieniądze"), sms)
+        self.assertTrue(next(l for l in sekcja if "Brak kryteriów" in l).endswith("· k · weryfikacja"))
+        self.assertTrue(next(l for l in sekcja if "Decyzja o integracji" in l).endswith("· k · decyzja"))
+        self.assertTrue(next(l for l in sekcja if "Plik leadów" in l).endswith("· k · klient"))
+        slowa = {l.rsplit(" · ", 1)[1] for l in sekcja}
+        self.assertTrue(slowa <= {"pieniądze", "klient", "zakaz", "decyzja", "weryfikacja"}, slowa)
 
-    def test_nagłówek_ma_dzien_tygodnia_i_date(self):
-        klienci, _ = self._dane()
-        self.assertIn("piątek 16.10.2026", podsumowanie.buduj_wiadomosc(klienci, DZIS))
+    def test_maksymalnie_5_pozycji_reszta_w_jednej_linijce(self):
+        wiele = [zgl(f"RIN-{100 + i}", f"Decyzja numer {i}", ["Decyzja człowieka"]) for i in range(8)]
+        tekst, _ = self._msg(dodatkowe=wiele)
+        sekcja = tekst.split("*Wymaga człowieka*\n")[1].split("\n\n")[0].splitlines()
+        self.assertEqual(len([l for l in sekcja if l.startswith("• ")]), 5)
+        self.assertRegex(sekcja[-1], r"^… i \d+ więcej")
+
+    def test_tytul_do_60_znakow_bez_prefiksu_klienta(self):
+        dlugi = "A" * 100
+        tekst, _ = self._msg(dodatkowe=[zgl("RIN-90", dlugi, ["Decyzja człowieka"])])
+        linia = next(l for l in tekst.splitlines() if "RIN-90" in l)
+        widoczny = tekst_widoczny(linia).removeprefix("• ")
+        tytul = widoczny.split(" · ")[0]
+        self.assertLessEqual(len(tytul), 60)
+        self.assertTrue(tytul.endswith("…"))
+        self.assertNotIn("[k]", tekst)
+
+    def test_uwaga_tylko_powtarzajace_sie_ryzyka_i_po_terminie_i_znika_gdy_pusta(self):
+        tekst, _ = self._msg(dodatkowe=[zgl("RIN-91", "Zaległa sprawa", ["Czeka na klienta"], "2026-10-10")])
+        uwaga = tekst.split("*Uwaga*\n")[1].split("\n\n")[0]
+        self.assertIn("VoiceDesk", uwaga)
+        self.assertIn("· ryzyko", uwaga)
+        self.assertIn("Zaległa sprawa", uwaga)
+        linia = next(l for l in uwaga.splitlines() if "Zaległa sprawa" in l)
+        self.assertIn("termin 10.10", linia)
+        self.assertTrue(linia.endswith("po terminie"), linia)
+        tekst2, _ = self._msg(ryzyka=False)
+        self.assertNotIn("*Uwaga*", tekst2, "sekcja znika, gdy nie ma ryzyk ani spraw po terminie")
+
+    def test_nic_nie_powtarza_sie_w_kilku_miejscach(self):
+        # RIN-1 jest po terminie, ale ma szkic przypomnienia: jest w „Wymaga człowieka”, nie w „Uwaga”
+        tekst, _ = self._msg()
+        uwaga = tekst.split("*Uwaga*\n")[1].split("\n\n")[0] if "*Uwaga*" in tekst else ""
+        self.assertNotIn("Plik leadów", uwaga, "sprawa ze szkicem jest tylko w „Wymaga człowieka”")
+        self.assertEqual(sum(1 for l in tekst.splitlines() if l.startswith("• ") and "Plik leadów" in l), 1)
+        tekst3, _ = self._msg(dodatkowe=[zgl("RIN-91", "Zaległa", ["Czeka na klienta"], "2026-10-10")])
+        self.assertEqual(tekst3.count("Zaległa"), 1)
+
+    def test_linijka_o_agentach(self):
+        tekst, _ = self._msg()
+        self.assertIn("Agenci pracują nad 2 zadaniami, 1 skończone od wczoraj.", tekst)
+
+    def test_linijka_o_czekaniu_z_najblizszym_terminem(self):
+        tekst, _ = self._msg()
+        linia = next(l for l in tekst.splitlines() if l.startswith("Czekamy na klientów"))
+        self.assertIn("w 2 sprawach", linia)
+        self.assertIn("najbliższy termin: 20.10, <https://linear.app/ws/issue/RIN-5|Czeka z terminem>", linia,
+                      "najbliższy przyszły termin, bez spraw po terminie")
+
+    def test_link_do_widoku_wszystkich_otwartych_zgloszen_na_dole(self):
+        tekst, bloki = self._msg()
+        self.assertIn("<https://linear.app/ws/team/RIN/active|Wszystkie otwarte zgłoszenia w Linearze>", tekst)
+        sekcje = [b["text"]["text"] for b in bloki if b["type"] == "section"]
+        self.assertTrue(sekcje[-1].startswith("<https://linear.app/ws/team/RIN/active|"))
+
+    def test_bez_list_nowe_od_wczoraj_i_bez_technicznych_nazw_w_tekscie(self):
+        tekst, _ = self._msg()
+        self.assertNotIn("Nowe od wczoraj", tekst)
+        widoczny = tekst_widoczny(tekst)
+        self.assertNotRegex(widoczny, r"RIN-\d+", "identyfikatory tylko w linkach")
+        self.assertNotIn("przygotowanie-", widoczny)
+
+    def test_znaczniki_slacka_z_tytulow_sa_oczyszczone(self):
+        tekst, _ = self._msg()
+        self.assertNotIn("<!channel>", tekst)
+        self.assertIn("&lt;!channel&gt;", tekst)
+
+    def test_struktura_block_kit_sekcje_mrkdwn_i_kontekst_z_data(self):
+        tekst, bloki = self._msg()
+        self.assertTrue(all(b["type"] in ("section", "context") for b in bloki))
+        self.assertEqual(bloki[0]["text"], {"type": "mrkdwn", "text": "*Dziś potrzebujemy Cię w 4 sprawach*"})
+        self.assertEqual(bloki[-1]["type"], "context")
+        self.assertIn("piątek 16.10.2026", bloki[-1]["elements"][0]["text"])
+        json.dumps(bloki)  # serializowalne dla webhooka
+
+    def test_szkic_przypomnienia_pokazany_krotko(self):
+        tekst, _ = self._msg()
+        self.assertIn("*Szkic przypomnienia*", tekst)
+        self.assertIn("> Cześć Kasia,", tekst)
+
+
+class TestSlackWidok(unittest.TestCase):
+
+    def test_odmiana_liczebnikow(self):
+        import slack_widok as sw
+        self.assertEqual([sw.forma(n, "a", "b", "c") for n in (1, 2, 4, 5, 12, 14, 22, 25)],
+                         ["a", "b", "b", "c", "c", "c", "b", "c"])
+
+    def test_krotki_tytul_prefiks_i_limit(self):
+        import slack_widok as sw
+        self.assertEqual(sw.krotki_tytul("[auto-tama] Krótki"), "Krótki")
+        self.assertLessEqual(len(sw.krotki_tytul("x" * 80)), 60)
+        self.assertEqual(sw.krotki_tytul("x" * 60), "x" * 60)
+
+    def test_slowo_powodu_z_regul_z_tekstow_i_z_etykiet(self):
+        import slack_widok as sw
+        self.assertEqual(sw.slowo_powodu({"reguly": ["zakaz", "pieniadze"]}, [], Z), "zakaz")
+        self.assertEqual(sw.slowo_powodu({"powody": [Z["czlowiek_gdy"]["pieniadze"]["powod"] + " (typ: finanse)"]}, [], Z),
+                         "pieniądze")
+        self.assertEqual(sw.slowo_powodu({"powody": ["priorytet produktowy"]}, [], Z), "decyzja")
+        self.assertEqual(sw.slowo_powodu({"powody": ["brak kryteriów"]}, [], Z), "weryfikacja")
+        self.assertEqual(sw.slowo_powodu(None, ["Do weryfikacji"], Z), "weryfikacja")
+
+    def test_widok_linear_url_z_linku_do_zgloszenia(self):
+        import slack_widok as sw
+        self.assertEqual(sw.widok_linear_url(["https://linear.app/ws/issue/RIN-1/tytul"]),
+                         "https://linear.app/ws/team/RIN/active")
+        self.assertIsNone(sw.widok_linear_url([None, "https://inny.pl/x"]))
+
+    def test_send_slack_wysyla_bloki_i_tekst_zapasowy(self):
+        import os, przetworz, urllib.request
+        wyslane = {}
+
+        class Odp:
+            status = 200
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+
+        def falszywy_urlopen(req, timeout=0, context=None):
+            wyslane["payload"] = json.loads(req.data.decode("utf-8"))
+            return Odp()
+
+        stary, stare_env = urllib.request.urlopen, os.environ.get("SLACK_WEBHOOK_URL")
+        urllib.request.urlopen = falszywy_urlopen
+        os.environ["SLACK_WEBHOOK_URL"] = "https://hooks.example/test"
+        try:
+            ok, _ = przetworz.send_slack("zapas", blocks=[{"type": "section", "text": {"type": "mrkdwn", "text": "x"}}])
+            self.assertTrue(ok)
+            self.assertEqual(wyslane["payload"]["text"], "zapas")
+            self.assertEqual(wyslane["payload"]["blocks"][0]["type"], "section")
+            przetworz.send_slack("sam tekst")
+            self.assertNotIn("blocks", wyslane["payload"])
+        finally:
+            urllib.request.urlopen = stary
+            if stare_env is None:
+                os.environ.pop("SLACK_WEBHOOK_URL", None)
+            else:
+                os.environ["SLACK_WEBHOOK_URL"] = stare_env
+
+
+class TestWiadomoscPoPrzetworzeniu(unittest.TestCase):
+    """Wiadomość po rozmowie albo mailu: zdanie, tylko to co wymaga człowieka, link."""
+
+    def _msg(self, pozycje, sync="", **kw):
+        import tempfile, przetworz
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Path(tmp) / "wynik.json"
+            f.write_text(json.dumps({"spotkanie": {"data": "2026-10-13"}, "pozycje": pozycje}), encoding="utf-8")
+            return przetworz.build_slack_message("klient-testowy", f, sync, **kw)
+
+    def test_zdanie_na_gorze_mowi_co_sie_zmienilo(self):
+        sync = "  ✓ RIN-1 (a) → zamknieta\n  ✓ RIN-2 (b) → zrob_teraz\n  Utworzono zgłoszeń:            3\n"
+        tekst, _ = self._msg([], sync)
+        self.assertEqual(tekst.splitlines()[0],
+                         ":white_check_mark: *klient-testowy*: rozmowa z 13.10 przetworzona. "
+                         "Nowych zgłoszeń: 3, zamkniętych: 1, wznowionych: 1.")
+
+    def test_mail_mowi_ze_zrodlem_byl_mail_i_podaje_temat(self):
+        tekst, _ = self._msg([], "", meta_maila={"data": "2026-10-14", "temat": "Re: Plik <!channel>"})
+        self.assertTrue(tekst.startswith(":email: *klient-testowy*: mail „Re: Plik &lt;!channel&gt;” przetworzony."))
+        self.assertIn("Bez zmian w zgłoszeniach.", tekst)
+
+    def test_bez_spraw_dla_czlowieka_jedno_zdanie_zamiast_sekcji(self):
+        tekst, _ = self._msg([poz(klucz_sprawy="a")])      # zwykła pozycja idzie do agenta
+        self.assertIn("Nic nie wymaga człowieka.", tekst)
+        self.assertNotIn("*Wymaga człowieka*", tekst)
+
+    def test_tylko_to_co_wymaga_czlowieka_z_powodem_w_jednym_slowie(self):
+        pozycje = [poz(klucz_sprawy="a", tytul="Naprawa listy"),
+                   poz(klucz_sprawy="b", typ="finanse", tytul="Korekta kwoty faktury"),
+                   poz(klucz_sprawy="c", tytul="Wysłać Kasi zestawienie")]
+        tekst, _ = self._msg(pozycje)
+        linie = [l for l in tekst.splitlines() if l.startswith("• ")]
+        self.assertEqual(len(linie), 2, "zwykła naprawa idzie do agenta i nie pojawia się w wiadomości")
+        self.assertTrue(any(l.endswith("Korekta kwoty faktury · klient-testowy · pieniądze") for l in map(tekst_widoczny, linie)))
+        self.assertTrue(any(l.endswith("Wysłać Kasi zestawienie · klient-testowy · klient") for l in map(tekst_widoczny, linie)))
+        self.assertNotIn("Naprawa listy", tekst)
+
+    def test_nie_ma_zerowych_linii_ani_technicznych_nazw(self):
+        tekst, _ = self._msg([poz(klucz_sprawy="a")], "  ✓ RIN-1 (klucz-sprawy) → zamknieta\n")
+        for zakazane in ("Zamknięte: 0", "Wznowione: 0", "Do weryfikacji: 0", "klucz-sprawy", "Zrób teraz:"):
+            self.assertNotIn(zakazane, tekst)
+        self.assertNotRegex(tekst_widoczny(tekst), r"RIN-\d+")
+
+    def test_odrzucona_zmiana_i_nieudane_testy_wymagaja_czlowieka(self):
+        sync = "  ⛔ Odrzucono aktualizację: Z4 → anulowana | brak uprawnień\n"
+        tekst, _ = self._msg([], sync, testy_wynik="FAIL 37/38")
+        self.assertIn("odrzucono: brak uprawnień", tekst)
+        self.assertIn("Testy oczekiwań nie przeszły (FAIL 37/38)", tekst)
+
+    def test_model_i_testy_w_szarej_linijce_na_dole(self):
+        tekst, bloki = self._msg([], "", model="claude-sonnet-5-5", testy_wynik="PASS 20/20")
+        self.assertEqual(bloki[-1]["type"], "context")
+        self.assertEqual(bloki[-1]["elements"][0]["text"], "model: claude-sonnet-5-5 · testy oczekiwań: PASS 20/20")
+        self.assertNotIn("Testy oczekiwań nie przeszły", tekst)
 
 
 class TestPrzeliczanieIstniejacychZgloszen(unittest.TestCase):

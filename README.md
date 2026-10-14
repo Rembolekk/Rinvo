@@ -73,7 +73,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
 | `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 43 testy) |
 | `testy/test_maile.py`, `testy/maile/*.eml` | testy źródła „maile” na przykładowych plikach .eml (53 testy) |
-| `testy/test_zasady.py` | zasady AI-first, opis zgłoszenia, przeliczanie, podsumowanie, strefa czasowa (67 testów) |
+| `testy/test_zasady.py` | zasady AI-first, opis zgłoszenia, przeliczanie, podsumowanie, strefa czasowa (88 testów) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -107,9 +107,11 @@ Log trafia do `logi/przebiegi/<timestamp>-<klient>.log`.
 
 Klucze z `.env` i ze zmiennych środowiskowych są czyszczone z białych i niewidocznych znaków (`sekrety.py`). Klucz wklejony z Notatek potrafi mieć na końcu enter albo `\u2028` i wygląda poprawnie, a serwer go odrzuca. W logu pojawia się tylko ostrzeżenie z nazwą zmiennej i liczbą usuniętych znaków, nigdy wartość.
 
-### Wiadomość na Slacku
+### Wiadomość na Slacku (Block Kit)
 
-Zawsze zawiera osobne linie (także z zerem): **Zamknięte**, **Wznowione**, **Zablokowane przez zakaz**, **Powtarzające się ryzyka**, **Wielu klientów** i **Do weryfikacji**, każda z tytułami pozycji. Do tego model analizy i wynik testów oczekiwań.
+Wiadomości są krótkie: do przeczytania w 10 sekund, wysyłane jako Block Kit przez webhook (z tekstem zapasowym do powiadomień). Wspólne klocki są w `slack_widok.py`.
+
+Po przetworzeniu rozmowy albo maila: **jedno zdanie, co się zmieniło** (np. „rozmowa z 13.10 przetworzona. Nowych zgłoszeń: 4, zamkniętych: 1, wznowionych: 1”; dla maila „mail „temat” przetworzony”), potem **tylko to, co wymaga człowieka** (maks. 5 linijek: tytuł do 60 znaków jako link, klient, jedno słowo powodu: pieniądze, klient, zakaz, decyzja, weryfikacja; do tego powtarzające się ryzyka, odrzucone zmiany bez uprawnień i nieudane testy) i **link do widoku wszystkich otwartych zgłoszeń w Linearze**. Gdy nic nie wymaga człowieka: „Nic nie wymaga człowieka.” Model i wynik testów to szara linijka na samym dole. Bez zer, bez powtórzeń i bez technicznych nazw (identyfikatory, klucze spraw) w tekście, tylko w linkach. Tytuły i tematy z maili są oczyszczane ze znaczników Slacka (`<!channel>`, linki).
 
 ## Daty liczy kod (`daty.py`)
 
@@ -268,7 +270,15 @@ Firma pracuje AI-first: agenci (Claude, Cursor) podpięci do Lineara robią ok. 
 
 ### Codzienne podsumowanie (`podsumowanie.py`)
 
-Jedna wiadomość na Slacku o **8:00 czasu polskiego** (workflow `.github/workflows/podsumowanie.yml`, ręcznie z `--wymus`). Dla każdego klienta: nowe od wczoraj, zadania u agentów, decyzje czekające na człowieka (z linkami), Do weryfikacji, sprawy czekające na klienta z terminem i **osobno po terminie**, powtarzające się ryzyka.
+Jedna wiadomość na Slacku (Block Kit) o **8:00 czasu polskiego** (workflow `.github/workflows/podsumowanie.yml`, ręcznie z `--wymus`), do przeczytania w 10 sekund:
+
+1. pierwsza linijka: „Dziś potrzebujemy Cię w N sprawach” (albo „Dziś nic nie wymaga człowieka.”),
+2. **Wymaga człowieka**: maks. 5 pozycji, każda w jednej linijce (tytuł do 60 znaków bez prefiksu klienta jako link, klient, jedno słowo powodu); reszta jako „… i N więcej”,
+3. **Uwaga**: tylko powtarzające się ryzyka i sprawy po terminie; gdy ich nie ma, sekcja znika,
+4. jedna linijka o agentach („Agenci pracują nad X zadaniami, Y skończone od wczoraj”) i jedna o czekaniu na klientów („Czekamy na klientów w Z sprawach, najbliższy termin: data, sprawa”),
+5. na dole link do widoku wszystkich otwartych zgłoszeń w Linearze.
+
+Bez list „nowe od wczoraj”, bez powtarzania tej samej sprawy w kilku miejscach i bez technicznych nazw w tekście (tylko w linkach). Słowa powodów są w `ops/zasady.json` (`slowa_powodow`).
 
 - **Strefa czasowa:** cron GitHuba działa w UTC, więc workflow odpala skrypt o 06:00 i 07:00 UTC, a skrypt sam sprawdza czas w `Europe/Warsaw` (lato UTC+2, zima UTC+1) i wysyła raz dziennie w oknie 8:00–12:00 (znosi opóźnienia crona i zmianę czasu).
 - **Przypomnienia:** gdy termin sprawy czekającej minął, limit przypomnień z rozmowy nie jest wyczerpany (brak limitu = `przypomnienia.domyslny_limit`) i klient nie prosił o brak przypomnień (limit 0 albo zakaz „nie przypominaj" w karcie), podsumowanie **przygotowuje szkic** w komentarzu zgłoszenia i podaje go na Slacku. **Nigdy nie wysyła nic do klienta.** Każdy szkic zwiększa `wykorzystane` w karcie (`otwarte_sprawy.<klucz>.przypomnienie`), więc limit nie zostanie przekroczony.
@@ -293,7 +303,7 @@ Pokrycie (43 testy):
 - Strażnik aktualizacji liczy się od **pochodzenia** sprawy (pierwsze źródło), a komentarz z późniejszej rozmowy go nie blokuje; aktualizacja z tej samej rozmowy nie zadziała dwa razy.
 - Zakazy — id są unikalne w karcie (numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie), ponowna analiza nie dubluje zakazów.
 - Czyszczenie kluczy (`sekrety.py`) — spacje, entery, `\u2028`, `\u2029`, `\u00a0`, znaki zerowej szerokości.
-- Wiadomość Slack — stałe linie (także `: 0`) i parsowanie zdarzeń z `linear_sync.py`.
+- Wiadomość Slack — krótka, bez zerowych linii (szczegółowo w `test_zasady.py`) i parsowanie zdarzeń z `linear_sync.py`.
 
 ### Testy zasad AI-first (offline)
 
@@ -301,7 +311,7 @@ Pokrycie (43 testy):
 python3 testy/test_zasady.py
 ```
 
-67 testów: każda reguła z `zasady.json` (pieniądze, do klienta ze szkicem, zakaz, decyzja zastrzeżona, pewność niska, nieodwracalne), domyślnie agent, brak kryteriów → Do weryfikacji, prośby produktowe (Wielu klientów, drobna zmiana, priorytet produktowy), ryzyka i zadanie przygotowawcze, stały układ opisu, przeliczanie istniejących zgłoszeń, limit przypomnień i „nie przypominaj", szkic jako wykorzystane przypomnienie, strefa czasowa podsumowania (lato, zima, zmiana czasu) i kształt wiadomości.
+88 testów: każda reguła z `zasady.json` (pieniądze, do klienta ze szkicem, zakaz, decyzja zastrzeżona, pewność niska, nieodwracalne), domyślnie agent, brak kryteriów → Do weryfikacji, prośby produktowe (Wielu klientów, drobna zmiana, priorytet produktowy), ryzyka i zadanie przygotowawcze, stały układ opisu, przeliczanie istniejących zgłoszeń, limit przypomnień i „nie przypominaj", szkic jako wykorzystane przypomnienie, strefa czasowa podsumowania (lato, zima, zmiana czasu) oraz wygląd obu wiadomości na Slacku (limit 5 pozycji, 60 znaków, słowa powodów, znikająca sekcja Uwaga, brak powtórzeń i technicznych nazw, Block Kit).
 
 ### Testy maili (offline, na plikach .eml)
 
