@@ -78,7 +78,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_daty.py` | daty względne liczone przez kod: parser, pierwszeństwo kodu nad modelem, „wniosek”, poprawa tekstów (37 testów) |
 | `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
 | `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
-| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (83 testy, bez poczty) |
+| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (105 testów, bez poczty) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -335,8 +335,13 @@ Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.
 | strażnik zakazów z karty: „nie przypominać Kasi o pliku” blokuje przypomnienie, „nie kontaktować się z Olą” blokuje adresata, „nie wysyłać wzoru” blokuje treść o wzorze (wzorce w `wzorce_zakazow`) | blokada |
 | filtr treści: `RIN-`, Linear i inne narzędzia, „zakaz”, klucze i pliki techniczne, nazwa innego klienta, adres e-mail spoza karty (sprawdzany też przy pisaniu szkicu) | blokada |
 | limit maili do jednego klienta dziennie (`max_dziennie_na_klienta`, teraz 2) | czeka do jutra |
+| szkic z miejscem do uzupełnienia (powód „szkic wymaga uzupełnienia: <fragment>”) albo obietnicą nieistniejącego załącznika | blokada |
 | tylko dni robocze 8:00–18:00 czasu polskiego (bez świąt z listy) | czeka do okna |
 | nieobecność osoby kontaktowej (`kontakty[].nieobecnosci` w karcie, np. urlop Kasi 19–23.10) | czeka do powrotu, Slack informuje |
+
+**Mail zbiorczy i gotowość.** Szkic powstaje osobno dla każdego zgłoszenia, a do jednego maila łączą się tylko części GOTOWE (model musi potwierdzić, że uwzględnił wszystkie; inaczej każda część idzie osobno). Część z miejscem do uzupełnienia („[...]”, „uzupełnić”, TODO, XXX, ???) albo zgłoszenie czekające na decyzję człowieka (powód inny niż „trafia do klienta”) nigdy nie jest łączone z gotowymi. Etykieta `Wyślij` na DOWOLNYM zgłoszeniu grupy wysyła mail całej grupy.
+
+**Zaproszenie na spotkanie.** Szkic może mieć pole spotkanie (data, godzina, miejsce, tytuł) wyłącznie z danych zgłoszenia (data i godzina muszą w nich występować i nie mogą być z przeszłości); wtedy do maila dołączane jest zaproszenie kalendarzowe `.ics` (adresat: tylko potwierdzony kontakt z karty). Bez niego treść nie może mówić „wysyłam/załączam” ani o zaproszeniu w załączniku: taki szkic jest odrzucany.
 
 Blokada: etykieta `Do weryfikacji`, zdjęcie `Wyślij`, komentarz z powodem i Slack („Wysyłka wstrzymana: <powód>”). Oczekiwanie zostawia `Wyślij`, a Slack dostaje powód tylko raz. Po udanej wysyłce Slack: „Wysłano do <osoba>: <temat>”.
 

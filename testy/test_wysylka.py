@@ -90,10 +90,13 @@ class AtrapaPoczta:
     def __init__(self, blad=None):
         self.wyslane, self.blad = [], blad
 
-    def wyslij(self, email, imie, temat, tresc):
+    def nadawca(self):
+        return "marek@rinvo.test"
+
+    def wyslij(self, email, imie, temat, tresc, ics=None):
         if self.blad:
             raise RuntimeError(self.blad)
-        self.wyslane.append({"email": email, "imie": imie, "temat": temat, "tresc": tresc})
+        self.wyslane.append({"email": email, "imie": imie, "temat": temat, "tresc": tresc, "ics": ics})
         return f"<{len(self.wyslane)}@test>"
 
 
@@ -114,11 +117,37 @@ class AtrapaClaude:
         return self.odpowiedzi.pop(0) if len(self.odpowiedzi) > 1 else self.odpowiedzi[0]
 
 
+def json_szkic(tresc=DOBRA, temat="Temat", spotkanie=None):
+    import json
+    return json.dumps({"temat": temat, "tresc": tresc, "spotkanie": spotkanie}, ensure_ascii=False)
+
+
+def claude_czesci(czesci, laczenie=None):
+    """Atrapa: odpowiedź dla części wg słowa kluczowego w prompcie (materiał), dla łączenia zadana odpowiedź."""
+    def odp(prompt):
+        if "Połącz poniższe części" in prompt:
+            return laczenie if laczenie is not None else "nie wiem"
+        material = prompt.split("MATERIAŁ:")[1]
+        for slowo, tekst in czesci.items():
+            if slowo in material:
+                return tekst
+        raise AssertionError("brak odpowiedzi dla: " + material[:80])
+    k = AtrapaClaude("")
+    k.zapytaj = lambda prompt: (k.prompty.append(prompt), odp(prompt))[1]
+    return k
+
+
+def json_laczenia(tresc=DOBRA, temat="Dwie sprawy", n=2, pomin=None):
+    import json
+    nr = [i for i in range(1, n + 1) if i != pomin]
+    return json.dumps({"temat": temat, "tresc": tresc, "uwzglednione": nr}, ensure_ascii=False)
+
+
 class Srodowisko:
     def __init__(self, zgloszenia=(), komentarze=None, karta=None, teraz=SROD, poczta=None, claude=None):
         self.Z = Z
         self.linear = AtrapaLinear(zgloszenia, komentarze)
-        self.poczta, self.slack, self.claude = poczta or AtrapaPoczta(), AtrapaSlack(), claude or AtrapaClaude('{"temat": "T", "tresc": "x"}')
+        self.poczta, self.slack, self.claude = poczta or AtrapaPoczta(), AtrapaSlack(), claude or AtrapaClaude(json_szkic())
         self.karta = copy.deepcopy(karta if karta is not None else KARTA)
         self.teraz = lambda: teraz
         self.sucho = False
@@ -133,6 +162,9 @@ class Srodowisko:
 
     def inni_klienci(self, klient):
         return [("klinika-usmiech", "Klinika Uśmiech")]
+
+    def fakty_zgloszen(self, grupa):
+        return "\n".join(szkice.fakty_zgloszenia(z) for z in grupa)
 
 
 def wyslij_jedno(tresc=DOBRA, temat="Godziny w sobotę", labels=("Konfiguracja", "Wyślij", "Szkic gotowy"), karta=None, teraz=SROD, poczta=None, do="Kasia Malinowska"):
@@ -466,13 +498,32 @@ class TestBladPoczty(unittest.TestCase):
         s = Srodowisko([zg(41, labels=("Wyślij",))])
         self.assertEqual(wy.uruchom(s)[0]["status"], "wstrzymane")
 
-    def test_wyslij_na_zgloszeniu_podrzednym_zbiorczego_blokuje(self):
-        z = zg(40, labels=("Wyślij",))
-        s = Srodowisko([z], {"RIN-40": [{"id": "z", "createdAt": "2026-10-14T07:00:00Z", "body": wy.format_komentarza_zbiorczego("RIN-41")}]})
+    def test_wyslij_na_zgloszeniu_podrzednym_wysyla_mail_calej_grupy(self):
+        """Człowiek nie musi wiedzieć, gdzie leży treść: etykieta na dowolnym zgłoszeniu grupy wysyła jej mail."""
+        z1, z2 = zg(41, labels=("Konfiguracja", "Szkic gotowy")), zg(40, labels=("Konfiguracja", "Szkic gotowy", "Wyślij"))
+        s = Srodowisko([z1, z2], {"RIN-41": [komentarz_szkicu(zgl=("RIN-41", "RIN-40"))],
+                                  "RIN-40": [{"id": "z", "createdAt": "2026-10-14T07:00:00Z", "body": wy.format_komentarza_zbiorczego("RIN-41")}]})
         w = wy.uruchom(s)
-        self.assertEqual(w[0]["status"], "wstrzymane")
-        self.assertIn("RIN-41", w[0]["powod"])
+        self.assertEqual([x["status"] for x in w], ["wyslane"])
+        self.assertEqual(len(s.poczta.wyslane), 1)
+        for n in ("RIN-41", "RIN-40"):
+            self.assertIn("Wysłano", s.linear.zgloszenia[n]["labels"])
+            self.assertNotIn("Wyślij", s.linear.zgloszenia[n]["labels"])
 
+    def test_wyslij_na_obu_zgloszeniach_grupy_to_jeden_mail_a_nie_blokada(self):
+        z1, z2 = zg(41, labels=("Konfiguracja", "Szkic gotowy", "Wyślij")), zg(40, labels=("Konfiguracja", "Szkic gotowy", "Wyślij"))
+        s = Srodowisko([z1, z2], {"RIN-41": [komentarz_szkicu(zgl=("RIN-41", "RIN-40"))],
+                                  "RIN-40": [{"id": "z", "createdAt": "2026-10-14T07:00:00Z", "body": wy.format_komentarza_zbiorczego("RIN-41")}]})
+        w = wy.uruchom(s)
+        self.assertEqual(len(s.poczta.wyslane), 1)
+        self.assertNotIn("Do weryfikacji", s.linear.zgloszenia["RIN-40"]["labels"])
+        self.assertEqual([x["status"] for x in w], ["wyslane"])
+
+    def test_wskazanie_na_nieistniejace_zgloszenie_glowne_blokuje(self):
+        z = zg(40, labels=("Wyślij",))
+        s = Srodowisko([z], {"RIN-40": [{"id": "z", "createdAt": "2026-10-14T07:00:00Z", "body": wy.format_komentarza_zbiorczego("RIN-99")}]})
+        self.assertEqual(wy.uruchom(s)[0]["status"], "wstrzymane")
+        self.assertEqual(s.poczta.wyslane, [])
 
 # ── szkice ────────────────────────────────────────────────────────────────────
 
@@ -490,7 +541,7 @@ class TestSzkice(unittest.TestCase):
         self.assertIsNone(szkice.powod_szkicu(zg(1, tytul="Notatka przed spotkaniem z Pawłem", labels=("Czeka na klienta",)), Z))
 
     def test_szkic_komentarz_i_etykieta_bez_wysylki(self):
-        s = Srodowisko([zg(41)], claude=AtrapaClaude('{"temat": "Godziny w sobotę", "tresc": ' + __import__("json").dumps(DOBRA) + '}'))
+        s = Srodowisko([zg(41)], claude=AtrapaClaude(json_szkic(temat="Godziny w sobotę")))
         w = szkice.uruchom(s)[0]
         self.assertEqual(w["status"], "szkic")
         self.assertIn("Szkic gotowy", s.linear.zgloszenia["RIN-41"]["labels"])
@@ -499,18 +550,41 @@ class TestSzkice(unittest.TestCase):
         p = wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-41"]))
         self.assertEqual((p["do"], p["temat"]), ("Kasia Malinowska", "Godziny w sobotę"))
 
-    def test_kilka_szkicow_klienta_z_jednego_dnia_to_jeden_mail(self):
+    def test_kilka_szkicow_klienta_z_jednego_dnia_to_jeden_mail_ze_wszystkimi_czesciami(self):
         z1, z2 = zg(41), zg(40, completed="2026-10-14T08:30:00Z", tytul="Godziny dzwonienia")
-        s = Srodowisko([z2, z1], claude=AtrapaClaude('{"temat": "Dwie poprawki", "tresc": ' + __import__("json").dumps(DOBRA) + '}'))
+        s = Srodowisko([z2, z1], claude=claude_czesci(
+            {"Sprawa: Godziny w sobotę": json_szkic("Dzień dobry, Kasia, sobota do 15:00.\nMarek Rewoliński"),
+             "Sprawa: Godziny dzwonienia": json_szkic("Dzień dobry, Kasia, dzwonimy 9–19.\nMarek Rewoliński")},
+            json_laczenia("Dzień dobry, Kasia,\n\n- sobota do 15:00\n- dzwonimy 9–19\n\nMarek Rewoliński")))
         w = szkice.uruchom(s)
         self.assertEqual(len(w), 1)
         self.assertEqual(w[0]["zgloszenia"], ["RIN-41", "RIN-40"], "najstarsze jako główne")
-        self.assertEqual(len(s.claude.prompty), 1, "jedno wywołanie modelu na grupę")
-        self.assertIn("Godziny dzwonienia", s.claude.prompty[0])
+        self.assertEqual(len(s.claude.prompty), 3, "dwie części i jedno łączenie")
         glowny = wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-41"]))
         self.assertEqual(glowny["zgloszenia"], ["RIN-41", "RIN-40"])
+        self.assertIn("sobota do 15:00", glowny["tresc"])
+        self.assertIn("dzwonimy 9–19", glowny["tresc"])
         self.assertEqual(wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-40"])), {"zbiorczy": "RIN-41"})
 
+    def test_laczenie_ktore_gubi_czesc_konczy_sie_osobnymi_szkicami(self):
+        z1, z2 = zg(41), zg(40, completed="2026-10-14T08:30:00Z", tytul="Godziny dzwonienia")
+        s = Srodowisko([z1, z2], claude=claude_czesci(
+            {"Sprawa: Godziny w sobotę": json_szkic("Dzień dobry, Kasia, sobota.\nMarek Rewoliński", "A"),
+             "Sprawa: Godziny dzwonienia": json_szkic("Dzień dobry, Kasia, dzwonienie.\nMarek Rewoliński", "B")},
+            json_laczenia("Dzień dobry, Kasia, tylko sobota.\nMarek Rewoliński", pomin=2)))
+        w = szkice.uruchom(s)
+        self.assertEqual([x["zgloszenia"] for x in w], [["RIN-41"], ["RIN-40"]], "nic nie ginie: każda część osobno")
+        self.assertIn("dzwonienie", wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-40"]))["tresc"])
+
+    def test_prompt_laczenia_zada_wszystkich_czesci(self):
+        z1, z2 = zg(41), zg(40, completed="2026-10-14T08:30:00Z", tytul="Godziny dzwonienia")
+        s = Srodowisko([z1, z2], claude=claude_czesci({"Sprawa: Godziny": json_szkic("Dzień dobry, Kasia, ok.\nMarek Rewoliński")},
+                                                       json_laczenia("Dzień dobry, Kasia, ok.\nMarek Rewoliński")))
+        szkice.uruchom(s)
+        p = s.claude.prompty[-1]
+        self.assertIn("WSZYSTKIE części", p)
+        self.assertIn("CZĘŚĆ 1", p)
+        self.assertIn("CZĘŚĆ 2", p)
     def test_rozne_dni_albo_klienci_to_osobne_maile(self):
         z1 = zg(41)
         z2 = zg(40, completed="2026-10-13T08:30:00Z")
@@ -530,7 +604,7 @@ class TestSzkice(unittest.TestCase):
 
     def test_szkic_z_identyfikatorem_jest_odrzucany_i_dostaje_druga_probe(self):
         zly = '{"temat": "T", "tresc": "Dzień dobry, Kasia, zamknęliśmy RIN-41."}'
-        dobry = '{"temat": "T", "tresc": ' + __import__("json").dumps(DOBRA) + '}'
+        dobry = json_szkic()
         s = Srodowisko([zg(41)], claude=AtrapaClaude(zly, dobry))
         self.assertEqual(szkice.uruchom(s)[0]["status"], "szkic")
         self.assertEqual(len(s.claude.prompty), 2)
@@ -538,17 +612,15 @@ class TestSzkice(unittest.TestCase):
         self.assertNotIn("zamknęliśmy RIN-41", s.claude.prompty[1], "model nie dostaje treści odrzuconego szkicu")
 
     def test_dwa_zle_szkice_to_do_weryfikacji_bez_szkicu(self):
-        zly = '{"temat": "T", "tresc": "Dzień dobry, Kasia, zamknęliśmy RIN-41."}'
+        zly = json_szkic("Dzień dobry, Kasia, zamknęliśmy RIN-41.")
         s = Srodowisko([zg(41)], claude=AtrapaClaude(zly))
         w = szkice.uruchom(s)[0]
-        self.assertEqual(w["status"], "odrzucony")
+        self.assertEqual(w["status"], "do_weryfikacji")
         self.assertIn("Do weryfikacji", s.linear.zgloszenia["RIN-41"]["labels"])
         self.assertNotIn("Szkic gotowy", s.linear.zgloszenia["RIN-41"]["labels"])
-
-    def test_nieczytelna_odpowiedz_modelu_to_odrzucenie(self):
+    def test_nieczytelna_odpowiedz_modelu_to_do_weryfikacji(self):
         s = Srodowisko([zg(41)], claude=AtrapaClaude("nie wiem"))
-        self.assertEqual(szkice.uruchom(s)[0]["status"], "odrzucony")
-
+        self.assertEqual(szkice.uruchom(s)[0]["status"], "do_weryfikacji")
     def test_brak_potwierdzonego_kontaktu_to_do_weryfikacji(self):
         s = Srodowisko([zg(41)], karta={"klient": "x", "kontakty": [], "zakazy": []})
         self.assertEqual(szkice.uruchom(s)[0]["status"], "brak_kontaktu")
@@ -565,11 +637,11 @@ class TestSzkice(unittest.TestCase):
 
     def test_nowe_zgloszenie_dolacza_do_niewyslanego_szkicu_tego_dnia(self):
         z1 = zg(41, labels=("Konfiguracja", "Szkic gotowy"))
-        z2 = zg(40, completed="2026-10-14T09:00:00Z")
-        s = Srodowisko([z1, z2], claude=AtrapaClaude('{"temat": "T", "tresc": ' + __import__("json").dumps(DOBRA) + '}'))
+        z2 = zg(40, completed="2026-10-14T09:00:00Z", tytul="Godziny dzwonienia")
+        s = Srodowisko([z1, z2], claude=claude_czesci({"Sprawa: Godziny": json_szkic("Dzień dobry, Kasia, ok.\nMarek Rewoliński")},
+                                                       json_laczenia("Dzień dobry, Kasia, ok.\nMarek Rewoliński")))
         w = szkice.uruchom(s)[0]
         self.assertEqual(w["zgloszenia"], ["RIN-41", "RIN-40"])
-
     def test_zgloszenie_wyslane_nie_wraca_do_szkicow(self):
         z = zg(41, labels=("Konfiguracja", "Wysłano"))
         self.assertEqual(szkice.uruchom(Srodowisko([z])), [])
@@ -708,6 +780,175 @@ class TestWiadomoscDoKlientaWTodo(unittest.TestCase):
         w = wy.uruchom(s)
         self.assertEqual(w[0]["status"], "wstrzymane")
         self.assertEqual(s.poczta.wyslane, [])
+
+
+# ── placeholdery, łączenie gotowych z resztą, zaproszenie .ics ───────────────
+
+OPIS_DECYZJA = (OPIS + "\n\n## Dlaczego człowiek\n\n- kosztuje pieniądze albo dotyczy cen i umów (słowo: „wycen”)\n"
+                "- trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic")
+OPIS_TYLKO_DO_KLIENTA = OPIS + "\n\n## Dlaczego człowiek\n\n- trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic"
+
+
+class TestPlaceholdery(unittest.TestCase):
+
+    FRAGMENTY = ["Cena wynosi [...] zł.", "Cena wynosi […] zł.", "Cena: uzupełnić po rozmowie.", "TODO: cena", "Cena XXX zł", "Cena ???",
+                 "Wstaw tutaj cenę.", "Cena [do uzupełnienia] zł.", "Dzień dobry <imię>,"]
+
+    def test_wysylka_nigdy_nie_wypuszcza_szkicu_z_miejscem_do_uzupelnienia(self):
+        for fragment in self.FRAGMENTY:
+            tresc = f"Dzień dobry, Kasia,\n\n{fragment}\n\nMarek Rewoliński"
+            s, w = wyslij_jedno(tresc=tresc)
+            self.assertEqual(w[0]["status"], "wstrzymane", fragment)
+            self.assertIn("szkic wymaga uzupełnienia:", w[0]["powod"], fragment)
+            self.assertEqual(s.poczta.wyslane, [], fragment)
+            self.assertIn("Do weryfikacji", s.linear.zgloszenia["RIN-41"]["labels"], fragment)
+            self.assertNotIn("Wyślij", s.linear.zgloszenia["RIN-41"]["labels"], fragment)
+
+    def test_powod_zawiera_fragment_z_miejscem(self):
+        s, w = wyslij_jedno(tresc="Dzień dobry, Kasia,\n\nCena wynosi [...] zł.\n\nMarek Rewoliński")
+        self.assertIn("[...]", w[0]["powod"])
+
+    def test_zwykly_tekst_nie_jest_placeholderem(self):
+        self.assertIsNone(wy.znajdz_placeholder("Temat", DOBRA, W))
+        self.assertIsNone(wy.znajdz_placeholder("Godziny", "Dzień dobry, Kasia, w sobotę 9:00–15:00? Tak, do 15:00.", W))
+
+    def test_szkic_z_placeholderem_trafia_do_weryfikacji_z_powodem_i_roboczym_tekstem(self):
+        s = Srodowisko([zg(41)], claude=AtrapaClaude(json_szkic("Dzień dobry, Kasia,\n\nwycena: [...] zł.\n\nMarek Rewoliński")))
+        w = szkice.uruchom(s)[0]
+        self.assertEqual(w["status"], "do_weryfikacji")
+        self.assertIn("szkic wymaga uzupełnienia: ", w["powod"])
+        self.assertIn("Do weryfikacji", s.linear.zgloszenia["RIN-41"]["labels"])
+        self.assertNotIn("Szkic gotowy", s.linear.zgloszenia["RIN-41"]["labels"])
+        self.assertIsNone(wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-41"])), "to nie jest szkic do wysłania")
+        self.assertEqual(len(s.claude.prompty), 1, "placeholder nie jest powodem ponawiania")
+
+    def test_gotowy_szkic_nie_jest_laczony_z_takim_ktory_wymaga_uzupelnienia(self):
+        """RIN-46 miał same SMS-y i brakowało zaproszenia: gotowe idą razem, niegotowe osobno."""
+        z1 = zg(51, tytul="Zaproszenie na spotkanie", completed="2026-10-14T06:00:00Z", stan="Todo")
+        z2 = zg(52, tytul="Gotowa sprawa A", completed="2026-10-14T06:10:00Z")
+        z3 = zg(53, tytul="Gotowa sprawa B", completed="2026-10-14T06:20:00Z")
+        for z in (z1, z2, z3):
+            z["createdAt"] = z["completedAt"]
+        s = Srodowisko([z1, z2, z3], claude=claude_czesci(
+            {"Sprawa: Zaproszenie": json_szkic("Dzień dobry, Kasia, wycena [...] zł.\nMarek Rewoliński"),
+             "Sprawa: Gotowa sprawa A": json_szkic("Dzień dobry, Kasia, A gotowe.\nMarek Rewoliński"),
+             "Sprawa: Gotowa sprawa B": json_szkic("Dzień dobry, Kasia, B gotowe.\nMarek Rewoliński")},
+            json_laczenia("Dzień dobry, Kasia, A gotowe, B gotowe.\nMarek Rewoliński")))
+        w = szkice.uruchom(s)
+        self.assertEqual(sorted((x["status"], tuple(x["zgloszenia"])) for x in w),
+                         [("do_weryfikacji", ("RIN-51",)), ("szkic", ("RIN-52", "RIN-53"))])
+        merge_prompt = next(p for p in s.claude.prompty if "Połącz poniższe części" in p)
+        self.assertNotIn("[...]", merge_prompt, "część do uzupełnienia nie trafia do łączenia")
+
+    def test_zgloszenie_wymagajace_decyzji_czlowieka_idzie_osobno(self):
+        z1 = zg(41, labels=("Konfiguracja", "Decyzja człowieka"), opis=OPIS_DECYZJA)
+        z2 = zg(40, completed="2026-10-14T08:30:00Z", tytul="Godziny dzwonienia", opis=OPIS.replace("Godziny w sobotę do 15:00.", "Dzwonienie 9–19."))
+        s = Srodowisko([z1, z2], claude=claude_czesci({"Sprawa: Godziny w sobotę": json_szkic("Dzień dobry, Kasia, A.\nMarek Rewoliński", "A"),
+                                                       "Sprawa: Godziny dzwonienia": json_szkic("Dzień dobry, Kasia, B.\nMarek Rewoliński", "B")}))
+        w = szkice.uruchom(s)
+        self.assertEqual(sorted(tuple(x["zgloszenia"]) for x in w), [("RIN-40",), ("RIN-41",)], "bez łączenia")
+        self.assertFalse(any("Połącz poniższe części" in p for p in s.claude.prompty))
+
+    def test_samo_do_klienta_nie_jest_decyzja_i_laczy_sie(self):
+        z1 = zg(41, labels=("Konfiguracja", "Decyzja człowieka"), opis=OPIS_TYLKO_DO_KLIENTA)
+        z2 = zg(40, completed="2026-10-14T08:30:00Z", tytul="Godziny dzwonienia", opis=OPIS.replace("Godziny w sobotę do 15:00.", "Dzwonienie 9–19."))
+        s = Srodowisko([z1, z2], claude=claude_czesci({"Sprawa: Godziny": json_szkic("Dzień dobry, Kasia, ok.\nMarek Rewoliński")},
+                                                       json_laczenia("Dzień dobry, Kasia, ok.\nMarek Rewoliński")))
+        w = szkice.uruchom(s)
+        self.assertEqual([tuple(x["zgloszenia"]) for x in w], [("RIN-41", "RIN-40")])
+
+    def test_wymaga_decyzji_etykieta_zakazu_zawsze(self):
+        self.assertTrue(szkice.wymaga_decyzji(zg(1, labels=("Zablokowane przez zakaz",)), Z))
+        self.assertFalse(szkice.wymaga_decyzji(zg(1, labels=("Konfiguracja",)), Z))
+
+
+class TestZaproszenieICS(unittest.TestCase):
+
+    TYTUL = "Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)"
+    SPOTKANIE = {"data": "2026-10-15", "godzina": "10:00", "czas_min": 60, "miejsce": "Toruń", "tytul": "Spotkanie Marek–Paweł–Kasia"}
+    TRESC = "Dzień dobry, Kasia,\n\nzapraszam na czwartek 15.10 o 10:00. Zaproszenie kalendarzowe jest w załączniku.\n\nMarek Rewoliński"
+
+    def _z(self, **kw):
+        return zg(51, **{"tytul": self.TYTUL, "opis": OPIS_ZAPROSZENIE, "stan": "Todo", "labels": ("Decyzja człowieka",), **kw})
+
+    def test_szkic_z_poprawnym_spotkaniem_ma_dane_w_komentarzu(self):
+        s = Srodowisko([self._z()], claude=AtrapaClaude(json_szkic(self.TRESC, "Zaproszenie", self.SPOTKANIE)))
+        w = szkice.uruchom(s)[0]
+        self.assertEqual((w["status"], w["zaproszenie"]), ("szkic", True))
+        p = wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-51"]))
+        self.assertEqual(p["spotkanie"]["data"], "2026-10-15")
+        self.assertEqual(p["spotkanie"]["godzina"], "10:00")
+
+    def test_wysylka_dolacza_ics_z_poprawna_godzina_utc(self):
+        z = self._z(labels=("Wyślij", "Szkic gotowy"))
+        k = {"id": "c", "createdAt": "2026-10-14T07:30:00Z",
+             "body": wy.format_komentarza_szkicu("Kasia Malinowska", "Zaproszenie", self.TRESC, ["RIN-51"], self.SPOTKANIE)}
+        s = Srodowisko([z], {"RIN-51": [k]})
+        w = wy.uruchom(s)
+        self.assertEqual(w[0]["status"], "wyslane")
+        ics = s.poczta.wyslane[0]["ics"]
+        self.assertIn("METHOD:REQUEST", ics)
+        self.assertIn("DTSTART:20261015T080000Z", ics, "10:00 czasu polskiego (CEST) to 08:00 UTC")
+        self.assertIn("DTEND:20261015T090000Z", ics)
+        self.assertIn("ATTENDEE;CN=Kasia Malinowska;ROLE=REQ-PARTICIPANT;RSVP=TRUE:mailto:kasia@autotama.pl", ics)
+        self.assertIn("SUMMARY:Spotkanie Marek–Paweł–Kasia", ics)
+        self.assertTrue(s.karta["historia_wysylek"][0]["zaproszenie_ics"])
+
+    def test_spotkanie_z_wymyslona_data_jest_odrzucone(self):
+        sp = {**self.SPOTKANIE, "data": "2026-10-16"}                  # w zgłoszeniu jest 15.10
+        s = Srodowisko([self._z()], claude=AtrapaClaude(json_szkic(self.TRESC, "Zaproszenie", sp)))
+        w = szkice.uruchom(s)[0]
+        self.assertEqual(w["status"], "do_weryfikacji")
+        self.assertIn("nie wynika z danych zgłoszenia", w["powod"])
+
+    def test_spotkanie_z_przeszlosci_albo_zlym_formatem_jest_odrzucone(self):
+        dzis = datetime(2026, 10, 14).date()
+        self.assertIsNone(wy.waliduj_spotkanie({**self.SPOTKANIE, "data": "2026-10-13"}, "13.10 10:00", dzis, W)[0])
+        self.assertIsNone(wy.waliduj_spotkanie({**self.SPOTKANIE, "godzina": "25:00"}, "15.10 25:00", dzis, W)[0])
+        self.assertIsNone(wy.waliduj_spotkanie({"data": "jutro", "godzina": "10:00"}, "15.10 10:00", dzis, W)[0])
+        self.assertIsNotNone(wy.waliduj_spotkanie(self.SPOTKANIE, "15.10, 10:00", dzis, W)[0])
+
+    def test_tresc_mowiaca_o_zaproszeniu_bez_ics_jest_odrzucana_przy_pisaniu(self):
+        z = self._z(tytul="Potwierdzenie spotkania", opis=OPIS_ZAPROSZENIE.replace("czwartek 15.10 o 10:00", "czwartek"))
+        zly = json_szkic("Dzień dobry, Kasia,\n\nwysyłam zaproszenie na czwartek.\n\nMarek Rewoliński")
+        s = Srodowisko([z], claude=AtrapaClaude(zly))
+        w = szkice.uruchom(s)[0]
+        self.assertEqual(w["status"], "do_weryfikacji")
+        self.assertIn("obiecuje załącznik albo zaproszenie", w["powod"])
+        self.assertEqual(len(s.claude.prompty), 2, "jedna ponowna próba z listą naruszeń")
+
+    def test_ponowna_proba_bez_obietnicy_zaproszenia_przechodzi(self):
+        z = self._z(tytul="Potwierdzenie spotkania", opis=OPIS_ZAPROSZENIE.replace("czwartek 15.10 o 10:00", "czwartek"))
+        zly = json_szkic("Dzień dobry, Kasia,\n\nwysyłam zaproszenie na czwartek.\n\nMarek Rewoliński")
+        dobry = json_szkic("Dzień dobry, Kasia,\n\ntermin spotkania w czwartek jest potwierdzony.\n\nMarek Rewoliński")
+        s = Srodowisko([z], claude=AtrapaClaude(zly, dobry))
+        w = szkice.uruchom(s)[0]
+        self.assertEqual((w["status"], w["zaproszenie"]), ("szkic", False))
+
+    def test_wysylka_blokuje_obietnice_zalacznika_bez_ics(self):
+        for tresc in ("Dzień dobry, Kasia, wysyłam zaproszenie.\nMarek Rewoliński", "Dzień dobry, Kasia, w załączniku termin.\nMarek Rewoliński",
+                      "Dzień dobry, Kasia, w załączeniu zaproszenie.\nMarek Rewoliński"):
+            s, w = wyslij_jedno(tresc=tresc)
+            self.assertEqual(w[0]["status"], "wstrzymane", tresc)
+            self.assertIn("obiecuje załącznik", w[0]["powod"])
+            self.assertEqual(s.poczta.wyslane, [])
+
+    def test_przesylam_ściągę_bez_zalacznika_jest_blokowane(self):
+        """Szkic z RIN-47 mówił „przesyłam ją”, choć żadnego załącznika nie ma."""
+        s, w = wyslij_jedno(tresc="Dzień dobry, Kasiu,\n\nprzesyłam ściągę statusów.\n\nMarek Rewoliński")
+        self.assertEqual(w[0]["status"], "wstrzymane")
+        s2, w2 = wyslij_jedno(tresc="Dzień dobry, Kasiu,\n\nściągę wyślę przed urlopem.\n\nMarek Rewoliński")
+        self.assertEqual(w2[0]["status"], "wyslane", "czas przyszły z terminem jest w porządku")
+
+    def test_ics_ma_tylko_potwierdzonego_odbiorce_z_karty(self):
+        ics = wy.zbuduj_ics({**self.SPOTKANIE}, "marek@rinvo.test", "kasia@autotama.pl", "Kasia Malinowska", SROD, W)
+        self.assertEqual(ics.count("ATTENDEE"), 1)
+        self.assertNotIn("pawel@", ics)
+
+    def test_parsowanie_szkicu_ze_spotkaniem_okragle(self):
+        k = {"id": "c", "createdAt": "2026-10-14T07:30:00Z", "body": wy.format_komentarza_szkicu("Kasia Malinowska", "T", DOBRA, ["RIN-51"], self.SPOTKANIE)}
+        self.assertEqual(wy.parsuj_szkic([k])["spotkanie"], self.SPOTKANIE)
+        self.assertIsNone(wy.parsuj_szkic([komentarz_szkicu()])["spotkanie"])
 
 
 # ── workflow ──────────────────────────────────────────────────────────────────

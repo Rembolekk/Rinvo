@@ -235,7 +235,11 @@ class Poczta:
     def __init__(self, W):
         self.W = W
 
-    def wyslij(self, email_do, imie_do, temat, tresc):
+    def nadawca(self):
+        from sekrety import czysc
+        return czysc(os.environ.get("GMAIL_ADDRESS", ""))
+
+    def wyslij(self, email_do, imie_do, temat, tresc, ics=None):
         import smtplib
         import ssl
         from email.message import EmailMessage
@@ -252,6 +256,9 @@ class Poczta:
         msg["Subject"] = " ".join(temat.split())
         msg["Message-ID"] = make_msgid(domain=nadawca.split("@")[-1])
         msg.set_content(tresc)
+        if ics:
+            msg.add_attachment(ics.encode("utf-8"), maintype="text", subtype="calendar", filename="zaproszenie.ics",
+                               params={"method": "REQUEST", "charset": "utf-8"})
         try:
             import certifi
             ctx = ssl.create_default_context(cafile=certifi.where())

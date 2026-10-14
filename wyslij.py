@@ -36,8 +36,12 @@ EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 
 # ── szkic w komentarzu ────────────────────────────────────────────────────────
 
-def format_komentarza_szkicu(odbiorca, temat, tresc, identyfikatory):
-    return (f"{NAGLOWEK_SZKICU}\n\n**Do:** {odbiorca}\n**Temat:** {temat}\n**Zgłoszenia:** {', '.join(identyfikatory)}\n\n"
+def format_komentarza_szkicu(odbiorca, temat, tresc, identyfikatory, spotkanie=None):
+    sp = ""
+    if spotkanie:
+        sp = (f"**Spotkanie:** {spotkanie['data']} {spotkanie['godzina']} | {spotkanie.get('czas_min', 60)} | "
+              f"{spotkanie.get('miejsce', '')} | {spotkanie.get('tytul', '')}  _(zaproszenie .ics zostanie dołączone)_\n")
+    return (f"{NAGLOWEK_SZKICU}\n\n**Do:** {odbiorca}\n**Temat:** {temat}\n**Zgłoszenia:** {', '.join(identyfikatory)}\n{sp}\n"
             f"---\n{tresc.strip()}\n---\n\n_Aby wysłać: dodaj etykietę „Wyślij”. Szkic możesz poprawić, dodając nowy komentarz "
             f"w tym samym układzie; wysłany zostanie najnowszy._")
 
@@ -60,12 +64,78 @@ def parsuj_szkic(komentarze):
         temat = re.search(r"^\*\*Temat:\*\*\s*(.+)$", body, re.M)
         zgl = re.search(r"^\*\*Zgłoszenia:\*\*\s*(.+)$", body, re.M)
         tresc = re.search(r"^---\n(.*?)\n---\s*$", body, re.M | re.S)
+        sp = re.search(r"^\*\*Spotkanie:\*\*\s*(\d{4}-\d{2}-\d{2}) (\d{1,2}:\d{2}) \| (\d+) \| ([^|\n]*) \| ([^\n]*?)(?:\s+_\(.*)?$", body, re.M)
         if not (do and temat and tresc):
             continue
         return {"do": do.group(1).strip(), "temat": temat.group(1).strip(),
                 "zgloszenia": re.findall(r"RIN-\d+", zgl.group(1)) if zgl else [],
-                "tresc": tresc.group(1).strip()}
+                "tresc": tresc.group(1).strip(),
+                "spotkanie": ({"data": sp.group(1), "godzina": sp.group(2), "czas_min": int(sp.group(3)),
+                               "miejsce": sp.group(4).strip(), "tytul": sp.group(5).strip()} if sp else None)}
     return None
+
+
+def znajdz_placeholder(temat, tresc, W):
+    """Fragment szkicu z miejscem do uzupełnienia („[...]”, „uzupełnić”, TODO, XXX, ???) albo None."""
+    tekst = f"{temat}\n{tresc}"
+    for wzorzec in W["filtr_tresci"]["placeholdery"]:
+        m = re.search(wzorzec, tekst, re.IGNORECASE)
+        if m:
+            a, b = max(0, m.start() - 25), min(len(tekst), m.end() + 25)
+            return " ".join(tekst[a:b].split())
+    return None
+
+
+def obiecuje_zalacznik(tresc, W):
+    """Treść mówi o załączniku albo „wysyłam zaproszenie” (fragment) albo None."""
+    for wzorzec in W["filtr_tresci"]["obietnice_zalacznika"]:
+        m = re.search(wzorzec, tresc, re.IGNORECASE)
+        if m:
+            return m.group(0)
+    return None
+
+
+def waliduj_spotkanie(sp, fakty, dzis, W):
+    """Spotkanie z szkicu → (poprawne słowniki albo None, powód). Data i godzina muszą być poprawne, nie z przeszłości
+    i widoczne w faktach zgłoszenia (np. „15.10”, „10:00”): model niczego nie wymyśla."""
+    try:
+        d = date.fromisoformat(str(sp["data"]))
+        g, m = str(sp["godzina"]).split(":")
+        godz, min_ = int(g), int(m)
+        assert 0 <= godz < 24 and 0 <= min_ < 60
+        czas = int(sp.get("czas_min") or 60)
+        assert 5 <= czas <= 600
+    except Exception:  # noqa: BLE001
+        return None, "niepoprawna data albo godzina spotkania"
+    if d < dzis:
+        return None, "termin spotkania jest w przeszłości"
+    f = fakty.lower()
+    dm = {f"{d.day}.{d.month}", f"{d.day:02d}.{d.month:02d}", f"{d.day}.{d.month:02d}", f"{d.day:02d}.{d.month}"}
+    hm = {f"{godz}:{min_:02d}", f"{godz:02d}:{min_:02d}"}
+    if not any(re.search(r"(?<!\d)" + re.escape(x) + r"(?!\d)", f) for x in dm) or \
+            not any(re.search(r"(?<!\d)" + re.escape(x) + r"(?!\d)", f) for x in hm):
+        return None, "data albo godzina spotkania nie wynika z danych zgłoszenia"
+    return {"data": d.isoformat(), "godzina": f"{godz:02d}:{min_:02d}", "czas_min": czas,
+            "miejsce": " ".join(str(sp.get("miejsce") or "").split())[:120],
+            "tytul": " ".join(str(sp.get("tytul") or "Spotkanie").split())[:120]}, ""
+
+
+def zbuduj_ics(sp, nadawca, odbiorca_email, odbiorca_imie, teraz, W):
+    """Zaproszenie kalendarzowe (.ics, METHOD:REQUEST) jako tekst. Czas lokalny polski zamieniamy na UTC."""
+    import uuid
+    start = datetime.fromisoformat(f"{sp['data']}T{sp['godzina']}:00").replace(tzinfo=ZoneInfo(W["strefa"]))
+    koniec = start + timedelta(minutes=sp["czas_min"])
+    z = lambda dt: dt.astimezone(ZoneInfo("UTC")).strftime("%Y%m%dT%H%M%SZ")        # noqa: E731
+    esc = lambda t: str(t).replace("\\", "\\\\").replace(";", "\\;").replace(",", "\\,").replace("\n", " ")      # noqa: E731
+    linie = ["BEGIN:VCALENDAR", "VERSION:2.0", "PRODID:-//Rinvo//Zaproszenie//PL", "METHOD:REQUEST", "BEGIN:VEVENT",
+             f"UID:{uuid.uuid4()}@{nadawca.split('@')[-1]}", f"DTSTAMP:{z(teraz)}", f"DTSTART:{z(start)}", f"DTEND:{z(koniec)}",
+             f"SUMMARY:{esc(sp['tytul'])}"]
+    if sp.get("miejsce"):
+        linie.append(f"LOCATION:{esc(sp['miejsce'])}")
+    linie += [f"ORGANIZER;CN={esc(W['nadawca_imie'])}:mailto:{nadawca}",
+              f"ATTENDEE;CN={esc(odbiorca_imie)};ROLE=REQ-PARTICIPANT;RSVP=TRUE:mailto:{odbiorca_email}",
+              "STATUS:CONFIRMED", "END:VEVENT", "END:VCALENDAR"]
+    return "\r\n".join(linie) + "\r\n"
 
 
 def hash_szkicu(temat, tresc, email):
@@ -231,8 +301,11 @@ def obsluz_zgloszenie(s, zg):
     szkic = parsuj_szkic(s.linear.komentarze(zg))
     if szkic is None:
         return wstrzymaj(s, zg, ["brak szkicu maila w komentarzach zgłoszenia"])
-    if "zbiorczy" in szkic:
-        return wstrzymaj(s, zg, [f"to jest szkic zbiorczy: etykietę „Wyślij” dodaj w zgłoszeniu {szkic['zbiorczy']}"])
+    if "zbiorczy" in szkic:                      # etykieta na dowolnym zgłoszeniu grupy wysyła mail całej grupy
+        glowny = s.linear.zgloszenie_po_numerze(int(szkic["zbiorczy"].split("-")[1])) if szkic["zbiorczy"].startswith("RIN-") else None
+        szkic = parsuj_szkic(s.linear.komentarze(glowny)) if glowny else None
+        if szkic is None or "zbiorczy" in szkic:
+            return wstrzymaj(s, zg, ["nie znaleziono szkicu zbiorczego w zgłoszeniu głównym"])
 
     identyfikatory = list(dict.fromkeys(szkic["zgloszenia"] or [zg["identifier"]]))
     if zg["identifier"] not in identyfikatory:
@@ -250,8 +323,23 @@ def obsluz_zgloszenie(s, zg):
     if dup or any(E["wyslano"] in g.get("labels", []) for g in grupa):
         return wstrzymaj(s, zg, ["ten szkic już wysłano" + (f" ({str(dup.get('data', ''))[:10]})" if dup else "")], grupa)
     # 3) strażnik zakazów, 4) filtr treści
-    powody = straznik_zakazow(karta, odbiorca, szkic["temat"], szkic["tresc"], W)
+    powody = []
+    frag = znajdz_placeholder(szkic["temat"], szkic["tresc"], W)
+    if frag:
+        powody.append(f"szkic wymaga uzupełnienia: {frag}")
+    powody += straznik_zakazow(karta, odbiorca, szkic["temat"], szkic["tresc"], W)
     powody += filtr_tresci(szkic["temat"], szkic["tresc"], karta, W, s.inni_klienci(klient))
+    # zaproszenie .ics: tylko z poprawnych danych; bez niego treść nie może obiecywać zaproszenia ani załącznika
+    spotkanie, ics = szkic.get("spotkanie"), None
+    if spotkanie:
+        sp_ok, powod_sp = waliduj_spotkanie(spotkanie, s.fakty_zgloszen(grupa), lokalnie(s.teraz(), W).date(), W)
+        if sp_ok is None:
+            powody.append(f"zaproszenie kalendarzowe: {powod_sp}")
+        spotkanie = sp_ok
+    if spotkanie is None:
+        obietnica = obiecuje_zalacznik(szkic["tresc"], W)
+        if obietnica:
+            powody.append(f"treść obiecuje załącznik albo zaproszenie („{obietnica}”), którego nie ma")
     if powody:
         return wstrzymaj(s, zg, powody, grupa)
 
@@ -273,14 +361,16 @@ def obsluz_zgloszenie(s, zg):
 
     # wysyłka
     try:
-        message_id = s.poczta.wyslij(odbiorca["email"], odbiorca["imie"], szkic["temat"], szkic["tresc"])
+        if spotkanie:
+            ics = zbuduj_ics(spotkanie, s.poczta.nadawca(), odbiorca["email"], odbiorca["imie"], teraz, W)
+        message_id = s.poczta.wyslij(odbiorca["email"], odbiorca["imie"], szkic["temat"], szkic["tresc"], ics)
     except Exception as exc:  # noqa: BLE001
         return czekaj(s, zg, karta, klient, f"błąd poczty: {slack_bezpiecznie(str(exc), 120)}; ponowimy przy następnym przebiegu")
 
     # historia ZANIM ruszymy Linear: nawet gdy dalsze kroki padną, drugi raz nie wyślemy
     karta.setdefault("historia_wysylek", []).append({
         "data": lokalnie(teraz, W).isoformat(timespec="seconds"), "message_id": message_id, "do": odbiorca["imie"],
-        "temat": szkic["temat"], "zgloszenia": identyfikatory, "hash": skrot})
+        "temat": szkic["temat"], "zgloszenia": identyfikatory, "hash": skrot, "zaproszenie_ics": bool(ics)})
     karta.get("wysylki_oczekujace", {}).pop(zg["identifier"], None)
     s.zapisz_karte(klient, karta)
 
@@ -291,14 +381,19 @@ def obsluz_zgloszenie(s, zg):
         s.linear.usun_etykiete(g, E["szkic"])
     s.linear.komentarz(zg, f"Wysłano {data_txt}")
     _slack(s, [f":email: Wysłano do {odbiorca['imie']}: {slack_bezpiecznie(szkic['temat'], 120)}"])
-    return {"status": "wyslane", "zgloszenie": zg["identifier"], "do": odbiorca["imie"], "message_id": message_id}
+    return {"status": "wyslane", "zgloszenie": zg["identifier"], "zgloszenia": identyfikatory, "do": odbiorca["imie"], "message_id": message_id}
 
 
 def uruchom(s):
-    wyniki = []
+    wyniki, wyslane = [], set()
     for zg in s.linear.z_etykieta(s.Z["etykiety"]["wyslij"]):
+        if zg["identifier"] in wyslane:               # to samo zgłoszenie grupy już poszło w tym przebiegu
+            continue
         try:
-            wyniki.append(obsluz_zgloszenie(s, zg))
+            w = obsluz_zgloszenie(s, zg)
+            wyniki.append(w)
+            if w["status"] == "wyslane":
+                wyslane.update(w["zgloszenia"])
         except Exception as exc:  # noqa: BLE001  (jedno zgłoszenie nie zatrzymuje reszty)
             wyniki.append({"status": "blad", "powod": slack_bezpiecznie(str(exc), 160), "zgloszenie": zg["identifier"]})
     return wyniki
@@ -342,6 +437,12 @@ def zbuduj_srodowisko(sucho=False):
         return out
 
     s.inni_klienci = inni
+
+    def fakty(grupa):
+        import szkice
+        return "\n".join(szkice.fakty_zgloszenia(z) for z in grupa)
+
+    s.fakty_zgloszen = fakty
 
     def cytaty(zg):
         import szkice
