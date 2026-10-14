@@ -28,6 +28,7 @@ from zoneinfo import ZoneInfo
 
 import slack_widok as sw
 from maile import slack_bezpiecznie
+from podpis import bez_podpisu
 
 NAGLOWEK_SZKICU = "**Szkic maila do klienta**"
 NAGLOWEK_ZBIORCZEGO = "**Szkic zbiorczy:**"
@@ -56,7 +57,7 @@ def parsuj_szkic(komentarze):
     """Najnowszy komentarz ze szkicem → {"do","temat","zgloszenia","tresc"} albo None.
     Komentarz zbiorczy (wskazujący inne zgłoszenie) → {"zbiorczy": "RIN-x"}."""
     for k in sorted(komentarze, key=lambda c: c.get("createdAt", ""), reverse=True):
-        body = (k.get("body") or "").strip()
+        body = bez_podpisu((k.get("body") or "").strip()).strip()
         if body.startswith(NAGLOWEK_ZBIORCZEGO):
             m = re.search(r"zgłoszeniu (RIN-\d+)", body)
             return {"zbiorczy": m.group(1) if m else "?"}

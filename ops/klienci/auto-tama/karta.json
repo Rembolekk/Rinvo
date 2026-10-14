@@ -915,5 +915,13 @@
       "zaproszenie_ics": true,
       "zalaczniki": []
     }
+  ],
+  "zalozenia_demo": [
+    {
+      "dotyczy": "sciga-statusow",
+      "temat": "Status „niezweryfikowany”",
+      "tresc": "agent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych",
+      "zrodlo": "polecenie właściciela (Marka) z 2026-10-14; w rozmowach z klientem nie ma definicji tego statusu"
+    }
   ]
 }

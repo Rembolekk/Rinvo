@@ -26,6 +26,7 @@ from agent import (NAZWY_SEKRETOW_ENV, pliki_do_commita, czy_dozwolona_sciezka, 
                    rozbij_opis, klient_z_tytulu)
 from agent_github import ocena_coderabbit, stan_coderabbit_ci, stan_testow
 from maile import slack_bezpiecznie
+from podpis import bez_podpisu
 
 ZNACZNIK_POPRAWKI = "<!-- agent-poprawka -->"
 ZNACZNIK_ODDANIA = "<!-- agent-oddanie -->"
@@ -41,7 +42,7 @@ def stan_oddania(komentarze):
         body = k.get("body") or ""
         if ZNACZNIK_WZNOWIENIA in body:
             stan = "wznowione"
-        elif ZNACZNIK_ODDANIA in body or body.startswith(TEKST_ODDANIA):
+        elif ZNACZNIK_ODDANIA in body or re.match(r"^(?:Agent\s+)?oddaje ten PR człowiekowi", bez_podpisu(body).lstrip()):
             stan = "oddane"
     return stan
 

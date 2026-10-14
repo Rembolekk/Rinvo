@@ -78,7 +78,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_daty.py` | daty względne liczone przez kod: parser, pierwszeństwo kodu nad modelem, „wniosek”, poprawa tekstów (37 testów) |
 | `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
 | `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
-| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (129 testów, bez poczty) |
+| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
@@ -353,6 +353,10 @@ Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.
 Blokada: etykieta `Do weryfikacji`, zdjęcie `Wyślij`, komentarz z powodem i Slack („Wysyłka wstrzymana: <powód>”). Oczekiwanie zostawia `Wyślij`, a Slack dostaje powód tylko raz. Po udanej wysyłce Slack: „Wysłano do <osoba>: <temat>”.
 
 Nic nie wyjdzie na prawdziwą skrzynkę, dopóki ktoś nie doda etykiety `Wyślij`. Podgląd bez zmian: `python3 wyslij.py --sucho`, `python3 szkice.py --sucho`. Testy bez sieci i poczty: `python3 testy/test_wysylka.py`.
+
+## Podpis agenta i konto bota
+
+Agent działa na tokenach właściciela (Linear, GitHub), więc jego wpisy wyglądają jak napisane przez człowieka. Dlatego **każdy komentarz automatu zaczyna się od „Agent:”** (Linear i GitHub): prefiks dodaje jedno miejsce w kodzie (`podpis.py`, wołane w `linear_sync.gql` dla komentarzy i w `GitHub.komentarz`), a parsery szkiców i oddań go ignorują. **Docelowo agent ma własne konto bota z osobnymi uprawnieniami** (osobny użytkownik w Linearze i GitHubie, token tylko do potrzebnych repozytoriów i zespołu), żeby autor wpisów był widoczny w historii bez prefiksu i żeby uprawnienia agenta nie pokrywały się z uprawnieniami właściciela.
 
 ## Notatka przed spotkaniem
 

@@ -21,6 +21,7 @@ import agent_scal
 import linear_sync
 import zasady
 
+ROOT_T = Path(__file__).parent.parent
 Z = zasady.wczytaj_zasady()
 A = Z["agent_wykonawczy"]
 TERAZ = datetime(2026, 10, 14, 12, 0, tzinfo=timezone.utc)
@@ -959,6 +960,72 @@ class TestCodeRabbitBezRecenzji(unittest.TestCase):
         s = srodowisko_scalania(recenzje=[], komentarze=[podsumowanie_cr("> ## Review skipped")], statusy=STATUS_CR)
         self.assertEqual(agent_scal.uruchom_scalanie(s)[0]["akcja"], "czekaj")
         self.assertEqual(s.github.scalone, [])
+
+
+# ── podpis „Agent:” ────────────────────────────────────────────────────────────
+
+class TestPodpisAgenta(unittest.TestCase):
+
+    def test_prefiks_raz_i_zamiana_agent_na_agent_dwukropek(self):
+        from podpis import bez_podpisu, podpisz_agenta
+        self.assertEqual(podpisz_agenta("Wysłano 2026-10-14"), "Agent: Wysłano 2026-10-14")
+        self.assertEqual(podpisz_agenta("Agent: gotowe"), "Agent: gotowe")
+        self.assertEqual(podpisz_agenta("Agent przejął"), "Agent: przejął")
+        self.assertEqual(podpisz_agenta("**Agent oddał zgłoszenie**\n\nx"), "Agent: **Agent oddał zgłoszenie**\n\nx")
+        self.assertEqual(podpisz_agenta(podpisz_agenta("x")), "Agent: x")
+        self.assertEqual(bez_podpisu("Agent: **Szkic maila do klienta**"), "**Szkic maila do klienta**")
+        self.assertEqual(bez_podpisu("bez prefiksu"), "bez prefiksu")
+
+    def test_kazdy_komentarz_w_linearze_dostaje_prefiks(self):
+        wyslane = []
+
+        class Odp:
+            def __enter__(self): return self
+            def __exit__(self, *a): return False
+            def read(self): return b'{"data": {}}'
+        import urllib.request as ur
+        oryginal = linear_sync.urllib.request.urlopen
+        linear_sync.urllib.request.urlopen = lambda req, **kw: (wyslane.append(json.loads(req.data.decode("utf-8"))), Odp())[1]
+        try:
+            linear_sync.gql("k", linear_sync.M_ADD_COMMENT, {"issueId": "i", "body": "Ponownie wspomniane w rozmowie"})
+            linear_sync.gql("k", linear_sync.M_UPDATE_ISSUE, {"id": "i", "input": {"stateId": "s"}})
+        finally:
+            linear_sync.urllib.request.urlopen = oryginal
+        self.assertEqual(wyslane[0]["variables"]["body"], "Agent: Ponownie wspomniane w rozmowie")
+        self.assertNotIn("body", wyslane[1]["variables"], "inne zapytania bez zmian")
+
+    def test_kazdy_komentarz_na_githubie_dostaje_prefiks(self):
+        gh = ag.GitHub("token-testowy-123", "x/y")
+        wyslane = []
+        gh._zapytaj = lambda metoda, sciezka, dane=None, params=None: wyslane.append(dane)
+        gh.komentarz(7, "Przyczyna oddania zniknęła")
+        self.assertEqual(wyslane[0]["body"], "Agent: Przyczyna oddania zniknęła")
+
+    def test_komentarze_z_prefiksem_sa_nadal_rozpoznawane(self):
+        import wyslij as wy
+        import szkice as sz
+        k = {"id": "c", "createdAt": "2026-10-14T07:30:00Z", "body": "Agent: " + wy.format_komentarza_szkicu("Kasia", "T", "Dzień dobry, Kasiu.\nMarek", ["RIN-1"])}
+        self.assertEqual(wy.parsuj_szkic([k])["do"], "Kasia")
+        z = {"id": "c2", "createdAt": "2026-10-14T07:31:00Z", "body": "Agent: " + wy.format_komentarza_zbiorczego("RIN-1")}
+        self.assertEqual(wy.parsuj_szkic([z]), {"zbiorczy": "RIN-1"})
+        self.assertEqual(agent_scal.stan_oddania([{"body": "Agent: oddaje ten PR człowiekowi (x). Automatyczne scalenie wstrzymane."}]), "oddane")
+        self.assertEqual(agent_scal.stan_oddania([{"body": "Agent oddaje ten PR człowiekowi (x)."}]), "oddane", "starsze komentarze")
+        self.assertEqual(agent_scal.stan_oddania([{"body": "Agent: Przyczyna oddania zniknęła, agent wznawia scalanie. " + agent_scal.ZNACZNIK_WZNOWIENIA}]), "wznowione")
+
+    def test_stare_szkice_z_prefiksem_sa_wycofywane(self):
+        import szkice as sz
+        import test_wysylka as tw
+        import wyslij as wy
+        z = tw.zg(41, labels=("Konfiguracja",))
+        s = tw.Srodowisko([z], {"RIN-41": [{"id": "c", "createdAt": "2026-10-14T07:30:00Z", "body": "Agent: " + wy.format_komentarza_szkicu("Kasia Malinowska", "T", tw.DOBRA, ["RIN-41"])}]})
+        self.assertEqual(sz.wycofaj_szkice(s, s.linear.zgloszenia["RIN-41"], "test"), 1)
+
+    def test_komentarze_agenta_w_kodzie_nie_zakladaja_innego_poczatku(self):
+        """Aplikacja prefiksu jest w jednym miejscu (gql i GitHub.komentarz), a nie w każdym wywołaniu."""
+        import re as _re
+        for plik in ("agent.py", "agent_scal.py", "szkice.py", "wyslij.py", "notatka_spotkania.py"):
+            tekst = (ROOT_T / plik).read_text(encoding="utf-8")
+            self.assertNotIn("podpisz_agenta(", tekst, plik)
 
 
 # ── workflow ──────────────────────────────────────────────────────────────────

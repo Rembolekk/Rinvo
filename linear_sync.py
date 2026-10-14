@@ -24,6 +24,7 @@ from maile import czy_mail, kontakt_ma_prawo_decyzji, wczytaj_meta_maila, znajdz
 import notatki
 import zasady
 from sekrety import czysc
+from podpis import podpisz_agenta
 
 
 def _date_from_path(path_str):
@@ -120,6 +121,8 @@ _SSL_CTX = _ssl_context()
 # ── HTTP / GraphQL ────────────────────────────────────────────────────────────
 
 def gql(api_key, query, variables=None, retries=3, delay=2):
+    if query == M_ADD_COMMENT and variables and "body" in variables:      # każdy komentarz automatu: „Agent: …”
+        variables = {**variables, "body": podpisz_agenta(variables["body"])}
     payload = json.dumps({"query": query, "variables": variables or {}}).encode("utf-8")
     req = urllib.request.Request(
         LINEAR_API, data=payload,

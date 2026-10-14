@@ -12,6 +12,8 @@ import urllib.error
 import urllib.parse
 import urllib.request
 
+from podpis import podpisz_agenta
+
 API = "https://api.github.com"
 BOTY_CODERABBIT = {"coderabbitai[bot]", "coderabbitai"}
 
@@ -95,7 +97,7 @@ class GitHub:
         return self._lista(f"/issues/{numer}/comments")
 
     def komentarz(self, numer, tekst):
-        return self._zapytaj("POST", f"/issues/{numer}/comments", {"body": tekst})
+        return self._zapytaj("POST", f"/issues/{numer}/comments", {"body": podpisz_agenta(tekst)})
 
     def scal_pr(self, numer, tytul, opis):
         return self._zapytaj("PUT", f"/pulls/{numer}/merge",

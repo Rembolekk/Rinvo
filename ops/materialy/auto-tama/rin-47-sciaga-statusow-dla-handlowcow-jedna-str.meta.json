@@ -1,9 +1,7 @@
 {
-  "skrot": "bc861bac2ba3b014608e",
+  "skrot": "8ffabfa88a463cd9949f",
   "identyfikator": "RIN-47",
   "rodzaj": "sciaga",
   "tytul": "Ściąga statusów leadów dla handlowców",
-  "luki": [
-    "Znaczenie statusu „niezweryfikowany” (w materiale podano tylko jego nazwę)"
-  ]
+  "luki": []
 }

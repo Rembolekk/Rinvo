@@ -25,6 +25,7 @@ import agent as ag
 import materialy as mat
 import wyslij as wy
 import zasady
+from podpis import bez_podpisu
 from maile import slack_bezpiecznie
 
 
@@ -291,6 +292,8 @@ def polacz_czesci(s, czesci, odbiorca, karta, klient):
     return None
 
 
+BRAK_KONTAKTU = ("**Brak szkicu maila: brak kontaktu w karcie klienta.** Karta nie ma potwierdzonego kontaktu z adresem e-mail, "
+                 "więc nie ma do kogo napisać. Uzupełnij kontakt w karcie, a szkic powstanie przy następnym przebiegu.")
 ZASTAPIONY = "_Szkic wycofany: {powod}_"
 
 
@@ -299,7 +302,7 @@ def wycofaj_szkice(s, zg, powod):
     nieaktualna treść, którą ktoś mógłby wysłać. Zwraca liczbę wycofanych komentarzy."""
     n = 0
     for k in s.linear.komentarze(zg):
-        body = (k.get("body") or "").lstrip()
+        body = bez_podpisu((k.get("body") or "").lstrip()).lstrip()
         if body.startswith(wy.NAGLOWEK_SZKICU) or body.startswith(wy.NAGLOWEK_ZBIORCZEGO):
             s.linear.edytuj_komentarz(k["id"], ZASTAPIONY.format(powod=powod))
             n += 1
@@ -349,9 +352,8 @@ def obsluz_grupe(s, klient, grupa):
         for z in grupa:
             if E["szkic"] not in z.get("labels", []):
                 s.linear.dodaj_etykiete(z, E["weryfikacja"])
-        s.linear.komentarz(grupa[0], "**Brak szkicu maila:** karta klienta nie ma potwierdzonego kontaktu z adresem e-mail, "
-                                     "więc nie ma do kogo napisać. Uzupełnij kontakt w karcie.")
-        return [{"status": "brak_kontaktu", "zgloszenia": [z["identifier"] for z in grupa]}]
+        s.linear.komentarz(grupa[0], BRAK_KONTAKTU)
+        return [{"status": "brak_kontaktu", "powod": "brak kontaktu w karcie", "zgloszenia": [z["identifier"] for z in grupa]}]
 
     czesci, wyniki_materialow = [], []
     for zg in grupa:

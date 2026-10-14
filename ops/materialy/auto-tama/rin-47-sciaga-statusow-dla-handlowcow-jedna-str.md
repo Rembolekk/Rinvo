@@ -1,36 +1,40 @@
 # Ściąga statusów leadów dla handlowców
 
-## Skąd biorą się statusy
+Krótki przewodnik po statusach, które handlowcy zobaczą przy leadach po rozmowie asystenta głosowego. Do przejrzenia przed szkoleniem we wtorek 27.10 o 10:00.
 
-- Agent dzwoni do osoby, która zostawiła zgłoszenie na stronie albo na Facebooku.
-- **Nie sprzedaje.** Potwierdza, że zgłoszenie jest aktualne, uzupełnia telefon, model i salon, i kończy rozmowę.
+## Skąd bierze się status
+
+- Asystent dzwoni do osoby, która zostawiła zgłoszenie na stronie albo na Facebooku.
+- **Nie sprzedaje.** Potwierdza, że zgłoszenie jest aktualne, uzupełnia telefon, model i salon, po czym kończy rozmowę.
 - **Pełna rozmowa** to taka, w której potwierdzono telefon, model i salon.
-- Po rozmowie handlowiec dostaje mail z transkrypcją.
+- Jeśli ktoś mówi „już kupiłem” albo „rozmyśliłem się”, asystent dziękuje i się rozłącza. Nie proponuje innych aut.
 
 ## Statusy
 
-### Zainteresowany
+## Zainteresowany
 
-- Osoba po rozmowie jest nadal zainteresowana. To lead dla handlowca.
-- Przykład z praktyki: lead z lipca, rozmowa z agentem w piątek, zakup Peugeota 208 w sobotę.
+- Osoba po rozmowie z asystentem nadal chce kontaktu w sprawie auta.
+- To właśnie do tych osób ma zadzwonić doradca.
+- Nie należą tu odpowiedzi „kupiłem gdzie indziej” i „już nieaktualne”.
+- **Przykład z praktyki:** zgłoszenie leżało od lipca, asystent zadzwonił w piątek, a w sobotę klient przyjechał i kupił Peugeota 208.
 
-### Oddzwonić
+## Oddzwonić
 
-- Klient prosi o kontakt w innym terminie, np. „oddzwońcie w przyszłym tygodniu, jestem na urlopie”.
-- **To lead, nie odmowa.** Agent zapytał, kiedy zadzwonić, i to wystarczy.
-- Doradca dzwoni, gdy klient wróci.
-- Nie traktuj takiej osoby jako niezainteresowanej tylko dlatego, że nie umówiła się na najbliższy dzień.
+- Osoba nie odmawia, tylko prosi o kontakt w innym terminie.
+- **Przykład z praktyki:** „oddzwońcie w przyszłym tygodniu, jestem na urlopie”. Asystent zapytał, kiedy zadzwonić, i to wystarczy.
+- **To jest lead, nie odmowa.** Doradca ma zadzwonić, gdy ta osoba wróci.
+- Nie traktuj takiego leada jak „niezainteresowany” tylko dlatego, że klient nie umówił się na najbliższy dzień.
 
-### Niezweryfikowany
+## Niezweryfikowany *(założenie demo)*
 
-- [do potwierdzenia: co oznacza status „niezweryfikowany”]
+- Asystent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych (założenie demo).
+- Dane takiego leada nie są potwierdzone, więc nie traktuj go jak leada z pełnej rozmowy.
 
-## Osoby niezainteresowane
+## Do zapamiętania
 
-- Gdy ktoś mówi „kupiłem gdzie indziej” albo „już nieaktualne”, nie jest zainteresowany.
-- Agent wtedy dziękuje i kończy rozmowę. Nie proponuje innych aut, w tym używanych.
+- Status mówi, co wynikło z rozmowy z asystentem. Dalszy kontakt z klientem należy do doradcy.
+- „Oddzwonić” oznacza, że klient prosi o kontakt w innym terminie. Nie jest to odmowa.
 
-## Co warto pamiętać
+## Założenia demo
 
-- Samo odebranie telefonu to jeszcze nie lead. Liczy się to, czy rozmowa była pełna i czy klient jest zainteresowany.
-- Mail z transkrypcją czytaj do końca: temat sprawy może być na samym dole.
+- Status „niezweryfikowany”: agent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych (założenie demo)

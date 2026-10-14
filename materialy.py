@@ -79,10 +79,19 @@ def _odczytaj(sciezka, limit=24000):
     return p.read_text(encoding="utf-8")[:limit] if p.exists() else ""
 
 
-def fakty_materialu(zg, klient, karta, zrodla):
+def zalozenia_demo(karta, klucz):
+    """Założenia demo z karty klienta dotyczące tej sprawy (albo wszystkich): ustalone przez właściciela, nie z rozmów."""
+    return [z for z in (karta or {}).get("zalozenia_demo", []) if z.get("dotyczy") in (None, klucz)]
+
+
+def fakty_materialu(zg, klient, karta, zrodla, klucz=None):
     sekcje = ag.rozbij_opis(zg.get("description"))
     czesci = [f"ZGŁOSZENIE: {ag.tytul_bez_prefiksu(zg.get('title'))}", f"Cel: {sekcje.get('Cel', '')}",
               f"Kontekst:\n{sekcje.get('Kontekst', '')}", f"Kryteria:\n{sekcje.get('Kryteria akceptacji', '')}"]
+    zal = zalozenia_demo(karta, klucz)
+    if zal:
+        czesci.append("ZAŁOŻENIA DEMO (ustalone przez właściciela, nie z rozmów; użyj ich i oznacz w materiale jako „założenie demo”):\n"
+                      + "\n".join(f"- {z['temat']}: {z['tresc']}" for z in zal))
     for z in zrodla:
         czesci.append(f"ŹRÓDŁO ({Path(z).name}):\n{_odczytaj(z)}")
     return "\n\n".join(czesci)
@@ -101,6 +110,12 @@ def buduj_prompt(rodzaj, fakty, Z):
         "- Wykorzystaj wszystko, co fakty mówią o danym elemencie (także pośrednio, z przykładów i liczb z rozmów), ale nie dopowiadaj.\n"
         "- Prosto i zwięźle, dla odbiorcy, który nie zna naszych narzędzi. Bez identyfikatorów zgłoszeń, nazw narzędzi "
         "wewnętrznych, słowa „zakaz”, informacji o innych klientach, adresów e-mail.\n"
+        "- Luka dotyczy wyłącznie sytuacji, gdy z faktów (także z przykładów, liczb i wypowiedzi w rozmowach) w ogóle nie da się "
+        "powiedzieć, co dany element oznacza. Jeśli da się go opisać praktycznie, opisz i NIE dodawaj luki o „formalnej definicji”, "
+        "„kryteriach nadawania” czy „zasadach panelu”.\n"
+        "- Opisuj TYLKO elementy, o które prosi klient albo które zgłoszenie wymienia (np. statusy wskazane przez klienta). "
+        "Nie dodawaj własnych elementów (dodatkowych statusów, kategorii, kroków), nawet jeśli pojawiają się w rozmowach.\n"
+        "- ZAŁOŻENIA DEMO z materiału traktuj jak ustalone i użyj ich w odpowiednim miejscu, z dopiskiem „(założenie demo)”.\n"
         "- Format: Markdown z nagłówkami (#, ##), listami (- ) i pogrubieniem (**tekst**). Bez tabel i obrazków.\n\n"
         "FAKTY:\n" + fakty + "\n\n"
         'Odpowiedz WYŁĄCZNIE jednym obiektem JSON: {"tytul": "...", "tresc": "<markdown>", "luki": ["czego brakuje", ...]}.')
@@ -184,7 +199,7 @@ def utworz_material(s, zg, klient, karta, rodzaj):
         return {"status": "czeka_na_dane", "rodzaj": rodzaj,
                 "powod": f"brak danych (ops/dane/{klient}/{klucz or '<sprawa>'}.*): wyniki jeszcze nie istnieją"}
     md, pdf, meta = sciezki_materialu(klient, zg, getattr(s, "katalog_materialow", None))
-    fakty = fakty_materialu(zg, klient, karta, zrodla)
+    fakty = fakty_materialu(zg, klient, karta, zrodla, klucz)
     skrot = hashlib.sha256(fakty.encode("utf-8")).hexdigest()[:20]
     if md.exists() and pdf.exists() and meta.exists():
         m = json.loads(meta.read_text(encoding="utf-8"))
@@ -201,7 +216,11 @@ def utworz_material(s, zg, klient, karta, rodzaj):
     if wy.znajdz_placeholder("", pelny, W) or "[do potwierdzenia" in pelny.lower():
         luki = luki or ["materiał zawiera miejsca do potwierdzenia"]
     md.parent.mkdir(parents=True, exist_ok=True)
-    md.write_text(f"# {tytul}\n\n" + re.sub(r"^# .*\n+", "", tresc, count=1) + "\n", encoding="utf-8")
+    tekst_md = f"# {tytul}\n\n" + re.sub(r"^# .*\n+", "", tresc, count=1) + "\n"
+    zal = zalozenia_demo(karta, klucz)
+    if zal:                                           # kod, nie model, gwarantuje widoczne oznaczenie założeń demo
+        tekst_md += "\n## Założenia demo\n\n" + "\n".join(f"- {z['temat']}: {z['tresc']} (założenie demo)" for z in zal) + "\n"
+    md.write_text(tekst_md, encoding="utf-8")
     markdown_do_pdf(tytul, md.read_text(encoding="utf-8"), pdf)
     m = {"skrot": skrot, "identyfikator": zg["identifier"], "rodzaj": rodzaj, "tytul": tytul, "luki": luki}
     meta.write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")

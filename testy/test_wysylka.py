@@ -639,6 +639,17 @@ class TestSzkice(unittest.TestCase):
         self.assertEqual(szkice.uruchom(s)[0]["status"], "brak_kontaktu")
         self.assertEqual(s.claude.prompty, [], "bez kontaktu model nie jest pytany")
 
+    def test_klinika_rin_65_bez_kontaktu_w_karcie_do_weryfikacji_z_powodem(self):
+        z = zg(65, klient="klinika-usmiech", opis=OPIS_RIN65, tytul="Błędne godziny otwarcia Sopot w piątek", labels=("Konfiguracja", "Repo"))
+        s = Srodowisko([z], karta={"klient": "Klinika Uśmiech", "zakazy": [], "kontakty": [], "otwarte_sprawy": {}})
+        w = szkice.uruchom(s)[0]
+        self.assertEqual((w["status"], w["powod"]), ("brak_kontaktu", "brak kontaktu w karcie"))
+        self.assertIn("Do weryfikacji", s.linear.zgloszenia["RIN-65"]["labels"])
+        self.assertNotIn("Szkic gotowy", s.linear.zgloszenia["RIN-65"]["labels"])
+        komentarz = next(k[2] for k in s.linear.zdarzenia if k[0] == "komentarz")
+        self.assertIn("brak kontaktu w karcie", komentarz)
+        self.assertEqual(s.claude.prompty, [], "model nie jest pytany")
+
     def test_odbiorca_to_kontakt_glowny_z_karty(self):
         self.assertEqual(szkice.wybierz_odbiorce(KARTA)["imie"], "Kasia Malinowska")
 
@@ -1047,6 +1058,39 @@ class TestMaterialy(unittest.TestCase):
         nowe = s.claude.prompty[liczba:]
         self.assertFalse(any("Przygotuj dla klienta materiał" in p for p in nowe))
 
+    def test_zalozenie_demo_trafia_do_faktow_i_jest_oznaczone_w_materiale(self):
+        karta = {**KARTA_SCIAGA, "zalozenia_demo": [{"dotyczy": "sciaga-statusow", "temat": "Status „niezweryfikowany”",
+                                                    "tresc": "agent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych"},
+                                                   {"dotyczy": "inna-sprawa", "temat": "Obce", "tresc": "nie dla tej sprawy"}]}
+        karta["otwarte_sprawy"] = {"sciaga-statusow": {"identifier": "RIN-47", "zrodla": []}}
+        s = Srodowisko([self._z()], karta=karta, claude=claude_material_i_mail(MATERIAL_OK))
+        self.assertEqual(szkice.uruchom(s)[0]["status"], "szkic")
+        p = s.claude.prompty[0]
+        self.assertIn("ZAŁOŻENIA DEMO", p)
+        self.assertIn("agent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych", p)
+        self.assertNotIn("nie dla tej sprawy", p)
+        md, _, _ = mat.sciezki_materialu("auto-tama", self._z(), s.katalog_materialow)
+        tekst = md.read_text(encoding="utf-8")
+        self.assertIn("## Założenia demo", tekst)
+        self.assertIn("(założenie demo)", tekst)
+        self.assertNotIn("nie dla tej sprawy", tekst)
+
+    def test_zmiana_zalozen_odswieza_material(self):
+        karta = {**KARTA_SCIAGA, "otwarte_sprawy": {"sciaga-statusow": {"identifier": "RIN-47", "zrodla": []}}}
+        s = Srodowisko([self._z()], karta=karta, claude=claude_material_i_mail(MATERIAL_OK))
+        szkice.uruchom(s)
+        z = s.linear.zgloszenia["RIN-47"]
+        z["labels"] = [l for l in z["labels"] if l != "Szkic gotowy"]
+        s.karta = {**karta, "zalozenia_demo": [{"dotyczy": "sciaga-statusow", "temat": "Nowy", "tresc": "nowa definicja"}]}
+        szkice.uruchom(s)
+        self.assertEqual(sum("Przygotuj dla klienta materiał" in p for p in s.claude.prompty), 2, "inne fakty = nowy materiał")
+
+    def test_karta_auto_tama_ma_zalozenie_niezweryfikowany_oznaczone_jako_demo(self):
+        k = _json.loads((Path(__file__).parent.parent / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        z = next(x for x in k["zalozenia_demo"] if "niezweryfikowany" in x["temat"])
+        self.assertEqual(z["tresc"], "agent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych")
+        self.assertEqual(z["dotyczy"], "sciga-statusow")
+
     def test_stary_szkic_ze_sciaga_bez_materialu_jest_wycofany_i_pisany_od_nowa(self):
         """RIN-47: szkic powstał, zanim istniał materiał, i obiecywał ściągę, której nie było."""
         z = self._z(labels=("Zadanie", "Szkic gotowy"))
@@ -1078,6 +1122,7 @@ class TestMaterialy(unittest.TestCase):
         p = s.claude.prompty[0]
         self.assertIn("Trzymaj się tematu zgłoszenia", p)
         self.assertIn("NIE dodawaj sekcji", p)
+        self.assertIn("Opisuj TYLKO elementy, o które prosi klient", p)
 
     def test_zestawienie_czeka_na_dane_bez_materialu_i_bez_szkicu(self):
         z = zg(73, tytul="W piątek wysłać Kasi zestawienie wyników testu wstępu", stan="Todo", labels=("Zadanie", "Decyzja człowieka"),

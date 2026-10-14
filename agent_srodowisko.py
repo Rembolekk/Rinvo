@@ -20,6 +20,7 @@ from pathlib import Path
 import linear_sync
 import zasady
 from maile import slack_bezpiecznie
+from podpis import podpisz_agenta
 
 TAJNE_DLA_MODELU = ("LINEAR_API_KEY", "SLACK_WEBHOOK_URL", "GMAIL_ADDRESS", "GMAIL_APP_PASSWORD", "AGENT_GITHUB_TOKEN")
 
@@ -118,7 +119,7 @@ class LinearAgent:
 
     def edytuj_komentarz(self, komentarz_id, tresc):
         linear_sync.gql(self.api_key, "mutation($id: String!, $input: CommentUpdateInput!) { commentUpdate(id: $id, input: $input) { success } }",
-                        {"id": komentarz_id, "input": {"body": tresc}})
+                        {"id": komentarz_id, "input": {"body": podpisz_agenta(tresc)}})
 
     def komentarze(self, zg):
         q = 'query { issue(id: "%s") { comments(first: 100) { nodes { id body createdAt } } } }' % zg["id"]
