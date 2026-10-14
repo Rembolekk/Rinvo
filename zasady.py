@@ -205,3 +205,20 @@ def etykiety_pozycji(item, zasady, karta=None, wielu=False):
 
 def powody_tekst(przyp):
     return [p["powod"] for p in przyp.get("powody", [])]
+
+
+def repo_pozycji(item, zasady):
+    """Repo pozycji po zastosowaniu mapowania (repo_mapowanie): np. rinvo-ops + zmiana_konfiguracji → rinvo-app.
+    Zwraca nazwę repo albo None (brak / nieznane)."""
+    repo = item.get("repo")
+    for r in zasady.get("repo_mapowanie", {}).get("reguly", []):
+        if repo == r["z"] and item.get("typ") in r["typy"]:
+            repo = r["na"]
+            break
+    return repo if repo in zasady.get("repo_etykiety", {}) else None
+
+
+def etykieta_repo(item, zasady):
+    """Etykieta Lineara „repo: …” dla pozycji (albo None)."""
+    repo = repo_pozycji(item, zasady)
+    return zasady["repo_etykiety"][repo] if repo else None

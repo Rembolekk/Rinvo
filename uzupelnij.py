@@ -16,7 +16,7 @@ import sys
 from pathlib import Path
 
 DOZWOLONE = ("cel", "kryteria_akceptacji", "jak_sprawdzic", "repo", "szkic_klienta", "zadanie_przygotowawcze")
-REPO = {"rinvo", "rinvo-ops", "brak"}
+REPO = {"rinvo-app", "rinvo", "rinvo-ops", "brak"}
 
 
 def _lista_tekstow(v):

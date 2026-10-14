@@ -46,6 +46,7 @@ REQUIRED_LABELS = [
     "Czeka na klienta", "Ryzyko", "Dla agenta", "Do weryfikacji",
     "Zablokowane przez zakaz", "Powtarzające się ryzyko", "Wielu klientów",
     "Decyzja człowieka",
+    "repo: rinvo-app", "repo: rinvo", "repo: rinvo-ops",
 ]
 
 LABEL_COLORS = {
@@ -62,6 +63,9 @@ LABEL_COLORS = {
     "Powtarzające się ryzyko": "#991b1b",
     "Wielu klientów": "#0891b2",
     "Decyzja człowieka": "#2563eb",
+    "repo: rinvo-app": "#0d9488",
+    "repo: rinvo": "#475569",
+    "repo: rinvo-ops": "#64748b",
 }
 
 TYP_DO_ETYKIETY = {
@@ -444,7 +448,7 @@ def build_description(item, source_path, karta=None, przyp=None, Z=None):
         parts.append("## Kryteria akceptacji\n\n_brak: uzupełnij, zanim zadanie trafi do agenta_")
     if item.get("jak_sprawdzic"):
         parts.append(f"## Jak sprawdzić\n\n{item['jak_sprawdzic']}")
-    repo = item.get("repo")
+    repo = zasady.repo_pozycji(item, Z) or item.get("repo")
     if repo:
         parts.append(f"## Repo\n\n`{repo}`: {Z.get('repo', {}).get(repo, '')}".rstrip(": "))
 
@@ -1037,6 +1041,9 @@ def main():
         # Etykiety i przypisanie wg ops/zasady.json (domyślnie agent, człowiek tylko wg reguł)
         wielu = sekcja == 3 and zasady.wielu_klientow(prosby, Z, item, klient)
         label_names = zasady.etykiety_pozycji(item, Z, karta, wielu)
+        etykieta_repo = zasady.etykieta_repo(item, Z)
+        if etykieta_repo:
+            label_names.append(etykieta_repo)          # repo, w którym agent ma wykonać zgłoszenie
         przyp = zasady.przypisz(item, Z, karta, wielu)
         priority = None
         if sekcja == 1:

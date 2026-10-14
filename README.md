@@ -77,6 +77,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_zasady.py` | zasady AI-first, opis zgłoszenia, przeliczanie, podsumowanie, strefa czasowa (89 testów) |
 | `testy/test_daty.py` | daty względne liczone przez kod: parser, pierwszeństwo kodu nad modelem, „wniosek”, poprawa tekstów (37 testów) |
 | `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
+| `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -295,6 +296,26 @@ Jedna wiadomość na Slacku (Block Kit) o **8:00 czasu polskiego** (workflow `.g
 
 - **Strefa czasowa:** cron GitHuba działa w UTC, więc workflow odpala skrypt o 06:00 i 07:00 UTC, a skrypt sam sprawdza czas w `Europe/Warsaw` (lato UTC+2, zima UTC+1) i wysyła raz dziennie w oknie 8:00–12:00 (znosi opóźnienia crona i zmianę czasu).
 - **Przypomnienia:** gdy termin sprawy czekającej minął, limit przypomnień z rozmowy nie jest wyczerpany (brak limitu = `przypomnienia.domyslny_limit`) i klient nie prosił o brak przypomnień (limit 0 albo zakaz „nie przypominaj" w karcie), podsumowanie **przygotowuje szkic** w komentarzu zgłoszenia i podaje go na Slacku. **Nigdy nie wysyła nic do klienta.** Każdy szkic zwiększa `wykorzystane` w karcie (`otwarte_sprawy.<klucz>.przypomnienie`), więc limit nie zostanie przekroczony.
+
+## Agent wykonawczy
+
+Agent sam wykonuje zgłoszenia z Lineara w osobnym repozytorium [Rinvo-app](https://github.com/Rembolekk/Rinvo-app) (symulacja produktu: konfiguracja agenta głosowego klienta w `config/` i baza wiedzy w `wiedza/`). Człowiek wchodzi tylko w wyjątkach.
+
+**Które zgłoszenia.** Etykiety `Dla agenta` + `repo: rinvo-app`, stan Todo. Etykietę `repo: …` dostaje każde nowe zgłoszenie (z pola `repo` i mapowania w `ops/zasady.json`: zmiany konfiguracji i bazy wiedzy trafiają do `rinvo-app`); `python3 przelicz.py` nadaje ją istniejącym. Do 3 zgłoszeń na przebieg.
+
+**`agent.py`** (dla każdego zgłoszenia):
+1. ponownie sprawdza zakazy i decyzje zastrzeżone z AKTUALNEJ karty klienta; konflikt: etykieta `Zablokowane przez zakaz`, komentarz, pominięcie (gdy sprawdzenia nie da się wykonać, agent niczego nie rusza),
+2. stan In Progress, komentarz „Agent przejął”,
+3. klonuje Rinvo-app, gałąź `rin-41-…` (Linear sam łączy PR ze zgłoszeniem),
+4. `claude -p` z celem, kryteriami, „jak sprawdzić” i „czego nie ruszać”; ma tylko Read/Write/Edit i może zmieniać wyłącznie `config/` i `wiedza/` (kod cofa wszystko inne, w tym `.github/`, `tests/`, `zakazy/`, i szuka sekretów w diffie),
+5. testy; po porażce jedna poprawka i testy jeszcze raz; dalej czerwone: bez PR, komentarz z powodem, etykieta `Do weryfikacji`, stan z powrotem Todo,
+6. PR (tytuł ze zgłoszenia, `Fixes RIN-xx`, kryteria, cytat klienta, czego nie ruszać) i link w komentarzu w Linearze.
+
+**`agent_scal.py`** scala PR (squash) tylko gdy JEDNOCZEŚNIE: testy zielone, CodeRabbit skończył recenzję ostatniego commita bez uwag, zmiana dotyka tylko `config/` lub `wiedza/`, zgłoszenie ma etykietę `Konfiguracja`. Uwagi CodeRabbit agent uwzględnia raz; dalej uwagi albo zmiana poza ścieżkami: etykieta `Decyzja człowieka` z powodem „przegląd kodu”. Po scaleniu zgłoszenie dostaje Done.
+
+**Slack** tylko na koniec: „Agent naprawił: <tytuł> (link do PR)” albo „Agent oddał: <tytuł>, powód”.
+
+**Workflow** `Agent wykonawczy` (`agent.yml`): ręcznie (zawsze), co 15 minut i po każdym udanym przetworzeniu rozmowy lub maila (te dwa dopiero po ustawieniu zmiennej repozytorium `AGENT_WLACZONY=true`). Sekret `AGENT_GITHUB_TOKEN` (dostęp tylko do Rinvo-app) istnieje wyłącznie w sekretach GitHuba; agent nie działa lokalnie. Testy logiki bez sieci: `python3 testy/test_agent.py`.
 
 ## Testy automatyczne
 

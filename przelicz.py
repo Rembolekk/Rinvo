@@ -65,12 +65,14 @@ def licz(klient, karta, Z, prosby, najnowsze, stan_linear):
         nowe_et = zasady.etykiety_pozycji(eff, Z, karta, wielu)
         przyp = zasady.przypisz(eff, Z, karta, wielu)
         routing = {Z["etykiety"][r] for r in ROUTING}
+        repo_wszystkie = set(Z["repo_etykiety"].values())
+        repo_et = zasady.etykieta_repo(eff, Z)
         wiersze.append({
             "klucz": klucz, "wpis": wpis, "item": eff, "zrodlo": zrodlo, "przyp": przyp, "wielu": wielu,
             "identifier": wpis.get("identifier"), "tytul": item.get("tytul", ""),
             "stare": stare_przypisanie(obecne, Z), "nowe": nowe_przypisanie_nazwa(przyp),
-            "dodaj": sorted((set(nowe_et) & routing) - obecne),
-            "usun": sorted((obecne & routing) - set(nowe_et)),
+            "dodaj": sorted(((set(nowe_et) & routing) - obecne) | ({repo_et} - obecne if repo_et else set())),
+            "usun": sorted(((obecne & routing) - set(nowe_et)) | ((obecne & repo_wszystkie) - {repo_et})),
             "powody": zasady.powody_tekst(przyp),
         })
     return wiersze

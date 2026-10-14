@@ -66,7 +66,7 @@ Firma pracuje AI-first: agenci (Claude, Cursor) robią większość zadań z Lin
 - "cel": jedno zdanie, co ma być osiągnięte (nie przepisuj tytułu),
 - "kryteria_akceptacji": lista 2–5 sprawdzalnych punktów (każdy da się odhaczyć: „agent podaje adres Toruńska 120”, nie „adres jest dobry”). Nie wymyślaj kryteriów, których nie da się oprzeć na rozmowie. Jeśli nie umiesz napisać żadnego sprawdzalnego kryterium, zostaw pustą listę: pozycja trafi do weryfikacji, a nie do agenta,
 - "jak_sprawdzic": krótko, jak potwierdzić wykonanie (test, ekran, rozmowa testowa),
-- "repo": „rinvo” (kod aplikacji), „rinvo-ops” (wiedza, dokumenty, konfiguracja klienta) albo „brak”,
+- "repo": „rinvo-app” (konfiguracja agenta głosowego klienta i baza wiedzy: pliki config/ i wiedza/ w repo Rinvo-app; tu trafiają poprawki godzin, adresów, limitów, tekstów wstępu), „rinvo” (kod aplikacji), „rinvo-ops” (dokumenty, notatki i wiedza o kliencie w repo Rinvo-ops) albo „brak”,
 - "szkic_klienta" (tylko gdy rezultat trafia do klienta: mail, przypomnienie, oferta, zaproszenie, zestawienie): gotowy szkic wiadomości na podstawie tego, co faktycznie ustalono. Człowiek tylko go wyśle; niczego nie obiecuj ponad rozmowę.
 Dla pozycji z sekcji 5 (ryzyka) możesz dodać "zadanie_przygotowawcze": {"cel", "kryteria_akceptacji", "jak_sprawdzic", "repo"} (np. notatka z argumentami przed spotkaniem); bez tego kod użyje szablonu z ops/zasady.json.
 

@@ -120,8 +120,9 @@
     "_opis": "Samo ryzyko ma etykietę Ryzyko (dla ludzi). Agent dostaje jedną notatkę na zaplanowane spotkanie z klientem (a gdy spotkania nie ma, jedną na klienta), zawierającą wszystkie ryzyka i otwarte tematy tego klienta (patrz notatki)."
   },
   "repo": {
+    "rinvo-app": "konfiguracja agenta głosowego klienta i baza wiedzy (config/, wiedza/ w repo Rinvo-app)",
     "rinvo": "kod aplikacji",
-    "rinvo-ops": "wiedza, dokumenty i konfiguracja klienta",
+    "rinvo-ops": "dokumenty, notatki i wiedza o kliencie (to repo)",
     "brak": "zadanie nie wymaga zmian w repozytorium"
   },
   "przypomnienia": {
@@ -179,5 +180,66 @@
       "szkolen"
     ],
     "_pomijaj_spotkania_slowa": "Spotkania, w których tytule albo opisie jest takie słowo (np. szkolenie dla handlowców), nie dostają osobnej notatki: to nie rozmowa o ryzykach z klientem."
+  },
+  "repo_etykiety": {
+    "rinvo-app": "repo: rinvo-app",
+    "rinvo": "repo: rinvo",
+    "rinvo-ops": "repo: rinvo-ops"
+  },
+  "repo_mapowanie": {
+    "_opis": "Starsze wyniki oznaczały zmiany konfiguracji i bazy wiedzy agenta głosowego jako rinvo-ops. Taka pozycja trafia do repo rinvo-app.",
+    "reguly": [
+      {
+        "z": "rinvo-ops",
+        "typy": [
+          "zmiana_konfiguracji",
+          "poprawka_bazy_wiedzy",
+          "bug"
+        ],
+        "na": "rinvo-app"
+      }
+    ]
+  },
+  "agent_wykonawczy": {
+    "_opis": "Agent wykonawczy (agent.py, agent_scal.py) sam wykonuje zgłoszenia Dla agenta z etykietą repo: rinvo-app i otwiera PR w Rinvo-app. Człowiek tylko w wyjątkach.",
+    "repo_github": "Rembolekk/Rinvo-app",
+    "etykieta_repo": "repo: rinvo-app",
+    "max_na_przebieg": 3,
+    "dozwolone_sciezki": [
+      "config/",
+      "wiedza/"
+    ],
+    "zabronione_sciezki": [
+      ".github/",
+      "tests/",
+      "zakazy/"
+    ],
+    "max_plikow": 6,
+    "max_napraw_testow": 1,
+    "max_poprawek_coderabbit": 1,
+    "czekaj_na_coderabbit_godzin": 6,
+    "typy_scalane_etykiety": [
+      "Konfiguracja"
+    ],
+    "etykiety_pomijane": [
+      "Zablokowane przez zakaz",
+      "Do weryfikacji",
+      "Decyzja człowieka",
+      "Czeka na klienta"
+    ],
+    "powod_przegladu": "przegląd kodu",
+    "komentarz_przejecia": "Agent przejął",
+    "komenda_testow": [
+      "python3",
+      "-m",
+      "unittest",
+      "discover",
+      "-s",
+      "tests"
+    ],
+    "autor_git": {
+      "imie": "Rinvo Agent",
+      "email": "agent@rinvo.invalid"
+    }
   }
 }

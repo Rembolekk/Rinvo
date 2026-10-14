@@ -1,0 +1,93 @@
+name: Agent wykonawczy
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  # Zaraz po udanym przetworzeniu rozmowy albo maila: nowe zgłoszenia Dla agenta ruszają bez czekania na cron.
+  workflow_run:
+    workflows: ["Przetwarzanie rozmów", "Sprawdzanie maili"]
+    types: [completed]
+  workflow_dispatch:
+
+# Ta sama grupa co przetwarzanie: jeden przebieg naraz (agent czyta karty klientów).
+concurrency:
+  group: przetworz-rozmowy
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  agent:
+    # Cron i uruchomienie po przetwarzaniu ruszają dopiero po ustawieniu zmiennej repozytorium AGENT_WLACZONY=true
+    # (Settings → Secrets and variables → Actions → Variables). Ręczne uruchomienie działa zawsze.
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (vars.AGENT_WLACZONY == 'true' &&
+       (github.event_name == 'schedule' ||
+        (github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success')))
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      # PyYAML potrzebują testy sklonowanego repo Rinvo-app.
+      - name: Zależności
+        run: pip install certifi pyyaml
+
+      - name: Node.js (dla Claude Code)
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Claude Code
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Diagnostyka Claude
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: |
+          set -uo pipefail
+          MODEL="${RINVO_MODEL:-}"
+          MODEL="${MODEL:-claude-sonnet-5-5}"
+          export CLAUDE_CODE_OAUTH_TOKEN="$(python3 sekrety.py CLAUDE_CODE_OAUTH_TOKEN)"
+          if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN jest pusty lub nieustawiony"
+            exit 1
+          fi
+          set +e
+          ODP=$(claude -p "Odpowiedz jednym słowem: OK" --model "$MODEL" --tools "" < /dev/null 2>&1)
+          RC=$?
+          set -e
+          echo "Model: $MODEL, kod wyjścia: $RC, odpowiedź: $ODP"
+          [ "$RC" -eq 0 ] || { echo "::error::claude -p nie działa na serwerze (kod $RC)"; exit 1; }
+
+      # Agent nie zapisuje nic w tym repo (czyta karty klientów); pracuje w klonie Rinvo-app w katalogu tymczasowym.
+      # AGENT_GITHUB_TOKEN ma dostęp tylko do Rinvo-app. Proces claude dostaje środowisko bez żadnych kluczy poza logowaniem.
+      - name: Agent wykonuje zgłoszenia
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          AGENT_GITHUB_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: python3 agent.py
+
+      # Scalanie PR agenta (testy zielone + CodeRabbit bez uwag + tylko config/ i wiedza/ + typ konfiguracja).
+      - name: Agent scala gotowe PR
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          AGENT_GITHUB_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: python3 agent_scal.py
