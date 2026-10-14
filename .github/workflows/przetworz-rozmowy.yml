@@ -63,6 +63,15 @@ jobs:
           MODEL="${MODEL:-claude-sonnet-5-5}"
           echo "Model: $MODEL"
           echo "Wersja: $(claude --version 2>&1)"
+          # Sekrety wklejone z Notatek mogą mieć enter, \u2028 itp. — czyścimy jak przetworz.py.
+          for NAZWA in CLAUDE_CODE_OAUTH_TOKEN LINEAR_API_KEY SLACK_WEBHOOK_URL; do
+            PRZED="${!NAZWA:-}"
+            export "$NAZWA=$(python3 sekrety.py "$NAZWA")"
+            PO="${!NAZWA:-}"
+            if [ "${#PRZED}" -ne "${#PO}" ]; then
+              echo "::warning::$NAZWA zawierał białe/niewidoczne znaki ($(( ${#PRZED} - ${#PO} )) usunięto) — popraw sekret w GitHubie"
+            fi
+          done
           if [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
             echo "CLAUDE_CODE_OAUTH_TOKEN: ustawiony (długość ${#CLAUDE_CODE_OAUTH_TOKEN})"
           else

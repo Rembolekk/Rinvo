@@ -136,6 +136,53 @@
         "Dobra. Bez pliku nic nie puszczam."
       ],
       "wlasciciel": "Marek Rewoliński"
+    },
+    {
+      "id": "Z15",
+      "klucz_sprawy": "decyzja-opel-stara-baza",
+      "tytul": "Nie puszczać Opla na starej bazie przed czwartkową rozmową we trzech",
+      "opis": "Opel czeka na wyniki świeżych leadów, a stara baza nie ma być puszczana drugi raz. Do rozmowy Marek–Kasia–Paweł w czwartek nic w tej sprawie się nie rusza. Potwierdza Z4 i Z9.",
+      "cytat": [
+        "Opel miał czekać na wyniki świeżych leadów, a starej bazy drugi raz mieliśmy nie puszczać. Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+    },
+    {
+      "id": "Z16",
+      "klucz_sprawy": "agent-nie-sprzedaje",
+      "tytul": "Nie wierzyć, że Kasia zgodziła się na propozycję aut używanych przy odmowie",
+      "opis": "Ola twierdziła, że Kasia zgodziła się, by agent przy odmowie proponował auta używane. Kasia się nie zgodziła. Potwierdza Z6.",
+      "cytat": [
+        "Nie zgodziłam się. Gdyby ktoś wam tak napisał, nie wierzcie.",
+        "Jasne, zostaje tak, jak było. Agent nie sprzedaje."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+    },
+    {
+      "id": "Z17",
+      "klucz_sprawy": "swieze-leady",
+      "tytul": "Nie przypominać Kasi o pliku ze świeżymi leadami",
+      "opis": "Kasia pamięta o pliku i prosi, żeby nie przypominać.",
+      "cytat": [
+        "Drugi raz nie przypominaj, sama pamiętam.",
+        "Dobra, nie przypominam."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+    },
+    {
+      "id": "Z18",
+      "klucz_sprawy": "nic-nowego-poza-testem",
+      "tytul": "W tym tygodniu nic nowego poza testem wstępu",
+      "opis": "Marek potwierdza, że poza testem wstępu nic nowego nie startuje. Powiązane z urlopem Kasi od 19.10 (Z5).",
+      "cytat": [
+        "I od dziewiętnastego mnie nie ma, pamiętasz.",
+        "Pamiętam, w tym tygodniu nic nowego poza testem wstępu."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
     }
   ],
   "otwarte_sprawy": {
@@ -212,6 +259,9 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "aktualizacje_zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "swieze-leady": {
@@ -240,6 +290,9 @@
       "tytul": "Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "aktualizacje_zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
@@ -331,6 +384,9 @@
       "tytul": "Szkolenie handlowców ze statusów (kwadrans online, po świeżych leadach)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "aktualizacje_zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
@@ -424,6 +480,11 @@
         "data": "2026-10-13",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "cytat": "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili."
+      },
+      {
+        "data": "2026-10-14",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
+        "cytat": "Paweł dostał od VoiceDesk ofertę na piśmie. Z cennikiem. Leży mu na biurku."
       }
     ],
     "grozba_rezygnacji": [
@@ -431,6 +492,11 @@
         "data": "2026-10-13",
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "cytat": "Paweł zobaczył tylko te dziewięć na siedemdziesiąt i chciał wszystko wyłączyć. Powiedziałam mu, że to trupy, a nie świeże leady."
+      },
+      {
+        "data": "2026-10-14",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
+        "cytat": "jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi."
       }
     ]
   },

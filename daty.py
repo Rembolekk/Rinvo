@@ -216,7 +216,8 @@ def main():
             if typ in ("blokada", "urlop") and od:
                 specific_blocks.append((od, do or od))
             elif typ == "termin" and od:
-                deadlines.append(od)
+                # termin z zakresem („środa i czwartek", od–do) kończy się na końcu zakresu
+                deadlines.append(do if do and do >= od else od)
             elif typ == "start_nie_wczesniej" and od:
                 if start_nie_wczesniej is None or od > start_nie_wczesniej:
                     start_nie_wczesniej = od

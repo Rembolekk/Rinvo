@@ -116,6 +116,40 @@ Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzieln
 > Dobra. Bez pliku nic nie puszczam.
 
 
+### Z15: Nie puszczać Opla na starej bazie przed czwartkową rozmową we trzech
+
+Opel czeka na wyniki świeżych leadów, a stara baza nie ma być puszczana drugi raz. Do rozmowy Marek–Kasia–Paweł w czwartek nic w tej sprawie się nie rusza. Potwierdza Z4 i Z9.
+
+> Opel miał czekać na wyniki świeżych leadów, a starej bazy drugi raz mieliśmy nie puszczać. Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek.
+
+
+### Z16: Nie wierzyć, że Kasia zgodziła się na propozycję aut używanych przy odmowie
+
+Ola twierdziła, że Kasia zgodziła się, by agent przy odmowie proponował auta używane. Kasia się nie zgodziła. Potwierdza Z6.
+
+> Nie zgodziłam się. Gdyby ktoś wam tak napisał, nie wierzcie.
+
+> Jasne, zostaje tak, jak było. Agent nie sprzedaje.
+
+
+### Z17: Nie przypominać Kasi o pliku ze świeżymi leadami
+
+Kasia pamięta o pliku i prosi, żeby nie przypominać.
+
+> Drugi raz nie przypominaj, sama pamiętam.
+
+> Dobra, nie przypominam.
+
+
+### Z18: W tym tygodniu nic nowego poza testem wstępu
+
+Marek potwierdza, że poza testem wstępu nic nowego nie startuje. Powiązane z urlopem Kasi od 19.10 (Z5).
+
+> I od dziewiętnastego mnie nie ma, pamiętasz.
+
+> Pamiętam, w tym tygodniu nic nowego poza testem wstępu.
+
+
 ## Historia zakazów (uchylone)
 
 - ~~Z2: Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10~~ — uchylony: _Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga._
@@ -154,5 +188,5 @@ Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzieln
 
 ## Ryzyka powtarzające się
 
-- **konkurencja** (1 rozmów, 2 wzmianek)
-- **grozba_rezygnacji** (1 rozmów, 1 wzmianek)
+- **konkurencja** (2 rozmów, 3 wzmianek)
+- **grozba_rezygnacji** (2 rozmów, 2 wzmianek)

@@ -20,6 +20,8 @@ import urllib.error
 from datetime import date
 from pathlib import Path
 
+from sekrety import czysc
+
 
 def _date_from_path(path_str):
     """Extract YYYY-MM-DD from a transcript filename, e.g. '2026-10-06-call.md' → '2026-10-06'."""
@@ -73,12 +75,12 @@ def load_api_key():
     env_path = Path(".env")
     if env_path.exists():
         for line in env_path.read_text(encoding="utf-8").splitlines():
-            line = line.strip()
-            if line.startswith("LINEAR_API_KEY="):
-                key = line.split("=", 1)[1].strip()
+            name, _, val = line.partition("=")
+            if czysc(name) == "LINEAR_API_KEY":
+                key = czysc(val)  # bez spacji, enterów, \u2028/\u2029 z Notatek
                 if key:
                     return key
-    key = os.environ.get("LINEAR_API_KEY", "")
+    key = czysc(os.environ.get("LINEAR_API_KEY", ""))
     if key:
         return key
     sys.exit("Błąd: brak LINEAR_API_KEY w .env ani w środowisku.")
@@ -169,6 +171,17 @@ def Q_ISSUE_LABELS(issue_id):
     return f"""
 query {{
   issue(id: "{issue_id}") {{
+    labels {{ nodes {{ id name }} }}
+  }}
+}}
+"""
+
+
+def Q_ISSUE_STATE(issue_id):
+    return f"""
+query {{
+  issue(id: "{issue_id}") {{
+    state {{ name type }}
     labels {{ nodes {{ id name }} }}
   }}
 }}
@@ -431,11 +444,9 @@ def update_risk_counter(karta, item, source, today):
     ryzyka = karta.setdefault("ryzyka", {})
     if temat not in ryzyka:
         ryzyka[temat] = []
-    ryzyka[temat].append({
-        "data": today,
-        "zrodlo": source,
-        "cytat": item.get("cytat", [""])[0] if item.get("cytat") else "",
-    })
+    cytat = item.get("cytat", [""])[0] if item.get("cytat") else ""
+    if not any(r.get("zrodlo") == source and r.get("cytat") == cytat for r in ryzyka[temat]):
+        ryzyka[temat].append({"data": today, "zrodlo": source, "cytat": cytat})
     unique_sources = len({r["zrodlo"] for r in ryzyka[temat]})
     return unique_sources >= RISK_REPEAT_THRESHOLD, unique_sources
 
@@ -474,6 +485,109 @@ def build_clients_comment(prosby, klucz):
     for client, r in seen.items():
         lines.append(f"- **{client}**: _{r['cytat']}_")
     return "\n".join(lines)
+
+
+# ── istniejące zgłoszenia: eskalacja ryzyka i termin ──────────────────────────
+
+def get_issue_state_and_labels(api_key, issue_id):
+    data = gql(api_key, Q_ISSUE_STATE(issue_id)).get("issue") or {}
+    return {
+        "type": (data.get("state") or {}).get("type", ""),
+        "name": (data.get("state") or {}).get("name", ""),
+        "labels": (data.get("labels") or {}).get("nodes", []),
+    }
+
+
+def _najnowsza_data_rozmowy(info):
+    daty = [d for d in (_date_from_path(s) for s in info.get("zrodla", [])) if d]
+    return max(daty) if daty else ""
+
+
+def eskaluj_istniejace_ryzyko(api_key, karta, existing, klucz, item, label_map, source, today):
+    """Ryzyko wspomniane w kolejnej rozmowie: licznik rozmów w karcie, a po przekroczeniu
+    progu etykieta „Powtarzające się ryzyko”, priorytet Urgent i historia w komentarzu."""
+    temat = item.get("temat_ryzyka", "inne")
+    escalate, _ = update_risk_counter(karta, item, source, today)
+    if not escalate:
+        return
+    linear_id = existing.get("linear_id")
+    ident = existing.get("identifier", klucz)
+    etykieta_id = label_map.get("Powtarzające się ryzyko")
+    if not linear_id or not etykieta_id:
+        return
+    stan = get_issue_state_and_labels(api_key, linear_id)
+    ids = [l["id"] for l in stan["labels"]]
+    nowa = etykieta_id not in ids
+    if nowa:
+        ids.append(etykieta_id)
+    gql(api_key, M_UPDATE_ISSUE, {"id": linear_id, "input": {"labelIds": ids, "priority": 1}})
+    if nowa:
+        gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": build_risk_history(karta, temat)})
+    print(f"  ↑ Powtarzające się ryzyko: {ident} ({klucz}) | {existing.get('tytul', '')}")
+
+
+def uzgodnij_istniejace(api_key, karta, existing, klucz, item, sekcja, label_map, termin,
+                        meeting_date, source, today):
+    """Idempotentne uzgodnienie zgłoszenia, które już istnieje (nowa rozmowa albo ponowna analiza):
+    eskalacja ryzyka i termin z NAJNOWSZEJ rozmowy (starsza rozmowa nie nadpisuje nowszego terminu)."""
+    if not isinstance(existing, dict) or not existing.get("linear_id"):
+        return
+    if sekcja == 5:
+        eskaluj_istniejace_ryzyko(api_key, karta, existing, klucz, item, label_map, source, today)
+    if termin and meeting_date and meeting_date >= _najnowsza_data_rozmowy(existing):
+        gql(api_key, M_UPDATE_ISSUE, {"id": existing["linear_id"], "input": {"dueDate": termin}})
+        print(f"  ✓ Termin → {existing.get('identifier', klucz)} ({klucz}): {termin}")
+
+
+# ── zakazy: unikalne id w karcie ───────────────────────────────────────────────
+
+def _numer_zakazu(zid):
+    m = re.search(r"\d+", str(zid))
+    return int(m.group()) if m else 0
+
+
+def zakaz_juz_w_karcie(karta, z, source):
+    """Czy ten zakaz (z bieżącego wyniku) już jest w karcie: aktywny albo uchylony?
+    Id NIE wystarcza: numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie."""
+    cytaty = set(z.get("cytat", []))
+    for k in karta.get("zakazy", []) + karta.get("historia_zakazow", []):
+        if k.get("klucz_sprawy") and k.get("zrodlo") == source and k["klucz_sprawy"] == z.get("klucz_sprawy"):
+            return True
+        if k.get("id") == z.get("id") and k.get("tytul") == z.get("tytul"):
+            return True
+        if cytaty & set(k.get("cytat", [])):
+            return True
+    return False
+
+
+def dodaj_zakazy(karta, nowe_zakazy, source, dry_run=False):
+    """Dodaje zakazy z rozmowy do karty z unikalnymi id. Zwraca liczbę dodanych."""
+    uzyte = {z.get("id") for z in karta.get("zakazy", []) + karta.get("historia_zakazow", [])}
+    nastepny = max([_numer_zakazu(i) for i in uzyte] + [0]) + 1
+    dodano = 0
+    for z in nowe_zakazy:
+        if zakaz_juz_w_karcie(karta, z, source):
+            continue
+        zid = z["id"]
+        if zid in uzyte:
+            zid = f"Z{nastepny}"
+            nastepny += 1
+            print(f"  ⚠ Id {z['id']} zajęte w karcie → zakaz zapisany jako {zid}: {z.get('tytul', '')}")
+        uzyte.add(zid)
+        nastepny = max(nastepny, _numer_zakazu(zid) + 1)
+        karta.setdefault("zakazy", []).append({
+            "id": zid,
+            "klucz_sprawy": z.get("klucz_sprawy", ""),
+            "tytul": z["tytul"],
+            "opis": z.get("opis", ""),
+            "cytat": z.get("cytat", []),
+            "wlasciciel": z.get("wlasciciel", ""),
+            "zrodlo": source,
+        })
+        dodano += 1
+        if dry_run:
+            print(f"  [zakaz → karta.json] {zid}: {z['tytul']}")
+    return dodano
 
 
 # ── aktualizacje otwartych spraw ──────────────────────────────────────────────
@@ -521,21 +635,21 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
         linear_id = issue_info.get("linear_id", "")
         identifier = issue_info.get("identifier", klucz)
 
-        # Ponowna analiza tej samej rozmowy nie może aktualizować spraw, które sama utworzyła.
-        # Aktualizacja wymaga rozmowy PÓŹNIEJSZEJ niż ta, z której sprawa pochodzi.
+        # Ponowna analiza rozmowy nie może aktualizować spraw, które sama utworzyła.
+        # Aktualizacja wymaga rozmowy PÓŹNIEJSZEJ niż ta, z której sprawa POCHODZI (pierwsze
+        # źródło). Późniejsza wzmianka w komentarzu (kolejne źródła) nie blokuje aktualizacji.
         issue_sources = issue_info.get("zrodla", [])
-        if source in issue_sources:
+        origin = issue_sources[0] if issue_sources else ""
+        if origin and source == origin:
             print(f"  [pominięto aktualizację] {identifier} ({klucz}): ta sama rozmowa ({source})")
             continue
-        issue_date = issue_info.get("data_spotkania", "")
-        if not issue_date:
-            for s in issue_sources:
-                issue_date = _date_from_path(s)
-                if issue_date:
-                    break
+        issue_date = issue_info.get("data_spotkania", "") or _date_from_path(origin)
         if issue_date and meeting_date and meeting_date <= issue_date:
             print(f"  [pominięto aktualizację] {identifier} ({klucz}): "
                   f"data rozmowy {meeting_date} nie jest późniejsza niż data sprawy {issue_date}")
+            continue
+        if source in issue_info.get("aktualizacje_zrodla", []):
+            print(f"  [pominięto aktualizację] {identifier} ({klucz}): już zastosowana z tej rozmowy")
             continue
 
         if dry_run:
@@ -551,8 +665,14 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
 
         # For zrob_teraz: remove "Czeka na klienta" label
         if nowy_status == "zrob_teraz":
-            current_labels = get_issue_labels_from_linear(api_key, linear_id)
+            stan = get_issue_state_and_labels(api_key, linear_id)
+            current_labels = stan["labels"]
             czeka_id = label_map.get("Czeka na klienta")
+            if stan["type"] == "unstarted" and czeka_id not in [l["id"] for l in current_labels]:
+                # zgłoszenie już jest wznowione (np. wcześniejszy przebieg): bez dubla komentarza
+                issue_info.setdefault("aktualizacje_zrodla", []).append(source)
+                print(f"  = {identifier} ({klucz}) → {nowy_status} (już w tym stanie, bez zmian)")
+                continue
             new_ids = [l["id"] for l in current_labels if l["id"] != czeka_id]
             if new_ids != [l["id"] for l in current_labels]:
                 update_input["labelIds"] = new_ids
@@ -569,6 +689,7 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
         gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": "\n".join(comment_parts)})
 
         # Update karta
+        issue_info.setdefault("aktualizacje_zrodla", []).append(source)
         if nowy_status in ("zamknieta", "anulowana"):
             karta.setdefault("zamkniete_sprawy", {})[klucz] = {
                 **issue_info, "status_koncowy": nowy_status,
@@ -646,20 +767,7 @@ def main():
 
     pozycje = wynik.get("pozycje", [])
     nowe_zakazy = [p for p in pozycje if p.get("sekcja") == 4]
-    istniejace_ids = {z.get("id") for z in karta.get("zakazy", [])}
-    dodano_zakazow = 0
-    for z in nowe_zakazy:
-        if z.get("id") not in istniejace_ids:
-            karta.setdefault("zakazy", []).append({
-                "id": z["id"],
-                "tytul": z["tytul"],
-                "opis": z.get("opis", ""),
-                "cytat": z.get("cytat", []),
-                "wlasciciel": z.get("wlasciciel", ""),
-            })
-            dodano_zakazow += 1
-            if args.dry_run:
-                print(f"  [zakaz → karta.json] {z['id']}: {z['tytul']}")
+    dodano_zakazow = dodaj_zakazy(karta, nowe_zakazy, source, dry_run=args.dry_run)
 
     zakazy_klienta = karta.get("zakazy", [])
 
@@ -735,7 +843,10 @@ def main():
             existing = otwarte[klucz]
             existing_sources = existing.get("zrodla", []) if isinstance(existing, dict) else []
             if source in existing_sources:
-                # Ta sama rozmowa – pomiń po cichu
+                # Ta sama rozmowa – bez nowego komentarza, ale uzgodnij stan (idempotentnie)
+                if not args.dry_run:
+                    uzgodnij_istniejace(api_key, karta, existing, klucz, item, sekcja,
+                                        label_map, termin, meeting_date, source, today)
                 stats["pominieto"] += 1
                 continue
             # Inna rozmowa – dodaj komentarz z nowym cytatem
@@ -753,6 +864,8 @@ def main():
                 if isinstance(existing, dict):
                     existing.setdefault("zrodla", []).append(source)
                 print(f"  ✓ Komentarz → {ident} ({klucz})")
+                uzgodnij_istniejace(api_key, karta, existing, klucz, item, sekcja,
+                                    label_map, termin, meeting_date, source, today)
             stats["zaktualizowano"] += 1
             continue
 
@@ -835,6 +948,11 @@ def main():
             if ban_text:
                 body += f"\n\n**Treść zakazu:** _{ban_text}_"
             gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": body})
+
+        if risk_escalate:
+            print(f"  ↑ Powtarzające się ryzyko: {identifier} ({klucz}) | {item['tytul']}")
+        if product_escalate:
+            print(f"  ★ Wielu klientów: {identifier} ({klucz}) | {item['tytul']}")
 
         # Komentarz o powtarzającym się ryzyku
         if risk_escalate:

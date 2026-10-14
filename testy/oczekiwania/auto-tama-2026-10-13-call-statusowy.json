@@ -1,0 +1,249 @@
+[
+  {
+    "opis": "Adres Włocławek działa: aktualizacja → zamknięta",
+    "typ_sprawdzania": "aktualizacja",
+    "klucz_sprawy": "adres-wloclawek",
+    "oczekiwany_nowy_status": "zamknieta"
+  },
+  {
+    "opis": "Adres Włocławek: sprawa zamknięta w karcie klienta",
+    "typ_sprawdzania": "karta_sprawa",
+    "klucz_sprawy": "adres-wloclawek",
+    "oczekiwany_stan": "zamknieta"
+  },
+  {
+    "opis": "Adres Włocławek: zgłoszenie w Linearze jest Done",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "adres-wloclawek",
+    "oczekiwany_stan_linear": "Done"
+  },
+
+  {
+    "opis": "Filtr „zainteresowany” zawęża: aktualizacja → zamknięta",
+    "typ_sprawdzania": "aktualizacja",
+    "klucz_sprawy": "filtr-statusu",
+    "oczekiwany_nowy_status": "zamknieta"
+  },
+  {
+    "opis": "Filtr „zainteresowany”: sprawa zamknięta w karcie klienta",
+    "typ_sprawdzania": "karta_sprawa",
+    "klucz_sprawy": "filtr-statusu",
+    "oczekiwany_stan": "zamknieta"
+  },
+  {
+    "opis": "Filtr „zainteresowany”: zgłoszenie w Linearze jest Done",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "filtr-statusu",
+    "oczekiwany_stan_linear": "Done"
+  },
+
+  {
+    "opis": "Korekta faktury dotarła: aktualizacja → zamknięta",
+    "typ_sprawdzania": "aktualizacja",
+    "klucz_sprawy": "korekta-faktury",
+    "oczekiwany_nowy_status": "zamknieta"
+  },
+  {
+    "opis": "Korekta faktury: sprawa zamknięta w karcie klienta",
+    "typ_sprawdzania": "karta_sprawa",
+    "klucz_sprawy": "korekta-faktury",
+    "oczekiwany_stan": "zamknieta"
+  },
+  {
+    "opis": "Korekta faktury: zgłoszenie w Linearze jest Done",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "korekta-faktury",
+    "oczekiwany_stan_linear": "Done"
+  },
+
+  {
+    "opis": "Teksty wstępu dostarczone: aktualizacja → wznowiona (zrob_teraz)",
+    "typ_sprawdzania": "aktualizacja",
+    "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+    "oczekiwany_nowy_status": "zrob_teraz"
+  },
+  {
+    "opis": "Test wstępu rusza w środę i czwartek: pozycja w sekcji 1",
+    "fragment_cytatu": "Możecie puścić od jutra, środa i czwartek",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz"
+  },
+  {
+    "opis": "Test wstępu rusza w środę 14.10 i obejmuje czwartek 15.10",
+    "typ_sprawdzania": "okno_w",
+    "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+    "od_rowne": "2026-10-14",
+    "do_min": "2026-10-15"
+  },
+  {
+    "opis": "Test wstępu mieści się w oknie 12–16.10 (przed urlopem Kasi)",
+    "typ_sprawdzania": "okno_w",
+    "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+    "od": "2026-10-12",
+    "do": "2026-10-16"
+  },
+  {
+    "opis": "Teksty wstępu: zgłoszenie w Linearze wznowione (Todo)",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+    "oczekiwany_stan_linear": "Todo",
+    "zakazane_etykiety": ["Czeka na klienta"]
+  },
+
+  {
+    "opis": "Zaproszenie dla Pawła: aktualizacja → wznowiona (zrob_teraz)",
+    "typ_sprawdzania": "aktualizacja",
+    "klucz_sprawy": "spotkanie-z-pawlem",
+    "oczekiwany_nowy_status": "zrob_teraz"
+  },
+  {
+    "opis": "Zaproszenie dla Pawła: sprawa otwarta w karcie klienta",
+    "typ_sprawdzania": "karta_sprawa",
+    "klucz_sprawy": "spotkanie-z-pawlem",
+    "oczekiwany_stan": "otwarta"
+  },
+  {
+    "opis": "Zaproszenie dla Pawła: zgłoszenie w Linearze wznowione (Todo)",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "spotkanie-z-pawlem",
+    "oczekiwany_stan_linear": "Todo",
+    "zakazane_etykiety": ["Czeka na klienta"]
+  },
+
+  {
+    "opis": "Plik świeżych leadów: dalej czeka, termin czwartek 15.10, zero przypomnień",
+    "fragment_cytatu": "Wyślę do czwartku. Drugi raz nie przypominaj",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka",
+    "oczekiwany_termin": "2026-10-15",
+    "oczekiwane_przypomnienia": 0
+  },
+  {
+    "opis": "Szkic maila nie obiecuje kolejnego przypomnienia o pliku",
+    "typ_sprawdzania": "mail_nie_zawiera",
+    "frazy": ["przypomnę", "wyślę przypomnienie", "jedno przypomnienie", "przypomnienie o"]
+  },
+  {
+    "opis": "Zakaz „nie przypominaj o pliku” zapisany w karcie klienta",
+    "typ_sprawdzania": "karta_zakaz",
+    "fragment_cytatu": "Drugi raz nie przypominaj, sama pamiętam"
+  },
+  {
+    "opis": "Plik świeżych leadów: w Linearze dalej Backlog, czeka na klienta, termin 15.10",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "swieze-leady",
+    "oczekiwany_stan_linear": "Backlog",
+    "oczekiwane_etykiety": ["Czeka na klienta"],
+    "oczekiwany_termin_linear": "2026-10-15"
+  },
+
+  {
+    "opis": "VoiceDesk drugi raz: pozycja w sekcji 5 (ryzyko)",
+    "fragment_cytatu": "Paweł dostał od VoiceDesk ofertę na piśmie",
+    "oczekiwana_sekcja": 5
+  },
+  {
+    "opis": "VoiceDesk: karta klienta liczy temat „konkurencja” z ≥ 2 różnych rozmów",
+    "typ_sprawdzania": "karta_ryzyka",
+    "temat": "konkurencja",
+    "min_zrodel": 2
+  },
+  {
+    "opis": "VoiceDesk: w Linearze „Powtarzające się ryzyko” i priorytet Urgent",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "ryzyko-voicedesk",
+    "oczekiwane_etykiety": ["Ryzyko", "Powtarzające się ryzyko"],
+    "oczekiwany_priorytet": 1
+  },
+
+  {
+    "opis": "Opel na starej bazie: żadna pozycja nie dostaje „Dla agenta” (zakaz albo czeka)",
+    "fragment_cytatu": "Opla nie ruszam",
+    "wszystkie_pasujace": true,
+    "oczekiwana_sekcja_jedna_z": [2, 4],
+    "zakazane_etykiety": ["Dla agenta"]
+  },
+  {
+    "opis": "Opel na starej bazie: zakaz zapisany w karcie klienta",
+    "typ_sprawdzania": "karta_zakaz",
+    "fragment_cytatu": "Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek"
+  },
+  {
+    "opis": "Opel na starej bazie: w Linearze bez „Dla agenta”",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "decyzja-opel-stara-baza",
+    "zakazane_etykiety": ["Dla agenta"]
+  },
+
+  {
+    "opis": "Toruń podaje sobotę do 14: błąd z „Dla agenta” (sekcja 1)",
+    "fragment_cytatu": "poprawiłem tylko Włocławek",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz",
+    "oczekiwany_rodzaj": "błąd",
+    "oczekiwane_etykiety": ["Dla agenta"]
+  },
+  {
+    "opis": "Toruń sobota: zgłoszenie w Linearze ma „Dla agenta” i nie jest Done",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "godziny-salonu-sobota",
+    "oczekiwane_etykiety": ["Dla agenta"],
+    "zakazany_stan_linear": "Done"
+  },
+
+  {
+    "opis": "Eksport do Excela: prośba produktowa w sekcji 3, bez „Dla agenta”",
+    "fragment_cytatu": "Eksportu nie ma. Zapisuję.",
+    "oczekiwana_sekcja": 3,
+    "zakazane_etykiety": ["Dla agenta"]
+  },
+  {
+    "opis": "Eksport do Excela: ta sama funkcja u klinika-usmiech i auto-tama w prosby.json",
+    "typ_sprawdzania": "prosby",
+    "fragment_cytatu": "Eksportu nie ma. Zapisuję.",
+    "min_klientow": 2,
+    "klienci": ["klinika-usmiech", "auto-tama"]
+  },
+  {
+    "opis": "Eksport do Excela: w Linearze „Wielu klientów”",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "eksport-kontaktow-excel",
+    "oczekiwane_etykiety": ["Produkt", "Wielu klientów"]
+  },
+
+  {
+    "opis": "Auta używane: zakaz sprzedaży, relacja Oli odrzucona (sekcja 4)",
+    "fragment_cytatu": "Gdyby ktoś wam tak napisał, nie wierzcie",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Auta używane: dotychczasowy zakaz zostaje w karcie klienta",
+    "typ_sprawdzania": "karta_zakaz",
+    "fragment_cytatu": "proponował auto używane"
+  },
+  {
+    "opis": "Auta używane: żadna aktualizacja nie uchyla zakazu sprzedaży",
+    "typ_sprawdzania": "aktualizacja",
+    "nie_ma_kluczy": ["Z6", "zakaz-sprzedaz-agent", "agent-nie-sprzedaje-uzywane"]
+  },
+
+  {
+    "opis": "Szkolenie 27.10 o 10:00: sprawa wznowiona (aktualizacja → zrob_teraz)",
+    "typ_sprawdzania": "aktualizacja",
+    "klucz_sprawy": "szkolenie-handlowcow",
+    "oczekiwany_nowy_status": "zrob_teraz"
+  },
+  {
+    "opis": "Szkolenie: termin 27.10 w pozycji",
+    "fragment_cytatu": "Dajmy dwudziesty siódmy, wtorek",
+    "oczekiwany_termin": "2026-10-27"
+  },
+  {
+    "opis": "Szkolenie: w Linearze wznowione (Todo) z terminem 27.10",
+    "typ_sprawdzania": "linear",
+    "klucz_sprawy": "szkolenie-handlowcow",
+    "oczekiwany_stan_linear": "Todo",
+    "oczekiwany_termin_linear": "2026-10-27"
+  }
+]

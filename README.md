@@ -62,9 +62,10 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `daty.py` | oblicza wolne okna robocze z fakty_czasowe, zapisuje okna_czasowe do wynik.json |
 | `przetworz.py` | automat end-to-end: rejestr → Claude → daty.py → render.py → Linear → Slack |
 | `linear_sync.py` | wysyła wynik.json do Linear (team RIN); idempotentny po klucz_sprawy |
+| `sekrety.py` | czyszczenie kluczy API z białych i niewidocznych znaków (Notatki na Macu je dodają) |
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
-| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 27 testów) |
+| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 40 testów) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -93,6 +94,14 @@ Wymagane zmienne w `.env`:
 Zabezpieczenia: lock file (jeden przebieg jednocześnie), rejestr rejestruje dopiero po pełnym sukcesie (retry jest bezpieczny), klucze nigdy nie trafiają do logów.
 
 Log trafia do `logi/przebiegi/<timestamp>-<klient>.log`.
+
+`--bez-analizy` pomija model i przetwarza istniejący `wynik.json` (render, daty, Linear, testy, Slack): do naprawy stanu po poprawce kodu, bez ponownego wołania Claude'a.
+
+Klucze z `.env` i ze zmiennych środowiskowych są czyszczone z białych i niewidocznych znaków (`sekrety.py`). Klucz wklejony z Notatek potrafi mieć na końcu enter albo `\u2028` i wygląda poprawnie, a serwer go odrzuca. W logu pojawia się tylko ostrzeżenie z nazwą zmiennej i liczbą usuniętych znaków, nigdy wartość.
+
+### Wiadomość na Slacku
+
+Zawsze zawiera osobne linie (także z zerem): **Zamknięte**, **Wznowione**, **Zablokowane przez zakaz**, **Powtarzające się ryzyka**, **Wielu klientów** i **Do weryfikacji**, każda z tytułami pozycji. Do tego model analizy i wynik testów oczekiwań.
 
 ## Daty liczy kod (`daty.py`)
 
@@ -130,7 +139,9 @@ Wymaga `LINEAR_API_KEY` w `.env`. Klucz musi mieć dostęp do zespołu `RIN`.
 - **Strażnik zakazów**: pozycja z `konflikt_z_zakazem` → **Backlog** + etykieta **Zablokowane przez zakaz**, bez **Dla agenta**.
 - **Pewność niska**: `pewnosc: niska` → etykieta **Do weryfikacji**.
 - **Idempotentny po klucz_sprawy**: ta sama `klucz_sprawy` z innego źródła → komentarz w istniejącym zgłoszeniu. Ochrona przed duplikatami opiera się na kluczu sprawy, nie na sha256 pliku.
-- **Aktualizacje otwartych spraw**: `aktualizacje_spraw` z wynik.json → zmiana stanu istniejącego zgłoszenia w Linear (Todo/Done/Cancelled).
+- **Aktualizacje otwartych spraw**: `aktualizacje_spraw` z wynik.json → zmiana stanu istniejącego zgłoszenia w Linear (Todo/Done/Cancelled). Aktualizacja musi pochodzić z rozmowy późniejszej niż ta, z której sprawa pochodzi; ta sama aktualizacja nie zadziała dwa razy, a zgłoszenie, które już jest w docelowym stanie, nie dostaje drugiego komentarza.
+- **Sprawa wspomniana ponownie** (ta sama `klucz_sprawy`): komentarz z nowym cytatem, **nowy termin** z najnowszej rozmowy oraz — dla ryzyk — licznik rozmów w karcie i eskalacja (**Powtarzające się ryzyko** + Urgent) także dla zgłoszenia, które już istnieje.
+- **Zakazy** dostają unikalne id w karcie (numeracja z rozmowy zaczyna się od Z1, więc przy kolizji linear_sync nadaje kolejny wolny numer), a nie są pomijane.
 - Po każdym przebiegu regeneruje `ops/klienci/<klient>/karta.md`.
 
 ## Pamięć między rozmowami
@@ -200,13 +211,17 @@ Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
 python3 testy/test_logika.py
 ```
 
-Pokrycie (27 testów):
+Pokrycie (40 testów):
 - `should_get_agent_label` — etykieta „Dla agenta” tylko dla bug/konfiguracja/baza_wiedzy z wysoka pewnością, bez zakazu, bez nowej_funkcji.
 - `process_aktualizacje` — ta sama rozmowa odrzucona, ta sama data odrzucona, późniejsza data akceptowana, nieznana sprawa pominięta.
 - `daty.py compute_windows` — blokada globalna, weekendy pomijane, deadline ogranicza okno.
 - `daty.py has_temporal_word` — frazy przyszłe wykrywane, neutralne cytaty nie.
 - `update_risk_counter` — dwa różne źródła eskalują, to samo źródło dwa razy nie.
 - Rejestr sha256 — ten sam hash wykryty, różne treści dają różne hashe.
+- Strażnik aktualizacji liczy się od **pochodzenia** sprawy (pierwsze źródło), a komentarz z późniejszej rozmowy go nie blokuje; aktualizacja z tej samej rozmowy nie zadziała dwa razy.
+- Zakazy — id są unikalne w karcie (numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie), ponowna analiza nie dubluje zakazów.
+- Czyszczenie kluczy (`sekrety.py`) — spacje, entery, `\u2028`, `\u2029`, `\u00a0`, znaki zerowej szerokości.
+- Wiadomość Slack — stałe linie (także `: 0`) i parsowanie zdarzeń z `linear_sync.py`.
 
 ### Testy oczekiwań (po analizie)
 
@@ -214,11 +229,28 @@ Pokrycie (27 testów):
 python3 testy/uruchom.py wyniki/<klient>/<nazwa>/wynik.json testy/oczekiwania/<klient>-<nazwa>.json
 ```
 
-Każde oczekiwanie ma `fragment_cytatu` (krótki, dosłowny) — runner wyszukuje pozycję po cytacie i sprawdza sekcję, status, etykiety, okna czasowe. Wyjście: `PASS X/Y` lub `FAIL X/Y` (exit code 0/1).
+```bash
+python3 testy/uruchom.py wyniki/<klient>/<nazwa>/wynik.json testy/oczekiwania/<klient>-<nazwa>.json --online
+```
+
+Każde oczekiwanie jest zakotwiczone w cytacie (`fragment_cytatu`, krótki i dosłowny) albo w kluczu sprawy. Rodzaje testów (`typ_sprawdzania`):
+
+| Rodzaj | Co sprawdza |
+|---|---|
+| `pozycje` (domyślny) | pozycja znaleziona po cytacie: sekcja, status, rodzaj, termin, przypomnienia, etykiety, okna czasowe |
+| `aktualizacja` | wpis w `aktualizacje_spraw` (zamknięta / wznowiona) albo jego brak |
+| `karta_sprawa`, `karta_zakaz`, `karta_ryzyka` | stan **po rozmowie** w karcie klienta: sprawa zamknięta/otwarta, aktywny zakaz, licznik ryzyk |
+| `prosby` | ta sama funkcja u kilku klientów w `ops/produkt/prosby.json` |
+| `okno_w`, `okna_dokladnie` | okna czasowe sprawy |
+| `mail_nie_zawiera` | szkic maila nie obiecuje tego, czego klient zabronił |
+| `linear` | stan, etykiety, priorytet i termin zgłoszenia w Linearze (**tylko z `--online`**) |
+
+Bez `--online` testy `linear` są pomijane i liczone osobno, a reszta działa offline. Wyjście: `PASS X/Y` lub `FAIL X/Y` (kod 0 tylko gdy wszystkie wykonane przeszły).
 
 Pliki oczekiwań:
 - `testy/oczekiwania/auto-tama-2026-10-06-call-statusowy.json` — 20 testów
 - `testy/oczekiwania/klinika-usmiech-2026-10-13-call-statusowy.json` — 10 testów
+- `testy/oczekiwania/auto-tama-2026-10-13-call-statusowy.json` — 38 testów (w tym stan po rozmowie w karcie, `prosby.json` i Linearze)
 
 `przetworz.py` uruchamia plik oczekiwań automatycznie po analizie (gdy plik istnieje) i dodaje wynik do wiadomości Slack.
 

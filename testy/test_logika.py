@@ -16,10 +16,12 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from linear_sync import (
-    should_get_agent_label,
+    dodaj_zakazy,
     process_aktualizacje,
+    should_get_agent_label,
     update_risk_counter,
 )
+from sekrety import czysc, wyczysc_srodowisko
 from daty import compute_windows, has_temporal_word
 
 
@@ -241,6 +243,187 @@ class TestRegistry(unittest.TestCase):
         finally:
             os.unlink(path_a)
             os.unlink(path_b)
+
+
+# ── strażnik aktualizacji: liczy się pochodzenie sprawy, nie komentarze ────────
+
+class TestStraznikAktualizacjiPochodzenie(unittest.TestCase):
+
+    def _wynik(self, source, meeting_date, klucz="k"):
+        return {"zrodlo": source, "spotkanie": {"data": meeting_date},
+                "aktualizacje_spraw": [{"klucz_sprawy": klucz, "nowy_status": "zrob_teraz",
+                                        "cytat": "c", "uzasadnienie": "u"}]}
+
+    def _karta(self, zrodla, extra=None):
+        info = {"linear_id": "x", "identifier": "RIN-1", "url": "u", "tytul": "t", "zrodla": zrodla}
+        info.update(extra or {})
+        return {"zakazy": [], "otwarte_sprawy": {"k": info}}
+
+    def test_komentarz_z_pozniejszej_rozmowy_nie_blokuje_aktualizacji(self):
+        # sprawa pochodzi z 10-06, 10-13 tylko dopisała komentarz; aktualizacja z 10-13 ma przejść
+        a, b = "ops/t/2026-10-06-a.md", "ops/t/2026-10-13-b.md"
+        n = process_aktualizacje(None, self._wynik(b, "2026-10-13"), self._karta([a, b]),
+                                 {}, {}, dry_run=True, meeting_date="2026-10-13")
+        self.assertEqual(n, 1)
+
+    def test_starsza_rozmowa_nie_aktualizuje_sprawy_z_nowszej(self):
+        a, b = "ops/t/2026-10-06-a.md", "ops/t/2026-10-13-b.md"
+        n = process_aktualizacje(None, self._wynik(a, "2026-10-06"), self._karta([b]),
+                                 {}, {}, dry_run=True, meeting_date="2026-10-06")
+        self.assertEqual(n, 0)
+
+    def test_juz_zastosowana_aktualizacja_pomijana(self):
+        a, b = "ops/t/2026-10-06-a.md", "ops/t/2026-10-13-b.md"
+        karta = self._karta([a, b], {"aktualizacje_zrodla": [b]})
+        n = process_aktualizacje(None, self._wynik(b, "2026-10-13"), karta,
+                                 {}, {}, dry_run=True, meeting_date="2026-10-13")
+        self.assertEqual(n, 0)
+
+
+# ── zakazy: unikalne id między rozmowami ──────────────────────────────────────
+
+class TestDodajZakazy(unittest.TestCase):
+
+    def _z(self, zid, klucz, cytat, tytul="t"):
+        return {"id": zid, "sekcja": 4, "klucz_sprawy": klucz, "tytul": tytul,
+                "opis": "", "cytat": [cytat], "wlasciciel": "M"}
+
+    def test_kolizja_id_dostaje_nowy_numer_zamiast_zostac_pominieta(self):
+        karta = {"zakazy": [{"id": "Z1", "tytul": "stary", "cytat": ["stary cytat"]},
+                            {"id": "Z2", "tytul": "stary2", "cytat": ["stary cytat 2"]}],
+                 "historia_zakazow": [{"id": "Z3", "tytul": "uchylony", "cytat": ["x"]}]}
+        n = dodaj_zakazy(karta, [self._z("Z1", "nowy", "nowy cytat")], "src-nowe.md")
+        self.assertEqual(n, 1)
+        ids = [z["id"] for z in karta["zakazy"]]
+        self.assertEqual(ids, ["Z1", "Z2", "Z4"], "nowy zakaz dostaje Z4 (Z3 jest w historii)")
+        self.assertEqual(karta["zakazy"][-1]["klucz_sprawy"], "nowy")
+        self.assertEqual(karta["zakazy"][-1]["zrodlo"], "src-nowe.md")
+
+    def test_ponowna_analiza_nie_dubluje_zakazow(self):
+        karta = {"zakazy": [], "historia_zakazow": []}
+        z = self._z("Z1", "nowy", "cytat")
+        self.assertEqual(dodaj_zakazy(karta, [z], "src.md"), 1)
+        self.assertEqual(dodaj_zakazy(karta, [z], "src.md"), 0)
+        self.assertEqual(len(karta["zakazy"]), 1)
+
+    def test_stary_zakaz_bez_klucza_rozpoznany_po_id_i_tytule(self):
+        karta = {"zakazy": [{"id": "Z1", "tytul": "t", "cytat": ["a"]}]}
+        self.assertEqual(dodaj_zakazy(karta, [self._z("Z1", "k", "b", tytul="t")], "s.md"), 0)
+
+
+# ── licznik ryzyk: ponowna analiza nie zawyża ─────────────────────────────────
+
+class TestRiskCounterIdempotencja(unittest.TestCase):
+
+    def test_ta_sama_wzmianka_dwa_razy_zapisana_raz(self):
+        karta = {}
+        item = {"temat_ryzyka": "konkurencja", "cytat": ["ten sam cytat"]}
+        update_risk_counter(karta, item, "src.md", "2026-10-13")
+        update_risk_counter(karta, item, "src.md", "2026-10-14")
+        self.assertEqual(len(karta["ryzyka"]["konkurencja"]), 1)
+
+
+# ── czyszczenie kluczy ────────────────────────────────────────────────────────
+
+class TestCzyszczenieKluczy(unittest.TestCase):
+
+    def test_usuwa_biale_i_niewidoczne_znaki(self):
+        brudny = "lin_api_ABC\u2028123\n \u2029\u00a0\ufeff\u200b\t"
+        self.assertEqual(czysc(brudny), "lin_api_ABC123")
+
+    def test_czysty_klucz_bez_zmian(self):
+        self.assertEqual(czysc("sk-ant-oat01-abc_DEF-123"), "sk-ant-oat01-abc_DEF-123")
+
+    def test_none_daje_pusty(self):
+        self.assertEqual(czysc(None), "")
+
+    def test_wyczysc_srodowisko_zmienia_tylko_sekrety_i_nie_drukuje_wartosci(self):
+        import os, io, contextlib
+        stare = {k: os.environ.get(k) for k in ("LINEAR_API_KEY", "RINVO_MODEL")}
+        try:
+            os.environ["LINEAR_API_KEY"] = "lin_api_SEKRET\u2028\n"
+            os.environ["RINVO_MODEL"] = "model z spacja "
+            bufor = io.StringIO()
+            with contextlib.redirect_stderr(bufor):
+                zmienione = wyczysc_srodowisko()
+            self.assertEqual(zmienione, ["LINEAR_API_KEY"])
+            self.assertEqual(os.environ["LINEAR_API_KEY"], "lin_api_SEKRET")
+            self.assertEqual(os.environ["RINVO_MODEL"], "model z spacja ")
+            self.assertNotIn("SEKRET", bufor.getvalue())
+        finally:
+            for k, v in stare.items():
+                if v is None:
+                    os.environ.pop(k, None)
+                else:
+                    os.environ[k] = v
+
+
+# ── Slack: stałe linie także gdy 0 ────────────────────────────────────────────
+
+class TestSlack(unittest.TestCase):
+
+    def _wynik(self):
+        import tempfile
+        d = {"spotkanie": {"data": "2026-10-13"},
+             "pozycje": [{"id": "T1", "sekcja": 1, "tytul": "Zadanie", "klucz_sprawy": "k",
+                          "pewnosc": "wysoka", "konflikt_z_zakazem": None}],
+             "aktualizacje_spraw": [], "ostrzezenia_dat": []}
+        f = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
+        json.dump(d, f)
+        f.close()
+        return Path(f.name)
+
+    def test_wszystkie_linie_obecne_nawet_gdy_zero(self):
+        import przetworz
+        p = self._wynik()
+        try:
+            msg = przetworz.build_slack_summary("klient-testowy", p, "")
+        finally:
+            p.unlink()
+        for nazwa in ("Zamknięte: 0", "Wznowione: 0", "Zablokowane przez zakaz: 0",
+                      "Powtarzające się ryzyka: 0", "Wielu klientów: 0", "Do weryfikacji: 0"):
+            self.assertIn(nazwa, msg)
+
+    def test_parsowanie_zdarzen_z_linear_sync(self):
+        import przetworz
+        out = ("  ✓ RIN-39 (adres) → zamknieta\n  ✓ RIN-48 (wstep) → zrob_teraz\n"
+               "  = RIN-51 (paw) → zrob_teraz (już w tym stanie, bez zmian)\n"
+               "  [pominięto aktualizację] RIN-1 (x): ta sama rozmowa (s)\n"
+               "  ↑ Powtarzające się ryzyko: RIN-62 (vd) | Tytuł ryzyka\n"
+               "  ★ Wielu klientów: RIN-76 (excel) | Tytuł funkcji\n")
+        z = przetworz.parse_sync_zdarzenia(out)
+        self.assertEqual(z["zamkniete"], [("RIN-39", "adres")])
+        self.assertEqual(z["wznowione"], [("RIN-48", "wstep")], "pominięte i już-w-stanie nie liczą się")
+        self.assertEqual(z["ryzyka"], [("RIN-62", "vd", "Tytuł ryzyka")])
+        self.assertEqual(z["wielu_klientow"], [("RIN-76", "excel", "Tytuł funkcji")])
+
+
+# ── daty.py: termin z zakresem ────────────────────────────────────────────────
+
+class TestTerminZZakresem(unittest.TestCase):
+
+    def _okna(self, fakty, klucz="wstep"):
+        import subprocess, tempfile
+        d = {"spotkanie": {"data": "2026-10-13"},
+             "pozycje": [{"id": "K1", "sekcja": 2, "klucz_sprawy": klucz, "cytat": ["x"]}],
+             "fakty_czasowe": fakty}
+        with tempfile.TemporaryDirectory() as tmp:
+            f = Path(tmp) / "wynik.json"
+            f.write_text(json.dumps(d), encoding="utf-8")
+            subprocess.run([sys.executable, "-I", str(Path(__file__).parent.parent / "daty.py"), str(f)],
+                           check=True, capture_output=True)
+            wynik = json.loads(f.read_text(encoding="utf-8"))
+        return next(o["okna"] for o in wynik["okna_czasowe"] if o["klucz_sprawy"] == klucz)
+
+    def test_koniec_zakresu_terminu_jest_deadlinem(self):
+        # „środa i czwartek": termin 14–15.10 → okno 14–15, a nie samo 14
+        okna = self._okna([{"typ": "termin", "od": "2026-10-14", "do": "2026-10-15",
+                            "dotyczy": "wstep", "cytat": "x"}])
+        self.assertEqual(okna, [{"od": "2026-10-14", "do": "2026-10-15"}])
+
+    def test_termin_bez_do_dziala_jak_dawniej(self):
+        okna = self._okna([{"typ": "termin", "od": "2026-10-15", "dotyczy": "wstep", "cytat": "x"}])
+        self.assertEqual(okna, [{"od": "2026-10-14", "do": "2026-10-15"}])
 
 
 if __name__ == "__main__":

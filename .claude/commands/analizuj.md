@@ -14,9 +14,10 @@ Wyznacz klienta i wczytaj jego historię:
 a) Klient: jeśli ścieżka ma postać ops/transkrypcje/<klient>/..., klient = <klient>. W przeciwnym razie klient = null.
 
 b) Jeśli klient != null i plik ops/klienci/<klient>/karta.json istnieje – wczytaj go:
-   - zakazy[]: lista zakazów klienta, każdy z polem "id" i "cytat",
+   - zakazy[]: lista zakazów klienta, każdy z polem "id" i "cytat" (id są unikalne w całej karcie; uchylone zakazy leżą w historia_zakazow[]),
    - decydenci[]: lista decydentów (kto może co zmieniać),
    - otwarte_sprawy: mapowanie klucz_sprawy → dane Linear.
+   Nowe zakazy z bieżącej rozmowy (sekcja 4) numeruj dalej od największego numeru id w karcie (zakazy[] i historia_zakazow[]): gdy karta ma Z14, pierwszy nowy zakaz to Z15. Dzięki temu id nie powtarzają się między rozmowami, a odwołanie w konflikt_z_zakazem i aktualizacje_spraw jest jednoznaczne.
    Jeśli pliku nie ma, przyjmij puste listy.
 
 c) Wczytaj ops/produkt/prosby.json (jeśli istnieje): mapowanie klucz_funkcji → lista klientów z cytatami.
@@ -33,8 +34,9 @@ Sprawdź listę z kroku 1:
 - usuń każdą pozycję bez dosłownego cytatu,
 - jeśli ktoś zmienił zdanie w trakcie rozmowy, zostaw tylko ostatnią wersję i odnotuj zmianę. Do zmian zdania zaliczaj tylko odwołanie lub zmianę wcześniejszej decyzji. Doprecyzowanie, odrzucona propozycja albo oferta, której druga strona nie przyjęła, to nie zmiana zdania,
 - odróżnij błąd (coś miało działać i nie działa) od nowej funkcji (czegoś nigdy nie było),
-- zakazy i ograniczenia ("nie rób", "nie wcześniej niż", "tylko raz", "nie wierzcie") zapisz jako osobne pozycje,
+- zakazy i ograniczenia ("nie rób", "nie wcześniej niż", "tylko raz", "nie wierzcie") zapisz jako osobne pozycje. Zapisz je także wtedy, gdy rozmowa potwierdza zakaz, który już jest w karcie, albo gdy klient ostrzega przed nieprawdziwą relacją innych („Ola mówiła, że się zgodziłam, nie zgodziłam się, gdyby ktoś tak napisał, nie wierzcie"): to nowe zastrzeżenie z własnym cytatem z tej rozmowy,
 - jeśli brakuje danych do działania (numer, nagranie, plik), status = czeka, nie zgaduj,
+- przypomnienia: gdy klient mówi, ile razy wolno przypomnieć („raz", „jeden mail"), wpisz to w przypomnienie.limit. Gdy klient wprost prosi, żeby NIE przypominać („drugi raz nie przypominaj, sama pamiętam"), ustaw przypomnienie = {"data": "brak", "limit": "0", "uwagi": "klient prosi, żeby nie przypominać"}, a samo „nie przypominaj" zapisz dodatkowo jako zakaz w sekcji 4 (z cytatem), bo tylko zakazy z karty obowiązują w kolejnych rozmowach. Termin, do którego klient ma dostarczyć (np. „do czwartku"), zostaje w polu "termin" pozycji i w fakty_czasowe — nie wpisuj go jako przypomnienie.data ani limit,
 - wypisz pole fakty_czasowe: każdy urlop, blokadę, termin i okno testów jako osobny wpis z polami typ (blokada/urlop/termin/start_nie_wczesniej), od i do (daty bezwzględne RRRR-MM-DD, przeliczone od daty spotkania; np. „w piątek" zamieniasz na datę), dotyczy (klucz_sprawy z sekcji 1–3 lub „wszystko_nowe" dla blokad globalnych jak urlop) i dosłowny cytat. Nie obliczaj konfliktów — zostaw konflikty_dat: []. Okna wolne oblicza skrypt daty.py po zapisaniu wynik.json,
 - dla każdej pozycji z sekcji 1–3: jeśli jej cytat zawiera ograniczenie czasowe odnoszące się wprost do tej sprawy (np. „tego nie robimy w tym tygodniu", „po urlopie", „do czwartku"), dodaj odpowiedni wpis do fakty_czasowe z dotyczy = klucz_sprawy tej pozycji. Jeśli jedno zdanie dotyczy wielu spraw, osobny wpis dla każdej. Urlopy i blokady globalne (dotyczy = „wszystko_nowe") wystarczą jako jeden wpis — nie trzeba ich powielać per sprawa,
 - każde stwierdzenie, które nie wynika wprost z cytatu (np. przeliczona data przypomnienia, domysł o intencji), przenieś do pola "wnioski",
@@ -65,6 +67,8 @@ nowy_status = "zrob_teraz": klient dostarczył to, na co czekaliśmy (np. przys�
 nowy_status = "zamknieta": sprawa rozwiązana lub nieaktualna.
 nowy_status = "anulowana": wyraźne wycofanie przez klienta.
 
+Wznowienie (zrob_teraz) dotyczy też spraw z otwarte_sprawy, które czekały na termin albo warunek zależny od klienta (np. „termin szkolenia ustalę ja", „po moim urlopie", „jak przyślę plik"). Jeśli w tej rozmowie klient podał ten termin albo spełnił ten warunek, dodaj aktualizację zrob_teraz z dosłownym cytatem. Dotyczy to także spraw, które w karcie są w backlogu albo oczekują. Sprawa, która już jest w otwarte_sprawy, dostaje aktualizację (z jej klucza), a nie wyłącznie nową pozycję „czeka" w sekcji 2. Nowy termin wpisz też w pole "termin" pozycji.
+
 Dotyczy też zakazów: jeśli ktoś w rozmowie uchyla zakaz, nowy_status = "anulowana". Zakaz może uchylić tylko decydent wskazany w karcie. Jeśli zrobiła to inna osoba, ustaw pewnosc = "niska" dla tej aktualizacji.
 
 Cytaty w aktualizacjach muszą być dosłowne (tak samo jak w pozycjach).
@@ -93,7 +97,7 @@ Schemat wynik.json:
     "cytat": ["dosłowny fragment", ...],
     "wnioski": ["stwierdzenie, które nie wynika wprost z cytatu", ...] (opcjonalnie),
     "zmiana_zdania": "..." (opcjonalnie),
-    "przypomnienie": { "data", "limit", "uwagi" } (sekcja 2),
+    "przypomnienie": { "data", "limit", "uwagi" } (sekcja 2; "limit" to liczba przypomnień, np. "1 raz", "0"; "data" to dzień przypomnienia, nigdy termin klienta),
     "klucz_sprawy": "slug-sprawy",
     "pewnosc": "wysoka | niska",
     "konflikt_z_zakazem": null | {"zakaz": "Z3", "uzasadnienie": "..."},

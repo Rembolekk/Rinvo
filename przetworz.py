@@ -30,6 +30,8 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from sekrety import NAZWY_SEKRETOW, czysc, wyczysc_srodowisko
+
 
 # ── .env ─────────────────────────────────────────────────────────────────────
 
@@ -43,7 +45,9 @@ def load_env():
         line = line.strip()
         if line and not line.startswith("#") and "=" in line:
             key, _, val = line.partition("=")
-            os.environ.setdefault(key.strip(), val.strip())
+            key = czysc(key)  # BOM i niewidoczne znaki z edytorów (Notatki)
+            val = czysc(val) if key in NAZWY_SEKRETOW else val.strip()
+            os.environ.setdefault(key, val)
 
 
 # ── rejestr ───────────────────────────────────────────────────────────────────
@@ -113,7 +117,7 @@ def send_slack(message, log_path=None):
     import ssl
     import urllib.request
 
-    webhook = os.environ.get("SLACK_WEBHOOK_URL", "")
+    webhook = czysc(os.environ.get("SLACK_WEBHOOK_URL", ""))
     if not webhook:
         note = "SLACK_WEBHOOK_URL nie ustawiony w .env — pominięto Slack."
         if log_path:
@@ -155,8 +159,7 @@ def _log(log_path, text):
 
 # ── redakcja kluczy i ogon logu ───────────────────────────────────────────────
 
-SECRET_ENV_VARS = ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY",
-                   "LINEAR_API_KEY", "SLACK_WEBHOOK_URL")
+SECRET_ENV_VARS = NAZWY_SEKRETOW
 SECRET_PATTERNS = [
     r"lin_api_\w+",
     r"https://hooks\.slack\.com/\S+",
@@ -205,6 +208,37 @@ def run_step(cmd, log_path, step_name, timeout=120):
 
 # ── Slack: podsumowanie ───────────────────────────────────────────────────────
 
+def _linia_slack(emoji, nazwa, pozycje, limit=5):
+    """Linia z licznikiem (także 0) i listą tytułów pod spodem."""
+    out = [f"{emoji} {nazwa}: {len(pozycje)}"]
+    out += [f"  • {t}" for t in pozycje[:limit]]
+    if len(pozycje) > limit:
+        out.append(f"  … i {len(pozycje) - limit} więcej")
+    return out
+
+
+def parse_sync_zdarzenia(sync_stdout):
+    """Wyciąga z wyjścia linear_sync.py to, co faktycznie zrobiono w tym przebiegu."""
+    wynik = {"zamkniete": [], "wznowione": [], "ryzyka": [], "wielu_klientow": []}
+    for ln in sync_stdout.splitlines():
+        m = re.match(r"\s*✓ (RIN-\d+) \(([^)]+)\) → (\w+)\s*$", ln)
+        if m:
+            ident, klucz, status = m.groups()
+            if status in ("zamknieta", "anulowana"):
+                wynik["zamkniete"].append((ident, klucz))
+            elif status == "zrob_teraz":
+                wynik["wznowione"].append((ident, klucz))
+            continue
+        m = re.match(r"\s*↑ Powtarzające się ryzyko: (RIN-\d+) \(([^)]+)\) \| (.*)$", ln)
+        if m:
+            wynik["ryzyka"].append(m.groups())
+            continue
+        m = re.match(r"\s*★ Wielu klientów: (RIN-\d+) \(([^)]+)\) \| (.*)$", ln)
+        if m:
+            wynik["wielu_klientow"].append(m.groups())
+    return wynik
+
+
 def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model=None):
     try:
         d = json.loads(wynik_path.read_text(encoding="utf-8"))
@@ -243,49 +277,64 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
             except ValueError:
                 pass
 
+    # karta klienta: tytuły i linki do spraw, o których mówi sync
+    karta = {}
+    karta_path = Path("ops") / "klienci" / klient / "karta.json"
+    if karta_path.exists():
+        try:
+            karta = json.loads(karta_path.read_text(encoding="utf-8"))
+        except Exception:
+            karta = {}
+    zdarzenia = parse_sync_zdarzenia(sync_stdout)
+
+    def sprawa(ident, klucz, tytul=""):
+        info = (karta.get("otwarte_sprawy", {}).get(klucz)
+                or karta.get("zamkniete_sprawy", {}).get(klucz) or {})
+        tytul = tytul or info.get("tytul", "") or klucz
+        url = info.get("url", "") if isinstance(info, dict) else ""
+        etykieta = f"<{url}|{ident}>" if url else ident
+        return f"{etykieta} {tytul[:70]}"
+
+    zamkniete = [sprawa(i, k) for i, k in zdarzenia["zamkniete"]]
+    wznowione = [sprawa(i, k) for i, k in zdarzenia["wznowione"]]
+    ryzyka_powt = [sprawa(i, k, t) for i, k, t in zdarzenia["ryzyka"]]
+    wielu = [sprawa(i, k, t) for i, k, t in zdarzenia["wielu_klientow"]]
+    zablokowane = [f"{p.get('id', '?')} {p.get('tytul', '')[:70]}" for p in blocked]
+    do_weryfikacji = [f"{p.get('id', '?')} {p.get('tytul', '')[:70]}" for p in niska]
+
     lines = [f":white_check_mark: *[{klient}]* Rozmowa z {data} przetworzona"]
     lines.append(
         f"Zrób teraz: {len(s1)} | Czeka: {len(s2)} | Ryzyka: {len(s5)} | "
         f"Nowe w Linear: {nowe} | Pominięte: {pominieto}"
     )
 
-    if blocked:
-        lines.append(f":no_entry: Zablokowane przez zakaz: {len(blocked)}")
-    if niska:
-        lines.append(f":warning: Do weryfikacji (pewność niska): {len(niska)}")
-    # Show reopened only when linear_sync actually processed updates (not pominięte)
-    if n_aktualizacji > 0:
-        reopened = [a for a in aktualizacje if a.get("nowy_status") == "zrob_teraz"]
-        if reopened:
-            lines.append(f":arrows_counterclockwise: Wznowione sprawy: {len(reopened)}")
+    # Te linie są zawsze, także gdy wynoszą 0 (brak linii wyglądałby jak brak informacji).
+    lines += _linia_slack(":white_check_mark:", "Zamknięte", zamkniete)
+    lines += _linia_slack(":arrows_counterclockwise:", "Wznowione", wznowione)
+    lines += _linia_slack(":no_entry:", "Zablokowane przez zakaz", zablokowane)
+    lines += _linia_slack(":rotating_light:", "Powtarzające się ryzyka", ryzyka_powt)
+    lines += _linia_slack(":busts_in_silhouette:", "Wielu klientów", wielu)
+    lines += _linia_slack(":warning:", "Do weryfikacji", do_weryfikacji)
+
     if ostrzezenia:
         lines.append(f":clock1: Brak faktów czasowych dla {len(ostrzezenia)} pozycji z cytatami o czasie")
-    if any("Powtarzające się ryzyko" in ln for ln in sync_stdout.splitlines()):
-        lines.append(":rotating_light: Powtarzające się ryzyko — sprawdź Linear")
     if model:
         lines.append(f":robot_face: Model analizy: {model}")
     if testy_wynik:
         icon = ":white_check_mark:" if testy_wynik.startswith("PASS") else ":x:"
         lines.append(f"{icon} Testy oczekiwań: {testy_wynik}")
 
-    # Links for sekcja 1 items (read karta.json for URLs)
-    karta_path = Path("ops") / "klienci" / klient / "karta.json"
-    if karta_path.exists():
-        try:
-            karta = json.loads(karta_path.read_text(encoding="utf-8"))
-            otwarte = karta.get("otwarte_sprawy", {})
-            for p in s1[:5]:
-                klucz = p.get("klucz_sprawy", "")
-                if klucz in otwarte and isinstance(otwarte[klucz], dict):
-                    info = otwarte[klucz]
-                    url = info.get("url", "")
-                    ident = info.get("identifier", klucz)
-                    if url:
-                        lines.append(f"  • <{url}|{ident}> {p['tytul'][:60]}")
-            if len(s1) > 5:
-                lines.append(f"  … i {len(s1) - 5} więcej")
-        except Exception:
-            pass
+    # Linki do spraw z sekcji 1
+    otwarte = karta.get("otwarte_sprawy", {})
+    if s1:
+        lines.append(f":pushpin: Zrób teraz ({len(s1)}):")
+    for p in s1[:5]:
+        klucz = p.get("klucz_sprawy", "")
+        info = otwarte.get(klucz)
+        if isinstance(info, dict) and info.get("url"):
+            lines.append(f"  • <{info['url']}|{info.get('identifier', klucz)}> {p['tytul'][:60]}")
+    if len(s1) > 5:
+        lines.append(f"  … i {len(s1) - 5} więcej")
 
     return "\n".join(lines)
 
@@ -300,6 +349,7 @@ def main():
             pass
 
     load_env()
+    wyczysc_srodowisko()  # sekrety ze środowiska (np. GitHub) też mogą mieć wklejone znaki
 
     parser = argparse.ArgumentParser(
         description="Przetwarza transkrypcję od początku do końca."
@@ -308,6 +358,9 @@ def main():
                         help="Ścieżka do pliku transkrypcji .md")
     parser.add_argument("--wymus", action="store_true",
                         help="Pomiń rejestr i przetworz ponownie")
+    parser.add_argument("--bez-analizy", action="store_true",
+                        help="Pomiń model: użyj istniejącego wynik.json (render, daty, Linear, testy, Slack). "
+                             "Do naprawy stanu po poprawce kodu; wymaga --wymus, jeśli transkrypcja jest w rejestrze")
     parser.add_argument("--test-slack", action="store_true",
                         help="Wyślij wiadomość testową na Slack i zakończ")
     args = parser.parse_args()
@@ -386,68 +439,74 @@ def main():
         print(f"Przetwarzam: {transkrypcja}  (klient: {klient})")
         print(f"Log: {log_path}")
 
-        # d) claude --print
-        cmd_file = Path(".claude/commands/analizuj.md")
-        if not cmd_file.exists():
-            fail("claude", f"Brak pliku komendy: {cmd_file}")
+        model = "istniejący wynik.json (bez analizy modelu)"
+        if args.bez_analizy:
+            if not wynik_path.exists():
+                fail("analiza", f"--bez-analizy: brak {wynik_path}")
+            print("Pominięto analizę modelu (--bez-analizy), używam istniejącego wynik.json")
+        else:
+            # d) claude --print
+            cmd_file = Path(".claude/commands/analizuj.md")
+            if not cmd_file.exists():
+                fail("claude", f"Brak pliku komendy: {cmd_file}")
 
-        raw = cmd_file.read_text(encoding="utf-8")
-        # Strip YAML frontmatter
-        prompt = re.sub(r"^---\n.*?\n---\n", "", raw, count=1, flags=re.DOTALL)
-        prompt = prompt.replace("$ARGUMENTS", transkrypcja).strip()
+            raw = cmd_file.read_text(encoding="utf-8")
+            # Strip YAML frontmatter
+            prompt = re.sub(r"^---\n.*?\n---\n", "", raw, count=1, flags=re.DOTALL)
+            prompt = prompt.replace("$ARGUMENTS", transkrypcja).strip()
 
-        env = os.environ.copy()
-        env["CLAUDE_CODE_MAX_OUTPUT_TOKENS"] = "64000"
-        # Pusta zmienna (np. nieustawiony sekret w GitHubie) to nie to samo co brak zmiennej:
-        # claude uznaje ją za podany, ale pusty token i kończy z "Not logged in".
-        for name in ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY"):
-            if name in env and not env[name].strip():
-                del env[name]
-        env.setdefault("HOME", str(Path.home()))
+            env = os.environ.copy()
+            env["CLAUDE_CODE_MAX_OUTPUT_TOKENS"] = "64000"
+            # Pusta zmienna (np. nieustawiony sekret w GitHubie) to nie to samo co brak zmiennej:
+            # claude uznaje ją za podany, ale pusty token i kończy z "Not logged in".
+            for name in ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY"):
+                if name in env and not env[name].strip():
+                    del env[name]
+            env.setdefault("HOME", str(Path.home()))
 
-        # Różnice Mac vs serwer: ścieżka instalacji i logowanie.
-        if not shutil.which("claude", path=env.get("PATH")):
-            fail("claude", "Nie znaleziono polecenia `claude` w PATH "
-                           "(npm install -g @anthropic-ai/claude-code).")
-        if os.environ.get("GITHUB_ACTIONS") == "true" and not (
-                env.get("CLAUDE_CODE_OAUTH_TOKEN") or env.get("ANTHROPIC_API_KEY")):
-            fail("claude", "Brak CLAUDE_CODE_OAUTH_TOKEN (sekret nieustawiony lub pusty). "
-                           "Na serwerze nie ma sesji z keychaina — wygeneruj token: claude setup-token.")
+            # Różnice Mac vs serwer: ścieżka instalacji i logowanie.
+            if not shutil.which("claude", path=env.get("PATH")):
+                fail("claude", "Nie znaleziono polecenia `claude` w PATH "
+                               "(npm install -g @anthropic-ai/claude-code).")
+            if os.environ.get("GITHUB_ACTIONS") == "true" and not (
+                    env.get("CLAUDE_CODE_OAUTH_TOKEN") or env.get("ANTHROPIC_API_KEY")):
+                fail("claude", "Brak CLAUDE_CODE_OAUTH_TOKEN (sekret nieustawiony lub pusty). "
+                               "Na serwerze nie ma sesji z keychaina — wygeneruj token: claude setup-token.")
 
-        model = os.environ.get("RINVO_MODEL", "").strip() or DEFAULT_MODEL
-        claude_cmd = [
-            "claude", "--print", prompt,
-            "--model", model,
-            "--allowedTools", "Read,Write,Edit,Bash",
-            "--dangerously-skip-permissions",
-        ]
+            model = os.environ.get("RINVO_MODEL", "").strip() or DEFAULT_MODEL
+            claude_cmd = [
+                "claude", "--print", prompt,
+                "--model", model,
+                "--allowedTools", "Read,Write,Edit,Bash",
+                "--dangerously-skip-permissions",
+            ]
 
-        print("Uruchamiam analizę Claude (do 30 min)…")
-        with open(log_path, "w", encoding="utf-8") as lf:
-            lf.write(f"=== przetworz.py ===\n")
-            lf.write(f"Transkrypcja: {transkrypcja}\n")
-            lf.write(f"Klient: {klient}\n")
-            lf.write(f"Start: {datetime.now().isoformat()}\n\n")
+            print("Uruchamiam analizę Claude (do 30 min)…")
+            with open(log_path, "w", encoding="utf-8") as lf:
+                lf.write(f"=== przetworz.py ===\n")
+                lf.write(f"Transkrypcja: {transkrypcja}\n")
+                lf.write(f"Klient: {klient}\n")
+                lf.write(f"Start: {datetime.now().isoformat()}\n\n")
 
-        try:
-            with open(log_path, "a", encoding="utf-8") as lf:
-                lf.write(f"{'='*60}\n=== claude --print ===\n{'='*60}\n\n")
-                lf.flush()
-                r = subprocess.run(
-                    claude_cmd,
-                    env=env,
-                    stdin=subprocess.DEVNULL,
-                    stdout=lf,
-                    stderr=lf,
-                    timeout=30 * 60,
-                )
-        except subprocess.TimeoutExpired:
-            fail("claude", "Przekroczono limit 30 minut.")
+            try:
+                with open(log_path, "a", encoding="utf-8") as lf:
+                    lf.write(f"{'='*60}\n=== claude --print ===\n{'='*60}\n\n")
+                    lf.flush()
+                    r = subprocess.run(
+                        claude_cmd,
+                        env=env,
+                        stdin=subprocess.DEVNULL,
+                        stdout=lf,
+                        stderr=lf,
+                        timeout=30 * 60,
+                    )
+            except subprocess.TimeoutExpired:
+                fail("claude", "Przekroczono limit 30 minut.")
 
-        if r.returncode != 0:
-            # claude zwykle pisze przyczynę (np. "Not logged in", "401") na stdout
-            cause = tail_log(log_path, 1)[:200]
-            fail("claude", f"Kod wyjścia: {r.returncode}. Przyczyna: {cause}. Log: {log_path}")
+            if r.returncode != 0:
+                # claude zwykle pisze przyczynę (np. "Not logged in", "401") na stdout
+                cause = tail_log(log_path, 1)[:200]
+                fail("claude", f"Kod wyjścia: {r.returncode}. Przyczyna: {cause}. Log: {log_path}")
 
         # e) render.py
         if not wynik_path.exists():
