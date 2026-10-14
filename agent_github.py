@@ -158,3 +158,29 @@ def ostatnia_recenzja_coderabbit(recenzje, komentarze_inline):
         uwagi = 0
     return {"commit": r.get("commit_id"), "uwagi": uwagi,
             "komentarze": [{"sciezka": c.get("path"), "linia": c.get("line"), "tresc": c.get("body", "")} for c in inline]}
+
+
+POMINIECIE_CODERABBIT = ("review skipped", "review failed", "rate limit", "review paused", "reviews paused")
+
+
+def ocena_coderabbit(recenzje, komentarze_inline, komentarze_issue, statusy, sha):
+    """Ocena CodeRabbit dla commita sha: {"commit", "uwagi", "komentarze"} albo None (jeszcze nie zrecenzował).
+
+    1) recenzja bota dla tego commita (z komentarzami inline) → jej liczba uwag;
+    2) bez obiektu recenzji CodeRabbit kończy też samym podsumowaniem w komentarzu PR i statusem „CodeRabbit” = success
+       (gdy nie ma czego zgłaszać). Uznajemy to za recenzję bez uwag tylko, gdy status jest zielony dla TEGO commita, bot
+       zostawił podsumowanie, a podsumowanie nie mówi „Review skipped/failed/paused” (np. przez filtr ścieżek) oraz nie ma
+       komentarzy inline bota do tego commita."""
+    rec = ostatnia_recenzja_coderabbit(recenzje, komentarze_inline)
+    if rec is not None and rec["commit"] == sha:
+        return rec
+    status_ok = any("coderabbit" in str(x.get("context", "")).lower() and x.get("state") == "success" for x in statusy)
+    bot = [k for k in komentarze_issue if (k.get("user") or {}).get("login") in BOTY_CODERABBIT]
+    if not (status_ok and bot):
+        return rec
+    tekst = " ".join((k.get("body") or "") for k in bot).lower()
+    if any(m in tekst for m in POMINIECIE_CODERABBIT):
+        return rec                                   # pominięta albo nieudana recenzja to nie „brak uwag”
+    inline = [c for c in komentarze_inline if (c.get("user") or {}).get("login") in BOTY_CODERABBIT and c.get("commit_id") == sha]
+    return {"commit": sha, "uwagi": len(inline), "bez_obiektu_recenzji": True,
+            "komentarze": [{"sciezka": c.get("path"), "linia": c.get("line"), "tresc": c.get("body", "")} for c in inline]}

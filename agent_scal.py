@@ -24,10 +24,26 @@ import slack_widok as sw
 import zasady
 from agent import (NAZWY_SEKRETOW_ENV, pliki_do_commita, czy_dozwolona_sciezka, sciezki_niedozwolone, tytul_bez_prefiksu, znajdz_sekrety,
                    rozbij_opis, klient_z_tytulu)
-from agent_github import ostatnia_recenzja_coderabbit, stan_coderabbit_ci, stan_testow
+from agent_github import ocena_coderabbit, stan_coderabbit_ci, stan_testow
 from maile import slack_bezpiecznie
 
 ZNACZNIK_POPRAWKI = "<!-- agent-poprawka -->"
+ZNACZNIK_ODDANIA = "<!-- agent-oddanie -->"
+ZNACZNIK_WZNOWIENIA = "<!-- agent-wznowienie -->"
+TEKST_ODDANIA = "Agent oddaje ten PR człowiekowi"          # także starsze komentarze bez znacznika
+
+
+def stan_oddania(komentarze):
+    """„oddane”, gdy OSTATNIM śladem agenta jest oddanie PR człowiekowi (komentarz agenta, nie decyzja człowieka);
+    „wznowione”, gdy ostatnie jest wznowienie; None, gdy agent PR nie oddawał. Kolejność komentarzy jak w GitHubie."""
+    stan = None
+    for k in komentarze:
+        body = k.get("body") or ""
+        if ZNACZNIK_WZNOWIENIA in body:
+            stan = "wznowione"
+        elif ZNACZNIK_ODDANIA in body or body.startswith(TEKST_ODDANIA):
+            stan = "oddane"
+    return stan
 
 
 # ── funkcje czyste ────────────────────────────────────────────────────────────
@@ -94,14 +110,15 @@ def _data_od_ktorej_czekamy(gh, pr):
 def zbierz_fakty(gh, pr, zg, A, teraz):
     sha = pr["head"]["sha"]
     runy, statusy = gh.check_runs(sha), gh.statusy(sha)
+    komentarze = gh.komentarze(pr["number"])
     return {
         "pliki": gh.pliki_pr(pr["number"]),
         "etykiety_zgloszenia": zg.get("labels", []),
         "testy": stan_testow(runy),
         "coderabbit_ci": stan_coderabbit_ci(runy, statusy),
-        "recenzja": ostatnia_recenzja_coderabbit(gh.recenzje(pr["number"]), gh.komentarze_inline(pr["number"])),
+        "recenzja": ocena_coderabbit(gh.recenzje(pr["number"]), gh.komentarze_inline(pr["number"]), komentarze, statusy, sha),
         "sha": sha,
-        "poprawki": sum(1 for k in gh.komentarze(pr["number"]) if ZNACZNIK_POPRAWKI in (k.get("body") or "")),
+        "poprawki": sum(1 for k in komentarze if ZNACZNIK_POPRAWKI in (k.get("body") or "")),
         "wiek_godzin": _godziny_od(_data_od_ktorej_czekamy(gh, pr), teraz),
     }
 
@@ -127,7 +144,8 @@ def oddaj_czlowiekowi(s, zg, pr, powod):
     pelny = f"{A['powod_przegladu']}: {powod}"
     s.linear.dodaj_etykiete(zg, s.Z["etykiety"]["czlowiek"])
     s.linear.komentarz(zg, f"**Decyzja człowieka: {A['powod_przegladu']}**\n\n{powod}\n\nPR: {pr.get('html_url', '')}")
-    s.github.komentarz(pr["number"], f"Agent oddaje ten PR człowiekowi ({pelny}). Automatyczne scalenie wstrzymane.")
+    s.github.komentarz(pr["number"], f"{TEKST_ODDANIA} ({pelny}). Automatyczne scalenie wstrzymane. "
+                                     f"Gdy przyczyna zniknie, agent sam wznowi scalanie. {ZNACZNIK_ODDANIA}")
     _slack_oddal(s, zg, pr, powod)
     return {"akcja": "oddane", "powod": pelny, "numer": pr["number"]}
 
@@ -174,10 +192,25 @@ def obsluz_pr(s, pr):
     zg = s.linear.zgloszenie_po_numerze(numer) if numer else None
     if zg is None:
         return None
-    if zg.get("state") in ("Done", "Canceled", "Cancelled") or s.Z["etykiety"]["czlowiek"] in zg.get("labels", []):
-        return None                                                   # skończone albo już oddane człowiekowi
+    if zg.get("state") in ("Done", "Canceled", "Cancelled"):
+        print(f"  PR #{pr['number']}: pominięty, zgłoszenie {zg['identifier']} jest zakończone")
+        return None
+    E = s.Z["etykiety"]
     f = zbierz_fakty(s.github, pr, zg, A, s.teraz())
     d = ocen_pr(f, A)
+    if E["czlowiek"] in zg.get("labels", []):
+        # PR oddany człowiekowi: wraca do scalania, gdy to AGENT go oddał, a przyczyna zniknęła (np. usunięto pliki .pyc).
+        # Etykieta nałożona przez człowieka (agent nie oddawał albo już wznowił) zostaje w spokoju.
+        if stan_oddania(s.github.komentarze(pr["number"])) != "oddane":
+            print(f"  PR #{pr['number']}: pominięty, etykieta „{E['czlowiek']}” nie pochodzi od agenta")
+            return None
+        if d["akcja"] == "oddaj":
+            print(f"  PR #{pr['number']}: nadal oddany człowiekowi ({d['powod']})")
+            return None
+        s.linear.usun_etykiete(zg, E["czlowiek"])
+        s.linear.komentarz(zg, f"**Agent wznawia scalanie.** Przyczyna oddania zniknęła; PR wraca do normalnej ścieżki "
+                               f"(testy, CodeRabbit, scalenie): {pr.get('html_url', '')}")
+        s.github.komentarz(pr["number"], f"Przyczyna oddania zniknęła, agent wznawia scalanie. {ZNACZNIK_WZNOWIENIA}")
 
     if d["akcja"] == "czekaj":
         return {"akcja": "czekaj", "powod": d["powod"], "numer": pr["number"]}
@@ -206,6 +239,7 @@ def uruchom_scalanie(s):
     wyniki = []
     for pr in s.github.otwarte_pr():
         if not pr_agenta(pr):
+            print(f"  PR #{pr.get('number')}: nie PR agenta (gałąź „{(pr.get('head') or {}).get('ref')}” albo brak „Fixes RIN-…” w opisie)")
             continue
         w = obsluz_pr(s, pr)
         if w is not None:

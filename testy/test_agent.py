@@ -64,7 +64,16 @@ class AtrapaLinear:
 
     def dodaj_etykiete(self, zg, nazwa):
         zg.setdefault("labels", []).append(nazwa)
+        for z in self.zgloszenia:                                    # zgłoszenia z po_numerze to kopie: zapisz też w magazynie
+            if z["identifier"] == zg["identifier"] and nazwa not in z.setdefault("labels", []):
+                z["labels"].append(nazwa)
         self.zdarzenia.append(("etykieta", zg["identifier"], nazwa))
+
+    def usun_etykiete(self, zg, nazwa):
+        for z in (zg, next((x for x in self.zgloszenia if x["identifier"] == zg["identifier"]), zg)):
+            if nazwa in z.get("labels", []):
+                z["labels"].remove(nazwa)
+        self.zdarzenia.append(("-etykieta", zg["identifier"], nazwa))
 
     def zgloszenie_po_numerze(self, numer):
         return next((copy.deepcopy(z) for z in self.zgloszenia if z["identifier"] == f"RIN-{numer}"), None)
@@ -817,6 +826,138 @@ class TestPrzebiegScalania(unittest.TestCase):
     def test_testy_czerwone_na_pr_to_oddanie_bez_scalenia(self):
         s = srodowisko_scalania(recenzje=[recenzja()], runy=[{"name": "testy", "status": "completed", "conclusion": "failure"}])
         self.assertEqual(agent_scal.uruchom_scalanie(s)[0]["akcja"], "oddane")
+        self.assertEqual(s.github.scalone, [])
+
+
+# ── powrót PR oddanego człowiekowi na ścieżkę scalania ────────────────────────
+
+ODDANIE_STARE = {"body": "Agent oddaje ten PR człowiekowi (przegląd kodu: zmiana wychodzi poza dozwolone ścieżki: "
+                         "tests/__pycache__/x.pyc). Automatyczne scalenie wstrzymane."}
+
+
+def srodowisko_oddane(komentarze=(ODDANIE_STARE,), etykiety=("Konfiguracja", "Decyzja człowieka"), **gh_kw):
+    zg = zgloszenie(41, etykiety=etykiety, stan="In Progress")
+    return Srodowisko([zg], github=AtrapaGitHub(prs=[pr()], komentarze=list(komentarze), **gh_kw))
+
+
+class TestPowrotDoScalania(unittest.TestCase):
+
+    def test_pr_agenta_z_etykieta_decyzja_czlowieka_nie_odpada_przy_rozpoznaniu(self):
+        """Rozpoznanie PR agenta (gałąź rin-N-… + „Fixes RIN-N”) nie zależy od etykiety w Linearze."""
+        self.assertTrue(agent_scal.pr_agenta(pr()))
+
+    def test_przyczyna_zniknela_pr_wraca_i_jest_scalany(self):
+        s = srodowisko_oddane(recenzje=[recenzja()])               # pliki już czyste, testy zielone, CodeRabbit bez uwag
+        w = agent_scal.uruchom_scalanie(s)[0]
+        self.assertEqual(w["akcja"], "scalone")
+        self.assertNotIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"])
+        self.assertIn(("-etykieta", "RIN-41", "Decyzja człowieka"), s.linear.zdarzenia)
+        self.assertIn(("stan", "RIN-41", "Done"), s.linear.zdarzenia)
+        self.assertTrue(any(agent_scal.ZNACZNIK_WZNOWIENIA in k[1] for k in s.github.dodane_komentarze))
+        self.assertTrue(any("wznawia scalanie" in k[2] for k in s.linear.zdarzenia if k[0] == "komentarz"))
+        self.assertEqual(len(s.github.scalone), 1)
+
+    def test_przyczyna_zniknela_ale_coderabbit_jeszcze_nie_skonczyl_pr_wraca_i_czeka(self):
+        s = srodowisko_oddane(recenzje=[])
+        w = agent_scal.uruchom_scalanie(s)[0]
+        self.assertEqual(w["akcja"], "czekaj")
+        self.assertNotIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"], "wrócił na ścieżkę, choć jeszcze nie scalony")
+        self.assertEqual(s.github.scalone, [])
+        self.assertEqual(s.slack.wiadomosci, [], "bez Slacka: dopiero scalenie albo oddanie")
+
+    def test_przyczyna_nadal_jest_pr_zostaje_oddany_bez_powtarzania_komentarzy(self):
+        s = srodowisko_oddane(recenzje=[recenzja()], pliki=["config/a.yaml", "tests/__pycache__/x.pyc"])
+        self.assertEqual(agent_scal.uruchom_scalanie(s), [])
+        self.assertIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"])
+        self.assertEqual((s.linear.zdarzenia, s.github.dodane_komentarze, s.slack.wiadomosci, s.github.scalone), ([], [], [], []))
+
+    def test_etykieta_nalozona_przez_czlowieka_zostaje(self):
+        s = srodowisko_oddane(komentarze=[], recenzje=[recenzja()])
+        self.assertEqual(agent_scal.uruchom_scalanie(s), [])
+        self.assertIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"])
+        self.assertEqual(s.github.scalone, [])
+
+    def test_czlowiek_po_wznowieniu_ponownie_oddaje_i_agent_nie_wraca_na_sile(self):
+        kom = [ODDANIE_STARE, {"body": f"Przyczyna oddania zniknęła, agent wznawia scalanie. {agent_scal.ZNACZNIK_WZNOWIENIA}"}]
+        s = srodowisko_oddane(komentarze=kom, recenzje=[recenzja()])          # etykieta znów jest, ale po wznowieniu: to człowiek
+        self.assertEqual(agent_scal.uruchom_scalanie(s), [])
+        self.assertIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"])
+        self.assertEqual(s.github.scalone, [])
+
+    def test_nowe_oddanie_po_wznowieniu_znowu_pozwala_wrocic(self):
+        kom = [ODDANIE_STARE, {"body": f"x {agent_scal.ZNACZNIK_WZNOWIENIA}"}, {"body": f"Agent oddaje ten PR człowiekowi (przegląd kodu: y). {agent_scal.ZNACZNIK_ODDANIA}"}]
+        self.assertEqual(agent_scal.stan_oddania(kom), "oddane")
+        self.assertIsNone(agent_scal.stan_oddania([{"body": "zwykły komentarz"}]))
+        self.assertEqual(agent_scal.stan_oddania([{"body": f"{agent_scal.ZNACZNIK_WZNOWIENIA}"}]), "wznowione")
+
+    def test_oddanie_zapisuje_znacznik_i_wskazuje_ze_agent_wznowi(self):
+        s = srodowisko_scalania(recenzje=[recenzja()], pliki=["config/a.yaml", ".github/x.yml"])
+        agent_scal.uruchom_scalanie(s)
+        tekst = s.github.dodane_komentarze[0][1]
+        self.assertIn(agent_scal.ZNACZNIK_ODDANIA, tekst)
+        self.assertIn("agent sam wznowi", tekst)
+        self.assertEqual(agent_scal.stan_oddania([{"body": tekst}]), "oddane")
+
+    def test_zakonczone_zgloszenie_nie_wraca(self):
+        zg = zgloszenie(41, etykiety=("Konfiguracja", "Decyzja człowieka"), stan="Done")
+        s = Srodowisko([zg], github=AtrapaGitHub(prs=[pr()], komentarze=[ODDANIE_STARE], recenzje=[recenzja()]))
+        self.assertEqual(agent_scal.uruchom_scalanie(s), [])
+        self.assertEqual(s.github.scalone, [])
+
+    def test_pelny_cykl_oddanie_potem_naprawa_potem_scalenie(self):
+        s = srodowisko_scalania(recenzje=[recenzja()], pliki=["config/a.yaml", "tests/__pycache__/x.pyc"])
+        self.assertEqual(agent_scal.uruchom_scalanie(s)[0]["akcja"], "oddane")
+        self.assertIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"])
+        s.github.pliki = ["config/a.yaml"]                         # usunięto .pyc z gałęzi
+        self.assertEqual(agent_scal.uruchom_scalanie(s)[0]["akcja"], "scalone")
+        self.assertNotIn("Decyzja człowieka", s.linear.zgloszenia[0]["labels"])
+
+
+# ── CodeRabbit bez obiektu recenzji (samo podsumowanie + zielony status) ───────
+
+def podsumowanie_cr(tresc="## Walkthrough\nZmiany w konfiguracji."):
+    return {"user": BOT, "body": tresc}
+
+
+STATUS_CR = [{"context": "CodeRabbit", "state": "success", "description": "Review completed"}]
+
+
+class TestCodeRabbitBezRecenzji(unittest.TestCase):
+
+    def test_podsumowanie_i_zielony_status_dla_commita_to_brak_uwag(self):
+        r = ag.ocena_coderabbit([], [], [podsumowanie_cr()], STATUS_CR, "abc")
+        self.assertEqual((r["commit"], r["uwagi"]), ("abc", 0))
+
+    def test_review_skipped_to_nie_recenzja(self):
+        self.assertIsNone(ag.ocena_coderabbit([], [], [podsumowanie_cr("> ## Review skipped\n> Files ignored due to path filters")], STATUS_CR, "abc"))
+        for marker in ("Review failed", "rate limit exceeded", "Reviews paused"):
+            self.assertIsNone(ag.ocena_coderabbit([], [], [podsumowanie_cr(marker)], STATUS_CR, "abc"), marker)
+
+    def test_bez_statusu_albo_bez_podsumowania_bota_nie_ma_oceny(self):
+        self.assertIsNone(ag.ocena_coderabbit([], [], [podsumowanie_cr()], [], "abc"))
+        self.assertIsNone(ag.ocena_coderabbit([], [], [], STATUS_CR, "abc"))
+        self.assertIsNone(ag.ocena_coderabbit([], [], [{"user": {"login": "ktos"}, "body": "ok"}], STATUS_CR, "abc"))
+        self.assertIsNone(ag.ocena_coderabbit([], [], [podsumowanie_cr()], [{"context": "CodeRabbit", "state": "pending"}], "abc"))
+
+    def test_komentarze_inline_bota_do_commita_to_uwagi(self):
+        inline = [{"user": BOT, "commit_id": "abc", "path": "config/a.yaml", "line": 3, "body": "Błąd"},
+                  {"user": BOT, "commit_id": "stary", "path": "x", "line": 1, "body": "stare"}]
+        r = ag.ocena_coderabbit([], inline, [podsumowanie_cr()], STATUS_CR, "abc")
+        self.assertEqual(r["uwagi"], 1)
+
+    def test_recenzja_dla_innego_commita_nie_liczy_sie_ale_podsumowanie_dla_nowego_tak(self):
+        rec = [{"id": 1, "user": BOT, "submitted_at": "2026-10-14T11:00:00Z", "commit_id": "stary", "body": "Actionable comments posted: 3", "state": "COMMENTED"}]
+        r = ag.ocena_coderabbit(rec, [], [podsumowanie_cr()], STATUS_CR, "nowy")
+        self.assertEqual((r["commit"], r["uwagi"]), ("nowy", 0))
+
+    def test_scalanie_dziala_gdy_coderabbit_skonczyl_samym_podsumowaniem(self):
+        s = srodowisko_scalania(recenzje=[], komentarze=[podsumowanie_cr()], statusy=STATUS_CR)
+        w = agent_scal.uruchom_scalanie(s)[0]
+        self.assertEqual(w["akcja"], "scalone")
+
+    def test_review_skipped_przez_pyc_czeka_a_nie_scala(self):
+        s = srodowisko_scalania(recenzje=[], komentarze=[podsumowanie_cr("> ## Review skipped")], statusy=STATUS_CR)
+        self.assertEqual(agent_scal.uruchom_scalanie(s)[0]["akcja"], "czekaj")
         self.assertEqual(s.github.scalone, [])
 
 

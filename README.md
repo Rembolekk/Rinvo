@@ -315,6 +315,8 @@ Agent sam wykonuje zgłoszenia z Lineara w osobnym repozytorium [Rinvo-app](http
 
 **`agent_scal.py`** scala PR (squash) tylko gdy JEDNOCZEŚNIE: testy zielone, CodeRabbit skończył recenzję ostatniego commita bez uwag, zmiana dotyka tylko `config/` lub `wiedza/`, zgłoszenie ma etykietę `Konfiguracja`. Uwagi CodeRabbit agent uwzględnia raz; dalej uwagi albo zmiana poza ścieżkami: etykieta `Decyzja człowieka` z powodem „przegląd kodu”. Po scaleniu zgłoszenie dostaje Done.
 
+**Powrót PR oddanego człowiekowi.** Gdy agent oddał PR (komentarz „Agent oddaje ten PR człowiekowi… <!-- agent-oddanie -->” + etykieta `Decyzja człowieka`), przy każdym przebiegu `agent_scal.py` sprawdza ponownie, czy przyczyna nadal istnieje. Jeśli zniknęła (np. usunięto pliki `.pyc`), zdejmuje etykietę, dodaje znacznik „agent-wznowienie” i PR idzie dalej zwykłą ścieżką (czekanie na testy i CodeRabbit, scalenie). Etykieta nałożona przez człowieka (agent PR nie oddawał albo już wznowił) zostaje nietknięta. CodeRabbit, który kończy samym podsumowaniem i zielonym statusem (bez obiektu recenzji), liczy się jako recenzja bez uwag, ale nie „Review skipped/failed/paused”. Przebieg wypisuje, dlaczego każdy PR został pominięty.
+
 **Slack** tylko na koniec: „Agent naprawił: <tytuł> (link do PR)” albo „Agent oddał: <tytuł>, powód”.
 
 **Workflow** `Agent wykonawczy` (`agent.yml`): ręcznie (zawsze), co 15 minut i po każdym udanym przetworzeniu rozmowy lub maila (te dwa dopiero po ustawieniu zmiennej repozytorium `AGENT_WLACZONY=true`). Sekret `AGENT_GITHUB_TOKEN` (dostęp tylko do Rinvo-app) istnieje wyłącznie w sekretach GitHuba; agent nie działa lokalnie. Testy logiki bez sieci: `python3 testy/test_agent.py`.
