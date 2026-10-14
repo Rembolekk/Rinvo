@@ -54,6 +54,38 @@ jobs:
           pip install certifi
           npm install -g @anthropic-ai/claude-code
 
+      # Diagnostyka logowania: te same flagi i model co w przetworz.py.
+      # Pokazuje, czy CLAUDE_CODE_OAUTH_TOKEN działa na serwerze, zanim ruszy analiza.
+      - name: Diagnostyka Claude
+        run: |
+          set -uo pipefail
+          MODEL="${RINVO_MODEL:-}"
+          MODEL="${MODEL:-claude-sonnet-5-5}"
+          echo "Model: $MODEL"
+          echo "Wersja: $(claude --version 2>&1)"
+          if [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+            echo "CLAUDE_CODE_OAUTH_TOKEN: ustawiony (długość ${#CLAUDE_CODE_OAUTH_TOKEN})"
+          else
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN jest pusty lub nieustawiony (Settings → Secrets → Actions)"
+            exit 1
+          fi
+          [ -n "${LINEAR_API_KEY:-}" ] && echo "LINEAR_API_KEY: ustawiony" || echo "::warning::LINEAR_API_KEY pusty"
+          [ -n "${SLACK_WEBHOOK_URL:-}" ] && echo "SLACK_WEBHOOK_URL: ustawiony" || echo "::warning::SLACK_WEBHOOK_URL pusty"
+
+          set +e
+          ODP=$(claude -p "Odpowiedz jednym słowem: OK" \
+                  --model "$MODEL" \
+                  --allowedTools "Read,Write,Edit,Bash" \
+                  --dangerously-skip-permissions < /dev/null 2>&1)
+          RC=$?
+          set -e
+          echo "Kod wyjścia: $RC"
+          echo "Odpowiedź: $ODP"
+          if [ "$RC" -ne 0 ]; then
+            echo "::error::claude -p nie działa na serwerze (kod $RC): $ODP"
+            exit 1
+          fi
+
       - name: Wykryj transkrypcje
         id: wykryj
         env:
@@ -101,6 +133,7 @@ jobs:
         if: steps.wykryj.outputs.liczba != '0'
         run: |
           set -uo pipefail
+          touch /tmp/start_przetwarzania
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
@@ -143,3 +176,46 @@ jobs:
             echo "::error::Błędy: $BLEDY"
             exit 1
           fi
+
+      # Gdy cokolwiek się wysypie: ostatnie 60 linii logu (bez kluczy) i cały folder logów jako artifact.
+      - name: Ostatnie linie logu przebiegu
+        if: failure()
+        run: |
+          python3 - <<'EOF'
+          import os, re, glob
+          from pathlib import Path
+
+          def redact(t):
+              for n in ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY", "LINEAR_API_KEY", "SLACK_WEBHOOK_URL"):
+                  v = os.environ.get(n, "")
+                  if len(v) >= 8:
+                      t = t.replace(v, "***")
+              for pat in (r"lin_api_\w+", r"https://hooks\.slack\.com/\S+", r"sk-ant-[\w-]+"):
+                  t = re.sub(pat, "***", t)
+              return re.sub(r"(?i)(bearer\s+)[\w.~+/=-]{12,}", r"\1***", t)
+
+          logi = sorted(glob.glob("logi/przebiegi/*.log"), key=os.path.getmtime)
+          start = Path("/tmp/start_przetwarzania")
+          if start.exists():
+              logi = [l for l in logi if os.path.getmtime(l) >= start.stat().st_mtime]
+          if not logi:
+              print("Brak logów przebiegu z tego uruchomienia (błąd przed przetwarzaniem).")
+          for l in logi:
+              linie = Path(l).read_text(encoding="utf-8", errors="replace").splitlines()
+              print(f"::group::{l} (ostatnie 60 linii)")
+              print(redact("\n".join(linie[-60:])))
+              print("::endgroup::")
+          EOF
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Logi jako artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logi-przebiegi-${{ github.run_id }}
+          path: logi/przebiegi
+          if-no-files-found: ignore
+          retention-days: 14

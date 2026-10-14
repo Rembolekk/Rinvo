@@ -23,6 +23,7 @@ import hashlib
 import json
 import os
 import re
+import shutil
 import subprocess
 import sys
 import time
@@ -150,6 +151,39 @@ def _log(log_path, text):
             lf.write(text)
     except OSError:
         pass
+
+
+# ── redakcja kluczy i ogon logu ───────────────────────────────────────────────
+
+SECRET_ENV_VARS = ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY",
+                   "LINEAR_API_KEY", "SLACK_WEBHOOK_URL")
+SECRET_PATTERNS = [
+    r"lin_api_\w+",
+    r"https://hooks\.slack\.com/\S+",
+    r"sk-ant-[\w-]+",
+    r"(?i)(bearer\s+)[\w.~+/=-]{12,}",
+]
+
+
+def redact(text):
+    """Usuwa z tekstu wartości sekretów (ze środowiska) i typowe wzorce kluczy."""
+    for name in SECRET_ENV_VARS:
+        val = os.environ.get(name, "")
+        if len(val) >= 8:
+            text = text.replace(val, "***")
+    for pat in SECRET_PATTERNS:
+        text = re.sub(pat, lambda m: (m.group(1) if m.groups() else "") + "***", text)
+    return text
+
+
+def tail_log(log_path, n=30):
+    """Ostatnie n niepustych linii logu, bez kluczy."""
+    try:
+        lines = Path(log_path).read_text(encoding="utf-8", errors="replace").splitlines()
+    except OSError:
+        return ""
+    lines = [ln for ln in lines if ln.strip()]
+    return redact("\n".join(lines[-n:]))
 
 
 # ── subprocesy ────────────────────────────────────────────────────────────────
@@ -337,6 +371,10 @@ def main():
         full = f"BŁĄD w kroku '{step}': {msg}"
         _log(log_path, f"\n{full}\n")
         print(full, file=sys.stderr)
+        tail = tail_log(log_path, 30)
+        if tail:
+            print(f"--- ostatnie linie logu ({log_path}) ---\n{tail}\n--- koniec ---",
+                  file=sys.stderr)
         send_slack(
             f":x: *[{klient}]* przetworz.py — błąd w `{step}`\n{msg}\nLog: `{log_path}`",
             log_path=log_path,
@@ -360,6 +398,21 @@ def main():
 
         env = os.environ.copy()
         env["CLAUDE_CODE_MAX_OUTPUT_TOKENS"] = "64000"
+        # Pusta zmienna (np. nieustawiony sekret w GitHubie) to nie to samo co brak zmiennej:
+        # claude uznaje ją za podany, ale pusty token i kończy z "Not logged in".
+        for name in ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY"):
+            if name in env and not env[name].strip():
+                del env[name]
+        env.setdefault("HOME", str(Path.home()))
+
+        # Różnice Mac vs serwer: ścieżka instalacji i logowanie.
+        if not shutil.which("claude", path=env.get("PATH")):
+            fail("claude", "Nie znaleziono polecenia `claude` w PATH "
+                           "(npm install -g @anthropic-ai/claude-code).")
+        if os.environ.get("GITHUB_ACTIONS") == "true" and not (
+                env.get("CLAUDE_CODE_OAUTH_TOKEN") or env.get("ANTHROPIC_API_KEY")):
+            fail("claude", "Brak CLAUDE_CODE_OAUTH_TOKEN (sekret nieustawiony lub pusty). "
+                           "Na serwerze nie ma sesji z keychaina — wygeneruj token: claude setup-token.")
 
         model = os.environ.get("RINVO_MODEL", "").strip() or DEFAULT_MODEL
         claude_cmd = [
@@ -383,6 +436,7 @@ def main():
                 r = subprocess.run(
                     claude_cmd,
                     env=env,
+                    stdin=subprocess.DEVNULL,
                     stdout=lf,
                     stderr=lf,
                     timeout=30 * 60,
@@ -391,7 +445,9 @@ def main():
             fail("claude", "Przekroczono limit 30 minut.")
 
         if r.returncode != 0:
-            fail("claude", f"Kod wyjścia: {r.returncode}. Log: {log_path}")
+            # claude zwykle pisze przyczynę (np. "Not logged in", "401") na stdout
+            cause = tail_log(log_path, 1)[:200]
+            fail("claude", f"Kod wyjścia: {r.returncode}. Przyczyna: {cause}. Log: {log_path}")
 
         # e) render.py
         if not wynik_path.exists():
