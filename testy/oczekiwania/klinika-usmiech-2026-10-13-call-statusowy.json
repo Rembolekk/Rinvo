@@ -1,0 +1,62 @@
+[
+  {
+    "opis": "Godziny Sopot piątek: poprawka bazy wiedzy → sekcja 1, Konfiguracja + Dla agenta",
+    "fragment_cytatu": "Agent działa nieźle, ale podaje złe godziny dla Sopotu",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz",
+    "oczekiwane_etykiety": ["Konfiguracja", "Dla agenta"]
+  },
+  {
+    "opis": "Korekta faktury za wrzesień: typ finanse → sekcja 1",
+    "fragment_cytatu": "Faktura za wrzesień ma złą kwotę, policzyliście minuty z sierpnia",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz"
+  },
+  {
+    "opis": "Podwójny telefon: czeka na numer od Bartka → sekcja 2",
+    "fragment_cytatu": "Bartek nie zapisał numeru ani godziny",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Zmiana zdania: przypomnienie wraca do 1 dnia (odwołanie decyzji o 2 dniach)",
+    "fragment_cytatu": "Jednak zostańcie przy jednym dniu przed wizytą",
+    "typ_sprawdzania": "zmiany_zdania"
+  },
+  {
+    "opis": "Zakaz: nie dzwonić do ortodoncji nawet na polecenie dr Nowaka → sekcja 4",
+    "fragment_cytatu": "I nie dzwońcie do pacjentów ortodoncji",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Eksport do Excela – prośba produktowa → sekcja 3 (backlog)",
+    "fragment_cytatu": "Chciałabym mieć w panelu przycisk eksportu do Excela",
+    "oczekiwana_sekcja": 3,
+    "oczekiwany_status": "backlog"
+  },
+  {
+    "opis": "Lista lekarzy z grafikiem na listopad – czeka na Anię → sekcja 2",
+    "fragment_cytatu": "Wyślę wam listę lekarzy z grafikiem na listopad",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Ryzyko: dr Nowak rozważa zmianę dostawcy → sekcja 5",
+    "fragment_cytatu": "dr Nowak dostał ofertę od innej firmy",
+    "oczekiwana_sekcja": 5
+  },
+  {
+    "opis": "Zakaz urlopu Ani 2-6.11: pewnosc niska (Marek potwierdził inny tydzień)",
+    "fragment_cytatu": "od 2 do 6 listopada mam urlop",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy",
+    "oczekiwana_pewnosc": "niska"
+  },
+  {
+    "opis": "Spotkanie z dr Nowakiem – zaproszenie tylko po potwierdzeniu Ani → sekcja 2",
+    "fragment_cytatu": "Bez mojego potwierdzenia nie wysyłaj zaproszenia",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  }
+]

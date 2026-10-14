@@ -1,0 +1,123 @@
+[
+  {
+    "opis": "Zmiana zdania: sobota 9-15, nie 9-14 (ostateczna decyzja)",
+    "fragment_cytatu": "Sobotę jednak zostaw do piętnastej, nie do czternastej",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz"
+  },
+  {
+    "opis": "Adres Włocławek: poprawka bazy wiedzy → etykiety Konfiguracja + Dla agenta",
+    "fragment_cytatu": "Toruńska 120. Godziny bez zmian",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz",
+    "oczekiwane_etykiety": ["Konfiguracja", "Dla agenta"]
+  },
+  {
+    "opis": "Filtr statusu to błąd (nie nowa funkcja) → sekcja 1, etykieta Błąd + Dla agenta",
+    "fragment_cytatu": "filtr statusu nie. To sprawdzę u nas po callu",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz",
+    "oczekiwane_etykiety": ["Błąd", "Dla agenta"]
+  },
+  {
+    "opis": "Kliknięcie w kafelek to nowa_funkcja → sekcja 3, NIE dostaje Dla agenta",
+    "fragment_cytatu": "to osobna sprawa, tego po prostu nie ma",
+    "oczekiwana_sekcja": 3,
+    "zakazane_etykiety": ["Dla agenta"]
+  },
+  {
+    "opis": "Opel zakaz – nawet na polecenie Pawła → sekcja 4",
+    "fragment_cytatu": "Nawet jak Paweł napisze, że kazał, to najpierw zadzwonię do ciebie",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Zakaz: nie wierzyć fałszywemu akceptowi po godzinach",
+    "fragment_cytatu": "że po godzinach od wtorku",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Tekst wstępu – jedno przypomnienie (raz, nie więcej) → sekcja 2",
+    "fragment_cytatu": "przypomnij mi. Raz.",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Plik leadów – jedno przypomnienie, jeden mail (nie trzy) → sekcja 2",
+    "fragment_cytatu": "napisz jeden mail, nie trzy",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Zakaz: nie wysyłać wzoru pliku",
+    "fragment_cytatu": "Eksport z panelu jest brzydki",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Zakaz: nie pisać do Oli bezpośrednio",
+    "fragment_cytatu": "I do Oli nie piszę, ustalam wszystko z tobą",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Zakaz: urlop Kasi 19-23.10 – nic nowego nie startuje",
+    "fragment_cytatu": "od dziewiętnastego do dwudziestego trzeciego mam urlop",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Zakaz: agent nie sprzedaje, bez aut używanych",
+    "fragment_cytatu": "Ola chciała, żeby przy odmowie proponował auto używane. Nie.",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "VoiceDesk jako ryzyko handlowe → sekcja 5",
+    "fragment_cytatu": "Dwa tygodnie temu była u Pawła firma VoiceDesk",
+    "oczekiwana_sekcja": 5
+  },
+  {
+    "opis": "Korekta faktury – Michał dziś → sekcja 1, typ finanse",
+    "fragment_cytatu": "Faktury wystawia Michał, przekażę mu dziś",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz"
+  },
+  {
+    "opis": "Zaproszenie dla Pawła tylko po potwierdzeniu Kasi → sekcja 2",
+    "fragment_cytatu": "zaproszenie wyślę dopiero wtedy",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Kolumna z nazwiskiem tylko przy okazji naprawy filtra – warunek ustawiony",
+    "fragment_cytatu": "Jak się okaże, że problem z filtrem siedzi gdzie indziej, to kolumn osobno nie ruszam",
+    "oczekiwana_sekcja": 1,
+    "oczekiwany_status": "zrob_teraz"
+  },
+  {
+    "opis": "Materiały po godzinach: przyjąć ale nie podpinać → zakaz sekcja 4",
+    "fragment_cytatu": "trzymajcie u siebie, nie podpinajcie",
+    "oczekiwana_sekcja": 4,
+    "oczekiwany_status": "nigdy"
+  },
+  {
+    "opis": "Sprawa przeglądu od Oli – bez numeru czeka, nie zgadywać → sekcja 2",
+    "fragment_cytatu": "Jak mi tego nie prześlesz, to nie wiem",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Tekst wstępu – dwie wersje do napisania przez Kasię → sekcja 2",
+    "fragment_cytatu": "Jedna taka jak teraz. Druga krótsza",
+    "oczekiwana_sekcja": 2,
+    "oczekiwany_status": "czeka"
+  },
+  {
+    "opis": "Okna czasowe dla tekst-wstepu-dwie-wersje: min 2 okna (blok + urlop)",
+    "fragment_cytatu": "Jedna taka jak teraz. Druga krótsza",
+    "oczekiwana_sekcja": 2,
+    "oczekiwane_okna_min": 2
+  }
+]

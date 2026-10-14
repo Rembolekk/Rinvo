@@ -167,7 +167,7 @@ def run_step(cmd, log_path, step_name, timeout=120):
 
 # ── Slack: podsumowanie ───────────────────────────────────────────────────────
 
-def build_slack_summary(klient, wynik_path, sync_stdout):
+def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None):
     try:
         d = json.loads(wynik_path.read_text(encoding="utf-8"))
     except Exception:
@@ -224,6 +224,9 @@ def build_slack_summary(klient, wynik_path, sync_stdout):
         lines.append(f":clock1: Brak faktów czasowych dla {len(ostrzezenia)} pozycji z cytatami o czasie")
     if any("Powtarzające się ryzyko" in ln for ln in sync_stdout.splitlines()):
         lines.append(":rotating_light: Powtarzające się ryzyko — sprawdź Linear")
+    if testy_wynik:
+        icon = ":white_check_mark:" if testy_wynik.startswith("PASS") else ":x:"
+        lines.append(f"{icon} Testy oczekiwań: {testy_wynik}")
 
     # Links for sekcja 1 items (read karta.json for URLs)
     karta_path = Path("ops") / "klienci" / klient / "karta.json"
@@ -420,8 +423,28 @@ def main():
         if sync_result.returncode != 0:
             fail("linear_sync", f"Kod {sync_result.returncode}. Log: {log_path}")
 
+        # e2) testy oczekiwań — jeśli plik istnieje
+        testy_wynik = None
+        oczekiwania_path = Path("testy/oczekiwania") / f"{klient}-{nazwa}.json"
+        if oczekiwania_path.exists():
+            print("  uruchom.py (oczekiwania)…")
+            testy_result = subprocess.run(
+                ["python3", "testy/uruchom.py", str(wynik_path), str(oczekiwania_path)],
+                capture_output=True,
+                text=True,
+                timeout=60,
+            )
+            with open(log_path, "a", encoding="utf-8") as lf:
+                lf.write(f"\n{'='*60}\n=== uruchom.py ===\n{'='*60}\n")
+                lf.write(testy_result.stdout)
+                lf.write(testy_result.stderr)
+            print(testy_result.stdout, end="")
+            last_line = testy_result.stdout.strip().splitlines()[-1] if testy_result.stdout.strip() else ""
+            if last_line.startswith(("PASS", "FAIL")):
+                testy_wynik = last_line
+
         # f) Slack — zawsze, niezależnie od liczby nowych zgłoszeń
-        summary = build_slack_summary(klient, wynik_path, sync_stdout)
+        summary = build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik)
         _log(log_path, f"\n{'='*60}\n=== Slack ===\n{'='*60}\n")
         slack_ok, slack_err = send_slack(summary, log_path=log_path)
         if slack_ok:

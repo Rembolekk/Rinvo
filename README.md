@@ -64,6 +64,9 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `linear_sync.py` | wysyła wynik.json do Linear (team RIN); idempotentny po klucz_sprawy |
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
+| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 27 testów) |
+| `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
+| `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
 | `logi/przebiegi/` | logi automatycznych przebiegów przetworz.py |
 | `logi/` | logi z pracy z AI (sesje Claude Code: surowe `.jsonl` i czytelne `.md`) |
@@ -164,7 +167,39 @@ ops/
 - Nic nie wychodzi do klienta bez zatwierdzenia przez człowieka.
 - Analiza zakłada perspektywę dostawcy („nasz zespół”). Nazwy firm i osób pochodzą wyłącznie z transkrypcji.
 
-## Kontrola jakości
+## Testy automatyczne
+
+Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
+
+### Testy jednostkowe logiki
+
+```bash
+python3 testy/test_logika.py
+```
+
+Pokrycie (27 testów):
+- `should_get_agent_label` — etykieta „Dla agenta” tylko dla bug/konfiguracja/baza_wiedzy z wysoka pewnością, bez zakazu, bez nowej_funkcji.
+- `process_aktualizacje` — ta sama rozmowa odrzucona, ta sama data odrzucona, późniejsza data akceptowana, nieznana sprawa pominięta.
+- `daty.py compute_windows` — blokada globalna, weekendy pomijane, deadline ogranicza okno.
+- `daty.py has_temporal_word` — frazy przyszłe wykrywane, neutralne cytaty nie.
+- `update_risk_counter` — dwa różne źródła eskalują, to samo źródło dwa razy nie.
+- Rejestr sha256 — ten sam hash wykryty, różne treści dają różne hashe.
+
+### Testy oczekiwań (po analizie)
+
+```bash
+python3 testy/uruchom.py wyniki/<klient>/<nazwa>/wynik.json testy/oczekiwania/<klient>-<nazwa>.json
+```
+
+Każde oczekiwanie ma `fragment_cytatu` (krótki, dosłowny) — runner wyszukuje pozycję po cytacie i sprawdza sekcję, status, etykiety, okna czasowe. Wyjście: `PASS X/Y` lub `FAIL X/Y` (exit code 0/1).
+
+Pliki oczekiwań:
+- `testy/oczekiwania/auto-tama-2026-10-06-call-statusowy.json` — 20 testów
+- `testy/oczekiwania/klinika-usmiech-2026-10-13-call-statusowy.json` — 10 testów
+
+`przetworz.py` uruchamia plik oczekiwań automatycznie po analizie (gdy plik istnieje) i dodaje wynik do wiadomości Slack.
+
+### Kontrola jakości ręczna
 
 Na przykładowej rozmowie (szczegóły w [kontrola.md](kontrola.md)):
 
@@ -178,16 +213,16 @@ Pierwszy wynik (`wyniki/transkrypcja-spotkanie/`) był poprawiany w trakcie budo
 Znane ograniczenia:
 - W pierwszym wyniku okno testu wstępu podano tylko jako 12–16.10, bez drugiej możliwości od 26.10 (po urlopie). Wynik od zera ma oba okna.
 - Godzin Torunia w dni robocze nie ma w rozmowie, więc oznaczono je jako wniosek, a nie fakt.
-- Kompletność listy sprawdzana jest ręcznie. Automatycznie sprawdzana jest tylko dosłowność cytatów.
+- Kompletność listy sprawdzana jest ręcznie (oczekiwania) i automatycznie (uruchom.py). Dosłowność cytatów sprawdza render.py.
 - Daty względne („do czwartku”, „wczoraj”) są przeliczane od daty spotkania. Przeliczone daty przypomnień są oznaczone jako wnioski.
 
 ## Co dalej z większą ilością czasu
 
-- **Automatyczna kontrola kompletności:** zestaw rozmów testowych z listą oczekiwanych pozycji, uruchamiany po każdej zmianie komendy.
 - **Integracje po zatwierdzeniu:** zadania do Linear, szkic maila do Gmaila (jako szkic, nie wysyłka), spotkania do kalendarza, notatka do CRM.
 - **Zatwierdzanie w raporcie:** przy każdej pozycji akceptuj, popraw albo odrzuć, a dopiero potem eksport.
 - **Historia klienta:** zakazy i ustalenia z poprzednich rozmów jako kontekst do następnej analizy, z wykrywaniem sprzeczności.
 - ~~**Kalendarz w kodzie:**~~ Zrealizowane w `daty.py` — model dostarcza `fakty_czasowe`, kod oblicza wolne okna robocze.
+- ~~**Automatyczna kontrola kompletności:**~~ Zrealizowane w `testy/` — oczekiwania zakotwiczone w cytatach, runner X/Y, integracja z przetworz.py.
 
 ## Logi
 
