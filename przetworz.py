@@ -33,6 +33,8 @@ from pathlib import Path
 # ── .env ─────────────────────────────────────────────────────────────────────
 
 def load_env():
+    """Czyta .env (setdefault: zmienne środowiskowe mają pierwszeństwo).
+    Bez pliku .env (np. GitHub Actions) klucze pochodzą ze środowiska."""
     env_path = Path(".env")
     if not env_path.exists():
         return
@@ -46,6 +48,8 @@ def load_env():
 # ── rejestr ───────────────────────────────────────────────────────────────────
 
 REGISTRY_PATH = Path("ops/.przetworzone.json")
+
+DEFAULT_MODEL = "claude-sonnet-5-5"
 
 
 def transcript_hash(path):
@@ -167,7 +171,7 @@ def run_step(cmd, log_path, step_name, timeout=120):
 
 # ── Slack: podsumowanie ───────────────────────────────────────────────────────
 
-def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None):
+def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model=None):
     try:
         d = json.loads(wynik_path.read_text(encoding="utf-8"))
     except Exception:
@@ -224,6 +228,8 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None):
         lines.append(f":clock1: Brak faktów czasowych dla {len(ostrzezenia)} pozycji z cytatami o czasie")
     if any("Powtarzające się ryzyko" in ln for ln in sync_stdout.splitlines()):
         lines.append(":rotating_light: Powtarzające się ryzyko — sprawdź Linear")
+    if model:
+        lines.append(f":robot_face: Model analizy: {model}")
     if testy_wynik:
         icon = ":white_check_mark:" if testy_wynik.startswith("PASS") else ":x:"
         lines.append(f"{icon} Testy oczekiwań: {testy_wynik}")
@@ -355,8 +361,10 @@ def main():
         env = os.environ.copy()
         env["CLAUDE_CODE_MAX_OUTPUT_TOKENS"] = "64000"
 
+        model = os.environ.get("RINVO_MODEL", "").strip() or DEFAULT_MODEL
         claude_cmd = [
             "claude", "--print", prompt,
+            "--model", model,
             "--allowedTools", "Read,Write,Edit,Bash",
             "--dangerously-skip-permissions",
         ]
@@ -444,7 +452,7 @@ def main():
                 testy_wynik = last_line
 
         # f) Slack — zawsze, niezależnie od liczby nowych zgłoszeń
-        summary = build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik)
+        summary = build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik, model=model)
         _log(log_path, f"\n{'='*60}\n=== Slack ===\n{'='*60}\n")
         slack_ok, slack_err = send_slack(summary, log_path=log_path)
         if slack_ok:
