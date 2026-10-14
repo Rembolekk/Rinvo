@@ -901,5 +901,19 @@
       "uchylony": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga.",
       "kiedy": "2026-10-14"
     }
+  ],
+  "historia_wysylek": [
+    {
+      "data": "2026-10-14T14:36:51+02:00",
+      "message_id": "<179198141111.2585.269021223224355856@gmail.com>",
+      "do": "Kasia Malinowska",
+      "temat": "Spotkanie w czwartek 15.10 o 10:00",
+      "zgloszenia": [
+        "RIN-51"
+      ],
+      "hash": "59006716d89821fcfda43263",
+      "zaproszenie_ics": true,
+      "zalaczniki": []
+    }
   ]
 }
