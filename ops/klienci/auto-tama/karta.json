@@ -17,7 +17,15 @@
       "rola": "BDC, kontakt główny",
       "zakres_decyzji": "kontakt główny: ustala z Rinvo zakazy i ograniczenia (Opel, stara baza, agent po godzinach, przypomnienia), terminy testów i szkoleń oraz dostarczanie materiałów; marki, budżet i nowe usługi zatwierdza Paweł",
       "potwierdzony": true,
-      "status": "potwierdzony"
+      "status": "potwierdzony",
+      "nieobecnosci": [
+        {
+          "od": "2026-10-19",
+          "do": "2026-10-23",
+          "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+          "cytat": "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień."
+        }
+      ]
     }
   ],
   "domeny": [

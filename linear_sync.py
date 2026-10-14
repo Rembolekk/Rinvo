@@ -47,6 +47,7 @@ REQUIRED_LABELS = [
     "Zablokowane przez zakaz", "Powtarzające się ryzyko", "Wielu klientów",
     "Decyzja człowieka",
     "repo: rinvo-app", "repo: rinvo", "repo: rinvo-ops",
+    "Szkic gotowy", "Wyślij", "Wysłano",
 ]
 
 LABEL_COLORS = {
@@ -63,6 +64,9 @@ LABEL_COLORS = {
     "Powtarzające się ryzyko": "#991b1b",
     "Wielu klientów": "#0891b2",
     "Decyzja człowieka": "#2563eb",
+    "Szkic gotowy": "#eab308",
+    "Wyślij": "#16a34a",
+    "Wysłano": "#15803d",
     "repo: rinvo-app": "#0d9488",
     "repo: rinvo": "#475569",
     "repo: rinvo-ops": "#64748b",

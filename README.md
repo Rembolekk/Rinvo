@@ -78,6 +78,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_daty.py` | daty względne liczone przez kod: parser, pierwszeństwo kodu nad modelem, „wniosek”, poprawa tekstów (37 testów) |
 | `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
 | `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
+| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy (67 testów, bez poczty) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -316,6 +317,30 @@ Agent sam wykonuje zgłoszenia z Lineara w osobnym repozytorium [Rinvo-app](http
 **Slack** tylko na koniec: „Agent naprawił: <tytuł> (link do PR)” albo „Agent oddał: <tytuł>, powód”.
 
 **Workflow** `Agent wykonawczy` (`agent.yml`): ręcznie (zawsze), co 15 minut i po każdym udanym przetworzeniu rozmowy lub maila (te dwa dopiero po ustawieniu zmiennej repozytorium `AGENT_WLACZONY=true`). Sekret `AGENT_GITHUB_TOKEN` (dostęp tylko do Rinvo-app) istnieje wyłącznie w sekretach GitHuba; agent nie działa lokalnie. Testy logiki bez sieci: `python3 testy/test_agent.py`.
+
+## Kontakt z klientem
+
+Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.
+
+1. **Szkice (`szkice.py`, w workflow „Agent wykonawczy”).** Gdy zgłoszenie przechodzi na Done, a klient prosił o informację („napisz, jak będzie poprawione”) albo zgłoszenie jest typu „do klienta” (przypomnienie, zaproszenie, zestawienie), agent pisze szkic w imieniu Marka: krótko, po ludzku, tylko ustalenia z rozmów. Model dostaje wyłącznie cel, kontekst z cytatami klienta i kryteria (bez zakazów, identyfikatorów i danych innych klientów). Szkic to komentarz w Linearze i etykieta `Szkic gotowy`. Szkice dla tego samego klienta z jednego dnia łączą się w jeden mail zbiorczy (treść w najstarszym zgłoszeniu, w pozostałych tylko wskazanie).
+2. **Zgoda.** Człowiek dodaje etykietę `Wyślij` (na zgłoszeniu ze szkicem). To jedyna czynność człowieka. Poprawka treści: nowy komentarz w tym samym układzie, wysłany będzie najnowszy.
+3. **Wysyłka (`wyslij.py`, osobne zadanie w workflow „Sprawdzanie maili”, co 15 minut).** SMTP z `GMAIL_ADDRESS` (hasło aplikacji) do kontaktu z karty klienta. Potem komentarz „Wysłano <data>”, zdjęcie `Wyślij` i `Szkic gotowy`, etykieta `Wysłano` i wpis w `karta.json` → `historia_wysylek` (data, Message-ID, temat, zgłoszenia, skrót treści). Historia zapisuje się zanim ruszy Linear: nawet awaria po wysyłce nie pozwoli wysłać drugi raz.
+
+**Bezpieczniki w kodzie (przed każdą wysyłką; parametry w `ops/zasady.json` → `wysylka`):**
+
+| Bezpiecznik | Działanie przy naruszeniu |
+|---|---|
+| nigdy dwa razy ten sam szkic (historia + etykieta `Wysłano` + skrót treści) | blokada |
+| odbiorca tylko z kontaktów karty z potwierdzonym kontaktem, nigdy z treści szkicu | blokada |
+| strażnik zakazów z karty: „nie przypominać Kasi o pliku” blokuje przypomnienie, „nie kontaktować się z Olą” blokuje adresata, „nie wysyłać wzoru” blokuje treść o wzorze (wzorce w `wzorce_zakazow`) | blokada |
+| filtr treści: `RIN-`, Linear i inne narzędzia, „zakaz”, klucze i pliki techniczne, nazwa innego klienta, adres e-mail spoza karty (sprawdzany też przy pisaniu szkicu) | blokada |
+| limit maili do jednego klienta dziennie (`max_dziennie_na_klienta`, teraz 2) | czeka do jutra |
+| tylko dni robocze 8:00–18:00 czasu polskiego (bez świąt z listy) | czeka do okna |
+| nieobecność osoby kontaktowej (`kontakty[].nieobecnosci` w karcie, np. urlop Kasi 19–23.10) | czeka do powrotu, Slack informuje |
+
+Blokada: etykieta `Do weryfikacji`, zdjęcie `Wyślij`, komentarz z powodem i Slack („Wysyłka wstrzymana: <powód>”). Oczekiwanie zostawia `Wyślij`, a Slack dostaje powód tylko raz. Po udanej wysyłce Slack: „Wysłano do <osoba>: <temat>”.
+
+Nic nie wyjdzie na prawdziwą skrzynkę, dopóki ktoś nie doda etykiety `Wyślij`. Podgląd bez zmian: `python3 wyslij.py --sucho`, `python3 szkice.py --sucho`. Testy bez sieci i poczty: `python3 testy/test_wysylka.py`.
 
 ## Testy automatyczne
 

@@ -91,3 +91,13 @@ jobs:
           AGENT_GITHUB_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
           RINVO_MODEL: ${{ vars.RINVO_MODEL }}
         run: python3 agent_scal.py
+
+      # Szkice maili do klienta po zamknięciu zgłoszeń (komentarz + etykieta Szkic gotowy). Niczego nie wysyła:
+      # wysyła dopiero wyslij.py po etykiecie Wyślij dodanej przez człowieka. Tu nie ma hasła do poczty.
+      - name: Szkice maili do klientów
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: python3 szkice.py

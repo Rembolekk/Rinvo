@@ -9,7 +9,10 @@
     "ryzyko": "Ryzyko",
     "czeka": "Czeka na klienta",
     "produkt": "Produkt",
-    "wielu_klientow": "Wielu klientów"
+    "wielu_klientow": "Wielu klientów",
+    "szkic": "Szkic gotowy",
+    "wyslij": "Wyślij",
+    "wyslano": "Wysłano"
   },
   "czlowiek_gdy": {
     "pieniadze": {
@@ -318,5 +321,114 @@
         "grup"
       ]
     }
+  },
+  "szkice": {
+    "_opis": "Szkice maili do klienta. Gdy zgłoszenie przechodzi na Done i spełnia któryś warunek poniżej, agent pisze szkic (komentarz + etykieta Szkic gotowy). Szkice dla tego samego klienta z jednego dnia łączą się w jeden mail zbiorczy.",
+    "max_dni_od_zamkniecia": 3,
+    "slowa_prosby": [
+      "napisz",
+      "napiszcie",
+      "daj znać",
+      "dajcie znać",
+      "dać znać",
+      "poinformuj",
+      "poinformujcie",
+      "odpisz",
+      "odpiszcie",
+      "powiadom",
+      "daj mi znać",
+      "dajcie mi znać"
+    ],
+    "slowa_tytulu": [
+      "przypomnien",
+      "zaproszen",
+      "zestawien",
+      "podsumowan",
+      "wyślij kasi",
+      "wyślij do klienta",
+      "odpowiedź dla"
+    ],
+    "etykiety_do_klienta": [
+      "Czeka na klienta"
+    ],
+    "pomijaj_tytuly": [
+      "notatka",
+      "notatki przed"
+    ],
+    "podpis": "Marek Rewoliński",
+    "model_pytanie_o_ton": "krótko, po ludzku, po polsku, w imieniu Marka; tylko ustalenia z rozmów"
+  },
+  "wysylka": {
+    "_opis": "Bezpieczniki wysyłki maili do klienta (wyslij.py). Wysyłka rusza tylko po etykiecie Wyślij dodanej przez człowieka.",
+    "max_dziennie_na_klienta": 2,
+    "strefa": "Europe/Warsaw",
+    "dni_robocze": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "godziny": {
+      "od": 8,
+      "do": 18
+    },
+    "swieta": [
+      "2026-11-01",
+      "2026-11-11",
+      "2026-12-25",
+      "2026-12-26",
+      "2027-01-01",
+      "2027-01-06"
+    ],
+    "smtp": {
+      "host": "smtp.gmail.com",
+      "port": 465
+    },
+    "nadawca_imie": "Marek Rewoliński",
+    "filtr_tresci": {
+      "zabronione_slowa": [
+        "RIN-",
+        "Linear",
+        "zakaz",
+        "Slack",
+        "GitHub",
+        "CodeRabbit",
+        "Rinvo-app",
+        "pull request",
+        "klucz_sprawy",
+        "config/",
+        "wiedza/"
+      ],
+      "zabronione_wzorce": [
+        "\\bRIN-\\d+",
+        "\\bZ\\d{1,2}\\b",
+        "\\b[a-z]+(?:-[a-z0-9]+){2,}\\b"
+      ]
+    },
+    "wzorce_zakazow": [
+      {
+        "tytul": "^nie przypomina[ćc]\\s+(?P<osoba>\\S+)(?P<reszta>.*)$",
+        "blokuje": "przypomnienie",
+        "slowa_przypomnienia": [
+          "przypom"
+        ]
+      },
+      {
+        "tytul": "^nie (?:kontaktowa[ćc] się z|pisa[ćc] do|dzwoni[ćc] do)\\s+(?P<osoba>\\S+)",
+        "blokuje": "adresat"
+      },
+      {
+        "tytul": "^nie wysyła[ćc].*\\bwzor",
+        "blokuje": "slowa",
+        "slowa": [
+          "wzór",
+          "wzoru",
+          "wzorze",
+          "wzor",
+          "wzorem"
+        ]
+      }
+    ]
   }
 }

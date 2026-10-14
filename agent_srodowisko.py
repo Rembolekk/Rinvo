@@ -86,6 +86,33 @@ class LinearAgent:
         if nazwa not in zg.get("labels", []):
             zg.setdefault("labels", []).append(nazwa)
 
+    def usun_etykiete(self, zg, nazwa):
+        lab = linear_sync.get_issue_labels_from_linear(self.api_key, zg["id"])
+        if any(l["name"] == nazwa for l in lab):
+            linear_sync.gql(self.api_key, linear_sync.M_UPDATE_ISSUE,
+                            {"id": zg["id"], "input": {"labelIds": [l["id"] for l in lab if l["name"] != nazwa]}})
+        if nazwa in zg.get("labels", []):
+            zg["labels"].remove(nazwa)
+
+    _POLA_PELNE = _POLA + " completedAt"
+
+    def z_etykieta(self, nazwa):
+        """Zgłoszenia zespołu z daną etykietą (dowolny stan)."""
+        q = ('query { issues(first: 50, filter: { and: [ { team: { key: { eq: "%s" } } }, '
+             '{ labels: { name: { eq: "%s" } } } ] }) { nodes { %s } } }' % (linear_sync.TEAM_KEY, nazwa, self._POLA_PELNE))
+        return [self._normalizuj(n) for n in linear_sync.gql(self.api_key, q)["issues"]["nodes"]]
+
+    def ukonczone(self, od_iso):
+        """Zgłoszenia zespołu zamknięte jako Done od podanej daty (ISO)."""
+        q = ('query { issues(first: 100, filter: { and: [ { team: { key: { eq: "%s" } } }, '
+             '{ state: { type: { eq: "completed" } } }, { completedAt: { gt: "%s" } } ] }) { nodes { %s } } }'
+             % (linear_sync.TEAM_KEY, od_iso, self._POLA_PELNE))
+        return [self._normalizuj(n) for n in linear_sync.gql(self.api_key, q)["issues"]["nodes"]]
+
+    def komentarze(self, zg):
+        q = 'query { issue(id: "%s") { comments(first: 100) { nodes { id body createdAt } } } }' % zg["id"]
+        return linear_sync.gql(self.api_key, q)["issue"]["comments"]["nodes"]
+
 
 # ── git ───────────────────────────────────────────────────────────────────────
 
@@ -191,6 +218,46 @@ class ClaudeAgent:
         if r.returncode != 0:
             raise RuntimeError(f"claude zakończył się kodem {r.returncode}")
         return r.stdout
+
+
+# ── poczta ────────────────────────────────────────────────────────────────────
+
+class Poczta:
+    """Wysyłka przez SMTP z GMAIL_ADDRESS (hasło aplikacji). Dane logowania tylko ze środowiska, nigdy do logów."""
+
+    def __init__(self, W):
+        self.W = W
+
+    def wyslij(self, email_do, imie_do, temat, tresc):
+        import smtplib
+        import ssl
+        from email.message import EmailMessage
+        from email.utils import formataddr, make_msgid
+
+        from sekrety import czysc
+        nadawca = czysc(os.environ.get("GMAIL_ADDRESS", ""))
+        haslo = czysc(os.environ.get("GMAIL_APP_PASSWORD", ""))
+        if not nadawca or not haslo:
+            raise RuntimeError("brak GMAIL_ADDRESS albo GMAIL_APP_PASSWORD")
+        msg = EmailMessage()
+        msg["From"] = formataddr((self.W["nadawca_imie"], nadawca))
+        msg["To"] = formataddr((imie_do, email_do))
+        msg["Subject"] = " ".join(temat.split())
+        msg["Message-ID"] = make_msgid(domain=nadawca.split("@")[-1])
+        msg.set_content(tresc)
+        try:
+            import certifi
+            ctx = ssl.create_default_context(cafile=certifi.where())
+        except ImportError:
+            ctx = ssl.create_default_context()
+        smtp = self.W["smtp"]
+        try:
+            with smtplib.SMTP_SSL(smtp["host"], smtp["port"], context=ctx, timeout=60) as srv:
+                srv.login(nadawca, haslo)
+                srv.send_message(msg)
+        except Exception as exc:  # noqa: BLE001
+            raise RuntimeError(maskuj(f"{type(exc).__name__}: {exc}", [haslo, nadawca])) from None
+        return msg["Message-ID"]
 
 
 # ── Slack ─────────────────────────────────────────────────────────────────────

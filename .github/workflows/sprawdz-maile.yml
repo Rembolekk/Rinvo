@@ -206,3 +206,55 @@ jobs:
           path: logi/przebiegi
           if-no-files-found: ignore
           retention-days: 14
+
+  # Wysyłka zatwierdzonych maili (etykieta „Wyślij” w Linearze), po sprawdzeniu skrzynki. Bezpieczniki są w kodzie
+  # (wyslij.py). Karta klienta dostaje historię wysyłek, więc zmiany commitujemy także po błędzie.
+  wysylka:
+    needs: maile
+    if: ${{ !cancelled() && (github.event_name != 'schedule' || vars.MAILE_WLACZONE == 'true') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Zależności (certifi)
+        run: pip install certifi
+
+      - name: Tożsamość git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      - name: Wyślij zatwierdzone maile
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: python3 wyslij.py
+
+      - name: Zapisz historię wysyłek
+        if: always()
+        run: |
+          set -uo pipefail
+          [ -e ops/klienci ] && git add -A -- ops/klienci
+          if git diff --cached --quiet; then
+            echo "Brak zmian do zapisania"
+            exit 0
+          fi
+          git commit -q -m "[automat] historia wysyłek maili [skip ci]"
+          for proba in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            echo "Push odrzucony (próba $proba/3), pull --rebase…"
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 1; }
+          done
+          exit 1
