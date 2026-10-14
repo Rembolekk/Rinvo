@@ -129,11 +129,11 @@
     "fragment_cytatu": "Drugi raz nie przypominaj, sama pamiętam"
   },
   {
-    "opis": "Plik świeżych leadów: w Linearze dalej Backlog, czeka na klienta, termin 15.10",
+    "opis": "Plik świeżych leadów: po rozmowie 13.10 czekał (termin 15.10); od maila z 14.10 plik dotarł → w Linearze wznowione (Todo), bez „Czeka na klienta”",
     "typ_sprawdzania": "linear",
     "klucz_sprawy": "swieze-leady",
-    "oczekiwany_stan_linear": "Backlog",
-    "oczekiwane_etykiety": ["Czeka na klienta"],
+    "oczekiwany_stan_linear": "Todo",
+    "zakazane_etykiety": ["Czeka na klienta"],
     "oczekiwany_termin_linear": "2026-10-15"
   },
 
@@ -192,10 +192,11 @@
   },
 
   {
-    "opis": "Eksport do Excela: prośba produktowa w sekcji 3, bez „Dla agenta”",
+    "opis": "Eksport do Excela: sekcja 3; AI-first: ta sama prośba u 2 klientów (Wielu klientów) → Dla agenta, nie Decyzja człowieka",
     "fragment_cytatu": "Eksportu nie ma. Zapisuję.",
     "oczekiwana_sekcja": 3,
-    "zakazane_etykiety": ["Dla agenta"]
+    "oczekiwane_etykiety": ["Produkt", "Wielu klientów", "Dla agenta"],
+    "zakazane_etykiety": ["Decyzja człowieka"]
   },
   {
     "opis": "Eksport do Excela: ta sama funkcja u klinika-usmiech i auto-tama w prosby.json",
@@ -205,10 +206,10 @@
     "klienci": ["klinika-usmiech", "auto-tama"]
   },
   {
-    "opis": "Eksport do Excela: w Linearze „Wielu klientów”",
+    "opis": "Eksport do Excela: w Linearze „Wielu klientów” i „Dla agenta” (AI-first)",
     "typ_sprawdzania": "linear",
     "klucz_sprawy": "eksport-kontaktow-excel",
-    "oczekiwane_etykiety": ["Produkt", "Wielu klientów"]
+    "oczekiwane_etykiety": ["Produkt", "Wielu klientów", "Dla agenta"]
   },
 
   {

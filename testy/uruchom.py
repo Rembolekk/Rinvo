@@ -35,48 +35,16 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-# ── replika logiki etykiet z linear_sync.py ──────────────────────────────────
+# ── etykiety: ten sam silnik zasad co w linear_sync.py (ops/zasady.json) ──────
 
-TYP_DO_ETYKIETY = {
-    "bug": "Błąd",
-    "zmiana_konfiguracji": "Konfiguracja",
-    "poprawka_bazy_wiedzy": "Konfiguracja",
-    "finanse": "Finanse",
-}
+import zasady  # noqa: E402
 
-TYPY_DLA_AGENTA = {"bug", "zmiana_konfiguracji", "poprawka_bazy_wiedzy"}
+ZASADY = zasady.wczytaj_zasady()
 
 
-def _should_get_agent_label(item):
-    if item.get("konflikt_z_zakazem"):
-        return False
-    if item.get("pewnosc") == "niska":
-        return False
-    if item.get("rodzaj") == "nowa_funkcja":
-        return False
-    return item.get("typ") in TYPY_DLA_AGENTA
-
-
-def compute_labels(item):
-    sekcja = item.get("sekcja")
-    blocked_by_ban = item.get("konflikt_z_zakazem")
-    labels = []
-
-    if sekcja == 1:
-        labels.append(TYP_DO_ETYKIETY.get(item.get("typ", ""), "Zadanie"))
-        if blocked_by_ban:
-            labels.append("Zablokowane przez zakaz")
-        elif _should_get_agent_label(item):
-            labels.append("Dla agenta")
-    elif sekcja == 2:
-        labels.append("Czeka na klienta")
-    elif sekcja == 3:
-        labels.append("Produkt")
-    elif sekcja == 5:
-        labels.append("Ryzyko")
-    if sekcja in (1, 2, 3, 5) and item.get("pewnosc") == "niska":
-        labels.append("Do weryfikacji")
-    return labels
+def compute_labels(item, karta=None, prosby=None, klient=None):
+    wielu = item.get("sekcja") == 3 and zasady.wielu_klientow(prosby or {}, ZASADY, item, klient)
+    return zasady.etykiety_pozycji(item, ZASADY, karta, wielu)
 
 
 # ── kontekst: wynik + karta + prosby (+ Linear) ───────────────────────────────
@@ -174,7 +142,7 @@ def _sprawdz_pozycje_jedna(ctx, p, exp):
             return (f"przypomnienia: oczekiwano {exp['oczekiwane_przypomnienia']}, "
                     f"jest {pr!r} (id={p.get('id')})")
 
-    labels = compute_labels(p)
+    labels = compute_labels(p, ctx.karta, ctx.prosby, ctx.klient)
     for lbl in exp.get("oczekiwane_etykiety", []):
         if lbl not in labels:
             return (f"brakuje etykiety {lbl!r} (jest: {labels}, typ={p.get('typ')}, "

@@ -60,6 +60,15 @@ D) temat_ryzyka (tylko sekcja 5): jeden z: konkurencja, grozba_rezygnacji, cena_
 
 E) klucz_funkcji (tylko sekcja 3): jeśli ta sama funkcja jest już zapisana w prosby.json, użyj jej klucza. W przeciwnym razie utwórz nowy slug.
 
+KROK 3c. ZGŁOSZENIA DLA AGENTA (AI-first)
+Firma pracuje AI-first: agenci (Claude, Cursor) robią większość zadań z Lineara same, więc zgłoszenie musi być samowystarczalne. Kto dostaje pozycję (agent czy człowiek), rozstrzyga KOD wg ops/zasady.json: Ty nie przypisujesz, ale przeczytaj ten plik, żeby wiedzieć, które pozycje pójdą do człowieka. Dla każdej pozycji z sekcji 1 i 3 oraz dla pozycji z sekcji 2 (na moment wznowienia) dodaj pola:
+- "cel": jedno zdanie, co ma być osiągnięte (nie przepisuj tytułu),
+- "kryteria_akceptacji": lista 2–5 sprawdzalnych punktów (każdy da się odhaczyć: „agent podaje adres Toruńska 120”, nie „adres jest dobry”). Nie wymyślaj kryteriów, których nie da się oprzeć na rozmowie. Jeśli nie umiesz napisać żadnego sprawdzalnego kryterium, zostaw pustą listę: pozycja trafi do weryfikacji, a nie do agenta,
+- "jak_sprawdzic": krótko, jak potwierdzić wykonanie (test, ekran, rozmowa testowa),
+- "repo": „rinvo” (kod aplikacji), „rinvo-ops” (wiedza, dokumenty, konfiguracja klienta) albo „brak”,
+- "szkic_klienta" (tylko gdy rezultat trafia do klienta: mail, przypomnienie, oferta, zaproszenie, zestawienie): gotowy szkic wiadomości na podstawie tego, co faktycznie ustalono. Człowiek tylko go wyśle; niczego nie obiecuj ponad rozmowę.
+Dla pozycji z sekcji 5 (ryzyka) możesz dodać "zadanie_przygotowawcze": {"cel", "kryteria_akceptacji", "jak_sprawdzic", "repo"} (np. notatka z argumentami przed spotkaniem); bez tego kod użyje szablonu z ops/zasady.json.
+
 KROK 3b. AKTUALIZACJE OTWARTYCH SPRAW
 Sprawdź listę otwarte_sprawy z karty klienta. Dla każdej otwartej sprawy: czy w tej rozmowie pojawiły się nowe informacje zmieniające jej status?
 
@@ -102,7 +111,8 @@ Schemat wynik.json:
     "pewnosc": "wysoka | niska",
     "konflikt_z_zakazem": null | {"zakaz": "Z3", "uzasadnienie": "..."},
     "temat_ryzyka": "..." (tylko sekcja 5),
-    "klucz_funkcji": "..." (tylko sekcja 3)
+    "klucz_funkcji": "..." (tylko sekcja 3),
+    "cel", "kryteria_akceptacji": [..], "jak_sprawdzic", "repo", "szkic_klienta" (opcjonalnie)  // KROK 3c
   }],
   "aktualizacje_spraw": [{
     "klucz_sprawy": "...",

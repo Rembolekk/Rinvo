@@ -21,6 +21,7 @@ from datetime import date
 from pathlib import Path
 
 from maile import czy_mail, kontakt_ma_prawo_decyzji, wczytaj_meta_maila, znajdz_kontakt
+import zasady
 from sekrety import czysc
 
 
@@ -43,6 +44,7 @@ REQUIRED_LABELS = [
     "Błąd", "Konfiguracja", "Finanse", "Zadanie", "Produkt",
     "Czeka na klienta", "Ryzyko", "Dla agenta", "Do weryfikacji",
     "Zablokowane przez zakaz", "Powtarzające się ryzyko", "Wielu klientów",
+    "Decyzja człowieka",
 ]
 
 LABEL_COLORS = {
@@ -58,6 +60,7 @@ LABEL_COLORS = {
     "Zablokowane przez zakaz": "#be123c",
     "Powtarzające się ryzyko": "#991b1b",
     "Wielu klientów": "#0891b2",
+    "Decyzja człowieka": "#2563eb",
 }
 
 TYP_DO_ETYKIETY = {
@@ -370,14 +373,11 @@ def save_prosby(prosby):
 
 # ── logika: etykiety i priorytety ─────────────────────────────────────────────
 
-def should_get_agent_label(item):
-    if item.get("konflikt_z_zakazem"):
-        return False
-    if item.get("pewnosc") == "niska":
-        return False
-    if item.get("rodzaj") == "nowa_funkcja":
-        return False
-    return item.get("typ") in TYPY_DLA_AGENTA
+def should_get_agent_label(item, karta=None, zasady_=None, wielu=False):
+    """Czy pozycja idzie do agenta wg ops/zasady.json (domyślnie tak; człowiek tylko wg reguł,
+    a bez kryteriów akceptacji agent nie dostaje zadania)."""
+    z = zasady_ or zasady.wczytaj_zasady()
+    return zasady.przypisz(item, z, karta, wielu)["komu"] == "agent"
 
 
 def get_issue_labels_from_linear(api_key, issue_id):
@@ -387,12 +387,21 @@ def get_issue_labels_from_linear(api_key, issue_id):
 
 # ── budowanie opisu ───────────────────────────────────────────────────────────
 
-def build_description(item, source_path, zakazy):
-    parts = []
+def _cytat_blok(tekst):
+    return "\n".join(f"> {linia}" for linia in str(tekst).splitlines() or [""])
 
+
+def build_description(item, source_path, karta=None, przyp=None, Z=None):
+    """Stały układ: Cel, Kontekst (z cytatami), Kryteria akceptacji (lista do odhaczenia),
+    Jak sprawdzić, Repo, [Dlaczego człowiek, Szkic], Czego nie ruszać, Źródło."""
+    Z = Z or zasady.wczytaj_zasady()
+    karta = karta or {}
+    sekcja = item.get("sekcja")
+    parts = [f"## Cel\n\n{item.get('cel') or item.get('tytul', '')}"]
+
+    ctx = []
     if item.get("opis"):
-        parts.append(f"## Opis\n\n{item['opis']}")
-
+        ctx.append(item["opis"])
     meta = []
     if item.get("wlasciciel"):
         meta.append(f"**Właściciel:** {item['wlasciciel']}")
@@ -402,44 +411,110 @@ def build_description(item, source_path, zakazy):
     if item.get("pewnosc") == "niska":
         meta.append("**⚠ Pewność: niska** — wymaga weryfikacji przed działaniem")
     if meta:
-        parts.append("\n".join(meta))
-
+        ctx.append("\n".join(meta))
     cytaty = item.get("cytat", [])
     if cytaty:
-        block = "\n".join(f"> {c}" for c in cytaty)
-        parts.append(f"## Cytaty z rozmowy\n\n{block}")
-
+        ctx.append("**Cytaty ze źródła:**\n\n" + "\n".join(f"> {c}" for c in cytaty))
     wnioski = item.get("wnioski", [])
     if wnioski:
-        block = "\n".join(f"- **[wniosek]** {w}" for w in wnioski)
-        parts.append(f"## Wnioski\n\n{block}")
-
-    p = item.get("przypomnienie", {})
-    if p:
+        ctx.append("\n".join(f"- **[wniosek]** {w}" for w in wnioski))
+    pr = item.get("przypomnienie", {})
+    if pr:
         r_parts = []
-        if p.get("data") and str(p["data"]) not in ("nie ustalono",):
-            r_parts.append(f"data: {p['data']}")
-        if p.get("limit") is not None and str(p["limit"]) not in ("nie ustalono",):
-            r_parts.append(f"limit: {p['limit']}")
-        if p.get("uwagi"):
-            r_parts.append(p["uwagi"])
+        if pr.get("data") and str(pr["data"]) not in ("nie ustalono",):
+            r_parts.append(f"data: {pr['data']}")
+        if pr.get("limit") is not None and str(pr["limit"]) not in ("nie ustalono",):
+            r_parts.append(f"limit: {pr['limit']}")
+        if pr.get("uwagi"):
+            r_parts.append(pr["uwagi"])
         if r_parts:
-            parts.append(f"**Przypomnienie:** {' · '.join(r_parts)}")
+            ctx.append(f"**Przypomnienie:** {' · '.join(r_parts)}")
+    parts.append("## Kontekst\n\n" + "\n\n".join(ctx or ["(brak)"]))
+
+    kryteria = [str(k).strip() for k in (item.get("kryteria_akceptacji") or []) if str(k).strip()]
+    if kryteria:
+        parts.append("## Kryteria akceptacji\n\n" + "\n".join(f"- [ ] {k}" for k in kryteria))
+    elif sekcja in (1, 3):
+        parts.append("## Kryteria akceptacji\n\n_brak: uzupełnij, zanim zadanie trafi do agenta_")
+    if item.get("jak_sprawdzic"):
+        parts.append(f"## Jak sprawdzić\n\n{item['jak_sprawdzic']}")
+    repo = item.get("repo")
+    if repo:
+        parts.append(f"## Repo\n\n`{repo}`: {Z.get('repo', {}).get(repo, '')}".rstrip(": "))
+
+    if przyp and przyp.get("komu") == "czlowiek":
+        parts.append("## Dlaczego człowiek\n\n" + "\n".join(f"- {t}" for t in zasady.powody_tekst(przyp)))
+        if przyp.get("wymaga_szkicu"):
+            if item.get("szkic_klienta"):
+                parts.append("## Szkic dla klienta (do wysłania przez człowieka)\n\n"
+                             + _cytat_blok(item["szkic_klienta"]))
+            else:
+                parts.append("## Szkic dla klienta\n\n_brak szkicu: agent ma go przygotować w tym zgłoszeniu_")
+    elif przyp and przyp.get("komu") == "weryfikacja":
+        parts.append("## Do weryfikacji\n\n" + "\n".join(f"- {t}" for t in zasady.powody_tekst(przyp)))
+
+    nie_ruszac = []
+    for z in karta.get("zakazy", []):
+        cyt = f" — _{z['cytat'][0]}_" if z.get("cytat") else ""
+        nie_ruszac.append(f"- **Zakaz {z['id']}: {z['tytul']}**{cyt}")
+    for d in karta.get("decyzje_zastrzezone", []):
+        osoby = d.get("zastrzezone_dla")
+        osoby = osoby if isinstance(osoby, str) else ", ".join(osoby or [])
+        nie_ruszac.append(f"- **Decyzja zastrzeżona dla {osoby}:** {d.get('opis', '')}")
+    parts.append("## Czego nie ruszać\n\n" + ("\n".join(nie_ruszac) or "_brak zakazów w karcie klienta_"))
 
     parts.append(f"## Źródło\n\n`{source_path}`")
-
-    if zakazy:
-        rows = "\n".join(
-            "- **{id} {tytul}**{cytat}".format(
-                id=z["id"],
-                tytul=z["tytul"],
-                cytat=f" — _{z['cytat'][0]}_" if z.get("cytat") else "",
-            )
-            for z in zakazy
-        )
-        parts.append(f"---\n\n## Zakazy klienta\n\n{rows}")
-
     return "\n\n".join(parts)
+
+
+def przypomnienie_z_pozycji(item, Z, karta=None):
+    """Dane o przypomnieniach dla sprawy czekającej: limit z rozmowy, termin, brak prośby o ich zakaz."""
+    pr = item.get("przypomnienie") or {}
+    limit_txt = str(pr.get("limit", ""))
+    m = re.search(r"\d+", limit_txt)
+    limit = int(m.group()) if m and not re.fullmatch(r"\d{4}-\d{2}-\d{2}", limit_txt.strip()) else None
+    zakazane = limit == 0
+    tekst_zakazu = " ".join([limit_txt, str(pr.get("uwagi", ""))]).lower()
+    if any(s in tekst_zakazu for s in Z.get("przypomnienia", {}).get("slowa_zakazu", [])):
+        zakazane = True
+    for zk in (karta or {}).get("zakazy", []):
+        t = " ".join([zk.get("tytul", ""), zk.get("opis", "")] + zk.get("cytat", [])).lower()
+        if zk.get("klucz_sprawy") == item.get("klucz_sprawy") and any(
+                s in t for s in Z.get("przypomnienia", {}).get("slowa_zakazu", [])):
+            zakazane = True
+    if limit is None:
+        limit = Z.get("przypomnienia", {}).get("domyslny_limit", 1)
+    return {"limit": limit, "wykorzystane": 0, "nie_przypominac": zakazane}
+
+
+def zapisz_przypisanie(entry, item, Z, karta, wielu):
+    """Zapamiętuje w karcie, komu przypisano zgłoszenie (do porównań i do wznowienia)."""
+    sekcja = item.get("sekcja")
+    p = zasady.przypisz(item, Z, karta, wielu)
+    entry["przypisanie"] = {"komu": p["komu"], "powody": zasady.powody_tekst(p)}
+    if sekcja == 2:
+        w = zasady.przypisz(item, Z, karta, wielu, sekcja=1)
+        entry["po_wznowieniu"] = {"komu": w["komu"], "powody": zasady.powody_tekst(w),
+                                  "wymaga_szkicu": w["wymaga_szkicu"]}
+        stare = entry.get("przypomnienie") or {}
+        entry["przypomnienie"] = przypomnienie_z_pozycji(item, Z, karta)
+        for k in ("wykorzystane", "ostatni_szkic"):      # licznik wykorzystanych przypomnień nie wraca do zera
+            if k in stare:
+                entry["przypomnienie"][k] = stare[k]
+    return p
+
+
+def komentarz_przypisania(komu, powody, wymaga_szkicu=False):
+    """Treść komentarza z powodem (None, gdy nic nie trzeba mówić)."""
+    if komu == "czlowiek":
+        t = "**Decyzja człowieka**\n\nPowody:\n" + "\n".join(f"- {x}" for x in powody)
+        if wymaga_szkicu:
+            t += "\n\nAgent przygotowuje gotowy szkic w tym zgłoszeniu, człowiek tylko wysyła."
+        return t
+    if komu == "weryfikacja":
+        return ("**Do weryfikacji:** " + "; ".join(powody) +
+                ". Agent nie dostanie zadania, dopóki w zgłoszeniu nie będzie kryteriów akceptacji.")
+    return None
 
 
 def parse_due_date(termin):
@@ -823,6 +898,17 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
             comment_parts.append(f"\n{uzasadnienie}")
         gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": "\n".join(comment_parts)})
 
+        if nowy_status == "zrob_teraz" and issue_info.get("po_wznowieniu"):
+            pw = issue_info["po_wznowieniu"]
+            Z = zasady.wczytaj_zasady()
+            nazwa = {"agent": "agent", "czlowiek": "czlowiek", "weryfikacja": "weryfikacja"}.get(pw.get("komu"))
+            if nazwa:
+                dodaj_etykiete(api_key, linear_id, label_map, Z["etykiety"][nazwa])
+            kom = komentarz_przypisania(pw.get("komu"), pw.get("powody", []), pw.get("wymaga_szkicu", False))
+            if kom:
+                gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": kom})
+            issue_info["przypisanie"] = {"komu": pw.get("komu"), "powody": pw.get("powody", [])}
+
         # Update karta
         issue_info.setdefault("aktualizacje_zrodla", []).append(source)
         if nowy_status in ("zamknieta", "anulowana"):
@@ -835,6 +921,34 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
         processed += 1
 
     return processed
+
+
+def utworz_przygotowanie(api_key, team_id, karta, item, klient, source, meeting_date, Z, label_map,
+                         todo_id, dry_run=False):
+    """Ryzyko dla ludzi (etykieta Ryzyko) + osobne zadanie przygotowawcze dla agenta (notatka)."""
+    prep = zasady.zadanie_przygotowawcze(item, klient, Z)
+    klucz = prep["klucz_sprawy"]
+    otwarte = karta.setdefault("otwarte_sprawy", {})
+    if klucz in otwarte:
+        return None
+    etykiety = [label_map[n] for n in (Z["etykiety"]["agent"], "Zadanie") if n in label_map]
+    przyp = zasady.przypisz(prep, Z, karta)
+    desc = build_description(prep, source, karta, przyp, Z)
+    if dry_run:
+        print(f"  [utwórz] {klucz} (zadanie przygotowawcze dla agenta)")
+        return None
+    wynik = gql(api_key, M_CREATE_ISSUE, {"input": {
+        "teamId": team_id, "title": f"[{klient}] {prep['tytul']}", "description": desc,
+        "stateId": todo_id, "labelIds": etykiety}})
+    issue = (wynik.get("issueCreate") or {}).get("issue")
+    if not issue:
+        print(f"  ⚠ Nie udało się utworzyć: {klucz}")
+        return None
+    otwarte[klucz] = {"linear_id": issue["id"], "identifier": issue["identifier"], "url": issue["url"],
+                      "tytul": prep["tytul"], "zrodla": [source], "data_spotkania": meeting_date,
+                      "przypisanie": {"komu": przyp["komu"], "powody": []}}
+    print(f"  ✓ {issue['identifier']} ({klucz}): [{klient}] {prep['tytul'][:50]}")
+    return issue
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
@@ -860,6 +974,7 @@ def main():
 
     karta = load_karta(klient)
     prosby = load_prosby()
+    Z = zasady.wczytaj_zasady()
     # autor i data źródła: dla maila z pliku maila (data maila = data źródła dla reguły „późniejsze źródło”)
     zrodlo_info = ustal_zrodlo(source, wynik, karta)
     meeting_date = zrodlo_info["data"]
@@ -940,39 +1055,17 @@ def main():
         termin = parse_due_date(item.get("termin"))
         blocked_by_ban = item.get("konflikt_z_zakazem")
 
-        # Klasyfikacja sekcji
+        # Etykiety i przypisanie wg ops/zasady.json (domyślnie agent, człowiek tylko wg reguł)
+        wielu = sekcja == 3 and zasady.wielu_klientow(prosby, Z, item, klient)
+        label_names = zasady.etykiety_pozycji(item, Z, karta, wielu)
+        przyp = zasady.przypisz(item, Z, karta, wielu)
+        priority = None
         if sekcja == 1:
-            if blocked_by_ban:
-                state_name = "Backlog"
-            else:
-                state_name = "Todo"
-            typ = item.get("typ", "")
-            base_label = TYP_DO_ETYKIETY.get(typ, "Zadanie")
-            label_names = [base_label]
-            if blocked_by_ban:
-                label_names.append("Zablokowane przez zakaz")
-            elif should_get_agent_label(item):
-                label_names.append("Dla agenta")
-            if item.get("pewnosc") == "niska":
-                label_names.append("Do weryfikacji")
-            priority = None
-        elif sekcja == 2:
+            state_name = "Backlog" if blocked_by_ban else "Todo"
+        elif sekcja in (2, 3):
             state_name = "Backlog"
-            label_names = ["Czeka na klienta"]
-            if item.get("pewnosc") == "niska":
-                label_names.append("Do weryfikacji")
-            priority = None
-        elif sekcja == 3:
-            state_name = "Backlog"
-            label_names = ["Produkt"]
-            if item.get("pewnosc") == "niska":
-                label_names.append("Do weryfikacji")
-            priority = None
         elif sekcja == 5:
             state_name = "Todo"
-            label_names = ["Ryzyko"]
-            if item.get("pewnosc") == "niska":
-                label_names.append("Do weryfikacji")
             priority = 2  # High
         else:
             stats["pominieto"] += 1
@@ -1023,10 +1116,8 @@ def main():
         product_escalate = False
         if sekcja == 3 and not args.dry_run:
             product_escalate, _ = update_prosby(prosby, item, klient, source, today)
-            if product_escalate:
-                label_names.append("Wielu klientów")
 
-        desc = build_description(item, source, zakazy_klienta)
+        desc = build_description(item, source, karta, przyp, Z)
 
         # ── dry-run ───────────────────────────────────────────────────────────
         if args.dry_run:
@@ -1077,6 +1168,11 @@ def main():
             "zrodla": [source],
             "data_spotkania": meeting_date,
         }
+        zapisz_przypisanie(karta["otwarte_sprawy"][klucz], item, Z, karta, wielu)
+        if sekcja == 1 or sekcja == 3:
+            kom = komentarz_przypisania(przyp["komu"], zasady.powody_tekst(przyp), przyp["wymaga_szkicu"])
+            if kom:
+                gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": kom})
 
         print(f"  ✓ {identifier} ({klucz}): {tytul[:50]}")
 
@@ -1110,6 +1206,9 @@ def main():
                 gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": body})
 
         stats["utworzono"] += 1
+        if sekcja == 5:
+            utworz_przygotowanie(api_key, team_id, karta, item, klient, source, meeting_date, Z,
+                                 label_map, todo_id)
 
     if not args.dry_run:
         save_karta(klient, karta)

@@ -40,7 +40,11 @@
       "tytul": "Błędne godziny otwarcia Sopot w piątek (agent podaje do 18, powinno być do 16)",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "korekta-faktury-wrzesien": {
       "linear_id": "c23e359b-62a2-4964-aad0-d1b8907fc008",
@@ -49,7 +53,13 @@
       "tytul": "Przekazanie korekty faktury za wrzesień do Michała",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)"
+        ]
+      }
     },
     "podwojny-telefon-godzina": {
       "linear_id": "2f4f2a5e-640d-41e7-b01d-f643ef4949e0",
@@ -58,7 +68,23 @@
       "tytul": "Numer pacjenta z podwójnym telefonem w ciągu godziny (od Bartka przez Anię)",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "weryfikacja",
+        "powody": [
+          "brak kryteriów"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
     },
     "grafik-lekarzy-listopad": {
       "linear_id": "21fbddd8-2a9f-48e0-a407-0203cf8f030a",
@@ -67,7 +93,21 @@
       "tytul": "Lista lekarzy z grafikiem na listopad (do piątku 17.10)",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "agent",
+        "powody": [],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
     },
     "spotkanie-dr-nowak": {
       "linear_id": "52143bff-0c09-4969-b877-a2592d72ff06",
@@ -76,7 +116,21 @@
       "tytul": "Potwierdzenie spotkania Marek–dr Nowak (środa 21.10, 9:00)",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "agent",
+        "powody": [],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
     },
     "eksport-excel-potwierdzenia": {
       "linear_id": "28455374-9038-4079-b03d-50125d3a0811",
@@ -85,7 +139,11 @@
       "tytul": "Eksport listy potwierdzeń do Excela",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "ryzyko-zmiana-dostawcy": {
       "linear_id": "3d401de2-f93e-4efe-b10a-41c86fa69ab2",
@@ -94,7 +152,25 @@
       "tytul": "Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "ryzyko",
+        "powody": []
+      }
+    },
+    "przygotowanie-ryzyko-zmiana-dostawcy": {
+      "linear_id": "38635d2b-29a7-4354-8872-66142640db97",
+      "identifier": "RIN-81",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-81/klinika-usmiech-notatka-z-argumentami-przed-spotkaniem-dr-nowak",
+      "tytul": "Notatka z argumentami przed spotkaniem: Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji",
+      "zrodla": [
+        "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     }
   },
   "ryzyka": {

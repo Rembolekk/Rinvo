@@ -1,0 +1,71 @@
+name: Codzienne podsumowanie
+
+on:
+  schedule:
+    # Cron działa w UTC. 08:00 w Polsce to 06:00 UTC latem (CEST) i 07:00 UTC zimą (CET), więc odpalamy
+    # o obu godzinach, a podsumowanie.py samo sprawdza czas w Europe/Warsaw i wysyła raz dziennie.
+    - cron: "0 6 * * *"
+    - cron: "0 7 * * *"
+  workflow_dispatch:
+
+# Ta sama grupa co przetwarzanie rozmów i maili: podsumowanie zapisuje karty klientów (licznik przypomnień).
+concurrency:
+  group: przetworz-rozmowy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  podsumowanie:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Zależności
+        run: pip install certifi tzdata
+
+      # Ręczne uruchomienie wysyła zawsze (--wymus); cron tylko w oknie 8:00-12:00 czasu polskiego, raz dziennie.
+      - name: Podsumowanie
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RECZNIE: ${{ github.event_name == 'workflow_dispatch' }}
+        run: |
+          set -uo pipefail
+          if [ "$RECZNIE" = "true" ]; then
+            python3 podsumowanie.py --wymus
+          else
+            python3 podsumowanie.py
+          fi
+
+      # Szkice przypomnień zwiększają licznik wykorzystanych przypomnień w karcie: zapisujemy go w repo.
+      - name: Zapisz karty i stan
+        run: |
+          set -uo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          for sciezka in ops/klienci ops/.podsumowanie.json; do
+            [ -e "$sciezka" ] && git add -A -- "$sciezka"
+          done
+          if git diff --cached --quiet; then
+            echo "Brak zmian do zapisania"
+            exit 0
+          fi
+          git commit -q -m "[automat] podsumowanie dzienne [skip ci]"
+          for proba in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            echo "Push odrzucony (próba $proba/3), pull --rebase…"
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 1; }
+          done
+          exit 1

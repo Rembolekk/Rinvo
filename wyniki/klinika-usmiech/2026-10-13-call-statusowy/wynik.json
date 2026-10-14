@@ -5,8 +5,15 @@
     "tytul": "Klinika Uśmiech × Rinvo: call statusowy",
     "data": "2026-10-13",
     "godziny": "10:00–10:25",
-    "uczestnicy": ["Ania Zielińska", "Marek Rewoliński"],
-    "wspominani": ["dr Nowak", "Bartek", "Michał"]
+    "uczestnicy": [
+      "Ania Zielińska",
+      "Marek Rewoliński"
+    ],
+    "wspominani": [
+      "dr Nowak",
+      "Bartek",
+      "Michał"
+    ]
   },
   "pozycje": [
     {
@@ -27,7 +34,16 @@
       ],
       "klucz_sprawy": "godziny-sopot-piatek",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Baza wiedzy agenta Kliniki Uśmiech podaje prawidłową godzinę zamknięcia salonu Sopot w piątek obowiązującą od października.",
+      "kryteria_akceptacji": [
+        "W bazie wiedzy klienta salon Sopot ma w piątek godzinę zamknięcia 16:00",
+        "W bazie wiedzy nie zostało żadne miejsce z godziną 18:00 dla piątku w Sopocie",
+        "Godziny pozostałych dni Sopotu i salonu w Gdańsku pozostają bez zmian"
+      ],
+      "jak_sprawdzic": "Przejrzeć diff w bazie wiedzy klienta (wszystkie wystąpienia godzin Sopotu w piątek) i zadać agentowi pytanie testowe „do której czynny jest Sopot w piątek”. Nagrania testowego nie wysyłać klientce: odmówiła.",
+      "repo": "rinvo-ops",
+      "szkic_klienta": "Cześć Aniu,\n\npoprawiłem godziny otwarcia salonu w Sopocie: agent podaje teraz, że w piątek jesteśmy do 16:00. Dzięki za zgłoszenie.\n\nPozdrawiam,\nMarek"
     },
     {
       "id": "T2",
@@ -45,7 +61,15 @@
       ],
       "klucz_sprawy": "korekta-faktury-wrzesien",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Przekazać Michałowi informację o błędnej kwocie faktury za wrzesień Kliniki Uśmiech, żeby wystawił korektę.",
+      "kryteria_akceptacji": [
+        "Michał dostał wiadomość z nazwą klienta, miesiącem faktury (wrzesień 2026) i opisem błędu: w kwocie policzono minuty z sierpnia",
+        "Wiadomość zawiera informację, że księgowa klienta potrzebuje korekty",
+        "Przekazanie nastąpiło w dniu rozmowy (13.10.2026)"
+      ],
+      "jak_sprawdzic": "Znaleźć wiadomość do Michała (kanał lub mail) z datą 13.10.2026 i sprawdzić, że zawiera trzy elementy z kryteriów.",
+      "repo": "brak"
     },
     {
       "id": "K1",
@@ -69,7 +93,11 @@
       },
       "klucz_sprawy": "podwojny-telefon-godzina",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Po otrzymaniu od Ani numeru pacjenta (i godziny, jeśli będzie znana) sprawdzić, dlaczego agent zadzwonił do niego dwa razy w ciągu godziny.",
+      "kryteria_akceptacji": [],
+      "jak_sprawdzic": "Bez numeru pacjenta nie da się zbadać sprawy; po dostarczeniu danych człowiek ustala zakres sprawdzenia w logach połączeń.",
+      "repo": "brak"
     },
     {
       "id": "K2",
@@ -92,7 +120,16 @@
       },
       "klucz_sprawy": "grafik-lekarzy-listopad",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Po otrzymaniu od Ani listy lekarzy z grafikiem na listopad wprowadzić ją do bazy wiedzy agenta, żeby agent wiedział, kto przyjmuje.",
+      "kryteria_akceptacji": [
+        "Baza wiedzy klienta zawiera wszystkich lekarzy z listy przysłanej przez Anię",
+        "Dla każdego lekarza zapisany jest grafik na listopad zgodny z przysłanym",
+        "Dane są zapisane w pliku wiedzy klienta, a źródło (data i forma przesłania listy) jest odnotowane"
+      ],
+      "jak_sprawdzic": "Porównać bazę wiedzy z listą od Ani lekarz po lekarzu i zadać agentowi pytanie testowe o dostępność wybranego lekarza w listopadzie.",
+      "repo": "rinvo-ops",
+      "szkic_klienta": "Cześć Aniu,\n\nprzypominam o liście lekarzy z grafikiem na listopad, którą miałaś przesłać do piątku (17.10). Czy możesz ją wysłać? Dzięki niej agent będzie wiedział, kto przyjmuje.\n\nDziękuję,\nMarek"
     },
     {
       "id": "K3",
@@ -109,7 +146,9 @@
         "Zapytam go i potwierdzę. Bez mojego potwierdzenia nie wysyłaj zaproszenia.",
         "Jasne, czekam."
       ],
-      "wnioski": ["Celem spotkania jest odpowiedź na ofertę konkurenta i pokazanie aktualnych możliwości Rinvo."],
+      "wnioski": [
+        "Celem spotkania jest odpowiedź na ofertę konkurenta i pokazanie aktualnych możliwości Rinvo."
+      ],
       "przypomnienie": {
         "data": "brak",
         "limit": "brak",
@@ -117,7 +156,16 @@
       },
       "klucz_sprawy": "spotkanie-dr-nowak",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Po potwierdzeniu przez Anię wysłać dr. Nowakowi zaproszenie na rozmowę z Markiem w środę 21.10.2026 o 9:00.",
+      "kryteria_akceptacji": [
+        "Zaproszenie nie zostało wysłane przed otrzymaniem potwierdzenia od Ani",
+        "Zaproszenie wskazuje środę 21.10.2026, godzinę 9:00 i uczestników: Marek Rewoliński oraz dr Nowak",
+        "Zaproszenie wysłano w uzgodniony przez Anię sposób (jeśli poda inny termin lub adres, użyć jej danych)"
+      ],
+      "jak_sprawdzic": "Sprawdzić, że potwierdzenie od Ani jest w korespondencji, a zaproszenie w kalendarzu ma poprawną datę, godzinę i uczestników.",
+      "repo": "brak",
+      "szkic_klienta": "Dzień dobry Panie Doktorze,\n\nzapraszam na rozmowę w środę 21.10.2026 o 9:00. Porozmawiamy o współpracy Kliniki Uśmiech z Rinvo i o aktualnych możliwościach agenta.\n\nPozdrawiam,\nMarek Rewoliński, Rinvo"
     },
     {
       "id": "B1",
@@ -137,7 +185,15 @@
       "klucz_sprawy": "eksport-excel-potwierdzenia",
       "klucz_funkcji": "eksport-excel-potwierdzenia",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Dodać w panelu przycisk eksportu do Excela listy pacjentów z podziałem na tych, którzy potwierdzili wizytę, i tych, którzy nie potwierdzili.",
+      "kryteria_akceptacji": [
+        "W panelu jest przycisk eksportu do Excela",
+        "Eksport zawiera listę pacjentów z oznaczeniem, kto potwierdził wizytę, a kto nie",
+        "Pobrany plik otwiera się w Excelu"
+      ],
+      "jak_sprawdzic": "W panelu konta testowego wyeksportować listę i otworzyć plik w Excelu; porównać statusy potwierdzeń z danymi w panelu.",
+      "repo": "rinvo"
     },
     {
       "id": "Z1",
@@ -171,7 +227,9 @@
         "A, od 2 do 6 listopada mam urlop. W tym czasie nic nowego nie wdrażajcie.",
         "Dobra, w tym tygodniu nic nie startuje."
       ],
-      "wnioski": ["Marek potwierdził zakaz dla 'tego tygodnia' (13-18.10), nie dla 2–6.11. Możliwe nieporozumienie – zakaz z rozmowy obowiązuje 2–6.11."],
+      "wnioski": [
+        "Marek potwierdził zakaz dla 'tego tygodnia' (13-18.10), nie dla 2–6.11. Możliwe nieporozumienie – zakaz z rozmowy obowiązuje 2–6.11."
+      ],
       "klucz_sprawy": "zakaz-urlop-ani",
       "pewnosc": "niska",
       "konflikt_z_zakazem": null
@@ -189,11 +247,25 @@
       "cytat": [
         "I uczciwie: dr Nowak dostał ofertę od innej firmy, która integruje się z naszym systemem rezerwacji. Rozważa zmianę."
       ],
-      "wnioski": ["Spotkanie z dr Nowakiem 21.10 (K3) jest bezpośrednią odpowiedzią na to ryzyko."],
+      "wnioski": [
+        "Spotkanie z dr Nowakiem 21.10 (K3) jest bezpośrednią odpowiedzią na to ryzyko."
+      ],
       "klucz_sprawy": "ryzyko-zmiana-dostawcy",
       "pewnosc": "wysoka",
       "konflikt_z_zakazem": null,
-      "temat_ryzyka": "grozba_rezygnacji"
+      "temat_ryzyka": "grozba_rezygnacji",
+      "zadanie_przygotowawcze": {
+        "cel": "Przygotować notatkę z argumentami dla Marka przed spotkaniem z dr. Nowakiem (21.10.2026) w sprawie oferty konkurenta, która integruje się z systemem rezerwacji kliniki.",
+        "kryteria_akceptacji": [
+          "Notatka zawiera dosłowny cytat Ani o ofercie innej firmy i rozważanej zmianie dostawcy",
+          "Notatka opisuje, co wiemy o ofercie konkurenta (integracja z systemem rezerwacji), i wyraźnie wskazuje, czego nie wiemy (cena, zakres, warunki)",
+          "Notatka zestawia aktualne możliwości Rinvo dla kliniki (potwierdzanie wizyt, baza wiedzy, rozliczenie za minuty) z faktami z karty klienta, w tym znane problemy: godziny Sopotu, korekta faktury za wrzesień",
+          "Notatka kończy się listą pytań do dr. Nowaka i rekomendowanym stanowiskiem",
+          "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+        ],
+        "jak_sprawdzic": "Marek czyta notatkę przed spotkaniem 21.10: cytat zgadza się z transkrypcją, a każdy punkt z kryteriów jest obecny.",
+        "repo": "rinvo-ops"
+      }
     }
   ],
   "aktualizacje_spraw": [],
@@ -209,8 +281,12 @@
   "konflikty_dat": [
     {
       "opis": "Ania ogłosiła zakaz wdrożeń na 2–6.11 (urlop), ale Marek potwierdził 'w tym tygodniu nic nie startuje' (tydzień 13–18.10). Zakres nie pokrywa się. Marek może nie mieć świadomości zamrożenia na listopad.",
-      "pozycje": ["Z2"],
-      "wnioski": ["Wskazane doprecyzowanie z Anią przed jej urlopem, że zakaz dotyczy 2–6.11, a nie tylko bieżącego tygodnia."]
+      "pozycje": [
+        "Z2"
+      ],
+      "wnioski": [
+        "Wskazane doprecyzowanie z Anią przed jej urlopem, że zakaz dotyczy 2–6.11, a nie tylko bieżącego tygodnia."
+      ]
     }
   ],
   "weryfikacja": {

@@ -1,0 +1,24 @@
+{
+  "T1": {
+    "cel": "Przygotować plik leady-pazdziernik.csv do uruchomienia kampanii na świeżych leadach, tak aby po zgodzie Kasi wystarczyło ją wystartować.",
+    "kryteria_akceptacji": [
+      "Każdy wiersz pliku ma zidentyfikowany numer telefonu i salon (Toruń albo Włocławek)",
+      "Nieczytelne nazwy kolumn są zmapowane na pola potrzebne kampanii, a mapowanie jest zapisane w notatce",
+      "Wiersze bez numeru lub bez salonu są wypisane osobno, bez zgadywania brakujących danych",
+      "Kampania nie jest uruchomiona, a Opel i stara baza nie są ruszane"
+    ],
+    "jak_sprawdzic": "Przejrzeć notatkę z mapowaniem i listę wierszy z brakami. Sprawdzić w panelu, że żadna kampania na tym pliku nie jest aktywna.",
+    "repo": "rinvo-ops"
+  },
+  "K1": {
+    "cel": "Uzyskać od Kasi jednoznaczną decyzję, czy świeże leady mają ruszyć teraz mimo zakazów Z18 i Z5, czy dopiero po jej urlopie.",
+    "kryteria_akceptacji": [
+      "Kasia odpowiada na piśmie, że start ma nastąpić teraz albo wskazuje konkretny termin po urlopie",
+      "Odpowiedź pochodzi bezpośrednio od Kasi, a nie od osoby trzeciej",
+      "Do czasu odpowiedzi nie startuje żadna nowa kampania, w tym Opel i stara baza"
+    ],
+    "jak_sprawdzic": "Sprawdzić w skrzynce, że Kasia odpisała na wysłane pytanie, i porównać jej odpowiedź z cytatem w zgłoszeniu.",
+    "repo": "brak",
+    "szkic_klienta": "Cześć Kasiu,\n\ndzięki za plik leady-pazdziernik.csv, mamy go. Przejrzymy kolumny i przygotujemy wszystko do uruchomienia.\n\nJedno pytanie, żebyśmy niczego nie puścili wbrew ustaleniom: ustaliliśmy, że w tym tygodniu nic nowego poza testem wstępu nie startuje, a od 19 do 23.10 masz urlop i też nic nowego nie odpalamy. Czy „możecie puszczać” znaczy, że mamy ruszyć świeże leady już teraz, czy wolisz poczekać do po urlopie? Opla i starej bazy nie ruszamy, o tym pogadamy w czwartek we trzech.\n\nPozdrawiam,\nMarek"
+  }
+}

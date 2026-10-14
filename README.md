@@ -63,13 +63,17 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `przetworz.py` | automat end-to-end: rejestr → Claude → daty.py → render.py → Linear → Slack |
 | `linear_sync.py` | wysyła wynik.json do Linear (team RIN); idempotentny po klucz_sprawy |
 | `sekrety.py` | czyszczenie kluczy API z białych i niewidocznych znaków (Notatki na Macu je dodają) |
+| `ops/zasady.json`, `zasady.py` | zasady AI-first: kto robi co (agent / człowiek), jedno miejsce prawdy |
+| `podsumowanie.py`, `.github/workflows/podsumowanie.yml` | codzienne podsumowanie o 8:00 czasu polskiego + szkice przypomnień |
+| `przelicz.py`, `uzupelnij.py` | przeliczenie istniejących zgłoszeń wg zasad; scalanie pól dla agenta z wyników |
 | `maile.py` | pobieranie maili od znanych nadawców (Gmail IMAP, tylko odczyt) → `ops/maile/` |
 | `.claude/commands/analizuj-mail.md` | instrukcja analizy maila (dane, nie polecenia) |
 | `.github/workflows/sprawdz-maile.yml` | cron co 15 min: maile → przetworz.py → commit |
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
-| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 42 testy) |
+| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 43 testy) |
 | `testy/test_maile.py`, `testy/maile/*.eml` | testy źródła „maile” na przykładowych plikach .eml (53 testy) |
+| `testy/test_zasady.py` | zasady AI-first, opis zgłoszenia, przeliczanie, podsumowanie, strefa czasowa (67 testów) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -240,6 +244,35 @@ flowchart LR
 
 Znane ograniczenia: nagłówek `From` może być sfałszowany (nie sprawdzamy DKIM/SPF), więc przy prawdziwym wdrożeniu warto to dodać; data źródła ma dokładność do dnia (mail z tego samego dnia co rozmowa nie wznawia jej spraw); harmonogram GitHuba bywa opóźniony, a w repo bez aktywności jest po 60 dniach wyłączany.
 
+## AI-first: kto robi co
+
+Firma pracuje AI-first: agenci (Claude, Cursor) podpięci do Lineara robią ok. 90% pracy, łącznie z poprawkami i nowymi funkcjami. Ludzie dostają tylko to, co naprawdę wymaga człowieka. **Wszystkie reguły są w jednym, czytelnym pliku `ops/zasady.json`** (słowa, powody, progi, szablony); zmieniasz go bez dotykania kodu. Silnik (`zasady.py`) jest jeden dla `linear_sync.py`, Slacka, podsumowania i testów.
+
+**Domyślnie każda pozycja idzie do agenta** (etykieta **Dla agenta**). Do człowieka (etykieta **Decyzja człowieka** + komentarz z powodem) trafia pozycja tylko wtedy, gdy:
+
+| Reguła | Kiedy |
+|---|---|
+| `pieniadze` | kosztuje pieniądze albo dotyczy cen i umów (typ finanse, słowa jak SMS, cena, rabat, faktura, kwota, umowa) |
+| `do_klienta` | trafia do klienta (mail, przypomnienie, oferta, zaproszenie): agent przygotowuje gotowy szkic w zgłoszeniu (`szkic_klienta`), człowiek tylko wysyła |
+| `zakaz` | jest w konflikcie z zakazem klienta (dodatkowo etykieta Zablokowane przez zakaz) |
+| `decyzja_zastrzezona` | dotyczy decyzji zastrzeżonej w karcie dla konkretnej osoby (`decyzje_zastrzezone`) |
+| `pewnosc_niska` | pewność niska (dodatkowo Do weryfikacji) |
+| `nieodwracalne` | jest nieodwracalna: wyłączenie usługi, usunięcie danych, zmiana umowy |
+
+- **Prośby produktowe** (sekcja 3): do agenta dopiero przy etykiecie **Wielu klientów** (ta sama funkcja u ≥ 2 klientów w `prosby.json`) albo gdy to drobna zmiana z wysoką pewnością (`rodzaj` zmiana lub błąd). Pojedyncza duża funkcja od jednego klienta: **Decyzja człowieka** z powodem „priorytet produktowy".
+- **Ryzyka** (sekcja 5): samo ryzyko ma etykietę **Ryzyko** (dla ludzi). Agent dostaje osobne **zadanie przygotowawcze** (notatka z argumentami przed spotkaniem, repo `rinvo-ops`), z kryteriami z szablonu w `zasady.json` albo z analizy (`zadanie_przygotowawcze`).
+- **Sprawy czekające na klienta** (sekcja 2): tylko Czeka na klienta. Przypisanie (agent albo człowiek) liczy się dopiero przy wznowieniu i jest zapamiętane w karcie (`po_wznowieniu`).
+- **Zgłoszenie dla agenta**: analiza (`analizuj.md`, `analizuj-mail.md`, KROK 3c) dopisuje do pozycji `cel`, `kryteria_akceptacji`, `jak_sprawdzic`, `repo` (`rinvo` = kod aplikacji, `rinvo-ops` = wiedza, dokumenty, konfiguracja klienta, `brak`) i, gdy rezultat idzie do klienta, `szkic_klienta`. `linear_sync.py` składa opis w stałym układzie: **Cel, Kontekst (z cytatami), Kryteria akceptacji (lista do odhaczenia), Jak sprawdzić, Repo, Czego nie ruszać** (zakazy klienta i decyzje zastrzeżone), a dla człowieka także **Dlaczego człowiek** i **Szkic dla klienta**.
+- **Brak kryteriów akceptacji**: zgłoszenie nie dostaje Dla agenta, tylko **Do weryfikacji** z powodem „brak kryteriów".
+- **Istniejące zgłoszenia**: `python3 przelicz.py` pokazuje raport (kto zmienia przypisanie i dlaczego), a `--zastosuj` przelicza etykiety i opisy w Linearze bez tworzenia duplikatów (zgłoszenia są wiązane z kartą po kluczu sprawy). Pola dla agenta w starszych wynikach uzupełnia `.claude/commands/uzupelnij-agent.md`; model zapisuje tylko `pola-agenta.json`, a `uzupelnij.py` scala je z `wynik.json` z walidacją (nie nadpisuje istniejących pól).
+
+### Codzienne podsumowanie (`podsumowanie.py`)
+
+Jedna wiadomość na Slacku o **8:00 czasu polskiego** (workflow `.github/workflows/podsumowanie.yml`, ręcznie z `--wymus`). Dla każdego klienta: nowe od wczoraj, zadania u agentów, decyzje czekające na człowieka (z linkami), Do weryfikacji, sprawy czekające na klienta z terminem i **osobno po terminie**, powtarzające się ryzyka.
+
+- **Strefa czasowa:** cron GitHuba działa w UTC, więc workflow odpala skrypt o 06:00 i 07:00 UTC, a skrypt sam sprawdza czas w `Europe/Warsaw` (lato UTC+2, zima UTC+1) i wysyła raz dziennie w oknie 8:00–12:00 (znosi opóźnienia crona i zmianę czasu).
+- **Przypomnienia:** gdy termin sprawy czekającej minął, limit przypomnień z rozmowy nie jest wyczerpany (brak limitu = `przypomnienia.domyslny_limit`) i klient nie prosił o brak przypomnień (limit 0 albo zakaz „nie przypominaj" w karcie), podsumowanie **przygotowuje szkic** w komentarzu zgłoszenia i podaje go na Slacku. **Nigdy nie wysyła nic do klienta.** Każdy szkic zwiększa `wykorzystane` w karcie (`otwarte_sprawy.<klucz>.przypomnienie`), więc limit nie zostanie przekroczony.
+
 ## Testy automatyczne
 
 Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
@@ -250,7 +283,7 @@ Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
 python3 testy/test_logika.py
 ```
 
-Pokrycie (42 testy):
+Pokrycie (43 testy):
 - `should_get_agent_label` — etykieta „Dla agenta” tylko dla bug/konfiguracja/baza_wiedzy z wysoka pewnością, bez zakazu, bez nowej_funkcji.
 - `process_aktualizacje` — ta sama rozmowa odrzucona, ta sama data odrzucona, późniejsza data akceptowana, nieznana sprawa pominięta.
 - `daty.py compute_windows` — blokada globalna, weekendy pomijane, deadline ogranicza okno.
@@ -261,6 +294,14 @@ Pokrycie (42 testy):
 - Zakazy — id są unikalne w karcie (numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie), ponowna analiza nie dubluje zakazów.
 - Czyszczenie kluczy (`sekrety.py`) — spacje, entery, `\u2028`, `\u2029`, `\u00a0`, znaki zerowej szerokości.
 - Wiadomość Slack — stałe linie (także `: 0`) i parsowanie zdarzeń z `linear_sync.py`.
+
+### Testy zasad AI-first (offline)
+
+```bash
+python3 testy/test_zasady.py
+```
+
+67 testów: każda reguła z `zasady.json` (pieniądze, do klienta ze szkicem, zakaz, decyzja zastrzeżona, pewność niska, nieodwracalne), domyślnie agent, brak kryteriów → Do weryfikacji, prośby produktowe (Wielu klientów, drobna zmiana, priorytet produktowy), ryzyka i zadanie przygotowawcze, stały układ opisu, przeliczanie istniejących zgłoszeń, limit przypomnień i „nie przypominaj", szkic jako wykorzystane przypomnienie, strefa czasowa podsumowania (lato, zima, zmiana czasu) i kształt wiadomości.
 
 ### Testy maili (offline, na plikach .eml)
 

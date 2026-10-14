@@ -28,40 +28,49 @@ from daty import compute_windows, has_temporal_word
 # ── should_get_agent_label ────────────────────────────────────────────────────
 
 class TestShouldGetAgentLabel(unittest.TestCase):
+    """Od AI-first: domyślnie agent, ale tylko z kryteriami akceptacji; człowiek wg ops/zasady.json.
+    ZMIENIONE ŚWIADOMIE względem wersji sprzed AI-first (lista typów → reguły):
+    - pozycje muszą mieć kryteria_akceptacji (inaczej Do weryfikacji, nie Dla agenta),
+    - nowa_funkcja w sekcji 1 nie blokuje agenta (liczą się reguły); prośby produktowe mają własną regułę,
+    - pomysl_produktowy nie jest już „nigdy agent”: agent przy Wielu klientów albo drobnej zmianie."""
+
+    K = ["Punkt do sprawdzenia"]
+
+    def _p(self, **kw):
+        item = {"typ": "bug", "pewnosc": "wysoka", "sekcja": 1, "tytul": "Błąd listy",
+                "opis": "Lista nie działa", "kryteria_akceptacji": self.K}
+        item.update(kw)
+        return item
 
     def test_bug_dostaje_agent(self):
-        self.assertTrue(should_get_agent_label(
-            {"typ": "bug", "pewnosc": "wysoka", "rodzaj": "blad"}))
+        self.assertTrue(should_get_agent_label(self._p(rodzaj="błąd")))
 
     def test_zmiana_konfiguracji_dostaje_agent(self):
-        self.assertTrue(should_get_agent_label(
-            {"typ": "zmiana_konfiguracji", "pewnosc": "wysoka"}))
+        self.assertTrue(should_get_agent_label(self._p(typ="zmiana_konfiguracji")))
 
     def test_poprawka_bazy_wiedzy_dostaje_agent(self):
-        self.assertTrue(should_get_agent_label(
-            {"typ": "poprawka_bazy_wiedzy", "pewnosc": "wysoka"}))
+        self.assertTrue(should_get_agent_label(self._p(typ="poprawka_bazy_wiedzy")))
 
     def test_konflikt_z_zakazem_blokuje_agent(self):
-        self.assertFalse(should_get_agent_label({
-            "typ": "bug", "pewnosc": "wysoka",
-            "konflikt_z_zakazem": {"zakaz": "Z1", "uzasadnienie": "x"},
-        }))
+        self.assertFalse(should_get_agent_label(
+            self._p(konflikt_z_zakazem={"zakaz": "Z1", "uzasadnienie": "x"})))
 
     def test_niska_pewnosc_blokuje_agent(self):
-        self.assertFalse(should_get_agent_label(
-            {"typ": "bug", "pewnosc": "niska"}))
+        self.assertFalse(should_get_agent_label(self._p(pewnosc="niska")))
 
-    def test_nowa_funkcja_blokuje_agent(self):
+    def test_pomysl_produktowy_jednego_klienta_nie_idzie_do_agenta(self):
         self.assertFalse(should_get_agent_label(
-            {"typ": "bug", "pewnosc": "wysoka", "rodzaj": "nowa_funkcja"}))
+            self._p(typ="pomysl_produktowy", rodzaj="nowa_funkcja", sekcja=3)))
 
-    def test_pomysl_produktowy_nie_dostaje_agent(self):
-        self.assertFalse(should_get_agent_label(
-            {"typ": "pomysl_produktowy", "pewnosc": "wysoka"}))
+    def test_pomysl_produktowy_wielu_klientow_idzie_do_agenta(self):
+        self.assertTrue(should_get_agent_label(
+            self._p(typ="pomysl_produktowy", rodzaj="nowa_funkcja", sekcja=3), wielu=True))
 
     def test_finanse_nie_dostaje_agent(self):
-        self.assertFalse(should_get_agent_label(
-            {"typ": "finanse", "pewnosc": "wysoka"}))
+        self.assertFalse(should_get_agent_label(self._p(typ="finanse")))
+
+    def test_bez_kryteriow_akceptacji_nie_dostaje_agenta(self):
+        self.assertFalse(should_get_agent_label(self._p(kryteria_akceptacji=[])))
 
 
 # ── process_aktualizacje ──────────────────────────────────────────────────────
@@ -366,7 +375,8 @@ class TestSlack(unittest.TestCase):
         import tempfile
         d = {"spotkanie": {"data": "2026-10-13"},
              "pozycje": [{"id": "T1", "sekcja": 1, "tytul": "Zadanie", "klucz_sprawy": "k",
-                          "pewnosc": "wysoka", "konflikt_z_zakazem": None}],
+                          "pewnosc": "wysoka", "konflikt_z_zakazem": None,
+                          "kryteria_akceptacji": ["Punkt do sprawdzenia"]}],
              "aktualizacje_spraw": [], "ostrzezenia_dat": []}
         f = tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8")
         json.dump(d, f)
@@ -380,7 +390,8 @@ class TestSlack(unittest.TestCase):
             msg = przetworz.build_slack_summary("klient-testowy", p, "")
         finally:
             p.unlink()
-        for nazwa in ("Zamknięte: 0", "Wznowione: 0", "Zablokowane przez zakaz: 0",
+        for nazwa in ("Zamknięte: 0", "Wznowione: 0", "Zadania dla agentów: 1", "Decyzja człowieka: 0",
+                      "Zablokowane przez zakaz: 0",
                       "Powtarzające się ryzyka: 0", "Wielu klientów: 0", "Do weryfikacji: 0"):
             self.assertIn(nazwa, msg)
 

@@ -31,6 +31,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+import zasady
 from maile import czy_mail, oznacz_przetworzony, slack_bezpiecznie, wczytaj_meta_maila
 from sekrety import NAZWY_SEKRETOW, czysc, wyczysc_srodowisko
 
@@ -307,7 +308,23 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
     ryzyka_powt = [sprawa(i, k, t) for i, k, t in zdarzenia["ryzyka"]]
     wielu = [sprawa(i, k, t) for i, k, t in zdarzenia["wielu_klientow"]]
     zablokowane = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in blocked]
-    do_weryfikacji = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in niska]
+    # kto dostaje pozycje wg ops/zasady.json (domyślnie agent, człowiek tylko wg reguł)
+    try:
+        Z, prosby_wszystkie = zasady.wczytaj_zasady(), zasady.wczytaj_prosby()
+    except OSError:
+        Z, prosby_wszystkie = None, {}
+    agent_poz, czlowiek_poz, weryfikacja_poz = [], [], []
+    for p in pozycje:
+        if Z is None or p.get("sekcja") not in (1, 3):
+            continue
+        wk = p.get("sekcja") == 3 and zasady.wielu_klientow(prosby_wszystkie, Z, p, klient)
+        komu = zasady.przypisz(p, Z, karta, wk)["komu"]
+        {"agent": agent_poz, "czlowiek": czlowiek_poz, "weryfikacja": weryfikacja_poz}.get(komu, []).append(p)
+    ids_weryf = {id(p) for p in weryfikacja_poz} | {id(p) for p in niska}
+    do_weryfikacji = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}"
+                      for p in pozycje if id(p) in ids_weryf]
+    dla_agentow = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in agent_poz]
+    decyzje = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in czlowiek_poz]
     odrzucone = [f"{slack_bezpiecznie(k, 40)} → {st}: {slack_bezpiecznie(pow, 110)}"
                  for k, st, pow in zdarzenia["odrzucone"]]
 
@@ -325,6 +342,8 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
     # Te linie są zawsze, także gdy wynoszą 0 (brak linii wyglądałby jak brak informacji).
     lines += _linia_slack(":white_check_mark:", "Zamknięte", zamkniete)
     lines += _linia_slack(":arrows_counterclockwise:", "Wznowione", wznowione)
+    lines += _linia_slack(":gear:", "Zadania dla agentów", dla_agentow)
+    lines += _linia_slack(":raising_hand:", "Decyzja człowieka", decyzje)
     lines += _linia_slack(":no_entry:", "Zablokowane przez zakaz", zablokowane)
     lines += _linia_slack(":rotating_light:", "Powtarzające się ryzyka", ryzyka_powt)
     lines += _linia_slack(":busts_in_silhouette:", "Wielu klientów", wielu)

@@ -33,7 +33,15 @@
       ],
       "klucz_sprawy": "godziny-salonu-sobota",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Doprowadzić do tego, by agent w Toruniu podawał te same godziny sobotnie co we Włocławku, czyli do 15:00.",
+      "kryteria_akceptacji": [
+        "Agent w Toruniu na pytanie o godziny w sobotę odpowiada, że salon jest otwarty do 15:00",
+        "Agent we Włocławku nadal podaje sobotę do 15:00 (poprawka nie psuje już naprawionego salonu)",
+        "W konfiguracji lub bazie wiedzy obu salonów sobota kończy się o 15:00, nigdzie nie została godzina 14:00"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa z agentem Torunia i agentem Włocławka z pytaniem o godziny otwarcia w sobotę; oba mają odpowiedzieć „do piętnastej”. Przeszukać bazę wiedzy pod kątem „14:00” przy sobocie.",
+      "repo": "rinvo-ops"
     },
     {
       "id": "T2",
@@ -56,7 +64,16 @@
       ],
       "klucz_sprawy": "tekst-wstepu-dwie-wersje",
       "pewnosc": "niska",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Uruchomić w środę 14.10 i czwartek 15.10 test dwóch wersji wstępu rozmowy, po jednej wersji na salon.",
+      "kryteria_akceptacji": [
+        "Przed startem potwierdzone z Kasią (lub zapisane w zgłoszeniu), która wersja idzie na Toruń, a która na Włocławek",
+        "Toruń używa jednej wersji wstępu, Włocławek drugiej, obie zgodnie z tekstami z maila Kasi z 12.10",
+        "Test działa tylko w środę 14.10 i czwartek 15.10, po czym wstęp wraca do stanu sprzed testu albo czeka na decyzję Kasi",
+        "Poza wstępem nic innego w konfiguracji nie jest zmieniane"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa na każdy z dwóch salonów: agent wypowiada właściwą wersję wstępu. Po 15.10 sprawdzić w konfiguracji, że test jest zakończony.",
+      "repo": "rinvo-ops"
     },
     {
       "id": "T3",
@@ -77,7 +94,17 @@
       ],
       "klucz_sprawy": "zestawienie-wynikow-wstepu",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Przekazać Kasi w piątek 16.10 zestawienie, ilu rozmówców doszło do końca rozmowy przy każdej z dwóch wersji wstępu.",
+      "kryteria_akceptacji": [
+        "Zestawienie podaje osobno dla każdej wersji wstępu liczbę pełnych rozmów (doszedł do końca), bez liczenia rozłączeń",
+        "Dane obejmują tylko test ze środy 14.10 i czwartku 15.10",
+        "Zestawienie jasno wskazuje, która wersja szła na Toruń, a która na Włocławek",
+        "Wiadomość do Kasi jest gotowa do wysłania najpóźniej w piątek 16.10"
+      ],
+      "jak_sprawdzic": "Porównać liczby w zestawieniu z listą rozmów z panelu za 14–15.10; sprawdzić, że rozłączenia nie wchodzą do liczby pełnych rozmów.",
+      "repo": "brak",
+      "szkic_klienta": "Cześć Kasia,\n\nzgodnie z umową przesyłam zestawienie z testu wstępu (środa 14.10 i czwartek 15.10). Liczymy pełne rozmowy, czyli takie, w których rozmówca doszedł do końca, bez rozłączeń.\n\n- Toruń, wersja [krótsza / dłuższa]: [liczba] pełnych rozmów\n- Włocławek, wersja [dłuższa / krótsza]: [liczba] pełnych rozmów\n\nDaj znać, gdybyś potrzebowała czegoś jeszcze do wyników.\n\nPozdrawiam\nMarek"
     },
     {
       "id": "T4",
@@ -97,7 +124,16 @@
       ],
       "klucz_sprawy": "spotkanie-z-pawlem",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Wysłać Kasi i Pawłowi zaproszenie na spotkanie w czwartek 15.10 o 10:00.",
+      "kryteria_akceptacji": [
+        "Zaproszenie dotyczy czwartku 15.10, godz. 10:00",
+        "Zaproszenie trafia do Kasi i Pawła oraz Marka",
+        "Zaproszenie wysłane przed spotkaniem, najpóźniej w środę 14.10"
+      ],
+      "jak_sprawdzic": "Sprawdzić w kalendarzu Marka, że zaproszenie istnieje, ma właściwą datę i godzinę oraz że Kasia je otrzymała.",
+      "repo": "brak",
+      "szkic_klienta": "Cześć Kasia,\n\nwysyłam zaproszenie na czwartek 15.10, godz. 10:00, na spotkanie Marek–Paweł–Kasia, tak jak potwierdziłaś. Na spotkaniu wracamy też do tematu Opla.\n\nDo zobaczenia\nMarek"
     },
     {
       "id": "T5",
@@ -115,7 +151,15 @@
       ],
       "klucz_sprawy": "prezentacja-integracji-crm",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Przygotować na czwartkowe spotkanie z Pawłem konkretny materiał o połączeniu Rinvo z systemem klienta.",
+      "kryteria_akceptacji": [
+        "Materiał jest gotowy przed spotkaniem w czwartek 15.10, 10:00",
+        "Pokazuje konkretnie, jak Rinvo łączy się z systemem klienta, a nie ogólną deklarację",
+        "Nie zawiera obietnic cen ani terminów wdrożenia, których nie ustalono w rozmowie"
+      ],
+      "jak_sprawdzic": "Marek przegląda materiał przed spotkaniem i potwierdza, że odpowiada na pytanie Pawła o połączenie z systemem.",
+      "repo": "rinvo-ops"
     },
     {
       "id": "T6",
@@ -135,7 +179,16 @@
       ],
       "klucz_sprawy": "sciga-statusow",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Dać Kasi ściągę statusów dla handlowców do przejrzenia przed jej urlopem i szkoleniem 27.10.",
+      "kryteria_akceptacji": [
+        "Ściąga zostaje wysłana Kasi najpóźniej w piątek 16.10, przed jej urlopem od 19.10",
+        "Ściąga omawia statusy leadów używane w panelu i mieści się na jednej stronie",
+        "Wiadomość nie ustala terminu ani formy szkolenia ponad to, co wyznaczyła Kasia (wtorek 27.10, 10:00)"
+      ],
+      "jak_sprawdzic": "Sprawdzić, że ściąga zawiera wszystkie statusy z panelu zgodnie z ich bieżącymi nazwami oraz że wiadomość do Kasi wyszła przed 19.10.",
+      "repo": "rinvo-ops",
+      "szkic_klienta": "Cześć Kasia,\n\nprzesyłam ściągę statusów dla handlowców, żebyś zdążyła rzucić okiem przed urlopem. Szkolenie mamy we wtorek 27.10 o 10:00.\n\nJeśli coś warto poprawić, daj znać, a naniosę zmiany.\n\nPozdrawiam\nMarek"
     },
     {
       "id": "T7",
@@ -156,7 +209,16 @@
       ],
       "klucz_sprawy": "szkolenie-handlowcow",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Zarezerwować w kalendarzu i potwierdzić Kasi szkolenie handlowców ze statusów we wtorek 27.10 o 10:00.",
+      "kryteria_akceptacji": [
+        "Szkolenie jest w kalendarzu na wtorek 27.10, godz. 10:00",
+        "Termin nie koliduje z urlopem Kasi (19–23.10)",
+        "Potwierdzenie do Kasi zawiera dokładnie ten termin, bez dodatkowych ustaleń"
+      ],
+      "jak_sprawdzic": "Sprawdzić wpis w kalendarzu i wysłaną Kasi wiadomość z datą 27.10, 10:00.",
+      "repo": "brak",
+      "szkic_klienta": "Cześć Kasia,\n\npotwierdzam szkolenie handlowców ze statusów: wtorek 27.10, godz. 10:00, zgodnie z Twoim terminem po urlopie.\n\nPozdrawiam\nMarek"
     },
     {
       "id": "K1",
@@ -179,7 +241,15 @@
       },
       "klucz_sprawy": "swieze-leady",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Przyjąć od Kasi plik ze świeżymi leadami do czwartku 15.10 i dopiero wtedy wznowić sprawę.",
+      "kryteria_akceptacji": [
+        "Plik ze świeżymi leadami od Kasi dotarł najpóźniej w czwartek 15.10",
+        "Do Kasi nie wyszło żadne przypomnienie o pliku (prosiła, by nie przypominać)",
+        "Bez pliku nie została uruchomiona żadna kampania na świeżych leadach"
+      ],
+      "jak_sprawdzic": "Sprawdzić skrzynkę pod kątem maila od Kasi z plikiem do 15.10 i potwierdzić, że do niej nie wysłano żadnego przypomnienia.",
+      "repo": "brak"
     },
     {
       "id": "K2",
@@ -205,7 +275,15 @@
       ],
       "klucz_sprawy": "decyzja-opel-stara-baza",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Wrócić do decyzji o Oplu na starej bazie na czwartkowej rozmowie Marek–Kasia–Paweł i do tego czasu niczego w tej sprawie nie ruszać.",
+      "kryteria_akceptacji": [
+        "Do czwartkowej rozmowy 15.10 Opel nie jest uruchamiany na starej bazie",
+        "Temat jest punktem czwartkowego spotkania",
+        "Po rozmowie decyzja jest zapisana w zgłoszeniu"
+      ],
+      "jak_sprawdzic": "Sprawdzić w panelu, że do 15.10 nie ma kampanii Opla na starej bazie, a notatka ze spotkania zawiera decyzję.",
+      "repo": "brak"
     },
     {
       "id": "B1",
@@ -228,7 +306,14 @@
       "klucz_sprawy": "eksport-kontaktow-excel",
       "klucz_funkcji": "eksport-excel-potwierdzenia",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "cel": "Dodać do panelu możliwość eksportu listy kontaktów do Excela, aby handlowcy mogli wyciągać zainteresowanych i dzielić ich między siebie bez ręcznego przepisywania.",
+      "kryteria_akceptacji": [
+        "W panelu jest akcja eksportu listy kontaktów do pliku Excel",
+        "Eksport obejmuje kontakty o statusie „zainteresowany” (po zastosowaniu filtra statusu)"
+      ],
+      "jak_sprawdzic": "W panelu przefiltrować kontakty po statusie „zainteresowany”, wyeksportować i otworzyć plik w Excelu.",
+      "repo": "rinvo"
     },
     {
       "id": "Z15",
@@ -321,7 +406,19 @@
       ],
       "klucz_sprawy": "ryzyko-voicedesk",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "zadanie_przygotowawcze": {
+        "cel": "Przygotować notatkę dla Marka na czwartkowe spotkanie z Pawłem w sprawie pisemnej oferty VoiceDesk z cennikiem.",
+        "kryteria_akceptacji": [
+          "Notatka zawiera dosłowny cytat Kasi: „Paweł dostał od VoiceDesk ofertę na piśmie. Z cennikiem. Leży mu na biurku.”",
+          "Notatka wyraźnie oddziela, co wiemy (jest oferta na piśmie, z cennikiem), od tego, czego nie wiemy (kwoty, zakres, warunki)",
+          "Notatka zawiera nasze argumenty z dowodami z historii klienta, bez wymyślonych liczb",
+          "Notatka kończy się listą pytań do Pawła, w tym o zakres i warunki oferty VoiceDesk",
+          "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+        ],
+        "jak_sprawdzic": "Marek czyta notatkę przed spotkaniem 15.10; cytat zgadza się z transkrypcją z 13.10, a pięć punktów kryteriów jest spełnionych.",
+        "repo": "rinvo-ops"
+      }
     },
     {
       "id": "R2",
@@ -339,7 +436,19 @@
       ],
       "klucz_sprawy": "ryzyko-brak-integracji-crm",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "zadanie_przygotowawcze": {
+        "cel": "Przygotować notatkę na czwartek 15.10 o tym, co pokazać Pawłowi w sprawie połączenia Rinvo z systemem klienta, aby nie doszło do testu VoiceDesk w listopadzie.",
+        "kryteria_akceptacji": [
+          "Notatka zawiera dosłowny cytat Kasi: „jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi.”",
+          "Notatka wskazuje, co konkretnie o połączeniu z systemem można pokazać w czwartek, a czego jeszcze nie wiemy",
+          "Notatka przywołuje wcześniejszą wypowiedź Kasi, że Pawła bardziej kręci łączenie z systemem, bo dziewczyny przepisują wszystko z maili",
+          "Notatka kończy się rekomendowanym stanowiskiem i pytaniami do Pawła",
+          "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+        ],
+        "jak_sprawdzic": "Marek czyta notatkę przed spotkaniem 15.10; cytaty zgadzają się z transkrypcjami z 6.10 i 13.10, a pięć punktów kryteriów jest spełnionych.",
+        "repo": "rinvo-ops"
+      }
     }
   ],
   "aktualizacje_spraw": [

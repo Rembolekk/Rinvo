@@ -224,7 +224,11 @@
       "tytul": "Błąd podwójnego telefonu po rozłączeniu w ciągu 3 sekund",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "godziny-dzwonienia": {
       "linear_id": "0c453a8a-d683-42c5-bf58-63f508a0ec62",
@@ -233,7 +237,11 @@
       "tytul": "Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "godziny-salonu-sobota": {
       "linear_id": "834af663-d152-47d4-aa85-94b4fd571933",
@@ -243,7 +251,11 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "rozliczenie-krotkich-polaczen": {
       "linear_id": "82269a49-7b2a-40c7-bbc2-5ef11a44c7cf",
@@ -252,7 +264,13 @@
       "tytul": "Sprawdzenie rozliczenia krótkich połączeń i błędnych podwójnych telefonów",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)"
+        ]
+      }
     },
     "kolumna-nazwisko": {
       "linear_id": "d177726a-4000-4689-9c0d-f8eee001e92b",
@@ -261,7 +279,11 @@
       "tytul": "Przesunięcie kolumny 'nazwisko' na liście kontaktów",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "cena-smsow": {
       "linear_id": "f442d6ba-b970-4811-a948-9a017af895a3",
@@ -270,7 +292,14 @@
       "tytul": "Wysłanie Kasi wyceny SMS-ów po nieodebranych",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „cenę”)",
+          "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłanie”)"
+        ]
+      }
     },
     "sciga-statusow": {
       "linear_id": "bc26d756-f162-4e8c-bc99-b78b19ae5153",
@@ -280,7 +309,13 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłać”)"
+        ]
+      }
     },
     "tekst-wstepu-dwie-wersje": {
       "linear_id": "4e90cdf0-673f-4617-a715-08c76e4d7dc0",
@@ -293,7 +328,13 @@
       ],
       "aktualizacje_zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "pewność niska: nie wiadomo na pewno, czego dotyczy"
+        ]
+      }
     },
     "swieze-leady": {
       "linear_id": "d25cf1b4-dfac-474c-8042-922e43a6af20",
@@ -307,7 +348,11 @@
       ],
       "aktualizacje_zrodla": [
         "ops/maile/auto-tama/2026-10-14-plik-ze-swiezymi-leadami.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "mail-przeglad-ola": {
       "linear_id": "58401f8b-718b-4695-87da-9439a880ea5a",
@@ -316,7 +361,21 @@
       "tytul": "Numer sprawy z mailem o przeglądzie (Ola do Kasi)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "agent",
+        "powody": [],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
     },
     "spotkanie-z-pawlem": {
       "linear_id": "7d8f0849-45b9-4ad5-82da-325bfb63473c",
@@ -329,7 +388,13 @@
       ],
       "aktualizacje_zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłać”)"
+        ]
+      }
     },
     "material-po-godzinach": {
       "linear_id": "6970a064-843b-421c-9452-94064360040e",
@@ -338,7 +403,24 @@
       "tytul": "Materiały do projektu 'po godzinach' – jeśli i kiedy Kasia zdecyduje",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "czlowiek",
+        "powody": [
+          "dotyczy decyzji zastrzeżonej w karcie dla konkretnej osoby (decyduje: Kasia Malinowska)",
+          "jest nieodwracalna (wyłączenie usługi, usunięcie danych, zmiana umowy) (słowo: „wyłącz”)"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
     },
     "testy-ab-panel": {
       "linear_id": "430db31c-1cce-4aae-b1d7-dd12460b3ab2",
@@ -347,7 +429,13 @@
       "tytul": "Testy A/B wariantów rozmowy wbudowane w panel",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "priorytet produktowy"
+        ]
+      }
     },
     "kafelki-klikalne": {
       "linear_id": "913fa2f5-bcc1-4b64-82a5-c3b77e242c9f",
@@ -356,7 +444,13 @@
       "tytul": "Klikalne kafelki w dashboardzie (przejście do listy osób)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "priorytet produktowy"
+        ]
+      }
     },
     "raport-mailowy-tygodniowy": {
       "linear_id": "4d237e2b-664a-4021-a71b-79065f9f6da7",
@@ -365,7 +459,13 @@
       "tytul": "Automatyczny raport mailowy z tygodniowymi statystykami",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "priorytet produktowy"
+        ]
+      }
     },
     "mail-walidacji-model-salon": {
       "linear_id": "62ee2ebc-3db6-46ee-b729-de8d231d2a71",
@@ -374,7 +474,11 @@
       "tytul": "Ulepszony mail po walidacji: model i salon na górze",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "sms-po-nieodebranym": {
       "linear_id": "b6e48b4e-2ce8-4b4a-a0fc-45a8733e0cbd",
@@ -383,7 +487,14 @@
       "tytul": "SMS do klienta po dwóch nieudanych próbach połączenia",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „koszt”)",
+          "priorytet produktowy"
+        ]
+      }
     },
     "integracja-crm": {
       "linear_id": "45fda2bf-7be9-40ff-bffc-d1549b0123c4",
@@ -392,7 +503,13 @@
       "tytul": "Integracja Rinvo z CRM dealera",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "priorytet produktowy"
+        ]
+      }
     },
     "agent-po-godzinach": {
       "linear_id": "a38ea0d3-8cbe-4f50-ad11-af0f00539e6e",
@@ -401,7 +518,14 @@
       "tytul": "Agent po godzinach (sprzedaż, serwis, części, assistance routing)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "dotyczy decyzji zastrzeżonej w karcie dla konkretnej osoby (decyduje: Kasia Malinowska)",
+          "priorytet produktowy"
+        ]
+      }
     },
     "godziny-prob-obiadowa": {
       "linear_id": "26130adc-ca5a-423a-80d4-a947ec8be62e",
@@ -410,7 +534,14 @@
       "tytul": "Optymalizacja godzin pierwszej próby pod porę obiadową",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "pewność niska: nie wiadomo na pewno, czego dotyczy",
+          "priorytet produktowy"
+        ]
+      }
     },
     "szkolenie-handlowcow": {
       "linear_id": "eac157be-09a1-46b5-bfc1-062036a694fe",
@@ -423,7 +554,11 @@
       ],
       "aktualizacje_zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "ryzyko-voicedesk": {
       "linear_id": "b28c9577-d73f-46c4-949a-30baabfe8500",
@@ -433,7 +568,11 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "ryzyko",
+        "powody": []
+      }
     },
     "ryzyko-zla-interpretacja-wynikow": {
       "linear_id": "2876944d-6368-4174-8eaf-3863432cf454",
@@ -442,7 +581,11 @@
       "tytul": "Paweł chciał wyłączyć agenta po złej interpretacji wyników",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "ryzyko",
+        "powody": []
+      }
     },
     "ryzyko-brak-integracji-crm": {
       "linear_id": "959dca6e-e739-46d9-ba74-870dd00308d6",
@@ -452,7 +595,11 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "ryzyko",
+        "powody": []
+      }
     },
     "case-study-208": {
       "linear_id": "14a0d331-edcd-46eb-824b-230f1172d645",
@@ -461,7 +608,11 @@
       "tytul": "Użycie case study Peugeot 208 (anonimowo od razu; z nazwą po akceptacji Pawła)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
+      ],
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "zestawienie-wynikow-wstepu": {
       "linear_id": "47a23f04-7c8c-47fd-8f52-b81a0a347e94",
@@ -471,7 +622,13 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ],
-      "data_spotkania": "2026-10-13"
+      "data_spotkania": "2026-10-13",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłać”)"
+        ]
+      }
     },
     "prezentacja-integracji-crm": {
       "linear_id": "4299cf56-fb55-4d0c-af59-236b1a595048",
@@ -481,7 +638,11 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ],
-      "data_spotkania": "2026-10-13"
+      "data_spotkania": "2026-10-13",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "decyzja-opel-stara-baza": {
       "linear_id": "f4cc3d3f-747b-4fd0-8b17-6d9e45cf23d4",
@@ -491,7 +652,23 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ],
-      "data_spotkania": "2026-10-13"
+      "data_spotkania": "2026-10-13",
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "czlowiek",
+        "powody": [
+          "dotyczy decyzji zastrzeżonej w karcie dla konkretnej osoby (decyduje: Kasia Malinowska)"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
     },
     "eksport-kontaktow-excel": {
       "linear_id": "554fe144-7907-4b6d-9fb3-d2eb19dc42bf",
@@ -501,7 +678,11 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ],
-      "data_spotkania": "2026-10-13"
+      "data_spotkania": "2026-10-13",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     },
     "start-swiezych-leadow": {
       "linear_id": "71b8f493-e0a7-4dc3-99fe-22a18db71fef",
@@ -511,7 +692,66 @@
       "zrodla": [
         "ops/maile/auto-tama/2026-10-14-plik-ze-swiezymi-leadami.md"
       ],
-      "data_spotkania": "2026-10-14"
+      "data_spotkania": "2026-10-14",
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": []
+      },
+      "po_wznowieniu": {
+        "komu": "czlowiek",
+        "powody": [
+          "jest w konflikcie z zakazem klienta (zakaz Z18: Start kampanii na świeżych leadach to coś nowego, a Z18 mówi, że w tym tygodniu nic nowego nie startuje poza testem wstępu. Z5 blokuje też 19–23.10. „Możecie puszczać” nie uchyla tych zakazów wprost.)",
+          "pewność niska: nie wiadomo na pewno, czego dotyczy"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 0,
+        "wykorzystane": 0,
+        "nie_przypominac": true
+      }
+    },
+    "przygotowanie-ryzyko-voicedesk": {
+      "linear_id": "90cef0b1-e59e-45d9-967e-5afa5b626bf7",
+      "identifier": "RIN-78",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-78/auto-tama-notatka-z-argumentami-przed-spotkaniem-voicedesk-zlozyl",
+      "tytul": "Notatka z argumentami przed spotkaniem: VoiceDesk złożył Pawłowi pisemną ofertę z cennikiem",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
+    },
+    "przygotowanie-ryzyko-zla-interpretacja-wynikow": {
+      "linear_id": "72e62bef-8c71-4b79-b4b4-d1b973509c37",
+      "identifier": "RIN-79",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-79/auto-tama-notatka-z-argumentami-przed-spotkaniem-pawel-chcial-wylaczyc",
+      "tytul": "Notatka z argumentami przed spotkaniem: Paweł chciał wyłączyć agenta po złej interpretacji wyników",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ],
+      "data_spotkania": "",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
+    },
+    "przygotowanie-ryzyko-brak-integracji-crm": {
+      "linear_id": "fde1de18-d84a-4dcc-8b6b-6a45fe0950da",
+      "identifier": "RIN-80",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-80/auto-tama-notatka-z-argumentami-przed-spotkaniem-bez-konkretow-o",
+      "tytul": "Notatka z argumentami przed spotkaniem: Bez konkretów o integracji w czwartek Paweł testuje VoiceDesk w listopadzie",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      }
     }
   },
   "ryzyka": {

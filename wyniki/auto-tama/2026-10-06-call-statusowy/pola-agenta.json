@@ -1,0 +1,315 @@
+{
+  "T1": {
+    "cel": "Znaleźć i usunąć przyczynę, przez którą agent dzwoni drugi raz tego samego dnia do osób, które rozłączyły się w ciągu 3 sekund.",
+    "kryteria_akceptacji": [
+      "Przyczyna jest opisana na podstawie kampanii z 5.10 (po południu): sześć zgłoszonych par połączeń, w tym pierwsza o 16:40 na numer kończący się na 14",
+      "Osoba, która rozłączyła się w ciągu 3 sekund, nie dostaje drugiego telefonu tego samego dnia",
+      "Limit prób pozostaje 5 (bez schodzenia do 3)",
+      "Zapisana jest liczba błędnych drugich telefonów z tej kampanii (potrzebna do T7)"
+    ],
+    "jak_sprawdzic": "W logach kampanii z 5.10 odnaleźć sześć par połączeń i potwierdzić przyczynę. Po poprawce przeprowadzić połączenie testowe z rozłączeniem w ciągu 3 sekund i sprawdzić, że tego dnia nie ma drugiej próby.",
+    "repo": "rinvo"
+  },
+  "T2": {
+    "cel": "Sprawić, żeby agent podawał aktualny adres salonu we Włocławku zamiast adresu z ul. Kapitulnej.",
+    "kryteria_akceptacji": [
+      "Agent zapytany o salon we Włocławku podaje adres Toruńska 120",
+      "Agent nie podaje już ul. Kapitulnej",
+      "Godziny salonu we Włocławku w tygodniu pozostają 9–18",
+      "Dane salonu w Toruniu są bez zmian"
+    ],
+    "jak_sprawdzic": "Rozmowa testowa z pytaniem o adres salonu we Włocławku, następnie sprawdzenie wpisu w bazie wiedzy agenta. Kasia sama puści własny test, więc nagrania testowego nie wysyłamy.",
+    "repo": "rinvo-ops",
+    "szkic_klienta": "Cześć Kasiu,\n\nadres salonu we Włocławku w bazie wiedzy agenta jest już poprawiony: agent podaje teraz Toruńska 120. Godziny w tygodniu (9–18) zostają bez zmian, a dane salonu w Toruniu też. Możesz puścić swój test.\n\nPozdrawiam,\nMarek"
+  },
+  "T3": {
+    "cel": "Skrócić godziny dzwonienia agenta tak, żeby kończył o 19:00 w tygodniu i o 15:00 w sobotę.",
+    "kryteria_akceptacji": [
+      "Godziny dzwonienia od poniedziałku do piątku to 9:00–19:00",
+      "Godziny dzwonienia w sobotę to 9:00–15:00 (nie 14:00)",
+      "W niedzielę agent nie dzwoni",
+      "Limit prób pozostaje 5"
+    ],
+    "jak_sprawdzic": "Sprawdzić ustawienia godzin dzwonienia w konfiguracji kampanii klienta: pon–pt 9–19, sobota 9–15, niedziela wyłączona.",
+    "repo": "rinvo-ops"
+  },
+  "T4": {
+    "cel": "Zaktualizować w bazie wiedzy agenta sobotnie godziny otwarcia obu salonów (Toruń i Włocławek) na 15:00.",
+    "kryteria_akceptacji": [
+      "Agent podaje, że salon w Toruniu jest w sobotę otwarty do 15:00",
+      "Agent podaje, że salon we Włocławku jest w sobotę otwarty do 15:00",
+      "Godziny w tygodniu pozostają bez zmian"
+    ],
+    "jak_sprawdzic": "Dwie rozmowy testowe z pytaniem o godziny w sobotę (po jednej na salon) oraz sprawdzenie wpisów w bazie wiedzy.",
+    "repo": "rinvo-ops"
+  },
+  "T5": {
+    "cel": "Naprawić filtr statusu na liście kontaktów kampanii, żeby zawężał listę do wybranego statusu.",
+    "kryteria_akceptacji": [
+      "Po wybraniu statusu „zainteresowany” lista pokazuje tylko kontakty z tym statusem (dla kampanii ze starej bazy 9 kontaktów zamiast 70 wierszy)",
+      "Na liście nie ma kontaktów „kupiłem gdzie indziej”, odebranych bez zainteresowania ani nieodebranych",
+      "Filtr dat nadal działa",
+      "Zmiana nie obejmuje klikania w kafelek dashboardu (to osobna sprawa B2)"
+    ],
+    "jak_sprawdzic": "W panelu otworzyć listę kontaktów kampanii, ustawić filtr statusu „zainteresowany” i porównać liczbę wierszy z kafelkiem na dashboardzie. Potem ustawić filtr dat i sprawdzić, że też działa.",
+    "repo": "rinvo"
+  },
+  "T6": {
+    "cel": "Przekazać Michałowi prośbę o korektę faktury za wrzesień wystawionej na błędną nazwę firmy.",
+    "kryteria_akceptacji": [
+      "Michał dostał informację, że faktura za wrzesień jest wystawiona na „Grupa Auto Tama sp. z o.o.”, a umowa jest z „Auto Tama Toruń sp. z o.o.”",
+      "Korekta faktury jest wystawiona na „Auto Tama Toruń sp. z o.o.”",
+      "Korekta trafia do Kasi (zapowiedziana na przyszły tydzień po rozmowie)"
+    ],
+    "jak_sprawdzic": "Potwierdzenie od Michała, że prośba została przyjęta, oraz kopia wystawionej korekty z poprawną nazwą firmy.",
+    "repo": "brak"
+  },
+  "T7": {
+    "cel": "Ustalić, jak liczymy połączenia krótsze niż minuta, i odjąć od rozliczenia błędne podwójne telefony, jeśli to nasz błąd.",
+    "kryteria_akceptacji": [
+      "Opisana jest zasada liczenia połączeń krótszych niż minuta: od pierwszej sekundy czy za rozpoczętą minutę",
+      "Policzona jest liczba błędnych drugich telefonów (sześć zgłoszonych przez Kasię plus ewentualne inne z diagnozy T1)",
+      "Jeśli T1 potwierdzi błąd po stronie Rinvo, te połączenia są wyłączone z rozliczenia",
+      "Kasia dostaje odpowiedź z liczbą i informacją o błędzie, razem z wynikiem T1"
+    ],
+    "jak_sprawdzic": "Porównać zasadę liczenia minut z konfiguracją rozliczeń, sprawdzić listę odjętych połączeń w rozliczeniu za dany miesiąc i przejrzeć wysłaną odpowiedź.",
+    "repo": "brak",
+    "szkic_klienta": "Cześć Kasiu,\n\nwracam z informacją o drugim telefonie po rozłączeniu w ciągu 3 sekund: [przyczyna i co poprawiono, uzupełnić po diagnozie]. W kampanii z 5 października takich przypadków było [liczba, uzupełnić].\n\nRozliczenie krótkich połączeń: [uzupełnić, czy liczymy od pierwszej sekundy, czy za rozpoczętą minutę].\n\nJeśli te drugie telefony to nasz błąd, nie powinniście za nie płacić i odejmiemy je. [Uzupełnić po potwierdzeniu: czy to błąd po naszej stronie i w której fakturze zostaną odjęte.]\n\nPozdrawiam,\nMarek"
+  },
+  "T8": {
+    "cel": "Przesunąć na liście kontaktów kolumnę z nazwiskiem tuż za status, o ile ta lista i tak jest zmieniana przy naprawie filtra.",
+    "kryteria_akceptacji": [
+      "Kolumna „nazwisko” jest wyświetlana zaraz po kolumnie statusu",
+      "Nazwisko jest widoczne na liście kontaktów bez przewijania",
+      "Jeśli naprawa filtra (T5) nie wymagała zmian w liście kontaktów, kolumny nie są ruszane osobno"
+    ],
+    "jak_sprawdzic": "Otworzyć listę kontaktów kampanii i sprawdzić kolejność kolumn oraz widoczność nazwiska bez przewijania poziomego.",
+    "repo": "rinvo"
+  },
+  "T9": {
+    "cel": "Wysłać Kasi cenę SMS-ów, żeby Paweł mógł zdecydować o SMS-ie po nieudanych próbach połączenia.",
+    "kryteria_akceptacji": [
+      "Wiadomość zawiera cenę za jedną wiadomość SMS",
+      "Wiadomość mówi, że SMS-y kosztują osobno, za każdą wiadomość",
+      "Wiadomość mówi, że uruchomienie wymaga zatwierdzenia przez Pawła",
+      "Wiadomość nie zawiera treści SMS-a, bo tę pisze Kasia"
+    ],
+    "jak_sprawdzic": "Przejrzeć wysłaną wiadomość pod kątem czterech punktów i sprawdzić, że podana cena zgadza się z aktualnym cennikiem SMS.",
+    "repo": "brak",
+    "szkic_klienta": "Cześć Kasiu,\n\nprzesyłam cenę SMS-ów, o którą pytał Paweł: [cena za jedną wiadomość, uzupełnić z cennika]. SMS-y rozliczamy osobno, za każdą wysłaną wiadomość.\n\nTreść napiszesz Ty, tak jak przy tekście wstępu. Uruchomienie SMS-a po dwóch nieudanych próbach wymaga zatwierdzenia przez Pawła.\n\nPozdrawiam,\nMarek"
+  },
+  "T10": {
+    "cel": "Przygotować jednostronicową ściągę z opisem statusów, żeby handlowcy rozumieli je przed szkoleniem.",
+    "kryteria_akceptacji": [
+      "Ściąga mieści się na jednej stronie",
+      "Opisuje wszystkie statusy z panelu, w tym „zainteresowany”, „oddzwonić” i „niezweryfikowany”",
+      "Jest wysłana Kasi, a nie bezpośrednio do Oli ani handlowców",
+      "Nie zawiera terminu szkolenia, bo termin ustala Kasia"
+    ],
+    "jak_sprawdzic": "Otworzyć dokument i sprawdzić długość oraz listę statusów, porównując ją z listą statusów w panelu.",
+    "repo": "rinvo-ops",
+    "szkic_klienta": "Cześć Kasiu,\n\nw załączniku jednostronicowa ściąga: co znaczy każdy status w panelu. Możesz ją przekazać handlowcom przed startem świeżych leadów.\n\nSzkolenie (kwadrans online) zostaje na Twój termin, po uruchomieniu świeżych leadów.\n\nPozdrawiam,\nMarek"
+  },
+  "T11": {
+    "cel": "Przygotować anonimowy przykład sprzedaży Peugeota 208 do użycia na spotkaniu, a nazwę firmy dodać dopiero po zgodzie Pawła.",
+    "kryteria_akceptacji": [
+      "Przykład opisuje przebieg: lead z lipca, telefon w piątek, sprzedaż w sobotę",
+      "Przykład nie zawiera nazwiska klienta ani nazwy firmy",
+      "Wersja z nazwą firmy nie jest używana, dopóki Paweł jej nie zatwierdzi",
+      "Pytanie o zgodę na nazwę firmy jest wpisane do agendy spotkania z Pawłem 15.10"
+    ],
+    "jak_sprawdzic": "Przeczytać gotowy materiał i sprawdzić, że nie ma w nim nazwy firmy ani nazwiska, a agenda spotkania zawiera pytanie o zgodę.",
+    "repo": "rinvo-ops"
+  },
+  "K1": {
+    "cel": "Po otrzymaniu od Kasi obu wersji wstępu przeprowadzić test porównawczy, w którym to Kasia wybiera wersję.",
+    "kryteria_akceptacji": [
+      "Obie wersje tekstu pochodzą od Kasi, Rinvo ich nie pisze",
+      "Druga wersja nadal informuje, że agent jest wirtualną asystentką i że rozmowa jest nagrywana",
+      "Wersje są rozdzielone na dwa miasta (Toruń i Włocławek) albo na dwa dni, zgodnie z ostatnim ustaleniem Kasi",
+      "Zestawienie wyników pokazuje dla każdej wersji liczbę pełnych rozmów (potwierdzony telefon, model i salon)",
+      "Test nie startuje w dniach 19–23.10 (urlop Kasi)"
+    ],
+    "jak_sprawdzic": "Sprawdzić konfigurację kampanii (która wersja idzie na które miasto lub dzień), odsłuchać po jednej rozmowie z każdej wersji i porównać zestawienie z danymi z panelu.",
+    "repo": "rinvo-ops",
+    "szkic_klienta": "Cześć Kasiu,\n\nprzypominam o dwóch wersjach tekstu wstępu rozmowy: miały być do czwartku (8.10). Jak je prześlesz, puścimy test, a wybór wersji zostaje po Twojej stronie.\n\nPozdrawiam,\nMarek"
+  },
+  "K2": {
+    "cel": "Po otrzymaniu od Kasi pliku ze świeżymi leadami uruchomić na nim kampanię walidacji.",
+    "kryteria_akceptacji": [
+      "Plik pochodzi od Kasi i dla każdego leada zawiera numer telefonu oraz informację Toruń czy Włocławek",
+      "Kampania nie rusza bez pliku",
+      "Stara baza nie jest puszczana drugi raz",
+      "Kasia nie dostaje wzoru pliku",
+      "Kampania nie startuje w dniach 19–23.10 (urlop Kasi)"
+    ],
+    "jak_sprawdzic": "Porównać liczbę numerów w kampanii z plikiem od Kasi, sprawdzić przypisanie do salonów i potwierdzić, że żaden numer nie pochodzi ze starej bazy.",
+    "repo": "brak"
+  },
+  "K3": {
+    "cel": "Po otrzymaniu od Kasi numeru sprawy ustalić, czy agent źle zakwalifikował prośbę o przegląd jako lead sprzedażowy, czy handlowiec nie doczytał maila.",
+    "kryteria_akceptacji": [
+      "Praca zaczyna się dopiero po wiadomości od Kasi z numerem sprawy lub samym mailem, bez zgadywania kampanii",
+      "Znaleziona jest rozmowa i jej transkrypcja odpowiadające tej sprawie",
+      "Opisane jest, czy agent zakwalifikował prośbę o przegląd jako lead sprzedażowy, czy kwalifikacja była poprawna",
+      "Cała korespondencja idzie przez Kasię, nie bezpośrednio do Oli"
+    ],
+    "jak_sprawdzic": "Porównać transkrypcję rozmowy z mailem po walidacji i z kwalifikacją zapisaną w panelu, a następnie sprawdzić, że wniosek jest opisany w komentarzu zgłoszenia.",
+    "repo": "rinvo"
+  },
+  "K4": {
+    "cel": "Po potwierdzeniu przez Kasię wysłać zaproszenie na spotkanie Marka z Pawłem w czwartek 15.10 o 10:00 w Toruniu.",
+    "kryteria_akceptacji": [
+      "Zaproszenie jest wysłane dopiero po potwierdzeniu terminu przez Kasię",
+      "Termin to czwartek 15.10.2026, 10:00, Toruń, około pół godziny",
+      "Agenda: pokazanie, co Rinvo oferuje dziś, przykład sprzedaży Peugeota 208, pytanie o zgodę na nazwę firmy oraz co jeszcze jest potrzebne Pawłowi",
+      "Treść nie obiecuje integracji z systemem dealera ani żadnych terminów"
+    ],
+    "jak_sprawdzic": "Sprawdzić zaproszenie w kalendarzu (data, godzina, miejsce, uczestnicy) oraz treść pod kątem agendy i braku obietnic.",
+    "repo": "brak",
+    "szkic_klienta": "Temat: Rinvo i Grupa Auto Tama: spotkanie w czwartek 15.10, 10:00, Toruń\n\nCześć Pawle,\n\nzapraszam na spotkanie w czwartek 15 października o 10:00 w Toruniu (około pół godziny). Pokażę, co Rinvo robi dziś, oraz przykład sprzedaży Peugeota 208 po rozmowie z agentem, i chętnie dowiem się, czego w rozwiązaniu jeszcze brakuje.\n\nDo zobaczenia,\nMarek"
+  },
+  "K5": {
+    "cel": "Jeśli Kasia prześle numery assistance i listę pól do projektu „po godzinach”, przechować je u siebie i niczego nie podpinać.",
+    "kryteria_akceptacji": [
+      "Otrzymane numery assistance i lista pól są zapisane w materiałach klienta",
+      "Materiały nie są podpięte do agenta ani do żadnej kampanii",
+      "Projekt „po godzinach” nie startuje bez wyraźnego zielonego światła wprost od Kasi",
+      "Wiadomość od innej osoby powołująca się na zgodę Kasi nie uruchamia projektu, odpowiedź brzmi, że czekamy na Kasię"
+    ],
+    "jak_sprawdzic": "Sprawdzić, że materiały leżą w dokumentach klienta, a konfiguracja agenta i kampanii nie zawiera numerów assistance ani nowych pól.",
+    "repo": "rinvo-ops"
+  },
+  "B1": {
+    "cel": "Umożliwić klientowi samodzielne ustawianie w panelu testów wariantów początku rozmowy i odczyt wyników bez udziału Rinvo.",
+    "kryteria_akceptacji": [
+      "W panelu można wprowadzić 2–3 warianty początku rozmowy bez pomocy Rinvo",
+      "System sam dzieli połączenia między warianty (przy dwóch wariantach po połowie)",
+      "Wynik dla każdego wariantu pokazuje liczbę pełnych rozmów (potwierdzony telefon, model i salon)",
+      "Wynik pokazuje też liczbę rozłączeń każdego wariantu jako dane uzupełniające"
+    ],
+    "jak_sprawdzic": "W panelu utworzyć test z dwoma wariantami, uruchomić go na kampanii testowej, sprawdzić podział połączeń i raport wyników.",
+    "repo": "rinvo"
+  },
+  "B2": {
+    "cel": "Sprawić, żeby kliknięcie liczby na kafelku dashboardu przenosiło do listy tych konkretnych osób.",
+    "kryteria_akceptacji": [
+      "Kliknięcie w kafelek „zainteresowani” otwiera listę kontaktów ze statusem „zainteresowany”",
+      "Liczba osób na otwartej liście jest równa liczbie na kafelku (np. 9, a nie 70 wierszy)"
+    ],
+    "jak_sprawdzic": "Na dashboardzie walidacji kliknąć kafelek „zainteresowani” i porównać liczbę wierszy na liście z liczbą na kafelku.",
+    "repo": "rinvo"
+  },
+  "B3": {
+    "cel": "Automatycznie wysyłać Pawłowi tygodniowy mail ze statystykami, żeby nie trzeba było przepisywać ich ręcznie.",
+    "kryteria_akceptacji": [
+      "Mail do Pawła przychodzi automatycznie raz w tygodniu, proponowany termin to poniedziałek rano",
+      "Mail zawiera liczbę wykonanych połączeń",
+      "Mail zawiera liczbę połączeń odebranych",
+      "Mail zawiera liczbę zainteresowanych"
+    ],
+    "jak_sprawdzic": "Wywołać wysyłkę dla kampanii testowej i porównać liczby w mailu z dashboardem walidacji.",
+    "repo": "rinvo"
+  },
+  "B4": {
+    "cel": "Zmienić mail po walidacji, żeby model i salon były widoczne na górze, a handlowiec nie musiał ich szukać w transkrypcji.",
+    "kryteria_akceptacji": [
+      "Model i salon są pokazane na początku maila, przed transkrypcją",
+      "Zmiana nie jest wdrażana przed uruchomieniem świeżych leadów"
+    ],
+    "jak_sprawdzic": "Wygenerować mail z rozmowy testowej z modelem i salonem i sprawdzić, że oba pola są widoczne bez przewijania.",
+    "repo": "rinvo"
+  },
+  "B5": {
+    "cel": "Wysyłać SMS do osoby, do której agent dwa razy nie dodzwonił się, z informacją o próbie kontaktu.",
+    "kryteria_akceptacji": [
+      "Funkcja nie jest włączona dla kampanii bez decyzji Pawła po otrzymaniu wyceny",
+      "SMS wychodzi dopiero po dwóch nieudanych próbach połączenia",
+      "Treść SMS-a pochodzi od Kasi",
+      "Każdy SMS jest rozliczany osobno, za wiadomość, według ceny przesłanej w T9"
+    ],
+    "jak_sprawdzic": "Na kampanii testowej wywołać dwie nieudane próby na numer testowy i sprawdzić, że SMS przychodzi po drugiej, a nie po pierwszej, oraz że wiadomość jest zliczona w rozliczeniu.",
+    "repo": "rinvo"
+  },
+  "B6": {
+    "cel": "Umożliwić trafianie leadów bezpośrednio do systemu handlowców dealera, bez ręcznego przepisywania z maili.",
+    "kryteria_akceptacji": [],
+    "jak_sprawdzic": "Brak kryteriów: rozmowa nie podaje, o jaki system chodzi ani jakie dane miałyby tam trafiać. Najpierw trzeba to ustalić z klientem.",
+    "repo": "rinvo"
+  },
+  "B7": {
+    "cel": "Uruchomić agenta odbierającego po zamknięciu salonu na wszystkie numery, który zbiera zgłoszenia według rodzaju sprawy.",
+    "kryteria_akceptacji": [
+      "Sprawa sprzedażowa jest prowadzona jak walidacja i kończy się leadem",
+      "Przy serwisie agent nie umawia wizyt, zbiera imię, telefon, model, salon i opis problemu z autem, nie pyta o VIN, a rano oddzwania BOK",
+      "Przy częściach agent robi to samo i na koniec prosi, żeby rano mieć pod ręką VIN",
+      "Przy assistance agent podaje numer assistance marki i kończy bez zakładania sprawy, a pozostałe sprawy (np. zgubione kluczyki) trafiają do BOK na rano",
+      "Projekt nie startuje bez wyraźnego zielonego światła wprost od Kasi, a serwis w ciągu dnia tym agentem nie jest obsługiwany"
+    ],
+    "jak_sprawdzic": "Pięć rozmów testowych (sprzedaż, serwis, części, assistance, inna sprawa) i sprawdzenie, jak każda została zapisana i przekazana.",
+    "repo": "rinvo"
+  },
+  "B8": {
+    "cel": "Sprawdzić na świeżych leadach, czy pierwsza próba dzwonienia w przerwie obiadowej daje więcej odebranych połączeń.",
+    "kryteria_akceptacji": [
+      "Rozkład godzin odebranych połączeń na świeżych leadach jest porównany ze wzorcem ze starej bazy (najwięcej odebrań ok. 12–13 i po 17:00, rano przed 10:00 prawie nikt)",
+      "Ustawienia godzin prób nie są zmieniane przed analizą świeżych leadów",
+      "Limit prób pozostaje 5"
+    ],
+    "jak_sprawdzic": "Porównać zestawienie odebranych połączeń z godzin po uruchomieniu świeżych leadów z wzorcem opisanym w kryteriach.",
+    "repo": "rinvo-ops"
+  },
+  "B9": {
+    "cel": "Poprowadzić dla handlowców kwadransowe szkolenie online ze znaczenia statusów po uruchomieniu świeżych leadów.",
+    "kryteria_akceptacji": [
+      "Szkolenie nie jest organizowane przed uruchomieniem świeżych leadów",
+      "Termin szkolenia ustala Kasia",
+      "Szkolenie trwa około 15 minut i odbywa się online",
+      "Szkolenie opiera się na jednostronicowej ściądze statusów z T10"
+    ],
+    "jak_sprawdzic": "Sprawdzić w kalendarzu, że termin podała Kasia i przypada po starcie świeżych leadów, oraz że ściąga z T10 została użyta.",
+    "repo": "brak"
+  },
+  "R1": {
+    "zadanie_przygotowawcze": {
+      "cel": "Przygotować notatkę na spotkanie z Pawłem 15.10 o ofercie konkurenta VoiceDesk: podobny bot do leadów, według Pawła ok. 30% taniej, z połączeniem z systemem dealera.",
+      "kryteria_akceptacji": [
+        "Notatka streszcza ryzyko własnymi słowami i zawiera dosłowny cytat z rozmowy 6.10 o VoiceDesk",
+        "Notatka wprost wymienia niewiadome: od czego liczone jest „jakieś trzydzieści procent taniej” oraz jaki jest zakres oferty VoiceDesk",
+        "Notatka zawiera nasze argumenty z faktami: wyniki walidacji na starej bazie (70 numerów, 41 odebranych, 23 pełne rozmowy, 9 zainteresowanych) i sprzedaż Peugeota 208 po rozmowie z agentem",
+        "Notatka uwzględnia wpisy o konkurencji z karty klienta i kończy się listą pytań do Pawła",
+        "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+      ],
+      "jak_sprawdzic": "Przed spotkaniem 15.10 przeczytać notatkę: pięć punktów kryteriów jest spełnionych, a cytaty zgadzają się ze źródłem.",
+      "repo": "rinvo-ops"
+    }
+  },
+  "R2": {
+    "zadanie_przygotowawcze": {
+      "cel": "Przygotować notatkę, która pomoże wyjaśnić Pawłowi, jak czytać wyniki walidacji, po tym jak chciał wyłączyć agenta na podstawie 9 zainteresowanych na 70 numerów.",
+      "kryteria_akceptacji": [
+        "Notatka streszcza ryzyko własnymi słowami i zawiera dosłowny cytat z rozmowy 6.10 o chęci wyłączenia agenta",
+        "Notatka wyjaśnia, że baza była stara (leady sprzed dwóch, trzech miesięcy bez oddzwonienia), więc nie przewiduje wyników na świeżych leadach",
+        "Notatka zestawia liczby: 70 numerów, 41 odebranych, 23 pełne rozmowy, 9 zainteresowanych, w tym jedna osoba do oddzwonienia po urlopie",
+        "Notatka wskazuje, że miarą jest liczba pełnych rozmów (potwierdzony telefon, model i salon), a nie sama liczba zainteresowanych czy rozłączeń",
+        "Notatka nie obiecuje wyników na świeżych leadach ani terminów"
+      ],
+      "jak_sprawdzic": "Przed spotkaniem 15.10 przeczytać notatkę: pięć punktów kryteriów jest spełnionych, a liczby i cytat zgadzają się ze źródłem.",
+      "repo": "rinvo-ops"
+    }
+  },
+  "R3": {
+    "zadanie_przygotowawcze": {
+      "cel": "Przygotować notatkę o tym, że brak integracji z systemem dealera może przeważyć przy porównaniu z VoiceDesk, bo handlowcy przepisują leady z maili.",
+      "kryteria_akceptacji": [
+        "Notatka zawiera dosłowne cytaty: Kasi o przepisywaniu z maili i Marka o braku integracji, bez obietnicy terminu",
+        "Notatka opisuje obecny przepływ (mail po walidacji z transkrypcją, ręczne przepisywanie) i planowane ulepszenie maila (model i salon na górze) bez podawania terminu",
+        "Notatka wymienia, czego nie wiemy: z jakim systemem dealera miałaby być integracja i jakie dane miałyby tam trafiać",
+        "Notatka kończy się listą pytań do Pawła i Kasi",
+        "Notatka nie obiecuje integracji, cen ani terminów"
+      ],
+      "jak_sprawdzic": "Przed spotkaniem 15.10 przeczytać notatkę: pięć punktów kryteriów jest spełnionych, a cytaty zgadzają się ze źródłem.",
+      "repo": "rinvo-ops"
+    }
+  }
+}
