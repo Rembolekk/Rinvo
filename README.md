@@ -78,7 +78,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_daty.py` | daty względne liczone przez kod: parser, pierwszeństwo kodu nad modelem, „wniosek”, poprawa tekstów (37 testów) |
 | `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
 | `testy/test_agent.py` | agent wykonawczy: ponowne sprawdzenie zakazów, limit 3, zakazane ścieżki, oddanie po dwóch nieudanych testach, warunki scalania (72 testy, bez sieci) |
-| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (105 testów, bez poczty) |
+| `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (129 testów, bez poczty) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -342,6 +342,10 @@ Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.
 **Mail zbiorczy i gotowość.** Szkic powstaje osobno dla każdego zgłoszenia, a do jednego maila łączą się tylko części GOTOWE (model musi potwierdzić, że uwzględnił wszystkie; inaczej każda część idzie osobno). Część z miejscem do uzupełnienia („[...]”, „uzupełnić”, TODO, XXX, ???) albo zgłoszenie czekające na decyzję człowieka (powód inny niż „trafia do klienta”) nigdy nie jest łączone z gotowymi. Etykieta `Wyślij` na DOWOLNYM zgłoszeniu grupy wysyła mail całej grupy.
 
 **Zaproszenie na spotkanie.** Szkic może mieć pole spotkanie (data, godzina, miejsce, tytuł) wyłącznie z danych zgłoszenia (data i godzina muszą w nich występować i nie mogą być z przeszłości); wtedy do maila dołączane jest zaproszenie kalendarzowe `.ics` (adresat: tylko potwierdzony kontakt z karty). Bez niego treść nie może mówić „wysyłam/załączam” ani o zaproszeniu w załączniku: taki szkic jest odrzucany.
+
+**Materiały dla klienta (ściąga, zestawienie, notatka).** Zgłoszenie, którego wynikiem jest materiał, agent najpierw WYKONUJE: tworzy `ops/materialy/<klient>/<id>-<slug>.md` i `.pdf` (jedna strona) wyłącznie z faktów z rozmów, maili i kart; czego brakuje, oznacza „[do potwierdzenia: …]” zamiast zgadywać. Szkic maila powstaje dopiero, gdy materiał istnieje, i dołącza PDF jako załącznik. Materiał z lukami nie idzie do klienta: zgłoszenie dostaje `Do weryfikacji` z listą braków. Poprawka ręczna: edytujesz `.md`, w `.meta.json` ustawiasz `"reczny": true`, a przy następnym przebiegu PDF odświeża się z Twojej wersji. Zestawienie oparte na wynikach (np. test wstępu) czeka na plik `ops/dane/<klient>/<klucz sprawy>.*`: bez niego nie powstaje ani materiał, ani szkic. Załącznik przy wysyłce: tylko `.pdf` z `ops/materialy/<klient>/`, a towarzyszący `.md` przechodzi ten sam filtr treści i kontrolę luk.
+
+**Sprawy potwierdzone przez klienta.** Gdy klient sam potwierdził sprawę w późniejszej rozmowie lub mailu (aktualizacja „zamknięta” z pewnością inną niż niska), szkic nie powstaje, a istniejący zostaje wycofany. Wycofane i zastąpione szkice w Linearze dostają adnotację „Szkic wycofany: …”, więc nieaktualna treść nie zostaje do wysłania.
 
 Blokada: etykieta `Do weryfikacji`, zdjęcie `Wyślij`, komentarz z powodem i Slack („Wysyłka wstrzymana: <powód>”). Oczekiwanie zostawia `Wyślij`, a Slack dostaje powód tylko raz. Po udanej wysyłce Slack: „Wysłano do <osoba>: <temat>”.
 

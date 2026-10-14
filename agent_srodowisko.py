@@ -116,6 +116,10 @@ class LinearAgent:
              '{ state: { name: { in: [%s] } } } ] }) { nodes { %s } } }' % (linear_sync.TEAM_KEY, nazwy, self._POLA_PELNE))
         return [self._normalizuj(n) for n in linear_sync.gql(self.api_key, q)["issues"]["nodes"]]
 
+    def edytuj_komentarz(self, komentarz_id, tresc):
+        linear_sync.gql(self.api_key, "mutation($id: String!, $input: CommentUpdateInput!) { commentUpdate(id: $id, input: $input) { success } }",
+                        {"id": komentarz_id, "input": {"body": tresc}})
+
     def komentarze(self, zg):
         q = 'query { issue(id: "%s") { comments(first: 100) { nodes { id body createdAt } } } }' % zg["id"]
         return linear_sync.gql(self.api_key, q)["issue"]["comments"]["nodes"]
@@ -239,7 +243,7 @@ class Poczta:
         from sekrety import czysc
         return czysc(os.environ.get("GMAIL_ADDRESS", ""))
 
-    def wyslij(self, email_do, imie_do, temat, tresc, ics=None):
+    def wyslij(self, email_do, imie_do, temat, tresc, ics=None, zalaczniki=()):
         import smtplib
         import ssl
         from email.message import EmailMessage
@@ -256,6 +260,8 @@ class Poczta:
         msg["Subject"] = " ".join(temat.split())
         msg["Message-ID"] = make_msgid(domain=nadawca.split("@")[-1])
         msg.set_content(tresc)
+        for nazwa, dane in zalaczniki:
+            msg.add_attachment(dane, maintype="application", subtype="pdf", filename=nazwa)
         if ics:
             msg.add_attachment(ics.encode("utf-8"), maintype="text", subtype="calendar", filename="zaproszenie.ics",
                                params={"method": "REQUEST", "charset": "utf-8"})

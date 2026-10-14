@@ -15,7 +15,7 @@ concurrency:
   cancel-in-progress: false
 
 permissions:
-  contents: read
+  contents: write      # tylko do zapisu materiałów dla klienta (ops/materialy)
 
 jobs:
   agent:
@@ -39,9 +39,11 @@ jobs:
         with:
           python-version: "3.12"
 
-      # PyYAML potrzebują testy sklonowanego repo Rinvo-app.
+      # PyYAML potrzebują testy sklonowanego repo Rinvo-app; fpdf2 i czcionka DejaVu: PDF z materiałami dla klienta.
       - name: Zależności
-        run: pip install certifi pyyaml
+        run: |
+          pip install certifi pyyaml fpdf2
+          sudo apt-get install -y -q fonts-dejavu-core
 
       - name: Node.js (dla Claude Code)
         uses: actions/setup-node@v4
@@ -101,3 +103,24 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           RINVO_MODEL: ${{ vars.RINVO_MODEL }}
         run: python3 szkice.py
+
+      # Materiały dla klienta (ściąga, zestawienie, notatka) tworzy agent w ops/materialy/<klient>/ (md + pdf);
+      # wysyłka (wyslij.py) bierze załącznik z repozytorium, więc pliki muszą trafić na main.
+      - name: Zapisz materiały dla klientów
+        if: always()
+        run: |
+          set -uo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          [ -e ops/materialy ] && git add -A -- ops/materialy
+          if git diff --cached --quiet; then
+            echo "Brak nowych materiałów"
+            exit 0
+          fi
+          git commit -q -m "[automat] materiały dla klientów [skip ci]"
+          for proba in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            echo "Push odrzucony (próba $proba/3), pull --rebase…"
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 1; }
+          done
+          exit 1

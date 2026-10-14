@@ -68,7 +68,15 @@ class AtrapaLinear:
 
     def komentarz(self, z, tekst):
         self.zdarzenia.append(("komentarz", z["identifier"], tekst))
-        self.kom.setdefault(z["identifier"], []).append({"id": "n", "createdAt": "2026-10-14T09:00:00Z", "body": tekst})
+        self.licznik = getattr(self, "licznik", 0) + 1
+        self.kom.setdefault(z["identifier"], []).append({"id": f"n{self.licznik}", "createdAt": f"2026-10-14T09:{self.licznik % 60:02d}:00Z", "body": tekst})
+
+    def edytuj_komentarz(self, komentarz_id, tresc):
+        for lista in self.kom.values():
+            for k in lista:
+                if k["id"] == komentarz_id:
+                    k["body"] = tresc
+        self.zdarzenia.append(("edycja", komentarz_id, tresc))
 
     def dodaj_etykiete(self, z, nazwa):
         for t in (z, self.zgloszenia.get(z["identifier"], z)):
@@ -93,10 +101,10 @@ class AtrapaPoczta:
     def nadawca(self):
         return "marek@rinvo.test"
 
-    def wyslij(self, email, imie, temat, tresc, ics=None):
+    def wyslij(self, email, imie, temat, tresc, ics=None, zalaczniki=()):
         if self.blad:
             raise RuntimeError(self.blad)
-        self.wyslane.append({"email": email, "imie": imie, "temat": temat, "tresc": tresc, "ics": ics})
+        self.wyslane.append({"email": email, "imie": imie, "temat": temat, "tresc": tresc, "ics": ics, "zalaczniki": list(zalaczniki)})
         return f"<{len(self.wyslane)}@test>"
 
 
@@ -152,6 +160,11 @@ class Srodowisko:
         self.teraz = lambda: teraz
         self.sucho = False
         self.zapisy = 0
+        import tempfile
+        self._tmp = tempfile.TemporaryDirectory()
+        self.katalog_materialow = Path(self._tmp.name) / "materialy"
+        self.katalog_danych = Path(self._tmp.name) / "dane"
+        self.katalog_wynikow = Path(self._tmp.name) / "wyniki"
 
     def wczytaj_karte(self, klient):
         return self.karta
@@ -762,13 +775,14 @@ class TestWiadomoscDoKlientaWTodo(unittest.TestCase):
         z = zg(41, stan="Todo")          # prośba klienta o informację, ale praca jeszcze trwa
         self.assertEqual(szkice.uruchom(Srodowisko([z])), [])
 
-    def test_istniejacy_szkic_z_opisu_jest_materialem_a_nie_tresciami_do_wyslania(self):
-        z = self._zaproszenie(opis=OPIS_ZAPROSZENIE + "\n\n## Szkic dla klienta (do wysłania przez człowieka)\n\n> Cześć Kasia, zapraszam.")
+    def test_stary_szkic_z_opisu_zgloszenia_nie_trafia_do_promptu(self):
+        """Stały „Szkic dla klienta” z opisu zawierał „przesyłam ściągę”; model go przepisywał. Teraz go nie dostaje."""
+        z = self._zaproszenie(opis=OPIS_ZAPROSZENIE + "\n\n## Szkic dla klienta (do wysłania przez człowieka)\n\n> Cześć Kasia, przesyłam ściągę.")
         s = Srodowisko([z])
         szkice.uruchom(s)
-        self.assertIn("Wcześniejszy szkic do poprawy", s.claude.prompty[0])
+        self.assertNotIn("przesyłam ściągę", s.claude.prompty[0])
+        self.assertNotIn("Wcześniejszy szkic", s.claude.prompty[0])
         self.assertNotIn("Zakaz Z4", s.claude.prompty[0])
-
     def test_otwarte_zaproszenie_nie_dostaje_drugiego_szkicu(self):
         s = Srodowisko([self._zaproszenie(labels=("Decyzja człowieka", "Szkic gotowy"))])
         self.assertEqual(szkice.uruchom(s), [])
@@ -951,6 +965,277 @@ class TestZaproszenieICS(unittest.TestCase):
         self.assertIsNone(wy.parsuj_szkic([komentarz_szkicu()])["spotkanie"])
 
 
+# ── materiały, potwierdzenie przez klienta, wycofywanie szkiców ──────────────
+
+import json as _json
+import materialy as mat
+
+OPIS_SCIAGA = ("## Cel\n\nDać Kasi ściągę statusów dla handlowców.\n\n## Kontekst\n\nŚciąga ze statusów.\n\n> Ściągę wyślę ci przed urlopem.\n\n"
+               "## Kryteria akceptacji\n\n- [ ] Ściąga mieści się na jednej stronie\n\n## Czego nie ruszać\n\n- Zakaz Z4: x\n\n## Źródło\n\n`x`")
+MATERIAL_OK = _json.dumps({"tytul": "Ściąga statusów", "tresc": "# Ściąga statusów\n\n## Zainteresowany\n\n- osoba po pełnej rozmowie, która chce rozmawiać z doradcą\n",
+                           "luki": []}, ensure_ascii=False)
+MATERIAL_LUKI = _json.dumps({"tytul": "Ściąga statusów", "tresc": "# Ściąga statusów\n\n## Zainteresowany\n\n- po pełnej rozmowie\n\n## Niezweryfikowany\n\n- [do potwierdzenia: co znaczy ten status]\n",
+                             "luki": ["znaczenie statusu „niezweryfikowany”"]}, ensure_ascii=False)
+KARTA_SCIAGA = {**KARTA, "otwarte_sprawy": {"sciga-statusow": {"identifier": "RIN-47", "zrodla": []}},
+                "zamkniete_sprawy": {"adres-wloclawek": {"identifier": "RIN-39", "zrodla": [], "status_koncowy": "zamknieta"}}}
+
+
+def claude_material_i_mail(material, mail=None):
+    """Atrapa: prompt materiału dostaje JSON materiału, prompt maila JSON maila."""
+    mail = mail or json_szkic("Dzień dobry, Kasiu,\n\nściąga statusów jest w załączniku.\n\nMarek Rewoliński")
+    k = AtrapaClaude("")
+    k.zapytaj = lambda prompt: (k.prompty.append(prompt), material if "Przygotuj dla klienta materiał" in prompt else mail)[1]
+    return k
+
+
+class TestMaterialy(unittest.TestCase):
+
+    def _z(self, **kw):
+        return zg(47, **{"tytul": "Wysłać Kasi ściągę statusów przed urlopem", "opis": OPIS_SCIAGA, "stan": "Todo", "labels": ("Zadanie", "Decyzja człowieka"), **kw})
+
+    def _s(self, material=MATERIAL_OK, **kw):
+        return Srodowisko([self._z(**kw.pop("z", {}))], karta=KARTA_SCIAGA, claude=claude_material_i_mail(material, kw.pop("mail", None)), **kw)
+
+    def test_rodzaj_materialu(self):
+        self.assertEqual(mat.rodzaj_materialu(self._z(), Z), "sciaga")
+        self.assertEqual(mat.rodzaj_materialu(zg(1, tytul="Zestawienie wyników testu"), Z), "zestawienie")
+        self.assertEqual(mat.rodzaj_materialu(zg(1, tytul="Notatka ze spotkania dla klienta"), Z), "notatka")
+        self.assertIsNone(mat.rodzaj_materialu(zg(1, tytul="Notatka przed spotkaniem z Pawłem"), Z), "notatki wewnętrzne to nie materiał dla klienta")
+        self.assertIsNone(mat.rodzaj_materialu(zg(1, tytul="Godziny w sobotę"), Z))
+
+    def test_material_powstaje_przed_szkicem_i_jest_zalaczony(self):
+        s = self._s()
+        w = szkice.uruchom(s)[0]
+        self.assertEqual((w["status"], len(w["zalaczniki"])), ("szkic", 1))
+        md, pdf, meta = mat.sciezki_materialu("auto-tama", self._z(), s.katalog_materialow)
+        self.assertTrue(md.exists() and pdf.exists())
+        self.assertTrue(pdf.read_bytes().startswith(b"%PDF"), "to prawdziwy PDF")
+        self.assertIn("Zainteresowany", md.read_text(encoding="utf-8"))
+        self.assertIn("rin-47-", str(pdf))
+        # model dostał najpierw prośbę o materiał, dopiero potem o mail, i widzi treść załącznika
+        self.assertIn("Przygotuj dla klienta materiał", s.claude.prompty[0])
+        self.assertIn("ZAŁĄCZNIK", s.claude.prompty[1])
+        self.assertIn("Zainteresowany", s.claude.prompty[1])
+        p = wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-47"]))
+        self.assertEqual(p["zalaczniki"], [str(pdf)])
+
+    def test_material_z_lukami_nie_dostaje_szkicu_tylko_do_weryfikacji_z_lista_brakow(self):
+        s = self._s(MATERIAL_LUKI)
+        w = szkice.uruchom(s)[0]
+        self.assertEqual(w["status"], "do_weryfikacji")
+        self.assertIn("materiał wymaga uzupełnienia", w["powod"])
+        self.assertIn("niezweryfikowany", w["powod"])
+        self.assertIn("Do weryfikacji", s.linear.zgloszenia["RIN-47"]["labels"])
+        self.assertNotIn("Szkic gotowy", s.linear.zgloszenia["RIN-47"]["labels"])
+        self.assertEqual(len(s.claude.prompty), 1, "mail w ogóle nie jest pisany")
+
+    def test_material_pytany_o_fakty_nie_zgaduje(self):
+        s = self._s()
+        szkice.uruchom(s)
+        p = s.claude.prompty[0]
+        self.assertIn("WYŁĄCZNIE faktów", p)
+        self.assertIn("[do potwierdzenia", p)
+        self.assertIn("Ściągę wyślę ci przed urlopem", p, "fakty ze zgłoszenia")
+
+    def test_istniejacy_material_z_tymi_samymi_faktami_nie_wola_modelu_ponownie(self):
+        s = self._s()
+        szkice.uruchom(s)
+        liczba = len(s.claude.prompty)
+        z = s.linear.zgloszenia["RIN-47"]
+        z["labels"] = [l for l in z["labels"] if l != "Szkic gotowy"]
+        szkice.uruchom(s)
+        nowe = s.claude.prompty[liczba:]
+        self.assertFalse(any("Przygotuj dla klienta materiał" in p for p in nowe))
+
+    def test_stary_szkic_ze_sciaga_bez_materialu_jest_wycofany_i_pisany_od_nowa(self):
+        """RIN-47: szkic powstał, zanim istniał materiał, i obiecywał ściągę, której nie było."""
+        z = self._z(labels=("Zadanie", "Szkic gotowy"))
+        s = Srodowisko([z], {"RIN-47": [komentarz_szkicu(zgl=("RIN-47",), tresc="Dzień dobry, Kasiu, przesyłam ściągę.\nMarek Rewoliński")]},
+                       karta=KARTA_SCIAGA, claude=claude_material_i_mail(MATERIAL_OK))
+        w = szkice.uruchom(s)[0]
+        self.assertEqual((w["status"], len(w["zalaczniki"])), ("szkic", 1))
+        kom = sorted(s.linear.komentarze(s.linear.zgloszenia["RIN-47"]), key=lambda k: k["createdAt"])
+        self.assertTrue(kom[0]["body"].startswith("_Szkic wycofany"))
+        self.assertNotIn("przesyłam ściągę", wy.parsuj_szkic(kom)["tresc"])
+
+    def test_reczna_poprawka_materialu_usuwa_luki_i_odswieza_pdf(self):
+        s = self._s(MATERIAL_LUKI)
+        self.assertEqual(szkice.uruchom(s)[0]["status"], "do_weryfikacji")
+        md, pdf, meta = mat.sciezki_materialu("auto-tama", self._z(), s.katalog_materialow)
+        md.write_text("# Ściąga statusów\n\n## Niezweryfikowany\n\n- status dla kontaktów bez potwierdzenia numeru\n", encoding="utf-8")
+        m = _json.loads(meta.read_text(encoding="utf-8"))
+        m["reczny"] = True
+        meta.write_text(_json.dumps(m), encoding="utf-8")
+        z = s.linear.zgloszenia["RIN-47"]
+        z["labels"] = [l for l in z["labels"] if l != "Do weryfikacji"]
+        w = szkice.uruchom(s)[0]
+        self.assertEqual(w["status"], "szkic", "poprawiony ręcznie materiał jest gotowy")
+        self.assertTrue(pdf.read_bytes().startswith(b"%PDF"))
+
+    def test_prompt_materialu_kaze_trzymac_sie_tematu_i_nie_mieszac_faktow(self):
+        s = self._s()
+        szkice.uruchom(s)
+        p = s.claude.prompty[0]
+        self.assertIn("Trzymaj się tematu zgłoszenia", p)
+        self.assertIn("NIE dodawaj sekcji", p)
+
+    def test_zestawienie_czeka_na_dane_bez_materialu_i_bez_szkicu(self):
+        z = zg(73, tytul="W piątek wysłać Kasi zestawienie wyników testu wstępu", stan="Todo", labels=("Zadanie", "Decyzja człowieka"),
+               opis=OPIS.replace("Godziny w sobotę do 15:00.", "Zestawienie wyników testu wstępu."))
+        karta = {**KARTA, "otwarte_sprawy": {"zestawienie-wynikow-wstepu": {"identifier": "RIN-73", "zrodla": []}}}
+        s = Srodowisko([z], karta=karta)
+        w = szkice.uruchom(s)
+        self.assertEqual([x["status"] for x in w], ["czeka_na_dane"])
+        self.assertIn("ops/dane/auto-tama/zestawienie-wynikow-wstepu", w[0]["powod"])
+        self.assertEqual(s.claude.prompty, [], "model nie jest pytany")
+        self.assertEqual(s.linear.zdarzenia, [], "żadnych zmian w Linearze")
+        self.assertFalse(s.katalog_materialow.exists())
+
+    def test_zestawienie_z_danymi_jest_tworzone(self):
+        z = zg(73, tytul="Zestawienie wyników testu wstępu", stan="Todo", labels=("Zadanie",), opis=OPIS)
+        karta = {**KARTA, "otwarte_sprawy": {"zestawienie-wynikow-wstepu": {"identifier": "RIN-73", "zrodla": []}}}
+        s = Srodowisko([z], karta=karta, claude=claude_material_i_mail(MATERIAL_OK))
+        (s.katalog_danych / "auto-tama").mkdir(parents=True)
+        (s.katalog_danych / "auto-tama" / "zestawienie-wynikow-wstepu.csv").write_text("wersja,pelne\nA,10\n", encoding="utf-8")
+        self.assertEqual(szkice.uruchom(s)[0]["status"], "szkic")
+
+    def test_zestawienie_ktore_mialo_szkic_traci_go_gdy_brak_danych(self):
+        z = zg(73, tytul="Zestawienie wyników testu wstępu", stan="Todo", labels=("Zadanie", "Szkic gotowy"), opis=OPIS)
+        karta = {**KARTA, "otwarte_sprawy": {"zestawienie-wynikow-wstepu": {"identifier": "RIN-73", "zrodla": []}}}
+        s = Srodowisko([z], {"RIN-73": [komentarz_szkicu(zgl=("RIN-73",)), {"id": "p", "createdAt": "2026-10-14T07:00:00Z", "body": wy.format_komentarza_zbiorczego("RIN-46")}]}, karta=karta)
+        szkice.uruchom(s)
+        self.assertNotIn("Szkic gotowy", s.linear.zgloszenia["RIN-73"]["labels"])
+        self.assertIsNone(wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-73"])), "stare szkice wycofane")
+        self.assertTrue(all(k["body"].startswith("_Szkic wycofany") for k in s.linear.komentarze(s.linear.zgloszenia["RIN-73"])))
+
+
+class TestPotwierdzoneUKlienta(unittest.TestCase):
+
+    def _wyniki(self, tmp, nowy_status="zamknieta", pewnosc="wysoka"):
+        d = Path(tmp) / "auto-tama" / "2026-10-13-call"
+        d.mkdir(parents=True)
+        (d / "wynik.json").write_text(_json.dumps({"aktualizacje_spraw": [{"klucz_sprawy": "adres-wloclawek", "nowy_status": nowy_status,
+                                                                           "cytat": "Adres we Włocławku działa, puściłam sobie test.", "pewnosc": pewnosc}]}), encoding="utf-8")
+
+    def test_sprawa_potwierdzona_przez_klienta_nie_dostaje_szkicu(self):
+        z = zg(39, tytul="Nieaktualny adres salonu Włocławek", labels=("Konfiguracja",), opis=OPIS.replace("Napisz mi", "Napisz mi"))
+        s = Srodowisko([z], karta=KARTA_SCIAGA)
+        self._wyniki(s.katalog_wynikow)
+        w = szkice.uruchom(s)
+        self.assertEqual([x["status"] for x in w], ["pominiete"])
+        self.assertIn("klient sam potwierdził", w[0]["powod"])
+        self.assertIn("Adres we Włocławku działa", w[0]["powod"])
+        self.assertEqual(s.claude.prompty, [])
+
+    def test_potwierdzenie_dziala_gdy_prosba_o_informacje_jest_tylko_w_starszych_cytatach(self):
+        """Regresja: odfiltrowanie nie widziało cytatów ze starszych wyników, więc RIN-39 dostawał szkic mimo potwierdzenia."""
+        z = zg(39, tytul="Nieaktualny adres salonu Włocławek", labels=("Konfiguracja",), opis=OPIS.replace("> Napisz mi, jak będzie poprawione.", "> Dzięki."))
+        s = Srodowisko([z], karta=KARTA_SCIAGA, claude=AtrapaClaude(json_szkic()))
+        s.cytaty_zrodlowe = lambda zgl: ["Napisz tylko, jak będzie zrobione."]
+        self._wyniki(s.katalog_wynikow)
+        w = szkice.uruchom(s)
+        self.assertEqual([x["status"] for x in w], ["pominiete"])
+        self.assertEqual(s.claude.prompty, [])
+
+    def test_rin_39_traci_istniejacy_szkic(self):
+        z = zg(39, tytul="Nieaktualny adres salonu Włocławek", labels=("Konfiguracja", "Szkic gotowy"))
+        s = Srodowisko([z], {"RIN-39": [komentarz_szkicu(zgl=("RIN-39", "RIN-73"))]}, karta=KARTA_SCIAGA)
+        self._wyniki(s.katalog_wynikow)
+        szkice.uruchom(s)
+        self.assertNotIn("Szkic gotowy", s.linear.zgloszenia["RIN-39"]["labels"])
+        self.assertIsNone(wy.parsuj_szkic(s.linear.komentarze(s.linear.zgloszenia["RIN-39"])))
+
+    def test_niepewne_potwierdzenie_albo_inny_status_nie_blokuje(self):
+        for status, pewnosc in (("zrob_teraz", "wysoka"), ("zamknieta", "niska")):
+            z = zg(39, tytul="Nieaktualny adres", labels=("Konfiguracja",))
+            s = Srodowisko([z], karta=KARTA_SCIAGA, claude=AtrapaClaude(json_szkic()))
+            self._wyniki(s.katalog_wynikow, status, pewnosc)
+            self.assertEqual(szkice.uruchom(s)[0]["status"], "szkic", (status, pewnosc))
+
+    def test_potwierdzone_przez_klienta_na_prawdziwych_wynikach_rin_39(self):
+        import os
+        root = Path(__file__).parent.parent
+        k = _json.loads((root / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        cwd = os.getcwd()
+        os.chdir(root)
+        try:
+            self.assertIn("Adres we Włocławku działa", mat.potwierdzone_przez_klienta("auto-tama", k, "RIN-39") or "")
+            self.assertIsNone(mat.potwierdzone_przez_klienta("auto-tama", k, "RIN-47"))
+        finally:
+            os.chdir(cwd)
+
+
+class TestWycofywanieSzkicow(unittest.TestCase):
+
+    def test_nowy_szkic_zastepuje_stare_komentarze(self):
+        z = zg(41, labels=("Konfiguracja",))
+        s = Srodowisko([z], {"RIN-41": [komentarz_szkicu(tresc="Dzień dobry, stara wersja z przesyłam ściągę\nMarek Rewoliński")]},
+                       claude=AtrapaClaude(json_szkic("Dzień dobry, Kasiu, nowa wersja.\nMarek Rewoliński")))
+        szkice.uruchom(s)
+        kom = sorted(s.linear.komentarze(s.linear.zgloszenia["RIN-41"]), key=lambda k: k["createdAt"])
+        self.assertTrue(kom[0]["body"].startswith("_Szkic wycofany: zastąpiony nowszą wersją"))
+        self.assertNotIn("przesyłam", kom[0]["body"], "stara treść znika z Lineara")
+        self.assertIn("nowa wersja", wy.parsuj_szkic(kom)["tresc"])
+
+    def test_stary_szkic_z_obietnica_ktorej_nie_da_sie_spelnic_nie_zostaje_do_wyslania(self):
+        z = zg(47, labels=("Konfiguracja", "Wyślij", "Szkic gotowy"))
+        s = Srodowisko([z], {"RIN-47": [komentarz_szkicu(zgl=("RIN-47",), tresc="Dzień dobry, Kasiu, przesyłam ściągę statusów.\nMarek Rewoliński")]})
+        w = wy.uruchom(s)
+        self.assertEqual(w[0]["status"], "wstrzymane", "wykrywacz obietnic blokuje taki szkic")
+        self.assertEqual(s.poczta.wyslane, [])
+
+
+class TestZalacznikiWysylki(unittest.TestCase):
+
+    def _s(self, tresc, sciezki, tworz=True, md="# Ściąga\n\n- punkt\n"):
+        z = zg(47, labels=("Konfiguracja", "Wyślij", "Szkic gotowy"))
+        s = Srodowisko([z], {"RIN-47": [{"id": "c", "createdAt": "2026-10-14T07:30:00Z",
+                                        "body": wy.format_komentarza_szkicu("Kasia Malinowska", "Ściąga", tresc, ["RIN-47"], None, sciezki)}]})
+        if tworz:
+            kat = s.katalog_materialow / "auto-tama"
+            kat.mkdir(parents=True)
+            (kat / "sciaga.pdf").write_bytes(b"%PDF-1.4 test")
+            (kat / "sciaga.md").write_text(md, encoding="utf-8")
+        return s
+
+    def test_zalacznik_jest_wysylany_a_tresc_moze_o_nim_mowic(self):
+        s = self._s("Dzień dobry, Kasiu, ściąga jest w załączniku.\nMarek Rewoliński", [])
+        s.linear.kom["RIN-47"][0]["body"] = wy.format_komentarza_szkicu("Kasia Malinowska", "Ściąga", "Dzień dobry, Kasiu, ściąga jest w załączniku.\nMarek Rewoliński",
+                                                                       ["RIN-47"], None, [str(s.katalog_materialow / "auto-tama" / "sciaga.pdf")])
+        w = wy.uruchom(s)
+        self.assertEqual(w[0]["status"], "wyslane")
+        self.assertEqual(s.poczta.wyslane[0]["zalaczniki"], [("sciaga.pdf", b"%PDF-1.4 test")])
+        self.assertEqual(s.karta["historia_wysylek"][0]["zalaczniki"], ["sciaga.pdf"])
+
+    def test_zalacznik_spoza_katalogu_materialow_klienta_blokuje(self):
+        for sciezka in ("/etc/passwd.pdf", "ops/materialy/inny-klient/x.pdf", "ops/materialy/auto-tama/../../../.env.pdf", "sciaga.txt"):
+            s = self._s("Dzień dobry, Kasiu, ściąga w załączniku.\nMarek Rewoliński", [sciezka], tworz=False)
+            w = wy.uruchom(s)
+            self.assertEqual(w[0]["status"], "wstrzymane", sciezka)
+            self.assertEqual(s.poczta.wyslane, [])
+
+    def test_brakujacy_plik_blokuje(self):
+        s = self._s("Dzień dobry, Kasiu, ściąga w załączniku.\nMarek Rewoliński", [], tworz=False)
+        s.linear.kom["RIN-47"][0]["body"] = wy.format_komentarza_szkicu("Kasia Malinowska", "T", "Dzień dobry, Kasiu, ściąga w załączniku.\nMarek Rewoliński", ["RIN-47"], None,
+                                                                       [str(s.katalog_materialow / "auto-tama" / "brak.pdf")])
+        w = wy.uruchom(s)
+        self.assertEqual(w[0]["status"], "wstrzymane")
+        self.assertIn("nie istnieje", w[0]["powod"])
+
+    def test_material_z_luka_towarzyszacy_zalacznikowi_blokuje_wysylke(self):
+        s = self._s("Dzień dobry, Kasiu, ściąga w załączniku.\nMarek Rewoliński", [], md="# Ściąga\n\n- [do potwierdzenia: status]\n")
+        s.linear.kom["RIN-47"][0]["body"] = wy.format_komentarza_szkicu("Kasia Malinowska", "T", "Dzień dobry, Kasiu, ściąga w załączniku.\nMarek Rewoliński", ["RIN-47"], None,
+                                                                       [str(s.katalog_materialow / "auto-tama" / "sciaga.pdf")])
+        w = wy.uruchom(s)
+        self.assertEqual(w[0]["status"], "wstrzymane")
+        self.assertIn("wymaga uzupełnienia", w[0]["powod"])
+        self.assertEqual(s.poczta.wyslane, [])
+
+    def test_obietnica_zalacznika_bez_pliku_nadal_blokuje(self):
+        s = self._s("Dzień dobry, Kasiu, przesyłam ściągę.\nMarek Rewoliński", [], tworz=False)
+        self.assertEqual(wy.uruchom(s)[0]["status"], "wstrzymane")
+
+
 # ── workflow ──────────────────────────────────────────────────────────────────
 
 class TestWorkflow(unittest.TestCase):
@@ -965,6 +1250,13 @@ class TestWorkflow(unittest.TestCase):
     def test_szkice_w_workflow_agenta(self):
         t = (Path(__file__).parent.parent / ".github/workflows/agent.yml").read_text(encoding="utf-8")
         self.assertIn("python3 szkice.py", t)
+
+    def test_workflow_agenta_zapisuje_materialy_i_ma_pdf(self):
+        t = (Path(__file__).parent.parent / ".github/workflows/agent.yml").read_text(encoding="utf-8")
+        self.assertIn("fpdf2", t)
+        self.assertIn("fonts-dejavu-core", t)
+        self.assertIn("git add -A -- ops/materialy", t)
+        self.assertIn("contents: write", t)
 
     def test_agent_nie_dostaje_hasla_do_poczty(self):
         t = (Path(__file__).parent.parent / ".github/workflows/agent.yml").read_text(encoding="utf-8")

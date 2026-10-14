@@ -359,8 +359,8 @@
       "Czeka na klienta"
     ],
     "pomijaj_tytuly": [
-      "notatka",
-      "notatki przed"
+      "notatka przed spotkaniem",
+      "notatki przed spotkaniem"
     ],
     "podpis": "Marek Rewoliński",
     "model_pytanie_o_ton": "krótko, po ludzku, po polsku, w imieniu Marka; tylko ustalenia z rozmów",
@@ -439,7 +439,8 @@
         "\\?\\?\\?",
         "\\bdo uzupełnienia\\b",
         "\\b(?:wstaw|podaj) (?:tu|tutaj)\\b",
-        "<[^>\\n]{1,40}>"
+        "<[^>\\n]{1,40}>",
+        "do potwierdzenia"
       ],
       "obietnice_zalacznika": [
         "w załącz\\w*",
@@ -473,6 +474,28 @@
           "wzorem"
         ]
       }
-    ]
+    ],
+    "max_zalacznik_mb": 8
+  },
+  "materialy": {
+    "_opis": "Zgłoszenia, których wynikiem jest materiał dla klienta, agent najpierw WYKONUJE: tworzy dokument w ops/materialy/<klient>/ (md + pdf) z faktów z rozmów i kart; dopiero potem powstaje szkic maila z załącznikiem. wymaga_danych: materiał oparty na wynikach czeka na plik ops/dane/<klient>/<klucz sprawy>.* (bez niego nie powstaje ani materiał, ani szkic).",
+    "rodzaje": {
+      "sciaga": {
+        "slowa": [
+          "ściąg"
+        ]
+      },
+      "zestawienie": {
+        "slowa": [
+          "zestawieni"
+        ],
+        "wymaga_danych": true
+      },
+      "notatka": {
+        "slowa": [
+          "notatk"
+        ]
+      }
+    }
   }
 }

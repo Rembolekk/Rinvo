@@ -36,8 +36,10 @@ EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 
 # ── szkic w komentarzu ────────────────────────────────────────────────────────
 
-def format_komentarza_szkicu(odbiorca, temat, tresc, identyfikatory, spotkanie=None):
+def format_komentarza_szkicu(odbiorca, temat, tresc, identyfikatory, spotkanie=None, zalaczniki=()):
     sp = ""
+    if zalaczniki:
+        sp += f"**Załączniki:** {', '.join(zalaczniki)}\n"
     if spotkanie:
         sp = (f"**Spotkanie:** {spotkanie['data']} {spotkanie['godzina']} | {spotkanie.get('czas_min', 60)} | "
               f"{spotkanie.get('miejsce', '')} | {spotkanie.get('tytul', '')}  _(zaproszenie .ics zostanie dołączone)_\n")
@@ -64,12 +66,14 @@ def parsuj_szkic(komentarze):
         temat = re.search(r"^\*\*Temat:\*\*\s*(.+)$", body, re.M)
         zgl = re.search(r"^\*\*Zgłoszenia:\*\*\s*(.+)$", body, re.M)
         tresc = re.search(r"^---\n(.*?)\n---\s*$", body, re.M | re.S)
+        zal = re.search(r"^\*\*Załączniki:\*\*\s*(.+)$", body, re.M)
         sp = re.search(r"^\*\*Spotkanie:\*\*\s*(\d{4}-\d{2}-\d{2}) (\d{1,2}:\d{2}) \| (\d+) \| ([^|\n]*) \| ([^\n]*?)(?:\s+_\(.*)?$", body, re.M)
         if not (do and temat and tresc):
             continue
         return {"do": do.group(1).strip(), "temat": temat.group(1).strip(),
                 "zgloszenia": re.findall(r"RIN-\d+", zgl.group(1)) if zgl else [],
                 "tresc": tresc.group(1).strip(),
+                "zalaczniki": [x.strip() for x in zal.group(1).split(",") if x.strip()] if zal else [],
                 "spotkanie": ({"data": sp.group(1), "godzina": sp.group(2), "czas_min": int(sp.group(3)),
                                "miejsce": sp.group(4).strip(), "tytul": sp.group(5).strip()} if sp else None)}
     return None
@@ -84,6 +88,36 @@ def znajdz_placeholder(temat, tresc, W):
             a, b = max(0, m.start() - 25), min(len(tekst), m.end() + 25)
             return " ".join(tekst[a:b].split())
     return None
+
+
+def wczytaj_zalaczniki(klient, sciezki, W, karta, inni_klienci, katalog=None):
+    """([(nazwa, bajty)], powody). Załącznik tylko z ops/materialy/<klient>/ (bez ucieczki przez „..”), tylko .pdf, istniejący,
+    nieduży; towarzyszący plik .md przechodzi ten sam filtr treści i kontrolę luk co szkic."""
+    import os
+    from pathlib import Path
+    baza = Path(katalog) if katalog else Path("ops/materialy")
+    wynik, powody = [], []
+    for sc in sciezki:
+        nazwa = Path(sc).name
+        if os.path.normpath(sc) != os.path.normpath(str(baza / klient / nazwa)) or not nazwa.lower().endswith(".pdf"):
+            powody.append(f"załącznik „{sc}” spoza katalogu materiałów klienta")
+            continue
+        plik = baza / klient / nazwa
+        if not plik.exists():
+            powody.append(f"załącznik „{nazwa}” nie istnieje")
+            continue
+        if plik.stat().st_size > W.get("max_zalacznik_mb", 8) * 1024 * 1024:
+            powody.append(f"załącznik „{nazwa}” jest za duży")
+            continue
+        md = plik.with_suffix(".md")
+        if md.exists():
+            tekst = md.read_text(encoding="utf-8")
+            frag = znajdz_placeholder("", tekst, W)
+            if frag:
+                powody.append(f"materiał „{nazwa}” wymaga uzupełnienia: {frag}")
+            powody += [f"materiał „{nazwa}”: {p}" for p in filtr_tresci("", tekst, karta, W, inni_klienci)]
+        wynik.append((nazwa, plik.read_bytes()))
+    return wynik, powody
 
 
 def obiecuje_zalacznik(tresc, W):
@@ -336,7 +370,10 @@ def obsluz_zgloszenie(s, zg):
         if sp_ok is None:
             powody.append(f"zaproszenie kalendarzowe: {powod_sp}")
         spotkanie = sp_ok
-    if spotkanie is None:
+    pliki, powody_zal = wczytaj_zalaczniki(klient, szkic.get("zalaczniki", []), W, karta, s.inni_klienci(klient),
+                                           getattr(s, "katalog_materialow", None))
+    powody += powody_zal
+    if spotkanie is None and not pliki:
         obietnica = obiecuje_zalacznik(szkic["tresc"], W)
         if obietnica:
             powody.append(f"treść obiecuje załącznik albo zaproszenie („{obietnica}”), którego nie ma")
@@ -363,14 +400,14 @@ def obsluz_zgloszenie(s, zg):
     try:
         if spotkanie:
             ics = zbuduj_ics(spotkanie, s.poczta.nadawca(), odbiorca["email"], odbiorca["imie"], teraz, W)
-        message_id = s.poczta.wyslij(odbiorca["email"], odbiorca["imie"], szkic["temat"], szkic["tresc"], ics)
+        message_id = s.poczta.wyslij(odbiorca["email"], odbiorca["imie"], szkic["temat"], szkic["tresc"], ics, pliki)
     except Exception as exc:  # noqa: BLE001
         return czekaj(s, zg, karta, klient, f"błąd poczty: {slack_bezpiecznie(str(exc), 120)}; ponowimy przy następnym przebiegu")
 
     # historia ZANIM ruszymy Linear: nawet gdy dalsze kroki padną, drugi raz nie wyślemy
     karta.setdefault("historia_wysylek", []).append({
         "data": lokalnie(teraz, W).isoformat(timespec="seconds"), "message_id": message_id, "do": odbiorca["imie"],
-        "temat": szkic["temat"], "zgloszenia": identyfikatory, "hash": skrot, "zaproszenie_ics": bool(ics)})
+        "temat": szkic["temat"], "zgloszenia": identyfikatory, "hash": skrot, "zaproszenie_ics": bool(ics), "zalaczniki": [n for n, _ in pliki]})
     karta.get("wysylki_oczekujace", {}).pop(zg["identifier"], None)
     s.zapisz_karte(klient, karta)
 
