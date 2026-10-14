@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raport: Plik ze świeżymi leadami</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1b;--mut:#62615c;--line:#e3e1db;--acc:#2f5bd3;--accbg:#e8eefc;
+--now:#0f7a43;--nowbg:#e2f4ea;--wait:#9a5b00;--waitbg:#fdf0d9;--back:#5b4bb7;--backbg:#ece9fb;--no:#b42318;--nobg:#fde7e5;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#151514;--card:#1f1f1d;--ink:#ecebe6;--mut:#a3a29b;--line:#34332f;--acc:#8aa8ff;--accbg:#232c45;
+--now:#6fd39c;--nowbg:#173326;--wait:#f3b75a;--waitbg:#382a12;--back:#b3a8ff;--backbg:#2a2545;--no:#ff8a80;--nobg:#3d1d1a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:1.6rem;margin:0 0 4px;letter-spacing:-.01em}
+.meta{color:var(--mut);margin:0 0 24px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:28px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+.tile b{font-size:1.7rem;line-height:1.1} .tile span{color:var(--mut);font-size:.85rem}
+.tile.alt b{color:var(--acc)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:20px}
+.panel h2{font-size:1.1rem;margin:0 0 10px}
+.panel ol,.panel ul{margin:0;padding-left:20px} .panel li{margin:0 0 12px}
+.was{text-decoration:line-through;color:var(--mut)} .now{color:var(--now);font-weight:600}
+.refs a,.panel li>a{font:600 .75rem ui-monospace,Consolas,monospace;background:var(--accbg);color:var(--acc);padding:1px 6px;border-radius:5px;text-decoration:none;margin-left:2px}
+section{margin-top:36px}
+h2{display:flex;align-items:center;gap:10px;font-size:1.3rem;margin:0}
+h2 small{color:var(--mut);font-weight:500;font-size:.95rem}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.9rem}
+.sub{color:var(--mut);margin:4px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;scroll-margin-top:16px}
+.card:target{outline:2px solid var(--acc)}
+.card header{display:flex;gap:10px;align-items:baseline}
+.card h3{font-size:1rem;margin:0;line-height:1.35}
+.pid{font:600 .75rem ui-monospace,Consolas,monospace;color:var(--mut);flex:none}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font-size:.72rem;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut)}
+.tag.kind{background:var(--accbg);color:var(--acc);border-color:transparent}
+.st-zrob_teraz{background:var(--nowbg);color:var(--now);border-color:transparent;font-weight:600}
+.st-czeka{background:var(--waitbg);color:var(--wait);border-color:transparent;font-weight:600}
+.st-backlog{background:var(--backbg);color:var(--back);border-color:transparent;font-weight:600}
+.st-nigdy{background:var(--nobg);color:var(--no);border-color:transparent;font-weight:600}
+.st-zamknieta{background:var(--nowbg);color:var(--now);border-color:transparent;font-weight:600}
+.st-anulowana{background:var(--nobg);color:var(--no);border-color:transparent;font-weight:600}
+.desc{margin:6px 0}
+.infer{list-style:none;margin:6px 0;padding:0;font-size:.86rem;color:var(--mut)}
+.infer li{margin:3px 0 !important}
+.wn{display:inline-block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--back);background:var(--backbg);border-radius:4px;padding:0 5px;margin-right:6px}
+.change{margin:6px 0;font-size:.88rem;color:var(--wait);background:var(--waitbg);padding:6px 10px;border-radius:8px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:8px 0;font-size:.88rem}
+dt{color:var(--mut)} dd{margin:0}
+details summary{cursor:pointer;color:var(--acc);font-size:.85rem}
+blockquote{margin:8px 0 0;padding:6px 10px;border-left:3px solid var(--line);color:var(--mut);font-style:italic;font-size:.88rem}
+.mail{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.mail pre{margin:0;padding:18px 20px;white-space:pre-wrap;font:14px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:auto}
+#copy{position:absolute;top:10px;right:10px;font:inherit;font-size:.82rem;padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+footer{margin-top:40px;color:var(--mut);font-size:.85rem}
+</style></head><body><div class="wrap">
+<h1>Plik ze świeżymi leadami</h1>
+<p class="meta">Spotkanie 2026-10-14, 12:15 · Uczestnicy: Mateusz Rembecki · Raport z 2026-10-14</p>
+<div class="tiles"><a class="tile" href="#s1"><b>1</b><span>Do zrobienia teraz</span></a><a class="tile" href="#s2"><b>1</b><span>Czeka na klienta</span></a><a class="tile" href="#s3"><b>0</b><span>Backlog produktowy</span></a><a class="tile" href="#s4"><b>0</b><span>Zakazy i ograniczenia</span></a><a class="tile" href="#s5"><b>0</b><span>Ryzyka handlowe</span></a><a class="tile alt" href="#zmiany"><b>0</b><span>Zmiany zdania</span></a><a class="tile alt" href="#konflikty"><b>0</b><span>Konflikty dat</span></a><a class="tile alt" href="#aktualizacje"><b>1</b><span>Zmiany w otwartych sprawach</span></a><a class="tile alt" href="#ostrzezenia"><b>0</b><span>Ostrzeżenia dat</span></a></div>
+<div class="panel" id="zmiany"><h2>Zmiany zdania wykryte w rozmowie</h2><ol><li>Nie wykryto zmian zdania.</li></ol></div>
+<div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol><li>Brak zidentyfikowanych konfliktów.</li></ol></div>
+<div class="panel" id="aktualizacje"><h2>Zmiany w otwartych sprawach</h2><ul><li><b>swieze-leady</b> <span class="tag st-zrob_teraz">zrób teraz</span><br>Kasia przysłała plik, na który czekaliśmy, a treść maila wskazuje, czego dotyczy załącznik (świeże leady z ostatniego miesiąca, strona i Facebook).<blockquote>„tak jak obiecywałam, w załączniku plik ze świeżymi leadami z"</blockquote></li></ul></div>
+<section id="s1"><h2><span class="num">1</span>Do zrobienia teraz <small>1</small></h2><p class="sub">Zadania po stronie naszego zespołu, z właścicielem.</p><div class="grid"><article class="card" id="T1">
+<header><span class="pid">T1</span><h3>Przyjąć plik świeżych leadów i przygotować go do uruchomienia (bez startu kampanii)</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">zobowiazanie_nasze</span><span class="tag kind">zmiana</span></div><p class="desc">Kasia przysłała plik leady-pazdziernik.csv ze świeżymi leadami z ostatniego miesiąca (strona i Facebook). Kolumny są nieczytelne, ale numer i salon są przy każdym wpisie. Do zrobienia: sprawdzić plik, zmapować kolumny, przygotować kampanię. Sam start kampanii zależy od K1.</p><ul class="infer"><li><span class="wn">wniosek</span>Załącznik jest dowodem dostarczenia, bo treść maila wprost wskazuje, czego dotyczy.</li><li><span class="wn">wniosek</span>Zawartości załącznika nie sprawdzono, analiza opiera się wyłącznie na treści maila.</li><li><span class="wn">wniosek</span>Nadawca (adres z nagłówka) zgadza się z adresem Kasi Malinowskiej w karcie, choć nazwa wyświetlana w polu Od to inna osoba. Uprawnienia sprawdza kod na podstawie adresu.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„tak jak obiecywałam, w załączniku plik ze świeżymi leadami z”</blockquote><blockquote>„najładniejsze, ale numer i salon są przy każdym. Możecie puszczać.”</blockquote></details></article></div></section><section id="s2"><h2><span class="num">2</span>Czeka na klienta <small>1</small></h2><p class="sub">Dane, decyzje i potwierdzenia, na które czekamy. Podano datę i limit przypomnień, jeśli padły w rozmowie.</p><div class="grid"><article class="card" id="K1">
+<header><span class="pid">K1</span><h3>Potwierdzenie od Kasi, czy „możecie puszczać” znosi blokadę nowych startów</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">czeka_na_klienta</span></div><p class="desc">Kasia pisze „Możecie puszczać”, ale w karcie obowiązują zakazy: w tym tygodniu nic nowego poza testem wstępu (Z18) i nic nowego w dniach 19–23.10 (Z5), nawet gdy plik leadów już będzie. Mail nie mówi wprost, że te zakazy są uchylone, więc zakazów nie uchylamy. Trzeba dopytać, czy start ma ruszyć teraz, czy po urlopie.</p><ul class="infer"><li><span class="wn">wniosek</span>Plik dotarł, więc warunek z Z14 (bez pliku nic nie rusza) jest spełniony. Z Z18 i Z5 tak nie jest.</li><li><span class="wn">wniosek</span>Opel (Z4, Z15) i stara baza (Z9) są poza tym mailem i nie zmieniają się. Wyniki świeżych leadów mają dopiero dać podstawę do decyzji o Oplu, a rozmowa we trzech jest w czwartek.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>Kasia wprost potwierdza start świeżych leadów mimo Z18 i Z5, albo wskazuje termin po urlopie</dd><dt>Przypomnienie</dt><dd>brak · limit: 0 · Nie przypominać o pliku (Z17). Pytanie o start zadać w odpowiedzi na ten mail, bez osobnych przypomnień.</dd></dl>
+<details><summary>Cytat (1)</summary><blockquote>„najładniejsze, ale numer i salon są przy każdym. Możecie puszczać.”</blockquote></details></article></div></section><section id="s3"><h2><span class="num">3</span>Backlog produktowy <small>0</small></h2><p class="sub">Pomysły i prośby o funkcje. Odróżniamy nową funkcję od zmiany istniejącej.</p><div class="grid"><p class="sub">Brak pozycji.</p></div></section><section id="s4"><h2><span class="num">4</span>Zakazy i ograniczenia <small>0</small></h2><p class="sub">Czego dla tego klienta nie robimy albo czego nie robimy przed określonym terminem.</p><div class="grid"><p class="sub">Brak pozycji.</p></div></section><section id="s5"><h2><span class="num">5</span>Ryzyka handlowe <small>0</small></h2><p class="sub">Co może zagrozić współpracy lub budżetowi.</p><div class="grid"><p class="sub">Brak pozycji.</p></div></section><section id="s6"><h2><span class="num">6</span>Szkic maila podsumowującego do klienta</h2>
+<p class="sub">Zawiera tylko ustalenia z rozmowy.</p>
+<div class="mail"><button type="button" id="copy">Kopiuj</button><pre id="mailtxt">Cześć Kasiu,
+
+dzięki za plik leady-pazdziernik.csv, mamy go. Przejrzymy kolumny i przygotujemy wszystko do uruchomienia.
+
+Jedno pytanie, żebyśmy niczego nie puścili wbrew ustaleniom: ustaliliśmy, że w tym tygodniu nic nowego poza testem wstępu nie startuje, a od 19 do 23.10 masz urlop i też nic nowego nie odpalamy. Czy „możecie puszczać” znaczy, że mamy ruszyć świeże leady już teraz, czy wolisz poczekać do po urlopie? Opla i starej bazy nie ruszamy, o tym pogadamy w czwartek we trzech.
+
+Pozdrawiam,
+Marek</pre></div></section>
+<footer><div class="panel" id="ostrzezenia"><h2>Weryfikacja</h2><p>Wszystkie 2 pozycji mają dosłowny cytat, sprawdzony automatycznie z transkrypcją. Usunięte z powodu braku cytatu: 0. Wnioski, czyli stwierdzenia niewynikające wprost z cytatu, oznaczono etykietą „wniosek” (5).</p><ul><li>Szkolenie handlowców (szkolenie-handlowcow): czeka na uruchomienie świeżych leadów i termin od Kasi (Z13). Mail nie podaje terminu, więc bez aktualizacji.</li><li>Opel i stara baza (decyzja-opel-stara-baza): mail ich nie dotyczy, zakazy Z4, Z9 i Z15 bez zmian.</li><li>Brak nowych zakazów, ryzyk, terminów ani fakty_czasowe w treści maila.</li></ul></div>
+Źródło: ops/maile/auto-tama/2026-10-14-plik-ze-swiezymi-leadami.md · dane: wynik.json</footer>
+</div>
+<script>
+document.getElementById('copy').addEventListener('click',function(){
+  var b=this,t=document.getElementById('mailtxt').innerText;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Skopiowano';},function(){
+    var r=document.createRange();r.selectNodeContents(document.getElementById('mailtxt'));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Zaznaczono — Ctrl+C';});
+  setTimeout(function(){b.textContent='Kopiuj';},2500);
+});
+</script></body></html>

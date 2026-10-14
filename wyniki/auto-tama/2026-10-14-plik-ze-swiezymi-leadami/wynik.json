@@ -1,0 +1,95 @@
+{
+  "zrodlo": "ops/maile/auto-tama/2026-10-14-plik-ze-swiezymi-leadami.md",
+  "wygenerowano": "2026-10-14",
+  "spotkanie": {
+    "tytul": "Plik ze świeżymi leadami",
+    "data": "2026-10-14",
+    "godziny": "12:15",
+    "uczestnicy": [
+      "Mateusz Rembecki"
+    ],
+    "wspominani": [
+      "Marek",
+      "Kasia"
+    ]
+  },
+  "pozycje": [
+    {
+      "id": "T1",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "rodzaj": "zmiana",
+      "tytul": "Przyjąć plik świeżych leadów i przygotować go do uruchomienia (bez startu kampanii)",
+      "opis": "Kasia przysłała plik leady-pazdziernik.csv ze świeżymi leadami z ostatniego miesiąca (strona i Facebook). Kolumny są nieczytelne, ale numer i salon są przy każdym wpisie. Do zrobienia: sprawdzić plik, zmapować kolumny, przygotować kampanię. Sam start kampanii zależy od K1.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "tak jak obiecywałam, w załączniku plik ze świeżymi leadami z",
+        "najładniejsze, ale numer i salon są przy każdym. Możecie puszczać."
+      ],
+      "wnioski": [
+        "Załącznik jest dowodem dostarczenia, bo treść maila wprost wskazuje, czego dotyczy.",
+        "Zawartości załącznika nie sprawdzono, analiza opiera się wyłącznie na treści maila.",
+        "Nadawca (adres z nagłówka) zgadza się z adresem Kasi Malinowskiej w karcie, choć nazwa wyświetlana w polu Od to inna osoba. Uprawnienia sprawdza kod na podstawie adresu."
+      ],
+      "klucz_sprawy": "swieze-leady",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Potwierdzenie od Kasi, czy „możecie puszczać” znosi blokadę nowych startów",
+      "opis": "Kasia pisze „Możecie puszczać”, ale w karcie obowiązują zakazy: w tym tygodniu nic nowego poza testem wstępu (Z18) i nic nowego w dniach 19–23.10 (Z5), nawet gdy plik leadów już będzie. Mail nie mówi wprost, że te zakazy są uchylone, więc zakazów nie uchylamy. Trzeba dopytać, czy start ma ruszyć teraz, czy po urlopie.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "Kasia wprost potwierdza start świeżych leadów mimo Z18 i Z5, albo wskazuje termin po urlopie",
+      "status": "czeka",
+      "cytat": [
+        "najładniejsze, ale numer i salon są przy każdym. Możecie puszczać."
+      ],
+      "wnioski": [
+        "Plik dotarł, więc warunek z Z14 (bez pliku nic nie rusza) jest spełniony. Z Z18 i Z5 tak nie jest.",
+        "Opel (Z4, Z15) i stara baza (Z9) są poza tym mailem i nie zmieniają się. Wyniki świeżych leadów mają dopiero dać podstawę do decyzji o Oplu, a rozmowa we trzech jest w czwartek."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "0",
+        "uwagi": "Nie przypominać o pliku (Z17). Pytanie o start zadać w odpowiedzi na ten mail, bez osobnych przypomnień."
+      },
+      "klucz_sprawy": "start-swiezych-leadow",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": {
+        "zakaz": "Z18",
+        "uzasadnienie": "Start kampanii na świeżych leadach to coś nowego, a Z18 mówi, że w tym tygodniu nic nowego nie startuje poza testem wstępu. Z5 blokuje też 19–23.10. „Możecie puszczać” nie uchyla tych zakazów wprost."
+      }
+    }
+  ],
+  "aktualizacje_spraw": [
+    {
+      "klucz_sprawy": "swieze-leady",
+      "nowy_status": "zrob_teraz",
+      "cytat": "tak jak obiecywałam, w załączniku plik ze świeżymi leadami z",
+      "uzasadnienie": "Kasia przysłała plik, na który czekaliśmy, a treść maila wskazuje, czego dotyczy załącznik (świeże leady z ostatniego miesiąca, strona i Facebook).",
+      "pewnosc": "wysoka"
+    }
+  ],
+  "zmiany_zdania": [],
+  "konflikty_dat": [],
+  "fakty_czasowe": [],
+  "okna_czasowe": [],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [],
+    "pominiete": [
+      "Szkolenie handlowców (szkolenie-handlowcow): czeka na uruchomienie świeżych leadów i termin od Kasi (Z13). Mail nie podaje terminu, więc bez aktualizacji.",
+      "Opel i stara baza (decyzja-opel-stara-baza): mail ich nie dotyczy, zakazy Z4, Z9 i Z15 bez zmian.",
+      "Brak nowych zakazów, ryzyk, terminów ani fakty_czasowe w treści maila."
+    ]
+  },
+  "szkic_maila": "Cześć Kasiu,\n\ndzięki za plik leady-pazdziernik.csv, mamy go. Przejrzymy kolumny i przygotujemy wszystko do uruchomienia.\n\nJedno pytanie, żebyśmy niczego nie puścili wbrew ustaleniom: ustaliliśmy, że w tym tygodniu nic nowego poza testem wstępu nie startuje, a od 19 do 23.10 masz urlop i też nic nowego nie odpalamy. Czy „możecie puszczać” znaczy, że mamy ruszyć świeże leady już teraz, czy wolisz poczekać do po urlopie? Opla i starej bazy nie ruszamy, o tym pogadamy w czwartek we trzech.\n\nPozdrawiam,\nMarek",
+  "ostrzezenia_dat": []
+}

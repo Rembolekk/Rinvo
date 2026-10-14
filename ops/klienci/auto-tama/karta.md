@@ -194,6 +194,7 @@ Marek potwierdza, że poza testem wstępu nic nowego nie startuje. Powiązane z 
 - [RIN-74](https://linear.app/rinvo-demo/issue/RIN-74/auto-tama-przygotowac-na-czwartek-cos-konkretnego-o-polaczeniu-rinvo-z) – Przygotować na czwartek coś konkretnego o połączeniu Rinvo z systemem klienta
 - [RIN-75](https://linear.app/rinvo-demo/issue/RIN-75/auto-tama-decyzja-o-puszczeniu-opla-na-starej-bazie-ustalamy-we-trzech) – Decyzja o puszczeniu Opla na starej bazie: ustalamy we trzech w czwartek
 - [RIN-76](https://linear.app/rinvo-demo/issue/RIN-76/auto-tama-eksport-listy-kontaktow-do-excela) – Eksport listy kontaktów do Excela
+- [RIN-77](https://linear.app/rinvo-demo/issue/RIN-77/auto-tama-potwierdzenie-od-kasi-czy-mozecie-puszczac-znosi-blokade) – Potwierdzenie od Kasi, czy „możecie puszczać” znosi blokadę nowych startów
 
 ## Ryzyka powtarzające się
 
