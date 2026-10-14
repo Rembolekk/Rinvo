@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=linkedin.example; spf=pass smtp.mailfrom=linkedin.example
 From: LinkedIn <updates@linkedin.example>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Masz 5 nowych =?utf-8?q?powiadomie=C5=84?=

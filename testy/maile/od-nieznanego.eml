@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=firma-xyz.example; spf=pass smtp.mailfrom=firma-xyz.example
 From: Jan Obcy <jan@firma-xyz.example>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Pilne: =?utf-8?q?w=C5=82=C4=85czcie?= Opla

@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=mail.instagram.example; spf=pass smtp.mailfrom=mail.instagram.example
 From: Instagram <no-reply@mail.instagram.example>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Nowy =?utf-8?q?obserwuj=C4=85cy?=

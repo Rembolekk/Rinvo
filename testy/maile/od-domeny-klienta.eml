@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=autotama.pl; spf=pass smtp.mailfrom=autotama.pl
 From: =?utf-8?q?Pawe=C5=82?= Nowak <pawel.nowak@autotama.pl>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Opel

@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=sklep.example; spf=pass smtp.mailfrom=sklep.example
 From: Sklep <oferty@sklep.example>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Promocja -30%

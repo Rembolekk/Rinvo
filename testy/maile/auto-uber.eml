@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=uber.example; spf=pass smtp.mailfrom=uber.example
 From: Uber <receipts@uber.example>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: =?utf-8?q?Tw=C3=B3j?= przejazd

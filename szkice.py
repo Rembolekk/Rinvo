@@ -175,6 +175,8 @@ PROMPT_REGULY = (
     "- Do maila NIE ma żadnych załączników poza ewentualnym zaproszeniem kalendarzowym. Nie pisz, że coś przesyłasz, wysyłasz, "
     "dołączasz ani załączasz (poza tym zaproszeniem); o rzeczach, które dopiero przyjdą, pisz w czasie przyszłym i z terminem z materiału "
     "(„ściągę wyślę przed urlopem”).\n"
+    "- Prośba klienta o coś, czego NIE oferujemy (funkcja, integracja, raport, których jeszcze nie ma): NIGDY obietnicy ani terminu. "
+    "Napisz tylko, że prośba jest zapisana („zapisane”), np. „zapisaliśmy tę prośbę”. Nie pisz „zrobimy”, „dodamy”, „będzie”.\n"
     "- Zaproszenie kalendarzowe dostaje tylko adresat maila: nie pisz, że dostaną je inne osoby.\n"
     "- Zwracaj się do adresata imieniem w wołaczu („Dzień dobry, Kasiu”).\n")
 

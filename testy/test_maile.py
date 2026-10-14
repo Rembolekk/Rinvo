@@ -254,9 +254,14 @@ class TestRejestrPoSukcesie(unittest.TestCase):
 
     def test_przetworz_py_oznacza_mail_po_sukcesie_a_nie_przed_analiza(self):
         kod = (Path(maile.__file__).parent / "przetworz.py").read_text(encoding="utf-8")
-        self.assertEqual(kod.count("oznacz_przetworzony("), 1)
-        self.assertGreater(kod.index("oznacz_przetworzony("), kod.index("save_registry(registry)"),
-                           "oznaczenie dopiero po udanym zakończeniu (razem z rejestrem transkrypcji)")
+        # ZMIANA ŚWIADOMA (utwardzanie, pkt 17): dwa miejsca. Główne po analizie i drugie w ścieżce krótkiego potwierdzenia
+        # klienta („dzięki”), która kończy się bez analizy. W obu oznaczenie dopiero PO zapisie rejestru transkrypcji.
+        self.assertEqual(kod.count("oznacz_przetworzony("), 2)
+        poz = [i for i in range(len(kod)) if kod.startswith("oznacz_przetworzony(", i)]
+        zapisy = [i for i in range(len(kod)) if kod.startswith("save_registry(registry)", i)]
+        for i in poz:
+            self.assertTrue(any(z < i for z in zapisy), "oznaczenie dopiero po udanym zakończeniu (razem z rejestrem transkrypcji)")
+            self.assertLess(max(z for z in zapisy if z < i), i)
 
 
 class TestMaileAutomatyczne(unittest.TestCase):

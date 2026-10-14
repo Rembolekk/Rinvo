@@ -412,6 +412,15 @@ def main():
               f"({entry.get('przetworzone', '?')}).")
         sys.exit(0)
 
+    # b2) ta sama rozmowa przetranskrybowana ponownie (inny tekst, ta sama data, godzina i uczestnicy): bez analizy
+    import utwardz
+    wejscie = utwardz.przed_analiza(Path(transkrypcja).read_text(encoding="utf-8"), h, registry, args.wymus)
+    if wejscie["akcja"] == "duplikat":
+        pytanie = utwardz.pytanie_o_duplikat(transkrypcja, wejscie["wpis"])
+        print("Pominięto: " + pytanie.replace("*", "").replace("`", ""))
+        send_slack(pytanie)
+        sys.exit(0)
+
     # c) lock
     if not acquire_lock():
         print("BŁĄD: inny przebieg przetworz.py już trwa (ops/.przetworz.lock). "
@@ -447,6 +456,25 @@ def main():
     try:
         print(f"Przetwarzam: {transkrypcja}  (klient: {klient})")
         print(f"Log: {log_path}")
+
+        if czy_mail(transkrypcja):
+            meta_potw = wczytaj_meta_maila(transkrypcja)
+            if meta_potw.get("odpowiedz_na"):
+                import linear_sync
+                import zasady
+                from agent_srodowisko import LinearAgent
+                potw = utwardz.obsluz_potwierdzenie(meta_potw, LinearAgent(linear_sync.load_api_key(), zasady.wczytaj_zasady()))
+                if potw is not None:
+                    wiad = (":white_check_mark: *[{}]* klient potwierdził mailem „{}”: ".format(klient, " ".join(meta_potw["tresc"].split())[:60])
+                            + (f"zamknięto {', '.join(potw['zamkniete'])}" if potw["zamkniete"] else "zgłoszenia były już zamknięte")
+                            + ". Bez analizy i bez nowych zgłoszeń.")
+                    print(wiad.replace("*", ""))
+                    send_slack(wiad, log_path=log_path)
+                    registry[h] = {"klient": klient, "transkrypcja": transkrypcja,
+                                   "przetworzone": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "odcisk": None}
+                    save_registry(registry)
+                    oznacz_przetworzony(transkrypcja)
+                    return
 
         model = "istniejący wynik.json (bez analizy modelu)"
         if args.bez_analizy:
@@ -527,9 +555,23 @@ def main():
                 cause = tail_log(log_path, 1)[:200]
                 fail("claude", f"Kod wyjścia: {r.returncode}. Przyczyna: {cause}. Log: {log_path}")
 
-        # e) render.py
+        # e0) utwardzanie: znaczniki (niepełna transkrypcja, pomyłka mówcy, inny klient…), maskowanie danych osobowych,
+        # karta nowego klienta, rozmowa wewnętrzna. Przed render.py, żeby raport pokazał znaczniki i porównał cytaty po maskowaniu.
         if not wynik_path.exists():
             fail("render", f"Brak wynik.json po analizie: {wynik_path}")
+        import linear_sync
+
+        def zapisz_nowa_karte(kl, karta_):
+            linear_sync.save_karta(kl, karta_)
+            linear_sync.write_karta_md(kl, karta_)
+
+        utw = utwardz.po_analizie(wynik_path, transkrypcja, klient,
+                                  meta_maila=wczytaj_meta_maila(transkrypcja) if czy_mail(transkrypcja) else None,
+                                  zapisz_karte=zapisz_nowa_karte)
+        for linia in utw["slack"]:
+            print("  " + linia.replace("*", "").replace("`", ""))
+            send_slack(linia, log_path=log_path)
+        _log(log_path, f"\nUtwardzanie: {json.dumps(utw['kontrola'], ensure_ascii=False)}\n")
 
         print("  render.py…")
         r = run_step(
@@ -603,6 +645,7 @@ def main():
             "klient": klient,
             "transkrypcja": transkrypcja,
             "przetworzone": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "odcisk": wejscie["odcisk"],
         }
         save_registry(registry)
         # mail: Message-ID trafia do ops/.maile.json (przetworzone) dopiero po udanym przetworzeniu

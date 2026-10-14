@@ -138,6 +138,12 @@ def _powody_czlowieka(item, zasady, karta, sekcja, wielu):
     return powody
 
 
+def powody_flag(item, zasady):
+    """Powody wynikające ze znaczników kontroli pozycji (niepełna transkrypcja, pomyłka mówcy, inny klient…)."""
+    mapa = zasady.get("flagi_powody", {})
+    return [{"regula": f"flaga_{f}", "powod": mapa[f]} for f in item.get("flagi", []) if f in mapa]
+
+
 def przypisz(item, zasady, karta=None, wielu_klientow=False, sekcja=None):
     """Komu trafia pozycja. sekcja: nadpisuje item["sekcja"] (np. 1 przy ocenie „po wznowieniu”)."""
     sekcja = sekcja if sekcja is not None else item.get("sekcja")
@@ -164,8 +170,11 @@ def przypisz(item, zasady, karta=None, wielu_klientow=False, sekcja=None):
     if nadpisanie == "agent":
         powody = []
 
+    flagowe = powody_flag(item, zasady)
     if powody:
-        return {"komu": "czlowiek", "powody": powody, "wymaga_szkicu": wymaga_szkicu}
+        return {"komu": "czlowiek", "powody": powody + flagowe, "wymaga_szkicu": wymaga_szkicu}
+    if flagowe:                                  # znaczniki kontroli (higiena.py): nigdy Dla agenta, tylko Do weryfikacji
+        return {"komu": "weryfikacja", "powody": flagowe, "wymaga_szkicu": False}
     if zasady["agent"].get("wymagaj_kryteriow", True) and not kryteria_ok(item):
         return {"komu": "weryfikacja",
                 "powody": [{"regula": "brak_kryteriow", "powod": zasady["agent"]["powod_braku_kryteriow"]}],
@@ -177,7 +186,7 @@ def etykiety_pozycji(item, zasady, karta=None, wielu=False):
     """Pełna lista etykiet pozycji (sekcje 1, 2, 3, 5), taka sama w Linearze i w testach."""
     E = zasady["etykiety"]
     sekcja = item.get("sekcja")
-    niska = item.get("pewnosc") == "niska"
+    niska = item.get("pewnosc") == "niska" or bool(powody_flag(item, zasady))
     labels = []
     if sekcja == 1 or sekcja == 3:
         labels.append(TYP_DO_ETYKIETY.get(item.get("typ", ""), "Zadanie") if sekcja == 1 else E["produkt"])

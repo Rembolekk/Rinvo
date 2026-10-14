@@ -47,6 +47,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 
 from sekrety import czysc, wyczysc_srodowisko
+import higiena
 
 IMAP_HOST = "imap.gmail.com"
 REJESTR_PATH = Path("ops/.maile.json")
@@ -65,7 +66,8 @@ STATUS_NOWY = "nowy, bez prawa decyzji"
 MAX_PROB = 3   # tyle razy próbujemy przetworzyć mail, potem „porzucony”
 
 # nagłówki pobierane dla każdego maila (tylko nagłówki: treść dopiero od znanych nadawców)
-NAGLOWKI_IMAP = "FROM MESSAGE-ID DATE SUBJECT LIST-UNSUBSCRIBE AUTO-SUBMITTED PRECEDENCE"
+NAGLOWKI_IMAP = ("FROM MESSAGE-ID DATE SUBJECT LIST-UNSUBSCRIBE AUTO-SUBMITTED PRECEDENCE X-AUTOREPLY X-AUTORESPOND "
+                 "AUTHENTICATION-RESULTS IN-REPLY-TO REFERENCES")
 
 _ADRES_AUTOMATU = re.compile(
     r"(no[-_.]?reply|do[-_.]?not[-_.]?reply|^notifications?([-_+.]|$)|^notify([-_+.]|$)|"
@@ -188,12 +190,15 @@ _ZAMKNIECIE = re.compile(
     r"Dziękuję i pozdrawiam|Best regards|Kind regards|Regards|Thanks|Thank you)\b[\s,.!]*", re.I)
 
 
-def czysc_tresc(tekst):
-    """Usuwa cytowane wcześniejsze wiadomości i stopkę; zostawia to, co klient napisał nowego."""
+def czysc_tresc(tekst, zachowaj_przekazane=False):
+    """Usuwa cytowane wcześniejsze wiadomości i stopkę; zostawia to, co klient napisał nowego.
+    zachowaj_przekazane: wiadomość przekazana (Fwd) – przekazana treść jest właśnie informacją, więc jej nie ucinamy."""
     linie = tekst.replace("\r\n", "\n").replace("\r", "\n").split("\n")
+    if zachowaj_przekazane:
+        linie = [l.lstrip().lstrip(">").lstrip() if l.lstrip().startswith(">") else l for l in linie]
 
     # 1) pierwszy nagłówek cytatu ucina resztę (Gmail zawija go na dwie linie, więc sprawdzamy też parę)
-    for i, linia in enumerate(linie):
+    for i, linia in enumerate([] if zachowaj_przekazane else linie):
         nastepna = linie[i + 1].strip() if i + 1 < len(linie) else ""
         para = (linia.strip() + " " + nastepna).strip()
         zdanie_cytatu = any(w.match(linia.strip()) or w.match(para) for w in _NAGLOWKI_CYTATU[:2])
@@ -206,7 +211,8 @@ def czysc_tresc(tekst):
             break
 
     # 2) linie cytowane znakiem ">"
-    linie = [l for l in linie if not l.lstrip().startswith(">")]
+    if not zachowaj_przekazane:
+        linie = [l for l in linie if not l.lstrip().startswith(">")]
 
     # 3) separator stopki "-- " i stopki mobilne
     for i, linia in enumerate(linie):
@@ -279,11 +285,20 @@ def parsuj_wiadomosc(raw):
     if data is None:
         data = datetime.now().astimezone()
 
-    zalaczniki = []
+    zalaczniki, zablokowane = [], []
     for czesc in msg.iter_attachments():
         nazwa = czesc.get_filename()
         if nazwa:
-            zalaczniki.append(_jedna_linia(nazwa))
+            nazwa = _jedna_linia(nazwa)
+            try:
+                rozmiar = len(czesc.get_payload(decode=True) or b"")        # tylko rozmiar: załącznika nie otwieramy
+            except Exception:  # noqa: BLE001
+                rozmiar = 0
+            klasa = higiena.klasa_zalacznika(nazwa, rozmiar)
+            if klasa == "ok":
+                zalaczniki.append(nazwa)
+            else:
+                zablokowane.append((nazwa, klasa))
 
     cialo = msg.get_body(preferencelist=("plain", "html"))
     tekst = ""
@@ -292,15 +307,25 @@ def parsuj_wiadomosc(raw):
         if cialo.get_content_type() == "text/html":
             tekst = html_do_tekstu(tekst)
 
+    temat = _jedna_linia(msg.get("Subject", "")) or "(bez tematu)"
+    przek = higiena.przekazany(temat, tekst)
+    adres_n = normalizuj_adres(adres)
     return {
         "message_id": _jedna_linia(msg.get("Message-ID", "")),
         "od_imie": _jedna_linia(imie),
-        "od_adres": normalizuj_adres(adres),
+        "od_adres": adres_n,
         "do": _jedna_linia(msg.get("To", "")),
         "data": data,
-        "temat": _jedna_linia(msg.get("Subject", "")) or "(bez tematu)",
+        "temat": temat,
         "zalaczniki": zalaczniki,
-        "tresc": czysc_tresc(tekst),
+        "zalaczniki_zablokowane": zablokowane,
+        "tresc": czysc_tresc(tekst, zachowaj_przekazane=przek),
+        "przekazany": przek,
+        # nagłówek Authentication-Results: potwierdza DKIM/SPF dla domeny NADAWCY (From), nie kogoś w kopii
+        "uwierzytelnienie": "tak" if higiena.uwierzytelnienie(str(msg.get("Authentication-Results", "")), domena_adresu(adres_n)) else "nie",
+        "in_reply_to": _jedna_linia(msg.get("In-Reply-To", "")),
+        "references": _jedna_linia(msg.get("References", "")),
+        "naglowki_auto": {k: str(msg.get(k, "")) for k in ("Auto-Submitted", "X-Autoreply", "X-Autorespond", "Precedence")},
     }
 
 
@@ -327,6 +352,17 @@ def zapisz_mail_md(klient, meta, katalog=MAILE_DIR):
         n += 1
     od = f"{meta['od_imie']} <{meta['od_adres']}>" if meta["od_imie"] else meta["od_adres"]
     zal = ", ".join(meta["zalaczniki"]) if meta["zalaczniki"] else "brak"
+    dodatkowe = ""
+    if meta.get("zalaczniki_zablokowane"):
+        dodatkowe += ("- **Załączniki zablokowane:** " + ", ".join(f"{n} ({p})" for n, p in meta["zalaczniki_zablokowane"])
+                      + " (nie otwierano; to NIE jest dowód dostarczenia pliku)\n")
+    if meta.get("uwierzytelnienie") == "nie":
+        dodatkowe += "- **Uwierzytelnienie:** niepotwierdzone (brak DKIM/SPF pass dla domeny nadawcy)\n"
+    if meta.get("przekazany"):
+        dodatkowe += "- **Przekazany:** tak (treść przekazana to informacja, nie decyzja)\n"
+    if meta.get("odpowiedz_na"):
+        o = meta["odpowiedz_na"]
+        dodatkowe += f"- **Odpowiedź na nasz mail:** {o['temat']} (zgłoszenia: {', '.join(o['zgloszenia'])})\n"
     tresc = meta["tresc"] or "(pusta treść)"
     mid_linia = f"- **Message-ID:** {meta['message_id']}\n" if meta.get("message_id") else ""
     sciezka.write_text(
@@ -336,6 +372,7 @@ def zapisz_mail_md(klient, meta, katalog=MAILE_DIR):
         f"- **Data:** {meta['data'].strftime('%Y-%m-%d %H:%M')}\n"
         f"- **Temat:** {meta['temat']}\n"
         f"- **Załączniki:** {zal}\n"
+        f"{dodatkowe}"
         f"{mid_linia}\n"
         f"## Treść\n\n{tresc}\n",
         encoding="utf-8")
@@ -366,6 +403,15 @@ def wczytaj_meta_maila(sciezka):
     m = re.search(r"^- \*\*Message-ID:\*\* (.+)$", tekst, re.M)
     if m:
         meta["message_id"] = m.group(1).strip()
+    meta["uwierzytelnienie"] = "nie" if re.search(r"^- \*\*Uwierzytelnienie:\*\* niepotwierdzone", tekst, re.M) else "tak"
+    meta["przekazany"] = bool(re.search(r"^- \*\*Przekazany:\*\* tak", tekst, re.M))
+    m = re.search(r"^- \*\*Załączniki zablokowane:\*\* (.+?) \(nie otwierano", tekst, re.M)
+    meta["zalaczniki_zablokowane"] = [x.strip() for x in m.group(1).split("), ")] if m else []
+    m = re.search(r"^- \*\*Odpowiedź na nasz mail:\*\* (.+) \(zgłoszenia: ([^)]*)\)$", tekst, re.M)
+    if m:
+        meta["odpowiedz_na"] = {"temat": m.group(1).strip(), "zgloszenia": [x.strip() for x in m.group(2).split(",") if x.strip()]}
+    m = re.search(r"## Treść\n\n(.*)\Z", tekst, re.S)
+    meta["tresc"] = m.group(1).strip() if m else ""
     return meta
 
 
@@ -419,8 +465,25 @@ def analizuj_naglowki(surowe_naglowki):
         data = parsedate_to_datetime(str(msg.get("Date", ""))).date().isoformat()
     except (TypeError, ValueError):
         data = None
+    auto = {k: str(msg.get(k, "")) for k in ("Auto-Submitted", "X-Autoreply", "X-Autorespond", "Precedence")}
     return {"imie": _jedna_linia(imie), "adres": normalizuj_adres(adres), "mid": mid, "data": data,
-            "automatyczny": czy_automatyczny(msg, adres)}
+            "automatyczny": czy_automatyczny(msg, adres),
+            # autoodpowiedź (nie newsletter): od znanego kontaktu nie analizujemy treści, ale daty nieobecności zapisujemy w karcie
+            "autoodpowiedz": msg.get("List-Unsubscribe") is None and higiena.autoodpowiedz(auto, str(msg.get("Subject", "")))}
+
+
+def _zapisz_nieobecnosc(meta, klient, adres, mid, karty, rejestr, wynik):
+    """Autoodpowiedź znanego kontaktu: z dat w treści (daty.py) dopisuje nieobecność w karcie. Mail nie jest analizowany."""
+    okres = higiena.nieobecnosc_z_autoodpowiedzi(meta["tresc"], meta["data"].date())
+    if okres and higiena.dopisz_nieobecnosc(karty[klient], adres, okres, mid):
+        wynik["zmienione_karty"].add(klient)
+        wynik["nieobecnosci"].append((klient, adres, okres["od"].isoformat(), okres["do"].isoformat()))
+    rejestr["przetworzone"][mid] = {"klient": klient, "plik": "", "data": meta["data"].date().isoformat(), "autoodpowiedz": True}
+    wynik["autoodpowiedzi"] += 1
+
+
+def _obsluz_autoodpowiedz(raw, klient, adres, mid, karty, rejestr, wynik):
+    _zapisz_nieobecnosc(parsuj_wiadomosc(raw), klient, adres, mid, karty, rejestr, wynik)
 
 
 def przetworz_skrzynke(skrzynka, karty, rejestr, slack, dzis, katalog_maili=MAILE_DIR):
@@ -432,7 +495,8 @@ def przetworz_skrzynke(skrzynka, karty, rejestr, slack, dzis, katalog_maili=MAIL
     do "przetworzone" przenosi go dopiero przetworz.py po sukcesie. Slack: osobny alert tylko dla nadawcy
     z domeny klienta, a nieznanych nadawców podsumowuje jedna linijka na przebieg (bez adresów).
     """
-    wynik = {"nowe": [], "nieznani": 0, "automatyczne": 0, "nowe_kontakty": [], "zmienione_karty": set()}
+    wynik = {"nowe": [], "nieznani": 0, "automatyczne": 0, "nowe_kontakty": [], "zmienione_karty": set(),
+             "autoodpowiedzi": 0, "nieobecnosci": []}
     rejestr.setdefault("wlaczono", dzis)   # pierwszy przebieg: od dziś, bez historii skrzynki
     for uid in skrzynka.uids():
         nag = analizuj_naglowki(skrzynka.naglowki(uid))
@@ -441,11 +505,14 @@ def przetworz_skrzynke(skrzynka, karty, rejestr, slack, dzis, katalog_maili=MAIL
             continue
         if nag["data"] and nag["data"] < rejestr["wlaczono"]:
             continue                      # sprzed włączenia automatu
+        kl = klasyfikuj_nadawce(adres, karty)
         if nag["automatyczny"]:
-            wynik["automatyczne"] += 1    # po cichu: bez Slacka, bez rejestru, bez pobierania treści
+            if nag["autoodpowiedz"] and kl["typ"] == "kontakt":
+                _obsluz_autoodpowiedz(skrzynka.tresc(uid), kl["klient"], adres, mid, karty, rejestr, wynik)
+            else:
+                wynik["automatyczne"] += 1    # po cichu: bez Slacka, bez rejestru, bez pobierania treści
             continue
 
-        kl = klasyfikuj_nadawce(adres, karty)
         if kl["typ"] == "nieznany":
             wpis = rejestr["nieznani"].setdefault(_hash(adres), {"liczba": 0, "ids": []})
             if _hash(mid) in wpis["ids"]:
@@ -459,6 +526,21 @@ def przetworz_skrzynke(skrzynka, karty, rejestr, slack, dzis, katalog_maili=MAIL
         meta = parsuj_wiadomosc(skrzynka.tresc(uid))
         meta["message_id"] = mid          # ten sam identyfikator co w nagłówku, także przy braku Message-ID
         klient = kl["klient"]
+        # autoodpowiedź bez nagłówków (krótkie „jestem na urlopie…”): bez analizy treści, tylko nieobecność w karcie
+        krotki = len(meta["tresc"].split()) <= 60
+        if kl["typ"] == "kontakt" and (higiena.autoodpowiedz(meta["naglowki_auto"], meta["temat"], "")
+                                       or (krotki and higiena.autoodpowiedz({}, "", meta["tresc"]))):
+            _zapisz_nieobecnosc(meta, klient, adres, mid, karty, rejestr, wynik)
+            continue
+        wyslany = higiena.znajdz_wyslany(meta["in_reply_to"], meta["references"], karty)
+        if wyslany:                       # odpowiedź na nasz wysłany mail: przypisanie do zgłoszeń z historii wysyłek
+            meta["odpowiedz_na"] = {"temat": wyslany[1].get("temat", ""), "zgloszenia": list(wyslany[1].get("zgloszenia", []))}
+        if meta["uwierzytelnienie"] == "nie":
+            slack(f"mail od {adres} ({klient}) nie ma potwierdzonego DKIM/SPF dla domeny nadawcy. Zapisany, ale nic nie wznawia "
+                  f"ani nie uchyla; jego pozycje trafią do „Do weryfikacji”.")
+        if meta["zalaczniki_zablokowane"]:
+            slack("mail od {} ({}) ma zablokowane załączniki: {}. Nie były otwierane ani używane jako dowód dostarczenia.".format(
+                adres, klient, ", ".join(f"{n} ({p})" for n, p in meta["zalaczniki_zablokowane"])))
         if kl["typ"] == "domena":
             dodaj_kontakt_z_domeny(karty[klient], meta["od_adres"] or adres,
                                    meta["od_imie"] or nag["imie"], dzis)

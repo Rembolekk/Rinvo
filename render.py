@@ -12,6 +12,9 @@ Schemat JSON opisuje komenda ~/.claude/commands/analizuj.md.
 """
 import argparse, html, json, os, re, sys
 
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import higiena
+
 STATUS = {"zrob_teraz": "zrób teraz", "czeka": "czeka", "backlog": "backlog", "nigdy": "nigdy"}
 SECTIONS = [
     (1, "Do zrobienia teraz", "Zadania po stronie naszego zespołu, z właścicielem."),
@@ -50,20 +53,24 @@ def validate(d):
 
 
 def verify_quotes(d, transcript):
+    """Cytaty porównujemy po zamaskowaniu danych osobowych (telefony, PESEL, e-maile, nazwiska klientów końcowych):
+    wynik.json jest zamaskowany, więc transkrypcja i cytat przechodzą przez to samo maskowanie."""
+    transcript, nazwiska, _ = higiena.maskuj_zrodlo(transcript)
     tr = norm(transcript.replace("**", ""))
+    maskuj_q = lambda q: higiena.maskuj(q, (), nazwiska)[0]          # noqa: E731
     missing = []
     for p in d["pozycje"]:
         for q in p["cytat"]:
-            if norm(q) not in tr:
+            if norm(maskuj_q(q)) not in tr:
                 missing.append(f"{p['id']}: {q}")
     for z in d.get("zmiany_zdania", []):
-        if z.get("cytat") and norm(z["cytat"]) not in tr:
+        if z.get("cytat") and norm(maskuj_q(z["cytat"])) not in tr:
             missing.append(f"zmiana '{z.get('temat')}': {z['cytat']}")
     for a in d.get("aktualizacje_spraw", []):
-        if a.get("cytat") and norm(a["cytat"]) not in tr:
+        if a.get("cytat") and norm(maskuj_q(a["cytat"])) not in tr:
             missing.append(f"aktualizacja '{a.get('klucz_sprawy')}': {a['cytat']}")
     for f in d.get("fakty_czasowe", []):
-        if f.get("cytat") and norm(f["cytat"]) not in tr:
+        if f.get("cytat") and norm(maskuj_q(f["cytat"])) not in tr:
             missing.append(f"fakty_czasowe ({f.get('typ','?')}, {f.get('dotyczy','?')}): {f['cytat']}")
     return missing
 
@@ -86,6 +93,8 @@ def card(p):
     tags = f'<span class="tag st-{e(p["status"])}">{e(STATUS[p["status"]])}</span><span class="tag">{e(p["typ"])}</span>'
     if p.get("rodzaj"):
         tags += f'<span class="tag kind">{e(p["rodzaj"])}</span>'
+    for opis_z in higiena.opis_znacznikow(p):
+        tags += f'<span class="tag" style="background:var(--waitbg);color:var(--wait);border-color:transparent">{e(opis_z)}</span>'
     ch = f'<p class="change">Zmiana zdania: {e(p["zmiana_zdania"])}</p>' if p.get("zmiana_zdania") else ""
     opis = f'<p class="desc">{e(p["opis"])}</p>' if p.get("opis") else ""
     quotes = "".join(f"<blockquote>„{e(q)}”</blockquote>" for q in p["cytat"])
@@ -177,6 +186,29 @@ def render(d, verified):
     else:
         ostrzez_html = ""
 
+    k = d.get("kontrola") or {}
+    kl = []
+    if k.get("niepelna"):
+        kl.append("Niepełna transkrypcja (" + "; ".join(k["niepelna"]) + "): pozycje nie trafiają do agenta.")
+    if k.get("wewnetrzna"):
+        kl.append("Rozmowa wewnętrzna: karta klienta nie jest aktualizowana.")
+    if k.get("starsze"):
+        kl.append("Źródło starsze niż stan karty: aktualizacje spraw i zmiany decyzji nie nadpisują nowszych.")
+    if k.get("nowy_klient"):
+        kl.append("Nowy klient: karta założona z rozmowy, kontakty niepotwierdzone, nic dla agenta ani do wysyłki.")
+    if k.get("inny_klient"):
+        kl.append("Pozycje innego klienta wstrzymane (Do weryfikacji): " + ", ".join(k["inny_klient"]) + ".")
+    if k.get("polecenia"):
+        kl.append(f"W treści wykryto polecenia dla systemu ({len(k['polecenia'])}): zignorowane.")
+    for f in k.get("mail", []):
+        kl.append(higiena.FLAGI_OPISY.get(f, f).capitalize() + ".")
+    mk = k.get("maskowanie")
+    if mk is not None:
+        szcz = ", ".join(f"{n}: {c}" for n, c in sorted((mk.get("rodzaje") or {}).items()))
+        kl.append(f"Maskowanie danych osobowych: zamaskowano {mk.get('liczba', 0)}" + (f" ({szcz})" if szcz else "") + ".")
+    kontrola_html = (f'<div class="panel" id="kontrola"><h2>Kontrola przetwarzania</h2><ul>{"".join(f"<li>{e(x)}</li>" for x in kl)}</ul></div>'
+                     if kl else "")
+
     title = m.get("tytul", "Analiza rozmowy z klientem")
     meta_bits = [b for b in [
         f'Spotkanie {m.get("data", "")}{", " + m["godziny"] if m.get("godziny") else ""}' if m.get("data") else "",
@@ -244,6 +276,7 @@ footer{{margin-top:40px;color:var(--mut);font-size:.85rem}}
 <h1>{e(title)}</h1>
 <p class="meta">{e(" · ".join(meta_bits))}</p>
 <div class="tiles">{tiles}</div>
+{kontrola_html}
 <div class="panel" id="zmiany"><h2>Zmiany zdania wykryte w rozmowie</h2><ol>{changes}</ol></div>
 <div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol>{conf}</ol>{okna_html}</div>
 <div class="panel" id="aktualizacje"><h2>Zmiany w otwartych sprawach</h2><ul>{aktual_html}</ul></div>

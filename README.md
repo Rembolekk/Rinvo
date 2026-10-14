@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_utwardzanie.py` | 17 przypadków brzegowych rozmów i maili (duplikat, starsza rozmowa, niepełna, pomyłka mówcy, maskowanie, polecenia, uwierzytelnienie, autoodpowiedzi, załączniki, Fwd, odpowiedzi): 88 testów |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -376,6 +377,32 @@ Agent działa na tokenach właściciela (Linear, GitHub), więc jego wpisy wygl�
 ## Notatka przed spotkaniem
 
 Notatka przed spotkaniem to materiał WEWNĘTRZNY (dla Marka), nigdy mail do klienta: zadanie „Notatka przed spotkaniem…” nie dostaje szkicu ani wysyłki. `notatka_spotkania.py` (krok w workflow „Codzienne podsumowanie”, po porannym podsumowaniu) znajduje spotkania z karty klienta, które są dziś albo jutro (dzień przed), i tworzy `ops/materialy/<klient>/notatka-<data spotkania>.md` oraz `.pdf`: maksymalnie jedna strona, 3 ryzyka (każde z naszym argumentem z faktów z rozmów i kart oraz rekomendowanym stanowiskiem), 3–5 pytań do klienta i najwyżej 5 tematów ważnych dla tego spotkania. **Statusy bierze z Lineara w chwili pisania**, nie z opisu zgłoszenia (In Progress to „w toku”, nie „zrobione”). Kod odrzuca notatkę z obietnicą ceny, terminu albo integracji, z kwotą spoza faktów, z wzmianką o integracji bez uczciwego „nie mamy”, z miejscem do uzupełnienia albo z innym klientem, i prosi model o poprawę (do 3 prób; za długą najpierw zmniejsza czcionkę, potem skraca). Link do PDF trafia do komentarza zadania notatki i na Slacka („Notatka przed spotkaniem gotowa: <link>”). Idempotentne: istniejącej notatki nie nadpisuje bez `--odswiez` (odświeżenie nie powtarza powiadomień). Ręcznie: `python3 notatka_spotkania.py --dzien 2026-10-14 --klient auto-tama`; podgląd: `--sucho`. Testy: `python3 testy/test_notatka_spotkania.py`.
+
+## Przypadki brzegowe (utwardzanie)
+
+Kod, a nie model, pilnuje 17 sytuacji na styku rozmów i maili (`higiena.py`, `utwardz.py`, `maile.py`, `zasady.py`, `linear_sync.py`, `render.py`). Znaczniki trafiają do `wynik.json` (pola `flagi` pozycji i `kontrola` wyniku), a pozycja z jakimkolwiek znacznikiem trafia do „Do weryfikacji”, nigdy do „Dla agenta”. Testy: `python3 testy/test_utwardzanie.py` (88 testów, bez sieci i modelu; nazwy testów zaczynają się od numeru punktu).
+
+| Sytuacja | Co robi system | Plik | Test |
+|---|---|---|---|
+| 1. Ta sama rozmowa przetranskrybowana ponownie (inny tekst, ta sama data, godzina i uczestnicy) | bez analizy, Slack z pytaniem; `--wymus` omija | `higiena.py` (odcisk), `utwardz.przed_analiza`, `przetworz.py` | `test_t01_*` |
+| 2. Starsza rozmowa wrzucona po nowszej | jej aktualizacje spraw i zmiany decyzji nie nadpisują nowszych; nowe pozycje dodane z oznaczeniem „źródło starsze niż stan karty” | `higiena.zrodlo_starsze`, `linear_sync.main` | `test_t02_*` |
+| 3. Rozmowa urwana albo pusta (bardzo krótka, bez wypowiedzi klienta, urwana w pół zdania) | „niepełna transkrypcja”; pozycje bez „Dla agenta” | `higiena.ocena_kompletnosci`, `zasady.przypisz` | `test_t03_*` |
+| 4. Pomyleni mówcy (decyzja zastrzeżona u osoby bez prawa, treść wskazuje inną) | „Do weryfikacji”, powód „możliwa pomyłka mówcy” | `higiena.pomylka_mowcy` | `test_t04_*` |
+| 5. Liczby, adresy, godziny, kwoty w zmianach do klienta lub do konfiguracji | znacznik „sprawdź z nagraniem” w opisie i raporcie | `higiena.wartosci_do_sprawdzenia`, `linear_sync.build_description` | `test_t05_*` |
+| 6. Rozmowa bez nikogo od klienta | „rozmowa wewnętrzna”; karta i Linear klienta bez zmian | `higiena.rozmowa_wewnetrzna`, `linear_sync.main` | `test_t06_*` |
+| 7. Nowy klient bez karty | karta z rozmowy (kontakty niepotwierdzone, decydenci jako wniosek), Slack „nowy klient, potwierdź kartę”; nic dla agenta ani do wysyłki | `higiena.karta_nowego_klienta`, `utwardz.po_analizie` | `test_t07_*` |
+| 8. Dwóch klientów w jednej rozmowie | pozycje innego klienta nie trafiają do karty ani Lineara tego klienta; jedno zgłoszenie „Do weryfikacji” z listą | `higiena.inny_klient`, `linear_sync.zglosz_cudze_pozycje` | `test_t08_*` |
+| 9. Niepewność („chyba”, „może”, „zobaczymy”) i żart albo sarkazm | to nie zobowiązanie ani decyzja: pewność niska | `higiena.niepewnosc`, `ops/zasady.json` → `kontrola` | `test_t09_*` |
+| 10. Prośba o coś, czego nie oferujemy | w szkicach nigdy obietnica ani termin, tylko „zapisane”; filtr wysyłki blokuje obietnice | `szkice.PROMPT_REGULY`, `wyslij.filtr_tresci` | `test_t10_*` |
+| 11. Dane osobowe (telefony, PESEL, e-maile spoza kontaktów, nazwiska klientów końcowych) | maskowanie przed zapisem wyników, kart, opisów i stron; cytaty porównywane po zamaskowaniu; raport podaje liczbę | `higiena.maskuj*`, `utwardz.po_analizie`, `render.py` | `test_t11_*` |
+| 12. Polecenia dla systemu w treści rozmowy lub maila | dane, nie polecenia: bez efektu na kartę i zakazy, ostrzeżenie na Slacku, pozycja do weryfikacji | `higiena.polecenia_w_tresci`, instrukcje `analizuj*.md` | `test_t12_*` |
+| 13. Mail bez DKIM/SPF pass dla domeny nadawcy | nic nie wznawia ani nie uchyla; „Do weryfikacji”, Slack | `higiena.uwierzytelnienie`, `maile.py`, `linear_sync.ustal_zrodlo` | `test_t13_*` |
+| 14. Autoodpowiedź (Auto-Submitted, „out of office”, „jestem na urlopie”) | bez analizy treści; daty (daty.py) dopisują nieobecność kontaktu w karcie | `higiena.autoodpowiedz`, `maile.przetworz_skrzynke` | `test_t14_*` |
+| 15. Załączniki wykonywalne, archiwa i powyżej 10 MB | nie otwierane, nie są dowodem dostarczenia; Slack | `higiena.klasa_zalacznika`, `maile.parsuj_wiadomosc` | `test_t15_*` |
+| 16. Mail przekazany (Fwd) | przekazana treść to informacja, nie decyzja; klient w kopii nie jest nadawcą | `higiena.przekazany`, `maile.czysc_tresc` | `test_t16_*` |
+| 17. Odpowiedź klienta na nasz wysłany mail (In-Reply-To z historii wysyłek) | przypisanie do właściwych zgłoszeń; krótkie potwierdzenie („dzięki”, „będę”) zamyka je bez nowego zgłoszenia | `higiena.znajdz_wyslany`, `utwardz.obsluz_potwierdzenie` | `test_t17_*` |
+
+Nazwy testów w tabeli: `test_t01_…` … `test_t17_…` (np. `test_t01_inny_tekst_ta_sama_data_godzina_uczestnicy_to_duplikat`).
 
 ## Testy automatyczne
 

@@ -451,6 +451,14 @@
         "przesyłam zaproszenie",
         "zaproszenie (?:kalendarzowe )?(?:jest )?w (?:załączniku|załączeniu)",
         "\\b(?:przesyłam|wysyłam|przesyłamy|wysyłamy|dołączam|załączam)\\b"
+      ],
+      "obietnice_funkcji": [
+        "obiecuj\\w*",
+        "gwarantuj\\w*",
+        "na pewno (?:dodamy|zrobimy|wdrożymy)",
+        "\\b(?:dodamy|wdrożymy|wprowadzimy|zrobimy|dostarczymy)\\b[^.\\n]{0,60}\\b(?:funkcj\\w*|integracj\\w*|eksport\\w*|raport\\w*|panel\\w*)",
+        "będzie dostępn\\w+",
+        "w (?:tym|przyszłym) (?:kwartale|miesiącu|tygodniu)[^.\\n]{0,40}(?:będzie|dodamy|wdrożymy)"
       ]
     },
     "wzorce_zakazow": [
@@ -559,5 +567,74 @@
       }
     },
     "_tematy": "Dla każdego tematu: słowa w cytatach RYZYKA (ryzyko) i w PROŚBIE (prosba) muszą trafić oba. Słowa prośby są wąskie, żeby np. „rozłączają” nie pasowało do „łączenia z systemem”."
+  },
+  "kontrola": {
+    "_opis": "Utwardzanie przetwarzania (higiena.py). Słowa niepewności i żartu w cytacie obniżają pewność pozycji-zobowiązania; typy do sprawdzenia dostają znacznik „sprawdź z nagraniem”, gdy mają liczby, godziny, adresy albo kwoty.",
+    "min_slow": 80,
+    "niepewnosc": [
+      "chyba",
+      "może",
+      "być może",
+      "zobaczymy",
+      "jeszcze nie wiem",
+      "nie wiem",
+      "nie jestem pewn",
+      "raczej",
+      "pewnie",
+      "w sumie"
+    ],
+    "zart": [
+      "żartuj*",
+      "żartem",
+      "żart",
+      "haha*",
+      "ha ha",
+      "hehe*",
+      "no jasne",
+      "taa"
+    ],
+    "typy_zobowiazan": [
+      "zobowiazanie_nasze",
+      "zmiana_konfiguracji",
+      "poprawka_bazy_wiedzy",
+      "zakaz",
+      "finanse"
+    ],
+    "typy_do_sprawdzenia": [
+      "zmiana_konfiguracji",
+      "poprawka_bazy_wiedzy",
+      "zobowiazanie_nasze"
+    ],
+    "potwierdzenia": [
+      "dzięki",
+      "dziękuję",
+      "dziekuje",
+      "będę",
+      "bede",
+      "ok",
+      "okej",
+      "potwierdzam",
+      "super",
+      "jasne",
+      "w porządku",
+      "do zobaczenia",
+      "przyjęłam",
+      "przyjąłem",
+      "widzę"
+    ],
+    "max_slow_potwierdzenia": 12,
+    "_gwiazdka": "Słowo zakończone * jest dopasowywane od początku wyrazu (żartuj* łapie „żartuję”); pozostałe jako cały wyraz."
+  },
+  "flagi_powody": {
+    "niepelna_transkrypcja": "niepełna transkrypcja: pozycja nie trafia do agenta",
+    "zrodlo_starsze": "źródło starsze niż stan karty",
+    "mozliwa_pomylka_mowcy": "możliwa pomyłka mówcy",
+    "inny_klient": "pozycja dotyczy innego klienta",
+    "nowy_klient": "nowy klient: karta do potwierdzenia",
+    "niepewne": "niepewne lub żartobliwe sformułowanie, to nie zobowiązanie ani decyzja",
+    "nieuwierzytelniony_mail": "mail bez potwierdzonego DKIM/SPF dla domeny nadawcy",
+    "przekazany_mail": "treść przekazana: informacja, nie decyzja",
+    "zalacznik_zablokowany": "załącznik zablokowany, nie jest dowodem dostarczenia",
+    "polecenie_w_tresci": "w treści jest polecenie dla systemu"
   }
 }

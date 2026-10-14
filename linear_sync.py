@@ -25,6 +25,7 @@ import notatki
 import zasady
 from sekrety import czysc
 from podpis import podpisz_agenta
+import higiena
 import zakazy_czas
 
 
@@ -465,6 +466,9 @@ def build_description(item, source_path, karta=None, przyp=None, Z=None):
         parts.append("## Kryteria akceptacji\n\n_brak: uzupełnij, zanim zadanie trafi do agenta_")
     if item.get("jak_sprawdzic"):
         parts.append(f"## Jak sprawdzić\n\n{item['jak_sprawdzic']}")
+    uwagi = higiena.opis_znacznikow(item)
+    if uwagi:
+        parts.append("## Uwagi kontroli\n\n" + "\n".join(f"- {u}" for u in uwagi))
     repo = zasady.repo_pozycji(item, Z) or item.get("repo")
     if repo:
         parts.append(f"## Repo\n\n`{repo}`: {Z.get('repo', {}).get(repo, '')}".rstrip(": "))
@@ -623,6 +627,10 @@ def ustal_zrodlo(source, wynik, karta, meta=None):
             powod = "nadawca nie jest kontaktem klienta w karcie" if adres else "nie ustalono nadawcy maila"
         elif not kontakt_ma_prawo_decyzji(kontakt):
             powod = f"kontakt {adres} jest niepotwierdzony („{kontakt.get('status', 'bez prawa decyzji')}”)"
+        elif meta.get("uwierzytelnienie") == "nie":
+            powod = f"mail od {adres} bez potwierdzonego DKIM/SPF dla domeny nadawcy (nic nie wznawia ani nie uchyla)"
+        elif meta.get("przekazany"):
+            powod = "treść przekazana (Fwd): informacja, nie decyzja"
         else:
             powod = ""
         return {
@@ -956,6 +964,24 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
     return processed
 
 
+def zglosz_cudze_pozycje(api_key, team_id, label_map, state_id, klient, source, cudze, karta):
+    """Jedno zgłoszenie „Do weryfikacji” o pozycjach, które dotyczą innego klienta niż karta tej rozmowy. Idempotentne po źródle."""
+    zrobione = karta.setdefault("weryfikacje_zrodel", {})
+    if source in zrobione:
+        print(f"  Pozycje innego klienta: zgłoszenie weryfikacji już istnieje ({zrobione[source]})")
+        return
+    lista = "\n".join(f"- **{p.get('id', '?')}** {p.get('tytul', '')} (dotyczy: {p.get('inny_klient')})" for p in cudze)
+    opis = (f"## Do weryfikacji\n\n- Rozmowa dotyczy też innego klienta: poniższe pozycje NIE trafiły do karty ani do Lineara klienta {klient}. "
+            f"Sprawdź, czy należą do klienta, którego dotyczą, i przenieś je ręcznie.\n\n## Pozycje wstrzymane\n\n{lista}\n\n## Źródło\n\n`{source}`")
+    wynik = gql(api_key, M_CREATE_ISSUE, {"input": {
+        "teamId": team_id, "title": f"[{klient}] Rozmowa dotyczy też innego klienta: {len(cudze)} pozycji wstrzymanych",
+        "description": opis, "stateId": state_id,
+        "labelIds": [label_map[n] for n in ("Do weryfikacji",) if n in label_map]}})
+    ident = wynik.get("issueCreate", {}).get("issue", {}).get("identifier", "?")
+    zrobione[source] = ident
+    print(f"  Pozycje innego klienta wstrzymane: {len(cudze)} → {ident} (Do weryfikacji)")
+
+
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -980,6 +1006,11 @@ def main():
     karta = load_karta(klient)
     prosby = load_prosby()
     Z = zasady.wczytaj_zasady()
+    kontrola = wynik.get("kontrola") or {}
+    if kontrola.get("wewnetrzna"):
+        # rozmowa tylko naszego zespołu: nie aktualizuje karty klienta ani Lineara
+        print("Rozmowa wewnętrzna (nikogo ze strony klienta): karta klienta i Linear bez zmian.")
+        return
     # autor i data źródła: dla maila z pliku maila (data maila = data źródła dla reguły „późniejsze źródło”)
     zrodlo_info = ustal_zrodlo(source, wynik, karta)
     meeting_date = zrodlo_info["data"]
@@ -1033,7 +1064,11 @@ def main():
 
     # ── aktualizacje otwartych spraw ──────────────────────────────────────────
 
-    if args.dry_run:
+    if kontrola.get("starsze"):
+        # źródło starsze niż stan karty: jego aktualizacje spraw i zmiany decyzji nie nadpisują nowszych
+        print("Źródło starsze niż stan karty: aktualizacje spraw i zmiany decyzji pominięte (pozycje dodane z oznaczeniem).")
+        n_upd = 0
+    elif args.dry_run:
         n_upd = process_aktualizacje(
             None, wynik, karta, state_ids, label_map, dry_run=True, meeting_date=meeting_date,
             zrodlo_info=zrodlo_info, klient=klient, source=source
@@ -1051,6 +1086,12 @@ def main():
 
     stats = {"utworzono": 0, "zaktualizowano": 0, "pominieto": 0}
     do_linear = [p for p in pozycje if p.get("sekcja") != 4]
+    cudze = [p for p in do_linear if "inny_klient" in (p.get("flagi") or [])]
+    do_linear = [p for p in do_linear if p not in cudze]          # pozycje innego klienta nie trafiają do tego klienta
+    if cudze and not args.dry_run:
+        zglosz_cudze_pozycje(api_key, team_id, label_map, backlog_id, klient, source, cudze, karta)
+    elif cudze:
+        print(f"  [dry-run] pozycje innego klienta wstrzymane: {len(cudze)}")
 
     for item in do_linear:
         sekcja = item.get("sekcja")

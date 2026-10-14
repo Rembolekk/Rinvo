@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=gmail.com; spf=pass smtp.mailfrom=gmail.com
 From: Kasia Malinowska <mateuszrembecki1@gmail.com>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Re: Plik ze =?utf-8?q?=C5=9Bwie=C5=BCymi?= leadami

@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=autotama.pl; spf=pass smtp.mailfrom=autotama.pl
 From: System <noreply@autotama.pl>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: Powiadomienie systemowe

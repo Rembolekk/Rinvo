@@ -234,6 +234,12 @@ def filtr_tresci(temat, tresc, karta, W, inni_klienci=()):
         m = re.search(wzorzec, tekst, re.IGNORECASE if wzorzec.startswith("\\bRIN") else 0)
         if m:
             powody.append(f"treść zawiera wewnętrzne oznaczenie „{m.group(0)}”")
+    for wzorzec in F.get("obietnice_funkcji", []):          # prośba o coś, czego nie oferujemy: tylko „zapisane”, nigdy obietnica
+        for m in re.finditer(wzorzec, tekst, re.IGNORECASE):
+            if tekst[max(0, m.start() - 5):m.start()].lower().rstrip().endswith("nie"):
+                continue                                          # „nie obiecuję terminu” to nie obietnica
+            powody.append(f"obietnica funkcji albo terminu („{' '.join(m.group(0).split())[:50]}”): przy prośbie o coś, czego nie oferujemy, pisz tylko „zapisane”")
+            break
     dozwolone = {(k.get("email") or "").lower() for k in (karta or {}).get("kontakty", [])}
     for adres in {a.lower() for a in EMAIL_RE.findall(tekst)}:
         if adres not in dozwolone:

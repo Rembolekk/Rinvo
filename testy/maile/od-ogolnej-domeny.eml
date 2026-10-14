@@ -1,3 +1,4 @@
+Authentication-Results: mx.google.com; dkim=pass header.d=wp.pl; spf=pass smtp.mailfrom=wp.pl
 From: Ola <ola.handlowiec@wp.pl>
 To: Rinvo automat <automat.rinvo@example.com>
 Subject: =?utf-8?q?U=C5=BCywane?= auta
