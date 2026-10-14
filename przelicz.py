@@ -23,6 +23,7 @@ from pathlib import Path
 
 import copy
 
+import czlowiek
 import linear_sync
 import notatki
 import zasady
@@ -75,6 +76,9 @@ def licz(klient, karta, Z, prosby, najnowsze, stan_linear):
             "usun": sorted(((obecne & routing) - set(nowe_et)) | ((obecne & repo_wszystkie) - {repo_et})),
             "powody": zasady.powody_tekst(przyp),
         })
+        if czlowiek.etykiety_reczne(wpis.get("identifier")):      # człowiek zmienił etykiety: przeliczenie ich nie cofa
+            wiersze[-1]["dodaj"], wiersze[-1]["usun"] = [], []
+            wiersze[-1]["reczne_etykiety"] = True
     return wiersze
 
 

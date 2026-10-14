@@ -112,3 +112,44 @@ def przenies_wygasle(karta, dzis, klient=None, root="."):
     if not wygasle:
         karta.pop("zakazy_wygasle", None)
     return przeniesione
+
+
+# ── blokady typu „nic nowego nie startuje” ────────────────────────────────────
+
+def czy_blokada(zakaz, Z):
+    """Zakaz-blokada: tytuł pasuje do wzorców z ops/zasady.json → blokady.wzorce_zakazu (np. „Nic nowego nie startuje 19–23.10”)."""
+    return any(re.search(w, zakaz.get("tytul", ""), re.IGNORECASE) for w in Z["blokady"]["wzorce_zakazu"])
+
+
+def aktywne_blokady(karta, dzis, klient, Z, root="."):
+    """Blokady, których okres obejmuje dzisiaj (przed początkiem okresu jeszcze nie blokują)."""
+    wynik = []
+    for z in aktywne_zakazy(karta, dzis, klient, root):
+        o = okres_zakazu(z, klient, root, dzis)
+        if o and czy_blokada(z, Z) and o["od"] <= dzis <= o["do"]:
+            wynik.append(z)
+    return wynik
+
+
+def zadanie_nowe(zg_tekst, etykiety, Z):
+    """True dla zadania „nowego” (kampania, marka, funkcja, tekst), False dla poprawki błędu albo korekty istniejącej konfiguracji.
+    Etykieta Błąd i słowa korekty wygrywają; nierozpoznane zadanie uznajemy za poprawkę (blokada dotyczy tylko jawnie nowych rzeczy)."""
+    B = Z["blokady"]
+    t = zg_tekst.lower()
+    if set(etykiety) & set(B["dozwolone_etykiety"]):
+        return False
+    korekta = [s for s in B["dozwolone_slowa"] if s not in ("godzin", "adres")]
+    if any(s in t for s in korekta):
+        return False
+    if any(s in t for s in B["blokowane_slowa"]):
+        return True
+    return False
+
+
+def powod_blokady(karta, dzis, klient, zg_tekst, etykiety, Z, root="."):
+    """Powód odłożenia zadania przez aktywną blokadę (tekst) albo None. Poprawki błędów i korekty istniejącej konfiguracji przechodzą."""
+    bl = aktywne_blokady(karta, dzis, klient, Z, root)
+    if bl and zadanie_nowe(zg_tekst, etykiety, Z):
+        o = okres_zakazu(bl[0], klient, root, dzis)
+        return f"blokada {bl[0].get('id', '?')}: {bl[0].get('tytul', '')} (do {o['do'].isoformat()}); to nowa rzecz, poprawki błędów nie są blokowane"
+    return None

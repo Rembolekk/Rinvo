@@ -128,6 +128,9 @@ jobs:
             fi
           fi
 
+          # transkrypcje, które czekały na limit modelu, wracają do listy przy następnym przebiegu
+          python3 limity.py --dopisz-kolejke /tmp/transkrypcje.txt
+
           # tylko istniejące pliki (zmienione mogły zostać potem usunięte)
           while IFS= read -r f; do [ -f "$f" ] && echo "$f"; done < /tmp/transkrypcje.txt \
             | sort -u > /tmp/transkrypcje.ok
@@ -149,7 +152,7 @@ jobs:
           zapisz() {
             local plik="$1"
             python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
-            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json logi/przebiegi index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/.sygnaly.json ops/materialy; do
+            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json logi/przebiegi index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/.sygnaly.json ops/.reczne_zmiany.json ops/.zmiany_automatu.json ops/.zuzycie_modelu.json ops/.kolejka_limit.json ops/materialy; do
               [ -e "$sciezka" ] && git add -A -- "$sciezka"
             done
             if git diff --cached --quiet; then
@@ -174,7 +177,10 @@ jobs:
             python3 przetworz.py "$plik"
             RC=$?
             echo "::endgroup::"
-            if [ "$RC" -ne 0 ]; then
+            if [ "$RC" -eq 75 ]; then
+              # limit/kredyty modelu albo dzienny bezpiecznik: zadanie czeka w kolejce, to nie błąd ani nieudana próba
+              echo "::warning::$plik czeka na limit modelu (kolejka); ponowienie przy następnym przebiegu"
+            elif [ "$RC" -ne 0 ]; then
               echo "::error::przetworz.py zakończył się błędem dla $plik (kod $RC)"
               BLEDY=$((BLEDY + 1))
             fi

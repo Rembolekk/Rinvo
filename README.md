@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_utwardzanie2.py` | utwardzanie cz. 2 (regresje, pierwszeństwo człowieka, rozmiar zmiany i konflikty agenta, blokady a naprawy, klucze, limity i kredyty, bezpiecznik kosztów, eskalacja): 74 testy |
 | `testy/test_utwardzanie.py` | 17 przypadków brzegowych rozmów i maili (duplikat, starsza rozmowa, niepełna, pomyłka mówcy, maskowanie, polecenia, uwierzytelnienie, autoodpowiedzi, załączniki, Fwd, odpowiedzi): 88 testów |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
@@ -380,7 +381,7 @@ Notatka przed spotkaniem to materiał WEWNĘTRZNY (dla Marka), nigdy mail do kli
 
 ## Przypadki brzegowe (utwardzanie)
 
-Kod, a nie model, pilnuje 17 sytuacji na styku rozmów i maili (`higiena.py`, `utwardz.py`, `maile.py`, `zasady.py`, `linear_sync.py`, `render.py`). Znaczniki trafiają do `wynik.json` (pola `flagi` pozycji i `kontrola` wyniku), a pozycja z jakimkolwiek znacznikiem trafia do „Do weryfikacji”, nigdy do „Dla agenta”. Testy: `python3 testy/test_utwardzanie.py` (88 testów, bez sieci i modelu; nazwy testów zaczynają się od numeru punktu).
+Kod, a nie model, pilnuje 26 sytuacji na styku rozmów i maili (`higiena.py`, `utwardz.py`, `maile.py`, `zasady.py`, `linear_sync.py`, `render.py`). Znaczniki trafiają do `wynik.json` (pola `flagi` pozycji i `kontrola` wyniku), a pozycja z jakimkolwiek znacznikiem trafia do „Do weryfikacji”, nigdy do „Dla agenta”. Testy: `python3 testy/test_utwardzanie.py` (88 testów, bez sieci i modelu; nazwy testów zaczynają się od numeru punktu).
 
 | Sytuacja | Co robi system | Plik | Test |
 |---|---|---|---|
@@ -401,8 +402,17 @@ Kod, a nie model, pilnuje 17 sytuacji na styku rozmów i maili (`higiena.py`, `u
 | 15. Załączniki wykonywalne, archiwa i powyżej 10 MB | nie otwierane, nie są dowodem dostarczenia; Slack | `higiena.klasa_zalacznika`, `maile.parsuj_wiadomosc` | `test_t15_*` |
 | 16. Mail przekazany (Fwd) | przekazana treść to informacja, nie decyzja; klient w kopii nie jest nadawcą | `higiena.przekazany`, `maile.czysc_tresc` | `test_t16_*` |
 | 17. Odpowiedź klienta na nasz wysłany mail (In-Reply-To z historii wysyłek) | przypisanie do właściwych zgłoszeń; krótkie potwierdzenie („dzięki”, „będę”) zamyka je bez nowego zgłoszenia | `higiena.znajdz_wyslany`, `utwardz.obsluz_potwierdzenie` | `test_t17_*` |
+| 18. Naprawiona sprawa wraca (Toruń znowu podaje 14:00, a zgłoszenie jest Done) | to samo zgłoszenie wraca do Todo z etykietą „Regresja” i komentarzem „Wróciło” (cytat, źródło); bez nowego zgłoszenia; na stronie klienta znacznik „regresja” i wpis na osi czasu | `linear_sync.sprawdz_regresje`, `generuj_strony.py` | `test_c01_*` |
+| 19. Człowiek zamknął, anulował albo zmienił etykiety zgłoszenia lub je usunął | automat tego nie cofa; ponowne otwarcie tylko przez źródło późniejsze niż zmiana człowieka; usunięte lub zarchiwizowane = odrzucone (wpis w karcie, bez ponownego tworzenia). Zmiany człowieka rozpoznaje różnica migawek, bo automat i człowiek używają jednego konta | `czlowiek.py`, `stan_linear.odswiez`, `linear_sync.py`, `przelicz.py` | `test_c02_*` |
+| 20. Duża zmiana agenta (powyżej 40 linii albo 3 plików, `ops/zasady.json`) | PR zostaje otwarty bez auto-scalenia, „Decyzja człowieka” z powodem „duża zmiana” | `agent_scal.ocen_pr` | `test_c03_*` |
+| 21. Zadanie zmienia plik z otwartym PR innego zadania; gałąź za main | zadanie czeka na scalenie (nie liczy się do limitu); przed scaleniem aktualizacja gałęzi z main i ponowne testy i recenzja; konflikt = oddanie człowiekowi | `agent.pliki_zadania`, `agent_scal.py`, `agent_github.aktualizuj_galaz` | `test_c04_*` |
+| 22. Blokada „nic nowego nie startuje” (urlop 19–23.10) | blokuje nowe kampanie, marki, funkcje i teksty; poprawki błędów i korekty istniejącej konfiguracji przechodzą; reguła w `ops/zasady.json` (`blokady`) | `zakazy_czas.powod_blokady`, `agent.py` | `test_c05_*` |
+| 23. Wygasający klucz lub token | 7 dni przed linijka w „Uwadze” porannego podsumowania (nagłówek `github-authentication-token-expiration`, daty z `ops/zasady.json`) | `klucze.py`, `podsumowanie.py` | `test_c06_*` |
+| 24. Limit albo kredyty modelu skończone | zadanie trafia do kolejki „oczekuje na limit”, nie liczy się jako próba, jedna informacja na Slacku na epizod, ponowienie przy następnym przebiegu (kod wyjścia 75) | `limity.py`, `agent_srodowisko.py`, `przetworz.py` | `test_c07_*` |
+| 25. Dzienny bezpiecznik kosztów | limit wywołań modelu dla całego systemu i osobno dla agenta (`budzet_modelu`); po przekroczeniu zatrzymanie, alert raz dziennie, dalej następnego dnia | `limity.Budzet` | `test_c08_*` |
+| 26. „Decyzja człowieka” bez reakcji | ponad 2 dni robocze: na górze porannego podsumowania z liczbą dni; ponad 5: osobna wiadomość, raz na zgłoszenie | `podsumowanie.eskalacje`, `eskalacje_osobne` | `test_c09_*` |
 
-Nazwy testów w tabeli: `test_t01_…` … `test_t17_…` (np. `test_t01_inny_tekst_ta_sama_data_godzina_uczestnicy_to_duplikat`).
+Wiersze 18–26 (utwardzanie cz. 2): `python3 testy/test_utwardzanie2.py` (74 testy, bez sieci i modelu, nazwy `test_c01_…` … `test_c09_…`). Nazwy testów w wierszach 1–17: `test_t01_…` … `test_t17_…` (np. `test_t01_inny_tekst_ta_sama_data_godzina_uczestnicy_to_duplikat`).
 
 ## Testy automatyczne
 

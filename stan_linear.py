@@ -14,7 +14,7 @@ PLIK = Path("ops/.stan_linear.json")
 ZAPYTANIE = """
 query($after: String) {
   issues(first: 100, after: $after, filter: { team: { key: { eq: "%s" } } }) {
-    nodes { identifier title url priority createdAt updatedAt completedAt dueDate
+    nodes { id identifier title url priority createdAt updatedAt completedAt dueDate
             state { name type } labels { nodes { name } } }
     pageInfo { hasNextPage endCursor }
   }
@@ -29,7 +29,7 @@ def pobierz(api_key, gql, team_key="RIN"):
         dane = gql(api_key, ZAPYTANIE % team_key, {"after": po})["issues"]
         for n in dane["nodes"]:
             wynik[n["identifier"]] = {
-                "tytul": n["title"], "url": n["url"], "stan": (n.get("state") or {}).get("name", ""),
+                "id": n.get("id"), "tytul": n["title"], "url": n["url"], "stan": (n.get("state") or {}).get("name", ""),
                 "typ_stanu": (n.get("state") or {}).get("type", ""),
                 "etykiety": sorted(l["name"] for l in (n.get("labels") or {}).get("nodes", [])),
                 "priorytet": n.get("priority"), "utworzono": n.get("createdAt"), "zmieniono": n.get("updatedAt"),
@@ -54,7 +54,18 @@ def wczytaj(plik=PLIK):
 
 
 def odswiez(api_key, gql, plik=PLIK):
+    """Pobiera świeży stan, rejestruje zmiany człowieka od poprzedniej migawki (czlowiek.py) i zapisuje migawkę."""
+    import czlowiek
+    stare = wczytaj(plik)["zgloszenia"]
     zgl = pobierz(api_key, gql)
+    zm = czlowiek.wykryj(stare, zgl, czlowiek.wczytaj_dotkniete())
+    if zm:
+        czlowiek.zarejestruj(zm)
+        usuniete = {i for i, z in zm.items() if z.get("usuniete")}
+        if usuniete:
+            czlowiek.zastosuj_usuniete_do_kart(usuniete)
+        print(f"Zmiany człowieka w Linearze: {', '.join(sorted(zm))}")
+    czlowiek.wyczysc_dotkniete()
     zapisz(zgl, plik)
     return len(zgl)
 

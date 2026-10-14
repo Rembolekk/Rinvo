@@ -25,6 +25,7 @@ import notatki
 import zasady
 from sekrety import czysc
 from podpis import podpisz_agenta
+import czlowiek
 import higiena
 import zakazy_czas
 
@@ -50,7 +51,7 @@ REQUIRED_LABELS = [
     "Zablokowane przez zakaz", "Powtarzające się ryzyko", "Wielu klientów",
     "Decyzja człowieka",
     "repo: rinvo-app", "repo: rinvo", "repo: rinvo-ops",
-    "Szkic gotowy", "Wyślij", "Wysłano",
+    "Szkic gotowy", "Wyślij", "Wysłano", "Regresja",
 ]
 
 LABEL_COLORS = {
@@ -67,6 +68,7 @@ LABEL_COLORS = {
     "Powtarzające się ryzyko": "#991b1b",
     "Wielu klientów": "#0891b2",
     "Decyzja człowieka": "#2563eb",
+    "Regresja": "#dc2626",
     "Szkic gotowy": "#eab308",
     "Wyślij": "#16a34a",
     "Wysłano": "#15803d",
@@ -123,6 +125,8 @@ _SSL_CTX = _ssl_context()
 # ── HTTP / GraphQL ────────────────────────────────────────────────────────────
 
 def gql(api_key, query, variables=None, retries=3, delay=2):
+    if variables and ("issueUpdate" in query or "issueArchive" in query) and variables.get("id"):
+        czlowiek.zapisz_dotkniecie(variables["id"])           # zmiana automatu: nie jest zmianą człowieka
     if query == M_ADD_COMMENT and variables and "body" in variables:      # każdy komentarz automatu: „Agent: …”
         variables = {**variables, "body": podpisz_agenta(variables["body"])}
     payload = json.dumps({"query": query, "variables": variables or {}}).encode("utf-8")
@@ -757,6 +761,9 @@ def eskaluj_istniejace_ryzyko(api_key, karta, existing, klucz, item, label_map, 
     etykieta_id = label_map.get("Powtarzające się ryzyko")
     if not linear_id or not etykieta_id:
         return
+    if czlowiek.etykiety_reczne(ident):                  # człowiek zmienił etykiety: automat ich nie rusza
+        print(f"  [pominięto etykiety] {ident} ({klucz}): etykiety zmienione przez człowieka")
+        return
     stan = get_issue_state_and_labels(api_key, linear_id)
     ids = [l["id"] for l in stan["labels"]]
     nowa = etykieta_id not in ids
@@ -766,6 +773,61 @@ def eskaluj_istniejace_ryzyko(api_key, karta, existing, klucz, item, label_map, 
     if nowa:
         gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": build_risk_history(karta, temat)})
     print(f"  ↑ Powtarzające się ryzyko: {ident} ({klucz}) | {existing.get('tytul', '')}")
+
+
+def czy_regresja(item, Z):
+    """Pozycja opisuje problem do naprawy (błąd, zmiana konfiguracji, poprawka bazy wiedzy): kandydat na regresję zamkniętej sprawy."""
+    R = Z.get("regresja", {})
+    return item.get("sekcja") == 1 and item.get("typ") in R.get("typy", []) and item.get("status") in (None, "zrob_teraz")
+
+
+def otworz_ponownie(api_key, wpis, klucz, item, source, meeting_date, todo_id, label_map, Z):
+    """Otwiera to samo zgłoszenie ponownie: Todo, etykieta Regresja, komentarz „wróciło” z cytatem i źródłem, wpis w karcie
+    (regresje). Zwraca True, gdy otwarto."""
+    linear_id, ident = wpis.get("linear_id"), wpis.get("identifier", klucz)
+    cytat = item.get("cytat", [""])[0] if item.get("cytat") else ""
+    gql(api_key, M_UPDATE_ISSUE, {"id": linear_id, "input": {"stateId": todo_id}})
+    dodaj_etykiete(api_key, linear_id, label_map, Z.get("regresja", {}).get("etykieta", "Regresja"))
+    tresc = f"**Wróciło.** Późniejsze źródło `{source}` opisuje ten problem w zgłoszeniu, które było zamknięte."
+    if cytat:
+        tresc += f"\n\n> {cytat}"
+    gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": tresc})
+    wpis.setdefault("zrodla", []).append(source)
+    wpis.setdefault("regresje", []).append({"data": meeting_date, "zrodlo": source, "cytat": cytat})
+    wpis.pop("status_koncowy", None)
+    print(f"  ↩ Wróciło: {ident} ({klucz}) otwarte ponownie")
+    return True
+
+
+def sprawdz_regresje(api_key, karta, klucz, item, source, meeting_date, todo_id, label_map, Z, dry_run=False):
+    """Czy ta pozycja to regresja zamkniętej sprawy? Jeśli tak (i człowiek tego nie zablokował), otwiera zgłoszenie ponownie
+    i przenosi wpis z zamkniętych do otwartych. Zwraca True, gdy obsłużono (wtedy nie tworzymy nowego zgłoszenia)."""
+    if not czy_regresja(item, Z):
+        return False
+    otwarte, zamkniete = karta.setdefault("otwarte_sprawy", {}), karta.get("zamkniete_sprawy", {})
+    w_zamknietych = klucz in zamkniete
+    wpis = zamkniete[klucz] if w_zamknietych else otwarte.get(klucz)
+    if not isinstance(wpis, dict) or not wpis.get("linear_id") or source in wpis.get("zrodla", []):
+        return False
+    ident = wpis.get("identifier", klucz)
+    if meeting_date and meeting_date <= _najnowsza_data_rozmowy(wpis):
+        return False                                       # źródło nie jest późniejsze niż to, co sprawa już widziała
+    if dry_run:
+        if w_zamknietych:
+            print(f"  [regresja] {klucz} ({ident}): wróciło, zgłoszenie zostałoby otwarte ponownie")
+        return w_zamknietych
+    if not w_zamknietych:
+        stan = get_issue_state_and_labels(api_key, wpis["linear_id"])
+        if stan["type"] not in ("completed", "canceled"):
+            return False                                   # sprawa otwarta: zwykła obsługa (komentarz o ponownej wzmiance)
+    if not czlowiek.wolno_zmienic_stan(ident, meeting_date):
+        print(f"  [bez zmian] {ident} ({klucz}): człowiek zmienił stan zgłoszenia, a źródło nie jest późniejsze niż jego zmiana")
+        return False
+    otworz_ponownie(api_key, wpis, klucz, item, source, meeting_date, todo_id, label_map, Z)
+    if w_zamknietych:
+        otwarte[klucz] = wpis
+        del zamkniete[klucz]
+    return True
 
 
 def uzgodnij_istniejace(api_key, karta, existing, klucz, item, sekcja, label_map, termin,
@@ -908,6 +970,11 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
             processed += 1
             continue
 
+        if not czlowiek.wolno_zmienic_stan(identifier, meeting_date):
+            print(f"  [pominięto aktualizację] {identifier} ({klucz}): człowiek zmienił stan zgłoszenia, "
+                  f"a źródło nie jest późniejsze niż jego zmiana")
+            continue
+
         # Update state
         new_state_id = state_ids.get(nowy_status)
         update_input = {}
@@ -925,8 +992,8 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
                 print(f"  = {identifier} ({klucz}) → {nowy_status} (już w tym stanie, bez zmian)")
                 continue
             new_ids = [l["id"] for l in current_labels if l["id"] != czeka_id]
-            if new_ids != [l["id"] for l in current_labels]:
-                update_input["labelIds"] = new_ids
+            if new_ids != [l["id"] for l in current_labels] and not czlowiek.etykiety_reczne(identifier):
+                update_input["labelIds"] = new_ids         # etykiety zmienione przez człowieka zostają
 
         if update_input:
             gql(api_key, M_UPDATE_ISSUE, {"id": linear_id, "input": update_input})
@@ -1121,6 +1188,17 @@ def main():
             continue
 
         otwarte = karta.get("otwarte_sprawy", {})
+
+        # ── zgłoszenie usunięte albo zarchiwizowane przez człowieka: odrzucone, nie tworzymy go ponownie ──
+        if klucz in karta.get("odrzucone", {}):
+            print(f"  [odrzucone przez człowieka] {klucz} ({karta['odrzucone'][klucz].get('identifier', '?')}): nie tworzę ponownie")
+            stats["pominieto"] += 1
+            continue
+
+        # ── regresja: późniejsze źródło opisuje problem w sprawie, która jest Done ──
+        if sprawdz_regresje(api_key, karta, klucz, item, source, meeting_date, todo_id, label_map, Z, dry_run=args.dry_run):
+            stats["zaktualizowano"] += 1
+            continue
 
         # ── idempotencja ──────────────────────────────────────────────────────
         if klucz in otwarte:

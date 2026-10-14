@@ -177,7 +177,8 @@ def _lista_zgloszen(lista, dzis, pusto="Nic."):
     wiersze = []
     for z in lista:
         dod = f' <span class="tag {"bad" if po_terminie(z, dzis) else ""}">termin {e(z["termin"])}</span>' if z.get("termin") else ""
-        wiersze.append(f"<li>{_link_zgloszenia(z)} <span class=\"tag\">{e(z['stan'])}</span>{dod}</li>")
+        regr = ' <span class="tag bad">regresja</span>' if "Regresja" in z.get("etykiety", []) else ""
+        wiersze.append(f"<li>{_link_zgloszenia(z)} <span class=\"tag\">{e(z['stan'])}</span>{regr}{dod}</li>")
     return "<ul>" + "".join(wiersze) + "</ul>"
 
 
@@ -238,6 +239,12 @@ def os_czasu(dane, klient):
         wpisy.append((str(h.get("data", "")), "Wysłany mail", e(h.get("temat", "")),
                       f'do: {e(h.get("do", ""))}' + (" · zaproszenie .ics" if h.get("zaproszenie_ics") else "")
                       + (f' · załączniki: {e(", ".join(h["zalaczniki"]))}' if h.get("zalaczniki") else "")))
+    for sekcja in ("otwarte_sprawy", "zamkniete_sprawy"):          # regresje: naprawiona sprawa wróciła
+        for klucz, wpis in (klient["karta"].get(sekcja) or {}).items():
+            for r in (wpis.get("regresje") or []) if isinstance(wpis, dict) else []:
+                wpisy.append((str(r.get("data", "")), "Regresja", f'<a href="{e(wpis.get("url", "#"))}">{e(wpis.get("tytul", klucz))}</a>',
+                              f'<span class="tag bad">regresja</span> wróciło w źródle {e(Path(str(r.get("zrodlo", ""))).name)}'
+                              + (f'<blockquote>{e(r["cytat"])}</blockquote>' if r.get("cytat") else "")))
     prs = defaultdict(list)
     for z in dane["zdarzenia"]:
         if z.get("klient") != slug:

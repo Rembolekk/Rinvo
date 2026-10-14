@@ -84,6 +84,10 @@ class GitHub:
     def utworz_pr(self, tytul, galaz, opis, baza="main"):
         return self._zapytaj("POST", "/pulls", {"title": tytul, "head": galaz, "base": baza, "body": opis})
 
+    def aktualizuj_galaz(self, numer):
+        """Wciela main do gałęzi PR (GitHub: update-branch). Nowy commit uruchamia testy i CodeRabbit od nowa."""
+        return self._zapytaj("PUT", f"/pulls/{numer}/update-branch", {})
+
     def pliki_pr(self, numer):
         return [f["filename"] for f in self._lista(f"/pulls/{numer}/files")]
 

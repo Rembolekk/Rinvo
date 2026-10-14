@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-14T18:57:30+00:00",
+ "zapisano": "2026-10-14T19:26:58+00:00",
  "zgloszenia": {
   "RIN-38": {
    "etykiety": [
@@ -7,6 +7,7 @@
     "Dla agenta",
     "repo: rinvo"
    ],
+   "id": "53afb051-ae9d-4495-8251-d2d3dfb5e03b",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-06",
@@ -22,6 +23,7 @@
     "Dla agenta",
     "Konfiguracja"
    ],
+   "id": "6d340410-b31c-44ab-9657-d069f460cbea",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-06",
@@ -38,6 +40,7 @@
     "Konfiguracja",
     "repo: rinvo-app"
    ],
+   "id": "0c453a8a-d683-42c5-bf58-63f508a0ec62",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-06",
@@ -54,6 +57,7 @@
     "Konfiguracja",
     "repo: rinvo-app"
    ],
+   "id": "834af663-d152-47d4-aa85-94b4fd571933",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-13",
@@ -69,6 +73,7 @@
     "Błąd",
     "Dla agenta"
    ],
+   "id": "5bfd24f9-027c-4fca-b87c-1204e453916a",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-06",
@@ -83,6 +88,7 @@
    "etykiety": [
     "Finanse"
    ],
+   "id": "09c102ac-e4f2-4f8b-b2ec-87267b5ca0e2",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-06",
@@ -98,6 +104,7 @@
     "Decyzja człowieka",
     "Finanse"
    ],
+   "id": "82269a49-7b2a-40c7-bbc2-5ef11a44c7cf",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-06",
@@ -114,6 +121,7 @@
     "Konfiguracja",
     "repo: rinvo"
    ],
+   "id": "d177726a-4000-4689-9c0d-f8eee001e92b",
    "priorytet": 0,
    "stan": "Todo",
    "termin": null,
@@ -130,6 +138,7 @@
     "Szkic gotowy",
     "Zadanie"
    ],
+   "id": "f442d6ba-b970-4811-a948-9a017af895a3",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-11",
@@ -147,6 +156,7 @@
     "Zadanie",
     "repo: rinvo-ops"
    ],
+   "id": "bc26d756-f162-4e8c-bc99-b78b19ae5153",
    "priorytet": 0,
    "stan": "Todo",
    "termin": null,
@@ -163,6 +173,7 @@
     "Do weryfikacji",
     "repo: rinvo-app"
    ],
+   "id": "4e90cdf0-673f-4617-a715-08c76e4d7dc0",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-14",
@@ -178,6 +189,7 @@
     "Dla agenta",
     "repo: rinvo-ops"
    ],
+   "id": "d25cf1b4-dfac-474c-8042-922e43a6af20",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-15",
@@ -193,6 +205,7 @@
     "Czeka na klienta",
     "repo: rinvo"
    ],
+   "id": "58401f8b-718b-4695-87da-9439a880ea5a",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -208,6 +221,7 @@
     "Decyzja człowieka",
     "Wysłano"
    ],
+   "id": "7d8f0849-45b9-4ad5-82da-325bfb63473c",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-15",
@@ -223,6 +237,7 @@
     "Czeka na klienta",
     "repo: rinvo-ops"
    ],
+   "id": "6970a064-843b-421c-9452-94064360040e",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -239,6 +254,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "430db31c-1cce-4aae-b1d7-dd12460b3ab2",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -255,6 +271,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "913fa2f5-bcc1-4b64-82a5-c3b77e242c9f",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -271,6 +288,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "4d237e2b-664a-4021-a71b-79065f9f6da7",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -287,6 +305,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "62ee2ebc-3db6-46ee-b729-de8d231d2a71",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -303,6 +322,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "b6e48b4e-2ce8-4b4a-a0fc-45a8733e0cbd",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -319,6 +339,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "45fda2bf-7be9-40ff-bffc-d1549b0123c4",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -335,6 +356,7 @@
     "Produkt",
     "repo: rinvo"
    ],
+   "id": "a38ea0d3-8cbe-4f50-ad11-af0f00539e6e",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -352,6 +374,7 @@
     "Produkt",
     "repo: rinvo-ops"
    ],
+   "id": "26130adc-ca5a-423a-80d4-a947ec8be62e",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -367,6 +390,7 @@
     "Dla agenta",
     "Produkt"
    ],
+   "id": "eac157be-09a1-46b5-bfc1-062036a694fe",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-27",
@@ -382,6 +406,7 @@
     "Powtarzające się ryzyko",
     "Ryzyko"
    ],
+   "id": "b28c9577-d73f-46c4-949a-30baabfe8500",
    "priorytet": 1,
    "stan": "Todo",
    "termin": null,
@@ -396,6 +421,7 @@
    "etykiety": [
     "Ryzyko"
    ],
+   "id": "2876944d-6368-4174-8eaf-3863432cf454",
    "priorytet": 2,
    "stan": "Todo",
    "termin": null,
@@ -411,6 +437,7 @@
     "Powtarzające się ryzyko",
     "Ryzyko"
    ],
+   "id": "959dca6e-e739-46d9-ba74-870dd00308d6",
    "priorytet": 1,
    "stan": "Todo",
    "termin": "2026-10-15",
@@ -428,6 +455,7 @@
     "Konfiguracja",
     "repo: rinvo-app"
    ],
+   "id": "4c0405f9-2a42-4248-a50d-b7cfae82449e",
    "priorytet": 0,
    "stan": "Done",
    "termin": "2026-10-13",
@@ -443,6 +471,7 @@
     "Decyzja człowieka",
     "Finanse"
    ],
+   "id": "c23e359b-62a2-4964-aad0-d1b8907fc008",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-13",
@@ -457,6 +486,7 @@
    "etykiety": [
     "Czeka na klienta"
    ],
+   "id": "2f4f2a5e-640d-41e7-b01d-f643ef4949e0",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -472,6 +502,7 @@
     "Czeka na klienta",
     "repo: rinvo-ops"
    ],
+   "id": "21fbddd8-2a9f-48e0-a407-0203cf8f030a",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": "2026-10-16",
@@ -486,6 +517,7 @@
    "etykiety": [
     "Czeka na klienta"
    ],
+   "id": "52143bff-0c09-4969-b877-a2592d72ff06",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -503,6 +535,7 @@
     "Wielu klientów",
     "repo: rinvo"
    ],
+   "id": "28455374-9038-4079-b03d-50125d3a0811",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -517,6 +550,7 @@
    "etykiety": [
     "Ryzyko"
    ],
+   "id": "3d401de2-f93e-4efe-b10a-41c86fa69ab2",
    "priorytet": 2,
    "stan": "Todo",
    "termin": null,
@@ -533,6 +567,7 @@
     "Zadanie",
     "repo: rinvo-ops"
    ],
+   "id": "14a0d331-edcd-46eb-824b-230f1172d645",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-15",
@@ -548,6 +583,7 @@
     "Decyzja człowieka",
     "Zadanie"
    ],
+   "id": "47a23f04-7c8c-47fd-8f52-b81a0a347e94",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-16",
@@ -564,6 +600,7 @@
     "Zadanie",
     "repo: rinvo-ops"
    ],
+   "id": "4299cf56-fb55-4d0c-af59-236b1a595048",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-15",
@@ -578,6 +615,7 @@
    "etykiety": [
     "Czeka na klienta"
    ],
+   "id": "f4cc3d3f-747b-4fd0-8b17-6d9e45cf23d4",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": "2026-10-15",
@@ -595,6 +633,7 @@
     "Wielu klientów",
     "repo: rinvo"
    ],
+   "id": "554fe144-7907-4b6d-9fb3-d2eb19dc42bf",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -610,6 +649,7 @@
     "Czeka na klienta",
     "Do weryfikacji"
    ],
+   "id": "71b8f493-e0a7-4dc3-99fe-22a18db71fef",
    "priorytet": 0,
    "stan": "Backlog",
    "termin": null,
@@ -625,6 +665,7 @@
     "Dla agenta",
     "Zadanie"
    ],
+   "id": "90cef0b1-e59e-45d9-967e-5afa5b626bf7",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-15",
@@ -640,6 +681,7 @@
     "Dla agenta",
     "Zadanie"
    ],
+   "id": "38635d2b-29a7-4354-8872-66142640db97",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-21",

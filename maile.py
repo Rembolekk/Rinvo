@@ -584,6 +584,19 @@ def do_przetworzenia(rejestr, slack, max_prob=MAX_PROB):
     return lista
 
 
+def cofnij_probe(sciezka_md, rejestr_path=None):
+    """Błąd limitu modelu nie jest nieudaną próbą: oddaje próbę zużytą przy wejściu na listę (ops/.maile.json → oczekujace)."""
+    sciezka_rejestru = Path(rejestr_path) if rejestr_path else REJESTR_PATH
+    rejestr = wczytaj_rejestr(sciezka_rejestru)
+    cel = Path(str(sciezka_md)).as_posix()
+    for wpis in rejestr["oczekujace"].values():
+        if Path(str(wpis.get("plik", ""))).as_posix() == cel and wpis.get("proby", 0) > 0:
+            wpis["proby"] -= 1
+            zapisz_rejestr(rejestr, sciezka_rejestru)
+            return True
+    return False
+
+
 def oznacz_przetworzony(sciezka_md, rejestr_path=None):
     """Wywołuje przetworz.py po UDANYM przetworzeniu maila: Message-ID przechodzi do "przetworzone".
     Zwraca True, gdy rejestr zmieniono (starsze pliki maili bez Message-ID są pomijane)."""

@@ -211,22 +211,35 @@ class GitRepo:
 # ── claude ────────────────────────────────────────────────────────────────────
 
 class ClaudeAgent:
-    def __init__(self, model):
-        self.model = model
+    """Wywołania modelu. budzet: limity.Budzet (dzienny bezpiecznik kosztów), rodzaj: „agent” albo „inne”, kolejka: limity.Kolejka.
+    Błąd limitu/kredytów z claude → limity.LimitModelu (zadanie czeka w kolejce, to nie jest nieudana próba)."""
+
+    def __init__(self, model, budzet=None, rodzaj="inne", kolejka=None, Z=None):
+        self.model, self.budzet, self.rodzaj, self.kolejka, self.Z = model, budzet, rodzaj, kolejka, Z
+
+    def _uruchom(self, cmd, **kw):
+        import limity
+        if self.budzet is not None:
+            self.budzet.zuzyj(self.rodzaj)                        # BudzetWyczerpany przed wywołaniem
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True, **kw)
+        tekst = (r.stdout or "") + (r.stderr or "")
+        if r.returncode != 0 and self.Z is not None and limity.czy_limit(tekst, self.Z):
+            raise limity.LimitModelu(tekst[-200:])
+        if r.returncode == 0 and self.kolejka is not None:
+            self.kolejka.sukces()
+        return r, tekst
 
     def edytuj(self, katalog, prompt):
         """Edycja plików w katalogu (tylko Read/Write/Edit, tryb acceptEdits). Zwraca (ok, tekst)."""
-        r = subprocess.run(
+        r, tekst = self._uruchom(
             ["claude", "--print", prompt, "--model", self.model, "--tools", "Read,Write,Edit",
              "--allowedTools", "Read,Write,Edit", "--permission-mode", "acceptEdits"],
-            cwd=katalog, env=env_modelu(), stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=600)
-        return r.returncode == 0, (r.stdout + r.stderr)[-3000:]
+            cwd=katalog, env=env_modelu(), timeout=600)
+        return r.returncode == 0, tekst[-3000:]
 
     def zapytaj(self, prompt):
         """Pytanie bez narzędzi (np. sprawdzenie zakazów). Zwraca tekst odpowiedzi."""
-        r = subprocess.run(
-            ["claude", "--print", prompt, "--model", self.model, "--tools", ""],
-            env=env_modelu(), stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=180)
+        r, _ = self._uruchom(["claude", "--print", prompt, "--model", self.model, "--tools", ""], env=env_modelu(), timeout=180)
         if r.returncode != 0:
             raise RuntimeError(f"claude zakończył się kodem {r.returncode}")
         return r.stdout

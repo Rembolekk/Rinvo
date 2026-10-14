@@ -37,13 +37,13 @@ KARTA = {
 
 
 def zgloszenie(numer=41, tytul="Toruń podaje sobotę do 14:00 zamiast do 15:00", etykiety=None, priorytet=0,
-               stan="Todo", created="2026-10-06T10:00:00Z"):
+               stan="Todo", created="2026-10-06T10:00:00Z", klient="auto-tama"):
     item = {"sekcja": 1, "typ": "bug", "tytul": tytul, "opis": "Toruń podaje złe godziny.", "pewnosc": "wysoka",
             "klucz_sprawy": "k", "cytat": ["Toruń dalej po staremu.", "Oba salony mają do piętnastej."],
             "cel": "Toruń podaje w sobotę godziny do 15:00.",
             "kryteria_akceptacji": ["config: Toruń sobota do 15:00", "wiedza: Toruń sobota 9:00–15:00"],
             "jak_sprawdzic": "Przejrzeć config i wiedzę.", "repo": "rinvo-app"}
-    return {"id": f"id-{numer}", "identifier": f"RIN-{numer}", "title": f"[auto-tama] {tytul}",
+    return {"id": f"id-{numer}", "identifier": f"RIN-{numer}", "title": f"[{klient}] {tytul}",
             "description": linear_sync.build_description(item, "src.md", KARTA, zasady.przypisz(item, Z, KARTA), Z),
             "priority": priorytet, "createdAt": created, "url": f"https://linear.app/ws/issue/RIN-{numer}/x", "state": stan,
             "labels": list(etykiety) if etykiety is not None else ["Konfiguracja", "Dla agenta", "repo: rinvo-app"]}
@@ -141,7 +141,8 @@ class AtrapaClaude:
 
 class AtrapaGitHub:
     def __init__(self, prs=(), pliki=("config/auto-tama.yaml", "wiedza/auto-tama.md"), runy=None, statusy=(), recenzje=(),
-                 inline=(), komentarze=(), blad_scalenia=None):
+                 inline=(), komentarze=(), blad_scalenia=None, blad_aktualizacji=None):
+        self.blad_aktualizacji, self.aktualizacje = blad_aktualizacji, []
         self.prs, self.pliki, self.runy, self.statusy_lista = list(prs), list(pliki), runy, list(statusy)
         self.recenzje_lista, self.inline_lista, self.komentarze_lista = list(recenzje), list(inline), list(komentarze)
         self.blad_scalenia = blad_scalenia
@@ -149,6 +150,14 @@ class AtrapaGitHub:
 
     def otwarte_pr(self):
         return self.prs
+
+    def pr(self, numer):
+        return next(p for p in self.prs if p["number"] == numer)
+
+    def aktualizuj_galaz(self, numer):
+        if self.blad_aktualizacji:
+            raise RuntimeError(self.blad_aktualizacji)
+        self.aktualizacje.append(numer)
 
     def utworz_pr(self, tytul, galaz, opis, baza="main"):
         self.utworzone.append({"tytul": tytul, "galaz": galaz, "opis": opis})
@@ -291,7 +300,7 @@ class TestWyborKandydatow(unittest.TestCase):
 class TestLimit(unittest.TestCase):
 
     def test_maksymalnie_3_zgloszenia_na_przebieg(self):
-        s = Srodowisko([zgloszenie(i) for i in range(1, 7)])
+        s = Srodowisko([zgloszenie(i, klient=f"k{i}") for i in range(1, 7)])     # różni klienci: bez konfliktów plików
         wyniki = agent.uruchom(s)
         self.assertEqual(len(wyniki), A["max_na_przebieg"])
         self.assertEqual(A["max_na_przebieg"], 3)
@@ -299,11 +308,11 @@ class TestLimit(unittest.TestCase):
         self.assertEqual({w["status"] for w in wyniki}, {"pr"})
 
     def test_parametr_max_nadpisuje_limit(self):
-        s = Srodowisko([zgloszenie(i) for i in range(1, 7)])
+        s = Srodowisko([zgloszenie(i, klient=f"k{i}") for i in range(1, 7)])
         self.assertEqual(len(agent.uruchom(s, max_n=1)), 1)
 
     def test_zablokowane_zakazem_nie_zuzywaja_limitu(self):
-        zg = [zgloszenie(i, tytul=f"Zadanie {'opel' if i <= 2 else 'zwykle'} {i}") for i in range(1, 6)]
+        zg = [zgloszenie(i, tytul=f"Zadanie {'opel' if i <= 2 else 'zwykle'} {i}", klient=f"k{i}") for i in range(1, 6)]
         s = Srodowisko(zg, claude=AtrapaClaude(lambda p: '{"konflikt": true, "zakaz": "Z4", "powod": "włącza Opla"}'
                                                if "Zadanie opel" in p else '{"konflikt": false}'))
         wyniki = agent.uruchom(s)
@@ -520,12 +529,15 @@ class TestPrzebiegZgloszenia(unittest.TestCase):
         s = Srodowisko([zgloszenie(41)], git=AtrapaGit(zmienione=[]))
         self.assertEqual(agent.uruchom(s)[0]["status"], "oddane")
 
-    def test_za_duzo_plikow_to_oddanie(self):
-        git = AtrapaGit(zmienione=[f"config/k{i}.yaml" for i in range(A["max_plikow"] + 1)])
-        s = Srodowisko([zgloszenie(41)], git=git)
-        w = agent.uruchom(s)[0]
+    def test_twardy_limit_plikow_to_oddanie_a_zwykla_duza_zmiana_zostaje_jako_pr(self):
+        """ZMIANA ŚWIADOMA (utwardzanie cz. 2): wcześniej już 6 plików kończyło się oddaniem bez PR. Teraz duża zmiana (powyżej 3 plików
+        albo 40 linii) zostaje jako PR bez auto-scalenia, a bez PR oddajemy dopiero powyżej twardego limitu."""
+        git = AtrapaGit(zmienione=[f"config/k{i}.yaml" for i in range(A["max_plikow_twardy"] + 1)])
+        w = agent.uruchom(Srodowisko([zgloszenie(41)], git=git))[0]
         self.assertEqual(w["status"], "oddane")
-        self.assertIn("limit", w["powod"])
+        self.assertIn("twardy limit", w["powod"])
+        git2 = AtrapaGit(zmienione=[f"config/k{i}.yaml" for i in range(A["max_plikow_auto_scalenia"] + 2)])
+        self.assertEqual(agent.uruchom(Srodowisko([zgloszenie(41)], git=git2))[0]["status"], "pr")
 
     def test_sekret_w_diffie_blokuje_wypchniecie(self):
         git = AtrapaGit(diff="+token: lin_api_ABCDEFGH12345678\n")

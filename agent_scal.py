@@ -20,6 +20,7 @@ import re
 import sys
 from datetime import datetime, timezone
 
+import limity
 import slack_widok as sw
 import stan_linear
 import zasady
@@ -79,6 +80,11 @@ def ocen_pr(f, A):
         return {"akcja": "oddaj", "powod": "PR nie zmienia żadnych plików"}
     if not set(f["etykiety_zgloszenia"]) & set(A["typy_scalane_etykiety"]):
         return {"akcja": "oddaj", "powod": "zgłoszenie nie jest typu konfiguracja ani baza wiedzy"}
+    linie, liczba_plikow = f.get("linie", 0), len(f["pliki"])
+    if linie > A["max_linii_auto_scalenia"] or liczba_plikow > A["max_plikow_auto_scalenia"]:
+        return {"akcja": "oddaj", "kategoria": "duza_zmiana",
+                "powod": f"{linie} zmienionych linii w {liczba_plikow} plikach (limit auto-scalenia: {A['max_linii_auto_scalenia']} linii, "
+                         f"{A['max_plikow_auto_scalenia']} plików); PR zostaje, scala człowiek"}
 
     if f["testy"] == "failure":
         return {"akcja": "oddaj", "powod": "testy na PR nie przechodzą"}
@@ -99,6 +105,10 @@ def ocen_pr(f, A):
         if f["poprawki"] < A["max_poprawek_coderabbit"]:
             return {"akcja": "popraw", "powod": f"CodeRabbit zgłosił uwagi ({rec['uwagi']})"}
         return {"akcja": "oddaj", "powod": f"CodeRabbit nadal zgłasza uwagi ({rec['uwagi']}) po poprawce"}
+    if f.get("stan_galezi") == "dirty":
+        return {"akcja": "oddaj", "kategoria": "konflikt", "powod": "gałąź PR ma konflikt z main"}
+    if f.get("stan_galezi") == "behind":
+        return {"akcja": "aktualizuj", "powod": "gałąź PR jest za main: aktualizacja i ponowne testy przed scaleniem"}
     return {"akcja": "scal", "powod": "testy zielone, CodeRabbit bez uwag, zmiana tylko w config/ lub wiedza/"}
 
 
@@ -114,7 +124,13 @@ def zbierz_fakty(gh, pr, zg, A, teraz):
     sha = pr["head"]["sha"]
     runy, statusy = gh.check_runs(sha), gh.statusy(sha)
     komentarze = gh.komentarze(pr["number"])
+    try:
+        szczegoly = pr if "additions" in pr else gh.pr(pr["number"])
+    except (AttributeError, Exception):  # noqa: BLE001
+        szczegoly = pr
     return {
+        "linie": (szczegoly.get("additions") or 0) + (szczegoly.get("deletions") or 0),
+        "stan_galezi": szczegoly.get("mergeable_state"),
         "pliki": gh.pliki_pr(pr["number"]),
         "etykiety_zgloszenia": zg.get("labels", []),
         "testy": stan_testow(runy),
@@ -141,12 +157,14 @@ def _slack_oddal(s, zg, pr, powod):
 
 # ── akcje ─────────────────────────────────────────────────────────────────────
 
-def oddaj_czlowiekowi(s, zg, pr, powod):
-    """Etykieta „Decyzja człowieka” z powodem „przegląd kodu”: komentarz w Linearze i na PR, Slack."""
+def oddaj_czlowiekowi(s, zg, pr, powod, kategoria=None):
+    """Etykieta „Decyzja człowieka” z powodem (domyślnie „przegląd kodu”, dla dużej zmiany „duża zmiana”): komentarz w Linearze
+    i na PR, Slack."""
     A = s.Z["agent_wykonawczy"]
-    pelny = f"{A['powod_przegladu']}: {powod}"
+    nazwa_powodu = A.get("powody_kategorii", {}).get(kategoria, A["powod_przegladu"])
+    pelny = f"{nazwa_powodu}: {powod}"
     s.linear.dodaj_etykiete(zg, s.Z["etykiety"]["czlowiek"])
-    s.linear.komentarz(zg, f"**Decyzja człowieka: {A['powod_przegladu']}**\n\n{powod}\n\nPR: {pr.get('html_url', '')}")
+    s.linear.komentarz(zg, f"**Decyzja człowieka: {nazwa_powodu}**\n\n{powod}\n\nPR: {pr.get('html_url', '')}")
     zdarzenia.zapisz_zdarzenie(s, "pr_oddany", klient_z_tytulu(zg.get("title")), zg["identifier"], tytul_bez_prefiksu(zg.get("title")), pr.get("html_url"))
     s.github.komentarz(pr["number"], f"{TEKST_ODDANIA} ({pelny}). Automatyczne scalenie wstrzymane. "
                                      f"Gdy przyczyna zniknie, agent sam wznowi scalanie. {ZNACZNIK_ODDANIA}")
@@ -216,10 +234,19 @@ def obsluz_pr(s, pr):
                                f"(testy, CodeRabbit, scalenie): {pr.get('html_url', '')}")
         s.github.komentarz(pr["number"], f"Przyczyna oddania zniknęła, agent wznawia scalanie. {ZNACZNIK_WZNOWIENIA}")
 
+    elif stan_oddania(s.github.komentarze(pr["number"])) == "oddane":
+        print(f"  PR #{pr['number']}: pominięty, człowiek zdjął etykietę „{E['czlowiek']}” po oddaniu przez agenta (przejął PR)")
+        return None
     if d["akcja"] == "czekaj":
         return {"akcja": "czekaj", "powod": d["powod"], "numer": pr["number"]}
     if d["akcja"] == "oddaj":
-        return oddaj_czlowiekowi(s, zg, pr, d["powod"])
+        return oddaj_czlowiekowi(s, zg, pr, d["powod"], d.get("kategoria"))
+    if d["akcja"] == "aktualizuj":
+        try:
+            s.github.aktualizuj_galaz(pr["number"])
+        except Exception as exc:  # noqa: BLE001
+            return oddaj_czlowiekowi(s, zg, pr, f"nie udało się zaktualizować gałęzi z main ({slack_bezpiecznie(str(exc), 100)})", "konflikt")
+        return {"akcja": "zaktualizowana", "powod": d["powod"], "numer": pr["number"]}
     if d["akcja"] == "popraw":
         w = popraw_pr(s, pr, zg, f["recenzja"])
         # znacznik wstawiamy zawsze: poprawka jest jedna, nawet jeśli nic nie zmieniła
@@ -246,7 +273,20 @@ def uruchom_scalanie(s):
         if not pr_agenta(pr):
             print(f"  PR #{pr.get('number')}: nie PR agenta (gałąź „{(pr.get('head') or {}).get('ref')}” albo brak „Fixes RIN-…” w opisie)")
             continue
-        w = obsluz_pr(s, pr)
+        try:
+            w = obsluz_pr(s, pr)
+        except limity.LimitModelu as exc:
+            kolejka = getattr(s, "kolejka", None)
+            if kolejka is not None and kolejka.powiadom_raz():
+                s.slack.wyslij(limity.tekst_oczekiwania_na_limit([f"PR #{pr['number']}"]), None)
+            wyniki.append({"akcja": "oczekuje_na_limit", "numer": pr["number"], "powod": str(exc)[:100]})
+            break
+        except limity.BudzetWyczerpany as exc:
+            budzet = getattr(s, "budzet", None)
+            if budzet is not None and budzet.alert_potrzebny(exc.zakres):
+                s.slack.wyslij(limity.tekst_alertu_budzetu(exc.zakres, budzet.zuzycie(), s.Z), None)
+            wyniki.append({"akcja": "budzet", "numer": pr["number"], "powod": str(exc)})
+            break
         if w is not None:
             wyniki.append(w)
     return wyniki

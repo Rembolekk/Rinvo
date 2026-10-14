@@ -285,7 +285,8 @@ def main():
     args = ap.parse_args()
     s = wy.zbuduj_srodowisko(args.sucho)
     from agent_srodowisko import ClaudeAgent
-    s.claude = ClaudeAgent(os.environ.get("RINVO_MODEL", "").strip() or "claude-sonnet-5-5")
+    import limity
+    s.claude = ClaudeAgent(os.environ.get("RINVO_MODEL", "").strip() or "claude-sonnet-5-5", limity.Budzet(s.Z), "inne", limity.Kolejka(), s.Z)
     s.odswiez = args.odswiez
     dzis = date.fromisoformat(args.dzien) if args.dzien else wy.lokalnie(s.teraz(), s.Z["wysylka"]).date()
     klienci = [args.klient] if args.klient else sorted(p.parent.name for p in Path("ops/klienci").glob("*/karta.json"))

@@ -12,7 +12,8 @@
     "wielu_klientow": "Wielu klientów",
     "szkic": "Szkic gotowy",
     "wyslij": "Wyślij",
-    "wyslano": "Wysłano"
+    "wyslano": "Wysłano",
+    "regresja": "Regresja"
   },
   "czlowiek_gdy": {
     "pieniadze": {
@@ -245,7 +246,20 @@
     "autor_git": {
       "imie": "Rinvo Agent",
       "email": "agent@rinvo.invalid"
-    }
+    },
+    "max_linii_auto_scalenia": 40,
+    "max_plikow_auto_scalenia": 3,
+    "max_plikow_twardy": 30,
+    "_duza_zmiana": "Powyżej max_linii_auto_scalenia albo max_plikow_auto_scalenia PR zostaje, ale bez auto-scalenia: Decyzja człowieka z powodem „duża zmiana”. max_plikow_twardy to bezpiecznik: więcej plików agent w ogóle nie wypycha.",
+    "powody_kategorii": {
+      "duza_zmiana": "duża zmiana",
+      "konflikt": "konflikt z main"
+    },
+    "pliki_klienta": [
+      "config/{klient}.yaml",
+      "wiedza/{klient}.md"
+    ],
+    "_pliki_klienta": "Pliki, które agent może zmienić dla klienta: zadanie nie rusza, gdy któryś z nich ma otwarty PR innego zadania (czeka na scalenie)."
   },
   "tematy_konfiguracji": {
     "_opis": "Zakazy dotyczące tej samej części konfiguracji co zgłoszenie idą na górę sekcji „Czego nie ruszać”. Temat jest aktywny, gdy w tytule, celu, opisie lub kryteriach zgłoszenia występuje któreś ze słów z „zgloszenie”; zakaz jest powiązany, gdy w jego tytule występuje słowo z „zakaz”.",
@@ -636,5 +650,91 @@
     "przekazany_mail": "treść przekazana: informacja, nie decyzja",
     "zalacznik_zablokowany": "załącznik zablokowany, nie jest dowodem dostarczenia",
     "polecenie_w_tresci": "w treści jest polecenie dla systemu"
+  },
+  "regresja": {
+    "_opis": "Gdy późniejsze źródło opisuje problem w sprawie, która jest Done, system otwiera to samo zgłoszenie ponownie (Todo, komentarz „wróciło” z cytatem i źródłem, etykieta Regresja) zamiast tworzyć nowe.",
+    "typy": [
+      "bug",
+      "zmiana_konfiguracji",
+      "poprawka_bazy_wiedzy"
+    ],
+    "etykieta": "Regresja"
+  },
+  "blokady": {
+    "_opis": "Blokady typu „nic nowego nie startuje” (np. urlop klienta) nie blokują poprawek błędów i korekt istniejącej konfiguracji, ale blokują nowe kampanie, marki, funkcje i teksty. Zakaz jest blokadą, gdy jego tytuł pasuje do wzorca i ma okres (zakazy_czas); strażnik agenta stosuje regułę.",
+    "wzorce_zakazu": [
+      "nic nowego",
+      "nie wdra",
+      "nie startuj",
+      "nie uruchamiaj nowych"
+    ],
+    "dozwolone_etykiety": [
+      "Błąd"
+    ],
+    "dozwolone_slowa": [
+      "błąd",
+      "błędn",
+      "popraw",
+      "korekt",
+      "napraw",
+      "aktualizacj",
+      "nieaktualn",
+      "godzin",
+      "adres",
+      "literówk"
+    ],
+    "blokowane_slowa": [
+      "kampani",
+      "marka",
+      "marki",
+      "marek",
+      "opel",
+      "funkcj",
+      "tekst wstępu",
+      "teksty wstępu",
+      "nowy",
+      "nowa",
+      "nowe",
+      "włącz",
+      "uruchom",
+      "wdroż",
+      "wprowadz",
+      "dodać",
+      "dodaj"
+    ]
+  },
+  "limity_modelu": {
+    "_opis": "Błąd limitu albo kredytów z claude: zadanie idzie do kolejki „oczekuje na limit”, nie liczy się jako nieudana próba, jedna informacja na Slacku na epizod, ponowienie przy następnym przebiegu.",
+    "wzorce": [
+      "usage limit",
+      "rate limit",
+      "limit reached",
+      "limit exceeded",
+      "credit balance",
+      "insufficient credit",
+      "quota",
+      "too many requests",
+      "\\b429\\b",
+      "overloaded",
+      "reached your .{0,30}limit",
+      "limit will reset"
+    ],
+    "kod_wyjscia": 75
+  },
+  "budzet_modelu": {
+    "_opis": "Bezpiecznik kosztów: dzienny limit wywołań modelu dla całego systemu i osobno dla agenta. Po przekroczeniu zatrzymanie, alert (raz dziennie), dalej następnego dnia.",
+    "dziennie_razem": 80,
+    "dziennie_agent": 25
+  },
+  "klucze": {
+    "_opis": "Wygasanie kluczy. Token GitHub: nagłówek github-authentication-token-expiration odpowiedzi API. Pozostałe sekrety: data wygaśnięcia ręcznie w „daty” (nazwa → RRRR-MM-DD). 7 dni przed: linijka w „Uwadze” podsumowania.",
+    "dni_przed": 7,
+    "daty": {},
+    "naglowek_github": "github-authentication-token-expiration"
+  },
+  "eskalacja": {
+    "_opis": "„Decyzja człowieka” bez reakcji (brak zmiany w zgłoszeniu) ponad dni_do_gory dni roboczych idzie na górę porannego podsumowania z liczbą dni; ponad dni_osobna_wiadomosc: osobna wiadomość raz.",
+    "dni_do_gory": 2,
+    "dni_osobna_wiadomosc": 5
   }
 }

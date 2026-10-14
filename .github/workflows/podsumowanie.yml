@@ -43,6 +43,7 @@ jobs:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
           RECZNIE: ${{ github.event_name == 'workflow_dispatch' }}
+          AGENT_GITHUB_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
         run: |
           set -uo pipefail
           if [ "$RECZNIE" = "true" ]; then
@@ -81,7 +82,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           python3 generuj_strony.py || echo "::warning::Strony nie zostały odświeżone"
-          for sciezka in ops/klienci ops/.podsumowanie.json index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/.sygnaly.json ops/materialy; do
+          for sciezka in ops/klienci ops/.podsumowanie.json index.html klienci glos-klientow.html ops/.stan_linear.json ops/.zdarzenia.json ops/.sygnaly.json ops/.reczne_zmiany.json ops/.zmiany_automatu.json ops/.zuzycie_modelu.json ops/.kolejka_limit.json ops/materialy; do
             [ -e "$sciezka" ] && git add -A -- "$sciezka"
           done
           if git diff --cached --quiet; then

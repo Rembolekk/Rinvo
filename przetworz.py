@@ -33,7 +33,7 @@ from pathlib import Path
 
 import slack_widok as sw
 import zasady
-from maile import czy_mail, oznacz_przetworzony, slack_bezpiecznie, wczytaj_meta_maila
+from maile import cofnij_probe, czy_mail, oznacz_przetworzony, slack_bezpiecznie, wczytaj_meta_maila
 from sekrety import NAZWY_SEKRETOW, czysc, wyczysc_srodowisko
 
 
@@ -528,6 +528,30 @@ def main():
                 "--dangerously-skip-permissions",
             ]
 
+            def odloz_na_limit(powod_slack):
+                """Limit/kredyty/budżet: zadanie czeka w kolejce, to nie nieudana próba, jedna informacja na Slacku; kod wyjścia 75."""
+                import limity
+                kolejka = limity.Kolejka()
+                kolejka.dodaj(transkrypcja)
+                if czy_mail(transkrypcja):
+                    cofnij_probe(transkrypcja)
+                if powod_slack is not None:
+                    send_slack(powod_slack, log_path=log_path)
+                print(f"Zadanie czeka na limit modelu (kolejka „oczekuje na limit”): {transkrypcja}")
+                release_lock()
+                sys.exit(limity_kod_wyjscia)
+
+            import limity
+            import zasady as zasady_
+            Zl = zasady_.wczytaj_zasady()
+            limity_kod_wyjscia = Zl["limity_modelu"]["kod_wyjscia"]
+            budzet = limity.Budzet(Zl)
+            try:
+                budzet.zuzyj("inne")
+            except limity.BudzetWyczerpany as exc:
+                alert = limity.tekst_alertu_budzetu(exc.zakres, budzet.zuzycie(), Zl) if budzet.alert_potrzebny(exc.zakres) else None
+                odloz_na_limit(alert)
+
             print("Uruchamiam analizę Claude (do 30 min)…")
             with open(log_path, "w", encoding="utf-8") as lf:
                 lf.write(f"=== przetworz.py ===\n")
@@ -549,6 +573,14 @@ def main():
                     )
             except subprocess.TimeoutExpired:
                 fail("claude", "Przekroczono limit 30 minut.")
+
+            if r.returncode != 0 and limity.czy_limit(tail_log(log_path, 40), Zl):
+                kolejka_ = limity.Kolejka()
+                tekst_oczek = limity.tekst_oczekiwania_na_limit(kolejka_.lista() + [transkrypcja]) if kolejka_.powiadom_raz() else None
+                odloz_na_limit(tekst_oczek)
+            if r.returncode == 0:
+                limity.Kolejka().sukces()
+                limity.Kolejka().usun(transkrypcja)
 
             if r.returncode != 0:
                 # claude zwykle pisze przyczynę (np. "Not logged in", "401") na stdout

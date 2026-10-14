@@ -22,6 +22,7 @@ sam sprawdza czas w Europe/Warsaw (lato/zima) i wysyła raz dziennie.
 
 import argparse
 import json
+import os
 import re
 import sys
 from datetime import date, datetime, timedelta, timezone
@@ -75,7 +76,7 @@ def czy_pora(teraz_utc, stan, Z, wymus=False):
 
 # ── dane z Lineara ────────────────────────────────────────────────────────────
 
-_POLA = "id identifier url title createdAt dueDate state { name type } labels { nodes { name } }"
+_POLA = "id identifier url title createdAt updatedAt dueDate state { name type } labels { nodes { name } }"
 
 
 def _pobierz(api_key, filtr):
@@ -224,6 +225,55 @@ def kategoria(z, dzis, Z, nowe_ids=()):
     return None
 
 
+def dni_robocze(od, do, swieta=()):
+    """Liczba dni roboczych (pon–pt, bez świąt) w przedziale (od, do]: ile dni roboczych minęło od dnia „od”."""
+    n, d = 0, od
+    while d < do:
+        d += timedelta(days=1)
+        if d.weekday() < 5 and d.isoformat() not in swieta:
+            n += 1
+    return n
+
+
+def _zmiana(z):
+    t = z.get("updatedAt") or z.get("createdAt") or ""
+    return _data(t[:10])
+
+
+def eskalacje(otwarte, karty, Z, dzis):
+    """„Decyzja człowieka” bez reakcji (bez zmiany w zgłoszeniu) ponad eskalacja.dni_do_gory dni roboczych: [{"z","klient","dni"}],
+    od najdłużej czekających. Dni liczone od ostatniej zmiany zgłoszenia."""
+    prog = Z["eskalacja"]["dni_do_gory"]
+    swieta = Z.get("wysylka", {}).get("swieta", [])
+    wynik = []
+    for z in otwarte:
+        klient = klient_z_tytulu(z.get("title"))
+        if klient not in karty or Z["etykiety"]["czlowiek"] not in _etykiety(z):
+            continue
+        od = _zmiana(z)
+        dni = dni_robocze(od, dzis, swieta) if od else 0
+        if dni > prog:
+            wynik.append({"z": z, "klient": klient, "dni": dni})
+    return sorted(wynik, key=lambda e: (-e["dni"], e["z"]["identifier"]))
+
+
+def eskalacje_osobne(dane, stan, Z, wyslij):
+    """Decyzja człowieka bez reakcji ponad eskalacja.dni_osobna_wiadomosc dni roboczych: osobna wiadomość, RAZ na zgłoszenie
+    (stan["eskalowane"]). wyslij(tekst) → (ok, błąd). Zwraca identyfikatory, o których wysłano wiadomość."""
+    prog = Z["eskalacja"]["dni_osobna_wiadomosc"]
+    wyslane = stan.setdefault("eskalowane", [])
+    nowe = []
+    for e in dane.get("eskalacje", []):
+        ident = e["z"]["identifier"]
+        if e["dni"] > prog and ident not in wyslane:
+            ok, _ = wyslij(f":rotating_light: Decyzja człowieka czeka już {e['dni']} dni roboczych bez reakcji: "
+                           f"{sw.link(e['z'].get('url'), e['z'].get('title'), 60)} ({e['klient']}). Podejmij decyzję albo oddaj zgłoszenie.")
+            if ok:
+                wyslane.append(ident)
+                nowe.append(ident)
+    return nowe
+
+
 def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
     """Dane do wiadomości: jedna lista dla wszystkich klientów, bez powtórzeń (jedna kategoria na zgłoszenie)."""
     klienci = zbierz(otwarte, [], karty, Z, dzis)            # tylko dla szkiców przypomnień
@@ -252,6 +302,9 @@ def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
                         szkic=z["identifier"] in z_szkicem)
         grupy[kat].append(wpis)
 
+    eskal = eskalacje(otwarte, karty, Z, dzis)
+    eskal_ids = {e["z"]["identifier"] for e in eskal}
+    grupy["czlowiek"] = [h for h in grupy["czlowiek"] if h["z"]["identifier"] not in eskal_ids]     # na górze z liczbą dni, bez powtórki
     human = sorted(grupy["czlowiek"] + grupy["weryfikacja"],
                    key=lambda h: (KOLEJNOSC_POWODOW.index(h["powod"]) if h["powod"] in KOLEJNOSC_POWODOW else 9,
                                   h["z"]["identifier"]))
@@ -260,7 +313,7 @@ def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
                        if _data(w["z"].get("dueDate")) and _data(w["z"]["dueDate"]) >= dzis),
                       key=lambda x: (x[0], x[2]["identifier"]))
     return {
-        "human": human, "uwaga": uwaga, "szkice": szkice,
+        "human": human, "uwaga": uwaga, "szkice": szkice, "eskalacje": eskal, "klucze_uwaga": [],
         "agenci_otwarte": len(grupy["agent"]), "agenci_skonczone": len({z["identifier"] for z in skonczone}),
         "czeka_n": len(grupy["czeka"]), "czeka_najblizsze": przyszle[0] if przyszle else None,
         "nowe_n": len(grupy["nowe"]),
@@ -274,6 +327,10 @@ def buduj_wiadomosc(dane, dzis):
     """(tekst, bloki) wiadomości Slack."""
     n = len(dane["human"])
     sekcje = []
+    if dane.get("eskalacje"):                         # „Decyzja człowieka” czeka ponad próg: na samej górze z liczbą dni
+        linie = [sw.linia_pozycji(e["z"].get("url"), e["z"].get("title"), e["klient"], "decyzja",
+                                  f"czeka {e['dni']} {'dzień' if e['dni'] == 1 else 'dni'} roboczych") for e in dane["eskalacje"]]
+        sekcje.append("*Czeka najdłużej na Twoją decyzję*\n" + "\n".join(sw.ogranicz(linie)))
     if n == 0:
         sekcje.append("*Dziś nic nie wymaga człowieka.*")
     else:
@@ -281,13 +338,14 @@ def buduj_wiadomosc(dane, dzis):
         linie = [sw.linia_pozycji(h["z"].get("url"), h["z"].get("title"), h["klient"], h["powod"])
                  for h in dane["human"]]
         sekcje.append("*Wymaga człowieka*\n" + "\n".join(sw.ogranicz(linie)))
-    if dane["uwaga"]:
+    if dane["uwaga"] or dane.get("klucze_uwaga"):
         linie = []
         for u in dane["uwaga"]:
             dod = f"termin {u['termin'].strftime('%d.%m')}" if u.get("termin") else None
             if u.get("szkic"):
                 dod = (dod + ", " if dod else "") + "szkic przypomnienia poniżej"
             linie.append(sw.linia_pozycji(u["z"].get("url"), u["z"].get("title"), u["klient"], u["powod"], dod))
+        linie += list(dane.get("klucze_uwaga") or [])           # wygasające klucze i tokeny
         sekcje.append("*Uwaga*\n" + "\n".join(sw.ogranicz(linie)))
     for sz in dane["szkice"]:
         tresc = "\n".join("> " + slack_bezpiecznie(l, 200) for l in sz["tekst"].splitlines() if l.strip())
@@ -373,7 +431,13 @@ def main():
     dzis = czas_polski(teraz).date()
     otwarte, skonczone = pobierz_zgloszenia(api_key, teraz, Z["podsumowanie"].get("okno_nowych_godzin", 26))
     klienci = zbierz(otwarte, [], karty, Z, dzis)
-    tekst, bloki = buduj_wiadomosc(przygotuj(otwarte, skonczone, karty, Z, dzis), dzis)
+    dane = przygotuj(otwarte, skonczone, karty, Z, dzis)
+    # wygasające klucze: token GitHub (nagłówek odpowiedzi API) i daty z ops/zasady.json; 7 dni przed: linijka w „Uwadze”
+    import klucze
+    naglowek = klucze.pobierz_naglowek_github(os.environ.get("AGENT_GITHUB_TOKEN", ""), Z["agent_wykonawczy"]["repo_github"],
+                                             Z["klucze"]["naglowek_github"])
+    dane["klucze_uwaga"] = klucze.linie_uwagi(klucze.wygasajace(Z, naglowek, dzis))
+    tekst, bloki = buduj_wiadomosc(dane, dzis)
     print(tekst)
 
     if args.sucho:
@@ -390,6 +454,8 @@ def main():
     if not ok:
         print(f"BŁĄD Slack: {blad}", file=sys.stderr)
         sys.exit(1)
+    # „Decyzja człowieka” bez reakcji ponad dni_osobna_wiadomosc dni roboczych: osobna wiadomość, raz na zgłoszenie
+    eskalacje_osobne(dane, stan, Z, send_slack)
     stan["ostatnie_wyslane"] = czas_polski(teraz).date().isoformat()
     zapisz_stan(stan)
     import stan_linear

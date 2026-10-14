@@ -467,7 +467,8 @@ def main():
     args = ap.parse_args()
     s = wy.zbuduj_srodowisko(args.sucho)
     from agent_srodowisko import ClaudeAgent
-    s.claude = ClaudeAgent(os.environ.get("RINVO_MODEL", "").strip() or "claude-sonnet-5-5")
+    import limity
+    s.claude = ClaudeAgent(os.environ.get("RINVO_MODEL", "").strip() or "claude-sonnet-5-5", limity.Budzet(s.Z), "inne", limity.Kolejka(), s.Z)
     s.tylko_klient = args.klient
     wyniki = uruchom(s)
     for w in wyniki:
