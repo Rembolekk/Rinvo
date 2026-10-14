@@ -10,6 +10,37 @@
       "rola": "przełożony Kasi, decyduje o markach, budżecie i nowych usługach"
     }
   ],
+  "kontakty": [
+    {
+      "imie": "Kasia Malinowska",
+      "email": "mateuszrembecki1@gmail.com",
+      "rola": "BDC, kontakt główny",
+      "zakres_decyzji": "kontakt główny: ustala z Rinvo zakazy i ograniczenia (Opel, stara baza, agent po godzinach, przypomnienia), terminy testów i szkoleń oraz dostarczanie materiałów; marki, budżet i nowe usługi zatwierdza Paweł",
+      "potwierdzony": true,
+      "status": "potwierdzony"
+    }
+  ],
+  "domeny": [
+    "autotama.pl"
+  ],
+  "decyzje_zastrzezone": [
+    {
+      "opis": "Opel, stara baza i agent po godzinach: decyduje Kasia, nie Paweł (zakaz Z4: „jeśli Paweł, a nie Kasia, napisze…”)",
+      "zastrzezone_dla": "Kasia Malinowska",
+      "zakazy": [
+        "Z3",
+        "Z4",
+        "Z9",
+        "Z10",
+        "Z15"
+      ],
+      "klucze_spraw": [
+        "decyzja-opel-stara-baza",
+        "agent-po-godzinach",
+        "material-po-godzinach"
+      ]
+    }
+  ],
   "zakazy": [
     {
       "id": "Z1",

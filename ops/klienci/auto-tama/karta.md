@@ -5,6 +5,15 @@
 - **Kasia Malinowska** – BDC, kontakt główny
 - **Paweł** – przełożony Kasi, decyduje o markach, budżecie i nowych usługach
 
+## Kontakty (maile)
+
+- **Kasia Malinowska** <mateuszrembecki1@gmail.com> — BDC, kontakt główny; decyzje: kontakt główny: ustala z Rinvo zakazy i ograniczenia (Opel, stara baza, agent po godzinach, przypomnienia), terminy testów i szkoleń oraz dostarczanie materiałów; marki, budżet i nowe usługi zatwierdza Paweł
+- Domeny klienta: autotama.pl
+
+## Decyzje zastrzeżone dla konkretnej osoby
+
+- Opel, stara baza i agent po godzinach: decyduje Kasia, nie Paweł (zakaz Z4: „jeśli Paweł, a nie Kasia, napisze…”) — tylko: **Kasia Malinowska**
+
 ## Zakazy i ograniczenia
 
 ### Z1: Limit prób pozostaje 5 – bez schodzenia do 3

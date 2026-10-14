@@ -1,0 +1,208 @@
+name: Sprawdzanie maili
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch:
+    inputs:
+      sciezka:
+        description: "Ścieżka zapisanego maila do (ponownego) przetworzenia, np. ops/maile/auto-tama/2026-10-14-temat.md. Puste = pobierz nowe maile ze skrzynki"
+        required: false
+        default: ""
+
+# Ta sama grupa co przetwarzanie rozmów: jeden przebieg naraz, bo oba zapisują karty klientów i rejestr.
+concurrency:
+  group: przetworz-rozmowy
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  maile:
+    # Cron rusza dopiero po ustawieniu zmiennej repozytorium MAILE_WLACZONE=true
+    # (Settings → Secrets and variables → Actions → Variables). Ręczne uruchomienie działa zawsze.
+    if: github.event_name != 'schedule' || vars.MAILE_WLACZONE == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Zależności (certifi)
+        run: pip install certifi
+
+      - name: Tożsamość git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+      # Tylko ten krok widzi hasło do Gmaila. Skrzynka jest otwierana tylko do odczytu.
+      - name: Pobierz maile
+        id: pobierz
+        env:
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          SCIEZKA: ${{ github.event.inputs.sciezka }}
+        run: |
+          set -euo pipefail
+          : > /tmp/maile.txt
+          if [ -n "${SCIEZKA:-}" ]; then
+            if [ ! -f "$SCIEZKA" ]; then
+              echo "::error::Brak pliku: $SCIEZKA"
+              exit 1
+            fi
+            printf '%s\n' "$SCIEZKA" > /tmp/maile.txt
+          else
+            python3 maile.py --lista /tmp/maile.txt
+          fi
+          N=$(grep -c . /tmp/maile.txt || true)
+          echo "liczba=$N" >> "$GITHUB_OUTPUT"
+          echo "Maile do przetworzenia: $N"
+
+      # Rejestr Message-ID, nowe pliki maili i nowe kontakty zapisujemy od razu: nawet gdy analiza padnie,
+      # ten sam mail nie zostanie pobrany drugi raz (ponowne przetworzenie: ręcznie, z polem "sciezka").
+      - name: Zapisz rejestr i pobrane maile
+        run: |
+          set -uo pipefail
+          for sciezka in ops/.maile.json ops/maile ops/klienci; do
+            [ -e "$sciezka" ] && git add -A -- "$sciezka"
+          done
+          if git diff --cached --quiet; then
+            echo "Brak zmian do zapisania"
+            exit 0
+          fi
+          git commit -q -m "[automat] maile: pobrano ${{ steps.pobierz.outputs.liczba }}, rejestr [skip ci]"
+          for proba in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            echo "Push odrzucony (próba $proba/3), pull --rebase…"
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 1; }
+          done
+          exit 1
+
+      - name: Node.js (dla Claude Code)
+        if: steps.pobierz.outputs.liczba != '0'
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Claude Code
+        if: steps.pobierz.outputs.liczba != '0'
+        run: npm install -g @anthropic-ai/claude-code
+
+      - name: Diagnostyka Claude
+        if: steps.pobierz.outputs.liczba != '0'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: |
+          set -uo pipefail
+          MODEL="${RINVO_MODEL:-}"
+          MODEL="${MODEL:-claude-sonnet-5-5}"
+          export CLAUDE_CODE_OAUTH_TOKEN="$(python3 sekrety.py CLAUDE_CODE_OAUTH_TOKEN)"
+          if [ -z "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN jest pusty lub nieustawiony"
+            exit 1
+          fi
+          set +e
+          ODP=$(claude -p "Odpowiedz jednym słowem: OK" --model "$MODEL" \
+                  --tools "Read,Write,Edit" --allowedTools "Read,Write,Edit" \
+                  --dangerously-skip-permissions < /dev/null 2>&1)
+          RC=$?
+          set -e
+          echo "Model: $MODEL, kod wyjścia: $RC, odpowiedź: $ODP"
+          [ "$RC" -eq 0 ] || { echo "::error::claude -p nie działa na serwerze (kod $RC)"; exit 1; }
+
+      # Analiza maila nie widzi LINEAR_API_KEY ani haseł Gmaila w swoim środowisku (przetworz.py je usuwa),
+      # a model dostaje tylko narzędzia Read, Write, Edit (bez Bash).
+      - name: Przetwórz maile
+        if: steps.pobierz.outputs.liczba != '0'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: |
+          set -uo pipefail
+          touch /tmp/start_przetwarzania
+
+          zapisz() {
+            local plik="$1"
+            local temat
+            temat=$(python3 -c 'import sys,re; from maile import wczytaj_meta_maila; t=wczytaj_meta_maila(sys.argv[1]).get("temat","bez tematu"); print(re.sub(r"[^\w .,:;!?()/+-]", "", t)[:80].strip() or "bez tematu")' "$plik")
+            for sciezka in wyniki ops/klienci ops/produkt ops/.przetworzone.json ops/.maile.json ops/maile logi/przebiegi; do
+              [ -e "$sciezka" ] && git add -A -- "$sciezka"
+            done
+            if git diff --cached --quiet; then
+              echo "Brak zmian do zapisania dla $plik"
+              return 0
+            fi
+            git commit -q -m "[automat] mail $temat [skip ci]"
+            for proba in 1 2 3; do
+              git push origin HEAD:main && return 0
+              echo "Push odrzucony (próba $proba/3), pull --rebase…"
+              git pull --rebase origin main || { git rebase --abort 2>/dev/null; return 1; }
+            done
+            return 1
+          }
+
+          BLEDY=0
+          while IFS= read -r plik; do
+            [ -z "$plik" ] && continue
+            echo "::group::przetworz.py $plik"
+            python3 przetworz.py "$plik"
+            RC=$?
+            echo "::endgroup::"
+            if [ "$RC" -ne 0 ]; then
+              echo "::error::przetworz.py zakończył się błędem dla $plik (kod $RC)"
+              BLEDY=$((BLEDY + 1))
+            fi
+            zapisz "$plik" || { echo "::error::Nie udało się wypchnąć wyników dla $plik"; BLEDY=$((BLEDY + 1)); }
+          done < /tmp/maile.txt
+
+          [ "$BLEDY" -eq 0 ] || { echo "::error::Błędy: $BLEDY"; exit 1; }
+
+      - name: Ostatnie linie logu przebiegu
+        if: failure()
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          GMAIL_ADDRESS: ${{ secrets.GMAIL_ADDRESS }}
+          GMAIL_APP_PASSWORD: ${{ secrets.GMAIL_APP_PASSWORD }}
+        run: |
+          python3 - <<'EOF'
+          import glob, os
+          from pathlib import Path
+          from przetworz import redact
+
+          logi = sorted(glob.glob("logi/przebiegi/*.log"), key=os.path.getmtime)
+          start = Path("/tmp/start_przetwarzania")
+          if start.exists():
+              logi = [l for l in logi if os.path.getmtime(l) >= start.stat().st_mtime]
+          if not logi:
+              print("Brak logów przebiegu z tego uruchomienia.")
+          for l in logi:
+              linie = Path(l).read_text(encoding="utf-8", errors="replace").splitlines()
+              print(f"::group::{l} (ostatnie 60 linii)")
+              print(redact("\n".join(linie[-60:])))
+              print("::endgroup::")
+          EOF
+
+      - name: Logi jako artifact
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logi-maile-${{ github.run_id }}
+          path: logi/przebiegi
+          if-no-files-found: ignore
+          retention-days: 14

@@ -15,7 +15,8 @@ import sys
 import unicodedata
 
 NAZWY_SEKRETOW = ("CLAUDE_CODE_OAUTH_TOKEN", "ANTHROPIC_API_KEY",
-                  "LINEAR_API_KEY", "SLACK_WEBHOOK_URL")
+                  "LINEAR_API_KEY", "SLACK_WEBHOOK_URL",
+                  "GMAIL_ADDRESS", "GMAIL_APP_PASSWORD")  # hasło aplikacji Gmaila bywa pokazane ze spacjami
 
 # kategorie Unicode do usunięcia: separatory (Zs, Zl, Zp), znaki sterujące (Cc),
 # formatujące (Cf: zero-width, BOM, kierunek pisma)

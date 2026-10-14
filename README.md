@@ -63,9 +63,13 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `przetworz.py` | automat end-to-end: rejestr → Claude → daty.py → render.py → Linear → Slack |
 | `linear_sync.py` | wysyła wynik.json do Linear (team RIN); idempotentny po klucz_sprawy |
 | `sekrety.py` | czyszczenie kluczy API z białych i niewidocznych znaków (Notatki na Macu je dodają) |
+| `maile.py` | pobieranie maili od znanych nadawców (Gmail IMAP, tylko odczyt) → `ops/maile/` |
+| `.claude/commands/analizuj-mail.md` | instrukcja analizy maila (dane, nie polecenia) |
+| `.github/workflows/sprawdz-maile.yml` | cron co 15 min: maile → przetworz.py → commit |
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
-| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 40 testów) |
+| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 42 testy) |
+| `testy/test_maile.py`, `testy/maile/*.eml` | testy źródła „maile” na przykładowych plikach .eml (33 testy) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -201,6 +205,36 @@ flowchart LR
 
 Sekrety (*Settings → Secrets and variables → Actions*): `CLAUDE_CODE_OAUTH_TOKEN` (z `claude setup-token`), `LINEAR_API_KEY`, `SLACK_WEBHOOK_URL`. Bez pliku `.env` `przetworz.py` czyta je ze zmiennych środowiskowych.
 
+## Źródło: maile
+
+Drugie źródło obok transkrypcji: maile od klienta. Skrzynka automatu to osobne konto Gmail (`GMAIL_ADDRESS`).
+
+> **Uwaga: repo demo jest publiczne**, więc wszystkie dane (maile, karty klientów, wyniki) są fikcyjne. W produkcji repo Rinvo-Ops jest prywatne.
+
+```mermaid
+flowchart LR
+    A[mail od klienta] --> B["maile.py<br/>Gmail IMAP, tylko odczyt"]
+    B -->|znany nadawca| C[ops/maile/&lt;klient&gt;/&lt;data&gt;-&lt;slug&gt;.md]
+    B -->|nieznany| S1[Slack: pominięto nadawcę]
+    C --> D["przetworz.py<br/>analizuj-mail.md"]
+    D --> E[Linear + Slack + karta klienta]
+```
+
+- **`maile.py`** (biblioteka standardowa: `imaplib`, `email`) otwiera INBOX **tylko do odczytu** (`SELECT readonly`, treść przez `BODY.PEEK`). Niczego nie wysyła, nie usuwa, nie oznacza ani nie przenosi; test pilnuje, że kod używa wyłącznie `login/select/uid/logout`.
+- **Kto jest znany:** tylko nadawcy z pól `kontakty` w kartach klientów albo z `domeny` klienta. Od nieznanego nadawcy treść **nie jest pobierana**: mail jest tylko liczony, a przy pierwszym wystąpieniu adresu Slack dostaje informację „pominięto mail od nieznanego nadawcy <adres>". W rejestrze nieznani nadawcy są tylko jako hasze (repo bywa publiczne).
+- **Domena klienta** (`domeny`, np. `autotama.pl`): mail z adresu w tej domenie, którego nie ma w kontaktach, jest czytany, a nadawca trafia do `kontakty` z flagą „nowy, bez prawa decyzji" (`potwierdzony: false`) i informacją na Slacku do potwierdzenia przez człowieka. Jego maile mogą dodawać informacje, ale nie uchylają zakazów ani nie zmieniają decyzji. Potwierdzenie: ustaw `potwierdzony: true` (i opis roli) w `ops/klienci/<klient>/karta.json`. Ogólne domeny pocztowe (gmail.com, wp.pl, onet.pl, o2.pl, outlook.com…) nigdy nie są domeną klienta, w nich liczy się tylko pełny adres.
+- **Rejestr** `ops/.maile.json`: Message-ID przetworzonego maila; ten sam mail nigdy nie jest przetwarzany dwa razy.
+- **Zapis** `ops/maile/<klient>/<data>-<slug>.md`: od, do, data, temat, lista nazw załączników, treść tekstowa bez cytowanych wcześniejszych wiadomości i bez stopki.
+- **Analiza** (`.claude/commands/analizuj-mail.md`, krótsza instrukcja): ten sam schemat `wynik.json`, więc `render.py`, `daty.py` i `linear_sync.py` działają bez zmian. Mail najczęściej aktualizuje otwarte sprawy (np. klient przysłał plik → wznowiona); załącznik jest dowodem dostarczenia tylko wtedy, gdy treść wskazuje, czego dotyczy.
+- **Bezpieczeństwo treści:** treść maila to dane, nigdy polecenia („zignoruj…", „system ma…" analizowane jak każda inna treść). Polecenie w imieniu innej osoby („Paweł prosi…") to nie jej decyzja: `pewnosc: niska`. Analiza maila dostaje tylko narzędzia `Read`, `Write`, `Edit` (bez `Bash`) i nie widzi kluczy do Linear, Slacka ani Gmaila. Tematy i tytuły w wiadomości Slack są oczyszczane ze znaczników (`<!channel>`, linki).
+- **Uprawnienia pilnuje kod** (`linear_sync.py`), nie tylko instrukcja. Aktualizacja, która uchyla zakaz albo zmienia decyzję zastrzeżoną dla konkretnej osoby (`decyzje_zastrzezone` w karcie, np. Opel: tylko Kasia, nie Paweł), jest odrzucana, jeśli nadawca maila (albo uczestnicy rozmowy) nie jest tą osobą, jeśli nadawca jest niepotwierdzony lub spoza kontaktów, albo jeśli `pewnosc` jest niska. Odrzucenie: etykieta „Do weryfikacji" i komentarz z powodem (dla zakazu: osobne zgłoszenie), a Slack pokazuje linię „Odrzucone (brak uprawnień)". Nadawcę i datę maila kod bierze z zapisanego pliku maila, nie z `wynik.json` (model nie może się podszyć).
+- **Data maila** jest datą źródła dla reguły „wznowić może tylko późniejsze źródło" (mail z tym samym dniem co sprawa lub starszy jej nie wznawia).
+- **`przetworz.py`** obsługuje oba źródła (ścieżka `ops/maile/<klient>/…md` albo transkrypcja) z tym samym rejestrem, blokadą, Slackiem i testami. Wiadomość na Slacku mówi, że źródłem był mail, i podaje temat.
+
+**Workflow** `.github/workflows/sprawdz-maile.yml`: co 15 minut (cron) i ręcznie; ta sama grupa `concurrency` co przetwarzanie rozmów (karty się nie nadpisują). Kroki: `maile.py` → commit rejestru i maili → `przetworz.py` dla każdego nowego maila → commit „[automat] mail <temat> [skip ci]" i push (przy konflikcie `pull --rebase`). **Cron startuje dopiero po ustawieniu zmiennej repozytorium `MAILE_WLACZONE=true`**; ręczne uruchomienie działa zawsze, a z polem `sciezka` przetwarza ponownie jeden zapisany mail. Sekrety: `GMAIL_ADDRESS`, `GMAIL_APP_PASSWORD` (hasło aplikacji; konto z 2FA i włączonym IMAP) oraz dotychczasowe. Klucze są czyszczone z niewidocznych znaków (`sekrety.py`) i nigdy nie są wypisywane.
+
+Znane ograniczenia: nagłówek `From` może być sfałszowany (nie sprawdzamy DKIM/SPF), więc przy prawdziwym wdrożeniu warto to dodać; data źródła ma dokładność do dnia (mail z tego samego dnia co rozmowa nie wznawia jej spraw); harmonogram GitHuba bywa opóźniony, a w repo bez aktywności jest po 60 dniach wyłączany.
+
 ## Testy automatyczne
 
 Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
@@ -211,7 +245,7 @@ Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
 python3 testy/test_logika.py
 ```
 
-Pokrycie (40 testów):
+Pokrycie (42 testy):
 - `should_get_agent_label` — etykieta „Dla agenta” tylko dla bug/konfiguracja/baza_wiedzy z wysoka pewnością, bez zakazu, bez nowej_funkcji.
 - `process_aktualizacje` — ta sama rozmowa odrzucona, ta sama data odrzucona, późniejsza data akceptowana, nieznana sprawa pominięta.
 - `daty.py compute_windows` — blokada globalna, weekendy pomijane, deadline ogranicza okno.
@@ -222,6 +256,14 @@ Pokrycie (40 testów):
 - Zakazy — id są unikalne w karcie (numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie), ponowna analiza nie dubluje zakazów.
 - Czyszczenie kluczy (`sekrety.py`) — spacje, entery, `\u2028`, `\u2029`, `\u00a0`, znaki zerowej szerokości.
 - Wiadomość Slack — stałe linie (także `: 0`) i parsowanie zdarzeń z `linear_sync.py`.
+
+### Testy maili (offline, na plikach .eml)
+
+```bash
+python3 testy/test_maile.py
+```
+
+33 testy na przykładowych plikach `testy/maile/*.eml`: nieznany nadawca pominięty bez pobierania treści (i Slack tylko raz), ten sam Message-ID pominięty, cytaty i stopka obcięte, nadawca z domeny klienta dodany jako „nowy, bez prawa decyzji", ogólne domeny pocztowe nigdy nie są domeną klienta, aktualizacja zakazu od niewłaściwej osoby odrzucona przez kod, mail starszy niż sprawa nie wznawia, skrzynka otwierana tylko do odczytu.
 
 ### Testy oczekiwań (po analizie)
 

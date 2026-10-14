@@ -2,7 +2,8 @@
 """przetworz.py – automat przetwarzania transkrypcji od początku do końca.
 
 Użycie:
-  python3 przetworz.py ops/transkrypcje/<klient>/<plik>.md
+  python3 przetworz.py ops/transkrypcje/<klient>/<plik>.md      # transkrypcja rozmowy
+  python3 przetworz.py ops/maile/<klient>/<plik>.md             # mail zapisany przez maile.py
   python3 przetworz.py ops/transkrypcje/<klient>/<plik>.md --wymus
   python3 przetworz.py --test-slack
 
@@ -30,6 +31,7 @@ import time
 from datetime import datetime
 from pathlib import Path
 
+from maile import czy_mail, wczytaj_meta_maila
 from sekrety import NAZWY_SEKRETOW, czysc, wyczysc_srodowisko
 
 
@@ -75,9 +77,10 @@ def save_registry(reg):
 # ── klient ────────────────────────────────────────────────────────────────────
 
 def extract_klient(transkrypcja):
+    """Klient ze ścieżki ops/transkrypcje/<klient>/… albo ops/maile/<klient>/…"""
     parts = Path(transkrypcja).parts
     for i, part in enumerate(parts):
-        if part == "transkrypcje" and i + 1 < len(parts):
+        if part in ("transkrypcje", "maile") and i + 1 < len(parts):
             return parts[i + 1]
     return None
 
@@ -208,6 +211,12 @@ def run_step(cmd, log_path, step_name, timeout=120):
 
 # ── Slack: podsumowanie ───────────────────────────────────────────────────────
 
+def slack_bezpiecznie(tekst, limit=120):
+    """Tekst z maila/transkrypcji bez znaków sterujących Slacka (<@U…>, <!channel>, linki)."""
+    t = re.sub(r"\s+", " ", str(tekst or "")).strip()[:limit]
+    return t.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
 def _linia_slack(emoji, nazwa, pozycje, limit=5):
     """Linia z licznikiem (także 0) i listą tytułów pod spodem."""
     out = [f"{emoji} {nazwa}: {len(pozycje)}"]
@@ -219,7 +228,7 @@ def _linia_slack(emoji, nazwa, pozycje, limit=5):
 
 def parse_sync_zdarzenia(sync_stdout):
     """Wyciąga z wyjścia linear_sync.py to, co faktycznie zrobiono w tym przebiegu."""
-    wynik = {"zamkniete": [], "wznowione": [], "ryzyka": [], "wielu_klientow": []}
+    wynik = {"zamkniete": [], "wznowione": [], "ryzyka": [], "wielu_klientow": [], "odrzucone": []}
     for ln in sync_stdout.splitlines():
         m = re.match(r"\s*✓ (RIN-\d+) \(([^)]+)\) → (\w+)\s*$", ln)
         if m:
@@ -236,10 +245,14 @@ def parse_sync_zdarzenia(sync_stdout):
         m = re.match(r"\s*★ Wielu klientów: (RIN-\d+) \(([^)]+)\) \| (.*)$", ln)
         if m:
             wynik["wielu_klientow"].append(m.groups())
+            continue
+        m = re.match(r"\s*⛔ Odrzucono aktualizację: (.+?) → (\w+) \| (.*)$", ln)
+        if m:
+            wynik["odrzucone"].append(m.groups())
     return wynik
 
 
-def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model=None):
+def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model=None, meta_maila=None):
     try:
         d = json.loads(wynik_path.read_text(encoding="utf-8"))
     except Exception:
@@ -290,19 +303,26 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
     def sprawa(ident, klucz, tytul=""):
         info = (karta.get("otwarte_sprawy", {}).get(klucz)
                 or karta.get("zamkniete_sprawy", {}).get(klucz) or {})
-        tytul = tytul or info.get("tytul", "") or klucz
+        tytul = slack_bezpiecznie(tytul or info.get("tytul", "") or klucz, 70)
         url = info.get("url", "") if isinstance(info, dict) else ""
         etykieta = f"<{url}|{ident}>" if url else ident
-        return f"{etykieta} {tytul[:70]}"
+        return f"{etykieta} {tytul}"
 
     zamkniete = [sprawa(i, k) for i, k in zdarzenia["zamkniete"]]
     wznowione = [sprawa(i, k) for i, k in zdarzenia["wznowione"]]
     ryzyka_powt = [sprawa(i, k, t) for i, k, t in zdarzenia["ryzyka"]]
     wielu = [sprawa(i, k, t) for i, k, t in zdarzenia["wielu_klientow"]]
-    zablokowane = [f"{p.get('id', '?')} {p.get('tytul', '')[:70]}" for p in blocked]
-    do_weryfikacji = [f"{p.get('id', '?')} {p.get('tytul', '')[:70]}" for p in niska]
+    zablokowane = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in blocked]
+    do_weryfikacji = [f"{p.get('id', '?')} {slack_bezpiecznie(p.get('tytul', ''), 70)}" for p in niska]
+    odrzucone = [f"{slack_bezpiecznie(k, 40)} → {st}: {slack_bezpiecznie(pow, 110)}"
+                 for k, st, pow in zdarzenia["odrzucone"]]
 
-    lines = [f":white_check_mark: *[{klient}]* Rozmowa z {data} przetworzona"]
+    if meta_maila is not None:
+        # źródłem był mail: Slack mówi to wprost i podaje temat
+        lines = [f":email: *[{klient}]* Źródło: mail z {meta_maila.get('data', data)}, "
+                 f"temat: „{slack_bezpiecznie(meta_maila.get('temat', '(bez tematu)'))}” przetworzony"]
+    else:
+        lines = [f":white_check_mark: *[{klient}]* Rozmowa z {data} przetworzona"]
     lines.append(
         f"Zrób teraz: {len(s1)} | Czeka: {len(s2)} | Ryzyka: {len(s5)} | "
         f"Nowe w Linear: {nowe} | Pominięte: {pominieto}"
@@ -315,6 +335,7 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
     lines += _linia_slack(":rotating_light:", "Powtarzające się ryzyka", ryzyka_powt)
     lines += _linia_slack(":busts_in_silhouette:", "Wielu klientów", wielu)
     lines += _linia_slack(":warning:", "Do weryfikacji", do_weryfikacji)
+    lines += _linia_slack(":no_good:", "Odrzucone (brak uprawnień)", odrzucone)
 
     if ostrzezenia:
         lines.append(f":clock1: Brak faktów czasowych dla {len(ostrzezenia)} pozycji z cytatami o czasie")
@@ -332,7 +353,8 @@ def build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=None, model
         klucz = p.get("klucz_sprawy", "")
         info = otwarte.get(klucz)
         if isinstance(info, dict) and info.get("url"):
-            lines.append(f"  • <{info['url']}|{info.get('identifier', klucz)}> {p['tytul'][:60]}")
+            lines.append(f"  • <{info['url']}|{info.get('identifier', klucz)}> "
+                         f"{slack_bezpiecznie(p['tytul'], 60)}")
     if len(s1) > 5:
         lines.append(f"  … i {len(s1) - 5} więcej")
 
@@ -446,7 +468,8 @@ def main():
             print("Pominięto analizę modelu (--bez-analizy), używam istniejącego wynik.json")
         else:
             # d) claude --print
-            cmd_file = Path(".claude/commands/analizuj.md")
+            cmd_file = Path(".claude/commands/analizuj-mail.md" if czy_mail(transkrypcja)
+                            else ".claude/commands/analizuj.md")
             if not cmd_file.exists():
                 fail("claude", f"Brak pliku komendy: {cmd_file}")
 
@@ -463,6 +486,10 @@ def main():
                 if name in env and not env[name].strip():
                     del env[name]
             env.setdefault("HOME", str(Path.home()))
+            # Model nie potrzebuje kluczy do Linear/Slacka/Gmaila. Treść maila to dane od obcych,
+            # więc nawet po udanej prompt injection nie ma czego wyciec.
+            for name in ("LINEAR_API_KEY", "SLACK_WEBHOOK_URL", "GMAIL_ADDRESS", "GMAIL_APP_PASSWORD"):
+                env.pop(name, None)
 
             # Różnice Mac vs serwer: ścieżka instalacji i logowanie.
             if not shutil.which("claude", path=env.get("PATH")):
@@ -474,10 +501,15 @@ def main():
                                "Na serwerze nie ma sesji z keychaina — wygeneruj token: claude setup-token.")
 
             model = os.environ.get("RINVO_MODEL", "").strip() or DEFAULT_MODEL
+            if czy_mail(transkrypcja):
+                # mail = niezaufane dane: bez Bash. Skrypty (render, daty) uruchamia przetworz.py.
+                narzedzia = ["--tools", "Read,Write,Edit", "--allowedTools", "Read,Write,Edit"]
+            else:
+                narzedzia = ["--allowedTools", "Read,Write,Edit,Bash"]
             claude_cmd = [
                 "claude", "--print", prompt,
                 "--model", model,
-                "--allowedTools", "Read,Write,Edit,Bash",
+                *narzedzia,
                 "--dangerously-skip-permissions",
             ]
 
@@ -532,7 +564,8 @@ def main():
         # linear_sync.py
         print("  linear_sync.py…")
         sync_result = subprocess.run(
-            ["python3", "linear_sync.py", str(wynik_path), "--klient", klient],
+            ["python3", "linear_sync.py", str(wynik_path), "--klient", klient,
+             "--zrodlo", transkrypcja],
             capture_output=True,
             text=True,
             timeout=180,
@@ -567,7 +600,9 @@ def main():
                 testy_wynik = last_line
 
         # f) Slack — zawsze, niezależnie od liczby nowych zgłoszeń
-        summary = build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik, model=model)
+        meta_maila = wczytaj_meta_maila(transkrypcja) if czy_mail(transkrypcja) else None
+        summary = build_slack_summary(klient, wynik_path, sync_stdout, testy_wynik=testy_wynik,
+                                      model=model, meta_maila=meta_maila)
         _log(log_path, f"\n{'='*60}\n=== Slack ===\n{'='*60}\n")
         slack_ok, slack_err = send_slack(summary, log_path=log_path)
         if slack_ok:

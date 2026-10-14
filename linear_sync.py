@@ -20,6 +20,7 @@ import urllib.error
 from datetime import date
 from pathlib import Path
 
+from maile import czy_mail, kontakt_ma_prawo_decyzji, wczytaj_meta_maila, znajdz_kontakt
 from sekrety import czysc
 
 
@@ -292,8 +293,22 @@ def write_karta_md(klient, karta):
             lines.append(f"- **{d['imie']}**{role}")
         lines.append("")
 
-    for z in karta.get("zakazy", []):
-        pass  # zakazy section below
+    if karta.get("kontakty"):
+        lines.append("## Kontakty (maile)\n")
+        for k in karta["kontakty"]:
+            flaga = "" if k.get("potwierdzony", True) else f" — **{k.get('status', 'niepotwierdzony')}**"
+            lines.append(f"- **{k.get('imie', '?')}** <{k.get('email', '')}> — {k.get('rola', '')}; "
+                         f"decyzje: {k.get('zakres_decyzji', 'brak')}{flaga}")
+        if karta.get("domeny"):
+            lines.append(f"- Domeny klienta: {', '.join(karta['domeny'])}")
+        lines.append("")
+
+    if karta.get("decyzje_zastrzezone"):
+        lines.append("## Decyzje zastrzeżone dla konkretnej osoby\n")
+        for d in karta["decyzje_zastrzezone"]:
+            lines.append(f"- {d.get('opis', '')} — tylko: **{d.get('zastrzezone_dla', '')}**")
+        lines.append("")
+
     if karta.get("zakazy"):
         lines.append("## Zakazy i ograniczenia\n")
         for z in karta["zakazy"]:
@@ -487,6 +502,117 @@ def build_clients_comment(prosby, klucz):
     return "\n".join(lines)
 
 
+# ── uprawnienia: kto może uchylić zakaz albo zmienić zastrzeżoną decyzję ───────
+
+def ustal_zrodlo(source, wynik, karta, meta=None):
+    """Kim jest autor źródła i jaką ma datę. Dla maila nadawca i data pochodzą Z PLIKU MAILA
+    zapisanego przez maile.py, nigdy z wynik.json (model nie może ich podmienić)."""
+    if czy_mail(source):
+        meta = meta if meta is not None else wczytaj_meta_maila(source)
+        adres = meta.get("od_adres", "")
+        kontakt = znajdz_kontakt(karta, adres) if adres else None
+        if not kontakt:
+            powod = "nadawca nie jest kontaktem klienta w karcie" if adres else "nie ustalono nadawcy maila"
+        elif not kontakt_ma_prawo_decyzji(kontakt):
+            powod = f"kontakt {adres} jest niepotwierdzony („{kontakt.get('status', 'bez prawa decyzji')}”)"
+        else:
+            powod = ""
+        return {
+            "typ": "mail", "data": meta.get("data") or _date_from_path(source),
+            "imiona": [kontakt["imie"]] if kontakt else [], "email": adres, "kontakt": kontakt,
+            "prawo": not powod, "powod_braku_prawa": powod,
+            "opis": f"mail od {adres or 'nieznanego nadawcy'}",
+        }
+    spotkanie = wynik.get("spotkanie", {})
+    uczestnicy = list(spotkanie.get("uczestnicy", []))
+    return {
+        "typ": "rozmowa", "data": spotkanie.get("data", "") or _date_from_path(source),
+        "imiona": uczestnicy, "email": "", "kontakt": None, "prawo": True, "powod_braku_prawa": "",
+        "opis": "rozmowa (uczestnicy: " + (", ".join(uczestnicy) or "brak danych") + ")",
+    }
+
+
+def _ta_sama_osoba(a, b):
+    a, b = a.strip().casefold(), b.strip().casefold()
+    return bool(a) and bool(b) and (a == b or a.startswith(b + " ") or b.startswith(a + " "))
+
+
+def wymagani_decydenci(karta, zakaz_id=None, klucz=None):
+    """Kto może uchylić zakaz / zmienić decyzję. None = brak ograniczenia.
+
+    1) decyzje_zastrzezone w karcie wskazują konkretną osobę (np. Opel: Kasia, nie Paweł),
+    2) uchylenie zakazu bez takiego wpisu: dowolny decydent z karty."""
+    osoby = []
+    for d in karta.get("decyzje_zastrzezone", []):
+        if (zakaz_id and zakaz_id in d.get("zakazy", [])) or (klucz and klucz in d.get("klucze_spraw", [])):
+            z = d.get("zastrzezone_dla", [])
+            osoby += [z] if isinstance(z, str) else list(z)
+    if osoby:
+        return osoby
+    if zakaz_id:
+        return [d["imie"] for d in karta.get("decydenci", []) if d.get("imie")]
+    return None
+
+
+def sprawdz_uprawnienia(karta, upd, zrodlo, zakaz_id=None, klucz=None):
+    """(True, "") albo (False, powód). Sprawdza kod, nie model."""
+    wymagani = wymagani_decydenci(karta, zakaz_id, klucz)
+    if wymagani is None:
+        return True, ""
+    co = f"uchylenie zakazu {zakaz_id}" if zakaz_id else f"decyzja w sprawie {klucz}"
+    if upd.get("pewnosc") == "niska":
+        return False, (f"{co}: pewność niska (np. polecenie przekazane w czyimś imieniu) — "
+                       f"takie zmiany wymagają decyzji człowieka")
+    if not zrodlo.get("prawo"):
+        return False, f"{co}: {zrodlo.get('powod_braku_prawa') or 'źródło bez prawa decyzji'}"
+    if not any(_ta_sama_osoba(n, w) for n in zrodlo.get("imiona", []) for w in wymagani):
+        return False, (f"{co} jest zastrzeżone dla: {', '.join(wymagani) or 'brak decydentów w karcie'}; "
+                       f"źródło: {zrodlo.get('opis', '?')}")
+    return True, ""
+
+
+def dodaj_etykiete(api_key, linear_id, label_map, nazwa):
+    etykieta_id = label_map.get(nazwa)
+    if not etykieta_id:
+        return
+    ids = [l["id"] for l in get_issue_labels_from_linear(api_key, linear_id)]
+    if etykieta_id not in ids:
+        gql(api_key, M_UPDATE_ISSUE, {"id": linear_id, "input": {"labelIds": ids + [etykieta_id]}})
+
+
+def odrzuc_aktualizacje(api_key, karta, upd, source, powod, issue_info, is_zakaz,
+                        label_map, state_ids, team_id, klient, dry_run):
+    """Odrzucona aktualizacja: nic nie zmieniamy, ale człowiek ma to zobaczyć w Linearze
+    (etykieta „Do weryfikacji” i komentarz z powodem; dla zakazu osobne zgłoszenie)."""
+    klucz, status = upd.get("klucz_sprawy", ""), upd.get("nowy_status", "")
+    print(f"  ⛔ Odrzucono aktualizację: {klucz} → {status} | {powod}")
+    if dry_run:
+        return
+    odrzucone = karta.setdefault("odrzucone_aktualizacje", [])
+    if any(r.get("klucz_sprawy") == klucz and r.get("zrodlo") == source for r in odrzucone):
+        return  # już zgłoszone (ponowny przebieg)
+    tresc = (f"**⛔ Odrzucono aktualizację → {status}**\n\n{powod}\n\n"
+             f"> {upd.get('cytat', '')}\n\nŹródło: `{source}`")
+    ident = ""
+    if isinstance(issue_info, dict) and issue_info.get("linear_id"):
+        dodaj_etykiete(api_key, issue_info["linear_id"], label_map, "Do weryfikacji")
+        gql(api_key, M_ADD_COMMENT, {"issueId": issue_info["linear_id"], "body": tresc})
+        ident = issue_info.get("identifier", "")
+    elif is_zakaz and team_id:
+        zakaz = next((z for z in karta.get("zakazy", []) if z.get("id") == klucz), {})
+        etykiety = [label_map[n] for n in ("Do weryfikacji", "Zablokowane przez zakaz") if n in label_map]
+        wynik = gql(api_key, M_CREATE_ISSUE, {"input": {
+            "teamId": team_id,
+            "title": f"[{klient}] Do weryfikacji: wniosek o uchylenie zakazu {klucz} odrzucony",
+            "description": f"{tresc}\n\n## Zakaz, który nadal obowiązuje\n\n**{klucz} {zakaz.get('tytul', '')}**",
+            "stateId": state_ids.get("backlog"),
+            "labelIds": etykiety,
+        }})
+        ident = ((wynik.get("issueCreate") or {}).get("issue") or {}).get("identifier", "")
+    odrzucone.append({"klucz_sprawy": klucz, "nowy_status": status, "zrodlo": source,
+                      "powod": powod, "zgloszenie": ident})
+
+
 # ── istniejące zgłoszenia: eskalacja ryzyka i termin ──────────────────────────
 
 def get_issue_state_and_labels(api_key, issue_id):
@@ -592,13 +718,15 @@ def dodaj_zakazy(karta, nowe_zakazy, source, dry_run=False):
 
 # ── aktualizacje otwartych spraw ──────────────────────────────────────────────
 
-def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, meeting_date=""):
+def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, meeting_date="",
+                         zrodlo_info=None, team_id=None, klient="", source=None):
     aktualizacje = wynik.get("aktualizacje_spraw", [])
     if not aktualizacje:
         return 0
 
     otwarte = karta.get("otwarte_sprawy", {})
-    source = wynik.get("zrodlo", "")
+    source = source or wynik.get("zrodlo", "")
+    zrodlo_info = zrodlo_info or ustal_zrodlo(source, wynik, karta)
     processed = 0
 
     for upd in aktualizacje:
@@ -609,7 +737,14 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
 
         # Zakaz (nie ma w otwarte_sprawy, jest w karta.zakazy)
         is_zakaz = any(z.get("id") == klucz for z in karta.get("zakazy", []))
-        if is_zakaz and nowy_status == "anulowana":
+        uchyla_zakaz = is_zakaz and nowy_status == "anulowana"
+        ok, powod = sprawdz_uprawnienia(karta, upd, zrodlo_info,
+                                        zakaz_id=klucz if uchyla_zakaz else None, klucz=klucz)
+        if not ok:
+            odrzuc_aktualizacje(api_key, karta, upd, source, powod, otwarte.get(klucz), uchyla_zakaz,
+                                label_map, state_ids, team_id, klient, dry_run)
+            continue
+        if uchyla_zakaz:
             if dry_run:
                 print(f"  [aktualizacja-zakaz] {klucz} → uchylony")
             else:
@@ -708,6 +843,8 @@ def main():
     parser = argparse.ArgumentParser(description="Synchronizuje wynik.json z Linear (team RIN).")
     parser.add_argument("wynik", help="Ścieżka do wynik.json")
     parser.add_argument("--klient", required=True, help="Slug klienta, np. auto-tama")
+    parser.add_argument("--zrodlo", help="Ścieżka źródła (transkrypcja albo mail) przekazana przez "
+                                         "przetworz.py; ma pierwszeństwo przed polem zrodlo z wynik.json")
     parser.add_argument("--dry-run", action="store_true",
                         help="Podgląd operacji bez wysyłania niczego do Linear")
     args = parser.parse_args()
@@ -718,12 +855,14 @@ def main():
 
     wynik = json.loads(wynik_path.read_text(encoding="utf-8"))
     klient = args.klient
-    source = wynik.get("zrodlo", str(wynik_path))
+    source = args.zrodlo or wynik.get("zrodlo", str(wynik_path))
     today = wynik.get("wygenerowano", str(date.today()))
-    meeting_date = wynik.get("spotkanie", {}).get("data", "")
 
     karta = load_karta(klient)
     prosby = load_prosby()
+    # autor i data źródła: dla maila z pliku maila (data maila = data źródła dla reguły „późniejsze źródło”)
+    zrodlo_info = ustal_zrodlo(source, wynik, karta)
+    meeting_date = zrodlo_info["data"]
 
     print(f"\n{'='*60}")
     mode = "DRY-RUN" if args.dry_run else "SYNCHRONIZACJA"
@@ -758,6 +897,7 @@ def main():
         print(f"Stany: Todo / Backlog / Done / Cancelled gotowe\n")
 
     state_ids = {
+        "backlog": backlog_id,
         "zrob_teraz": todo_id,
         "zamknieta": done_id,
         "anulowana": cancelled_id,
@@ -775,11 +915,13 @@ def main():
 
     if args.dry_run:
         n_upd = process_aktualizacje(
-            None, wynik, karta, state_ids, label_map, dry_run=True, meeting_date=meeting_date
+            None, wynik, karta, state_ids, label_map, dry_run=True, meeting_date=meeting_date,
+            zrodlo_info=zrodlo_info, klient=klient, source=source
         )
     else:
         n_upd = process_aktualizacje(
-            api_key, wynik, karta, state_ids, label_map, dry_run=False, meeting_date=meeting_date
+            api_key, wynik, karta, state_ids, label_map, dry_run=False, meeting_date=meeting_date,
+            zrodlo_info=zrodlo_info, team_id=team_id, klient=klient, source=source
         )
 
     if wynik.get("aktualizacje_spraw") or dodano_zakazow:
