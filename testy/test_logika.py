@@ -17,6 +17,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from linear_sync import (
     dodaj_zakazy,
+    find_state,
     process_aktualizacje,
     should_get_agent_label,
     update_risk_counter,
@@ -439,6 +440,30 @@ class TestTerminZZakresem(unittest.TestCase):
     def test_termin_bez_do_dziala_jak_dawniej(self):
         okna = self._okna([{"typ": "termin", "od": "2026-10-15", "dotyczy": "wstep", "cytat": "x"}])
         self.assertEqual(okna, [{"od": "2026-10-14", "do": "2026-10-15"}])
+
+
+# ── find_state: Linear pisze „Canceled”, w kodzie bywa „Cancelled” ─────────────
+
+class TestFindState(unittest.TestCase):
+    """Regresja: stan anulowany w Linearze to „Canceled” (typ „canceled”), więc wyszukiwanie „Cancelled” zwracało
+    None i żadna aktualizacja „anulowana” nie ustawiała stanu (ani archiwizacja notatek)."""
+
+    STANY = [{"id": "s-todo", "name": "Todo", "type": "unstarted"},
+             {"id": "s-canceled", "name": "Canceled", "type": "canceled"},
+             {"id": "s-done", "name": "Done", "type": "completed"}]
+
+    def test_obie_pisownie_anulowanego_stanu(self):
+        self.assertEqual(find_state(self.STANY, "Cancelled", "cancelled"), "s-canceled")
+        self.assertEqual(find_state(self.STANY, "Canceled", "canceled"), "s-canceled")
+
+    def test_typ_gdy_nazwa_inna(self):
+        stany = [{"id": "x", "name": "Anulowane", "type": "canceled"}]
+        self.assertEqual(find_state(stany, "Cancelled", "cancelled"), "x")
+
+    def test_pozostale_stany_jak_dawniej_a_brak_to_none(self):
+        self.assertEqual(find_state(self.STANY, "Todo", "unstarted"), "s-todo")
+        self.assertEqual(find_state(self.STANY, "Done", "completed"), "s-done")
+        self.assertIsNone(find_state(self.STANY, "Backlog", "backlog"))
 
 
 if __name__ == "__main__":

@@ -43,7 +43,9 @@
       ],
       "jak_sprawdzic": "Przejrzeć diff w bazie wiedzy klienta (wszystkie wystąpienia godzin Sopotu w piątek) i zadać agentowi pytanie testowe „do której czynny jest Sopot w piątek”. Nagrania testowego nie wysyłać klientce: odmówiła.",
       "repo": "rinvo-ops",
-      "szkic_klienta": "Cześć Aniu,\n\npoprawiłem godziny otwarcia salonu w Sopocie: agent podaje teraz, że w piątek jesteśmy do 16:00. Dzięki za zgłoszenie.\n\nPozdrawiam,\nMarek"
+      "szkic_klienta": "Cześć Aniu,\n\npoprawiłem godziny otwarcia salonu w Sopocie: agent podaje teraz, że w piątek jesteśmy do 16:00. Dzięki za zgłoszenie.\n\nPozdrawiam,\nMarek",
+      "termin_wyrazenie": "Poprawię dzisiaj",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T2",
@@ -69,7 +71,9 @@
         "Przekazanie nastąpiło w dniu rozmowy (13.10.2026)"
       ],
       "jak_sprawdzic": "Znaleźć wiadomość do Michała (kanał lub mail) z datą 13.10.2026 i sprawdzić, że zawiera trzy elementy z kryteriów.",
-      "repo": "brak"
+      "repo": "brak",
+      "termin_wyrazenie": "przekażę mu dziś",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "K1",
@@ -103,10 +107,10 @@
       "id": "K2",
       "sekcja": 2,
       "typ": "czeka_na_klienta",
-      "tytul": "Lista lekarzy z grafikiem na listopad (do piątku 17.10)",
+      "tytul": "Lista lekarzy z grafikiem na listopad (do piątku 16.10)",
       "opis": "Ania wyśle listę lekarzy i ich grafik na listopad, żeby agent wiedział, kto przyjmuje. Jedno przypomnienie jeśli nie przyjdzie do piątku.",
       "wlasciciel": "Ania Zielińska",
-      "termin": "2026-10-17",
+      "termin": "2026-10-16",
       "warunek": "brak",
       "status": "czeka",
       "cytat": [
@@ -114,7 +118,7 @@
         "Jak do piątku nic nie przyjdzie, przypomnę raz."
       ],
       "przypomnienie": {
-        "data": "2026-10-17",
+        "data": "2026-10-16",
         "limit": "1 raz",
         "uwagi": "Jedno przypomnienie – więcej Ania nie prosiła"
       },
@@ -129,7 +133,10 @@
       ],
       "jak_sprawdzic": "Porównać bazę wiedzy z listą od Ani lekarz po lekarzu i zadać agentowi pytanie testowe o dostępność wybranego lekarza w listopadzie.",
       "repo": "rinvo-ops",
-      "szkic_klienta": "Cześć Aniu,\n\nprzypominam o liście lekarzy z grafikiem na listopad, którą miałaś przesłać do piątku (17.10). Czy możesz ją wysłać? Dzięki niej agent będzie wiedział, kto przyjmuje.\n\nDziękuję,\nMarek"
+      "szkic_klienta": "Cześć Aniu,\n\nprzypominam o liście lekarzy z grafikiem na listopad, którą miałaś przesłać do piątku (16.10). Czy możesz ją wysłać? Dzięki niej agent będzie wiedział, kto przyjmuje.\n\nDziękuję,\nMarek",
+      "termin_wyrazenie": "Do piątku",
+      "termin_zrodlo": "kod",
+      "termin_modelu": "2026-10-17"
     },
     {
       "id": "K3",
@@ -232,7 +239,9 @@
       ],
       "klucz_sprawy": "zakaz-urlop-ani",
       "pewnosc": "niska",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "termin_wyrazenie": "od 2 do 6 listopada",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "R1",
@@ -298,5 +307,20 @@
       "Marek zaproponował wysłanie nagrania testowego po korekcie godzin – Ania odmówiła ('Nie, nie trzeba'). Brak zadania."
     ]
   },
-  "szkic_maila": "Cześć Aniu,\n\nPodsumowanie rozmowy z 13 października:\n\nCo robimy dziś:\n- Poprawiam godziny Sopotu w piątek na 16:00. Napiszę, jak będzie gotowe.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna kwota – minuty z sierpnia).\n\nCzekam od ciebie:\n- Numer pacjenta, który dostał dwa telefony w ciągu godziny – jak Bartek znajdzie, prześlij. Bez numeru nie zbadamy sprawy.\n- Lista lekarzy z grafikiem na listopad – do piątku (17.10). Jeśli nie przyjdzie, wyślę jedno przypomnienie.\n- Potwierdzenie spotkania z dr Nowakiem na środę 21.10 o 9:00. Zaproszenie wyślę dopiero po twoim potwierdzeniu.\n\nCo zostaje bez zmian:\n- Przypomnienia: zostajemy przy jednym dniu przed wizytą.\n- Ortodoncja: nie dzwonimy, dopóki ty nie powiesz. Nawet jeśli dr Nowak napisze zgodę, zadzwonię do ciebie najpierw.\n- Urlop 2–6.11: nic nowego nie wdrażamy w tym czasie.\n\nPozdrawiam,\nMarek"
+  "szkic_maila": "Cześć Aniu,\n\nPodsumowanie rozmowy z 13 października:\n\nCo robimy dziś:\n- Poprawiam godziny Sopotu w piątek na 16:00. Napiszę, jak będzie gotowe.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna kwota – minuty z sierpnia).\n\nCzekam od ciebie:\n- Numer pacjenta, który dostał dwa telefony w ciągu godziny – jak Bartek znajdzie, prześlij. Bez numeru nie zbadamy sprawy.\n- Lista lekarzy z grafikiem na listopad – do piątku (16.10). Jeśli nie przyjdzie, wyślę jedno przypomnienie.\n- Potwierdzenie spotkania z dr Nowakiem na środę 21.10 o 9:00. Zaproszenie wyślę dopiero po twoim potwierdzeniu.\n\nCo zostaje bez zmian:\n- Przypomnienia: zostajemy przy jednym dniu przed wizytą.\n- Ortodoncja: nie dzwonimy, dopóki ty nie powiesz. Nawet jeśli dr Nowak napisze zgodę, zadzwonię do ciebie najpierw.\n- Urlop 2–6.11: nic nowego nie wdrażamy w tym czasie.\n\nPozdrawiam,\nMarek",
+  "okna_czasowe": [],
+  "ostrzezenia_dat": [
+    {
+      "id": "K2",
+      "klucz_sprawy": "grafik-lekarzy-listopad",
+      "tytul": "„Do piątku”",
+      "uwaga": "termin: model podał 2026-10-17, kod policzył 2026-10-16 (względem 2026-10-13); użyto daty z kodu"
+    },
+    {
+      "id": "K2",
+      "klucz_sprawy": "grafik-lekarzy-listopad",
+      "tytul": "Lista lekarzy z grafikiem na listopad (do piątku 16.10)",
+      "uwaga": "cytat zawiera słowa czasowe, brak wpisu w fakty_czasowe"
+    }
+  ]
 }

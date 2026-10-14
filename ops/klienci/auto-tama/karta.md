@@ -195,9 +195,7 @@ Marek potwierdza, że poza testem wstępu nic nowego nie startuje. Powiązane z 
 - [RIN-75](https://linear.app/rinvo-demo/issue/RIN-75/auto-tama-decyzja-o-puszczeniu-opla-na-starej-bazie-ustalamy-we-trzech) – Decyzja o puszczeniu Opla na starej bazie: ustalamy we trzech w czwartek
 - [RIN-76](https://linear.app/rinvo-demo/issue/RIN-76/auto-tama-eksport-listy-kontaktow-do-excela) – Eksport listy kontaktów do Excela
 - [RIN-77](https://linear.app/rinvo-demo/issue/RIN-77/auto-tama-potwierdzenie-od-kasi-czy-mozecie-puszczac-znosi-blokade) – Potwierdzenie od Kasi, czy „możecie puszczać” znosi blokadę nowych startów
-- [RIN-78](https://linear.app/rinvo-demo/issue/RIN-78/auto-tama-notatka-z-argumentami-przed-spotkaniem-voicedesk-zlozyl) – Notatka z argumentami przed spotkaniem: VoiceDesk złożył Pawłowi pisemną ofertę z cennikiem
-- [RIN-79](https://linear.app/rinvo-demo/issue/RIN-79/auto-tama-notatka-z-argumentami-przed-spotkaniem-pawel-chcial-wylaczyc) – Notatka z argumentami przed spotkaniem: Paweł chciał wyłączyć agenta po złej interpretacji wyników
-- [RIN-80](https://linear.app/rinvo-demo/issue/RIN-80/auto-tama-notatka-z-argumentami-przed-spotkaniem-bez-konkretow-o) – Notatka z argumentami przed spotkaniem: Bez konkretów o integracji w czwartek Paweł testuje VoiceDesk w listopadzie
+- [RIN-78](https://linear.app/rinvo-demo/issue/RIN-78/auto-tama-notatka-z-argumentami-przed-spotkaniem-voicedesk-zlozyl) – Notatka przed spotkaniem: Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)
 
 ## Ryzyka powtarzające się
 

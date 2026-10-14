@@ -172,7 +172,7 @@ def render(d, verified):
         )
         ostrzez_html = (
             f'<h3 style="font-size:.95rem;margin:14px 0 6px;color:var(--wait)">'
-            f'Ostrzeżenia: cytat zawiera słowa czasowe, brak faktu w fakty_czasowe ({len(ostrzezenia_dat)})</h3>'
+            f'Ostrzeżenia dat: brak faktu czasowego albo rozbieżność daty modelu i kodu ({len(ostrzezenia_dat)})</h3>'
             f'<ul>{ostrzez_items}</ul>')
     else:
         ostrzez_html = ""

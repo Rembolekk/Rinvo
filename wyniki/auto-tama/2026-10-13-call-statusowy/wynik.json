@@ -41,7 +41,9 @@
         "W konfiguracji lub bazie wiedzy obu salonów sobota kończy się o 15:00, nigdzie nie została godzina 14:00"
       ],
       "jak_sprawdzic": "Rozmowa testowa z agentem Torunia i agentem Włocławka z pytaniem o godziny otwarcia w sobotę; oba mają odpowiedzieć „do piętnastej”. Przeszukać bazę wiedzy pod kątem „14:00” przy sobocie.",
-      "repo": "rinvo-ops"
+      "repo": "rinvo-ops",
+      "termin_wyrazenie": "Dziś",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T2",
@@ -73,7 +75,9 @@
         "Poza wstępem nic innego w konfiguracji nie jest zmieniane"
       ],
       "jak_sprawdzic": "Rozmowa testowa na każdy z dwóch salonów: agent wypowiada właściwą wersję wstępu. Po 15.10 sprawdzić w konfiguracji, że test jest zakończony.",
-      "repo": "rinvo-ops"
+      "repo": "rinvo-ops",
+      "termin_wyrazenie": "od jutra",
+      "termin_zrodlo": "wniosek"
     },
     {
       "id": "T3",
@@ -104,7 +108,9 @@
       ],
       "jak_sprawdzic": "Porównać liczby w zestawieniu z listą rozmów z panelu za 14–15.10; sprawdzić, że rozłączenia nie wchodzą do liczby pełnych rozmów.",
       "repo": "brak",
-      "szkic_klienta": "Cześć Kasia,\n\nzgodnie z umową przesyłam zestawienie z testu wstępu (środa 14.10 i czwartek 15.10). Liczymy pełne rozmowy, czyli takie, w których rozmówca doszedł do końca, bez rozłączeń.\n\n- Toruń, wersja [krótsza / dłuższa]: [liczba] pełnych rozmów\n- Włocławek, wersja [dłuższa / krótsza]: [liczba] pełnych rozmów\n\nDaj znać, gdybyś potrzebowała czegoś jeszcze do wyników.\n\nPozdrawiam\nMarek"
+      "szkic_klienta": "Cześć Kasia,\n\nzgodnie z umową przesyłam zestawienie z testu wstępu (środa 14.10 i czwartek 15.10). Liczymy pełne rozmowy, czyli takie, w których rozmówca doszedł do końca, bez rozłączeń.\n\n- Toruń, wersja [krótsza / dłuższa]: [liczba] pełnych rozmów\n- Włocławek, wersja [dłuższa / krótsza]: [liczba] pełnych rozmów\n\nDaj znać, gdybyś potrzebowała czegoś jeszcze do wyników.\n\nPozdrawiam\nMarek",
+      "termin_wyrazenie": "W piątek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T4",
@@ -133,7 +139,9 @@
       ],
       "jak_sprawdzic": "Sprawdzić w kalendarzu Marka, że zaproszenie istnieje, ma właściwą datę i godzinę oraz że Kasia je otrzymała.",
       "repo": "brak",
-      "szkic_klienta": "Cześć Kasia,\n\nwysyłam zaproszenie na czwartek 15.10, godz. 10:00, na spotkanie Marek–Paweł–Kasia, tak jak potwierdziłaś. Na spotkaniu wracamy też do tematu Opla.\n\nDo zobaczenia\nMarek"
+      "szkic_klienta": "Cześć Kasia,\n\nwysyłam zaproszenie na czwartek 15.10, godz. 10:00, na spotkanie Marek–Paweł–Kasia, tak jak potwierdziłaś. Na spotkaniu wracamy też do tematu Opla.\n\nDo zobaczenia\nMarek",
+      "termin_wyrazenie": "w czwartek o dziesiątej",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T5",
@@ -159,7 +167,9 @@
         "Nie zawiera obietnic cen ani terminów wdrożenia, których nie ustalono w rozmowie"
       ],
       "jak_sprawdzic": "Marek przegląda materiał przed spotkaniem i potwierdza, że odpowiada na pytanie Pawła o połączenie z systemem.",
-      "repo": "rinvo-ops"
+      "repo": "rinvo-ops",
+      "termin_wyrazenie": "na czwartek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T6",
@@ -188,7 +198,9 @@
       ],
       "jak_sprawdzic": "Sprawdzić, że ściąga zawiera wszystkie statusy z panelu zgodnie z ich bieżącymi nazwami oraz że wiadomość do Kasi wyszła przed 19.10.",
       "repo": "rinvo-ops",
-      "szkic_klienta": "Cześć Kasia,\n\nprzesyłam ściągę statusów dla handlowców, żebyś zdążyła rzucić okiem przed urlopem. Szkolenie mamy we wtorek 27.10 o 10:00.\n\nJeśli coś warto poprawić, daj znać, a naniosę zmiany.\n\nPozdrawiam\nMarek"
+      "szkic_klienta": "Cześć Kasia,\n\nprzesyłam ściągę statusów dla handlowców, żebyś zdążyła rzucić okiem przed urlopem. Szkolenie mamy we wtorek 27.10 o 10:00.\n\nJeśli coś warto poprawić, daj znać, a naniosę zmiany.\n\nPozdrawiam\nMarek",
+      "termin_wyrazenie": "przed urlopem",
+      "termin_zrodlo": "wniosek"
     },
     {
       "id": "T7",
@@ -218,7 +230,9 @@
       ],
       "jak_sprawdzic": "Sprawdzić wpis w kalendarzu i wysłaną Kasi wiadomość z datą 27.10, 10:00.",
       "repo": "brak",
-      "szkic_klienta": "Cześć Kasia,\n\npotwierdzam szkolenie handlowców ze statusów: wtorek 27.10, godz. 10:00, zgodnie z Twoim terminem po urlopie.\n\nPozdrawiam\nMarek"
+      "szkic_klienta": "Cześć Kasia,\n\npotwierdzam szkolenie handlowców ze statusów: wtorek 27.10, godz. 10:00, zgodnie z Twoim terminem po urlopie.\n\nPozdrawiam\nMarek",
+      "termin_wyrazenie": "dwudziesty siódmy, wtorek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "K1",
@@ -249,7 +263,9 @@
         "Bez pliku nie została uruchomiona żadna kampania na świeżych leadach"
       ],
       "jak_sprawdzic": "Sprawdzić skrzynkę pod kątem maila od Kasi z plikiem do 15.10 i potwierdzić, że do niej nie wysłano żadnego przypomnienia.",
-      "repo": "brak"
+      "repo": "brak",
+      "termin_wyrazenie": "do czwartku",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "K2",
@@ -283,7 +299,9 @@
         "Po rozmowie decyzja jest zapisana w zgłoszeniu"
       ],
       "jak_sprawdzic": "Sprawdzić w panelu, że do 15.10 nie ma kampanii Opla na starej bazie, a notatka ze spotkania zawiera decyzję.",
-      "repo": "brak"
+      "repo": "brak",
+      "termin_wyrazenie": "w czwartek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "B1",
@@ -330,7 +348,9 @@
       ],
       "klucz_sprawy": "decyzja-opel-stara-baza",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "termin_wyrazenie": "w czwartek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "Z16",
@@ -448,7 +468,9 @@
         ],
         "jak_sprawdzic": "Marek czyta notatkę przed spotkaniem 15.10; cytaty zgadzają się z transkrypcjami z 6.10 i 13.10, a pięć punktów kryteriów jest spełnionych.",
         "repo": "rinvo-ops"
-      }
+      },
+      "termin_wyrazenie": "w czwartek",
+      "termin_zrodlo": "kod"
     }
   ],
   "aktualizacje_spraw": [
@@ -503,77 +525,99 @@
       "od": "2026-10-19",
       "do": "2026-10-23",
       "dotyczy": "wszystko_nowe",
-      "cytat": "I od dziewiętnastego mnie nie ma, pamiętasz."
+      "cytat": "I od dziewiętnastego mnie nie ma, pamiętasz.",
+      "wyrazenie": "od dziewiętnastego",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "start_nie_wczesniej",
       "od": "2026-10-14",
       "do": "2026-10-15",
       "dotyczy": "tekst-wstepu-dwie-wersje",
-      "cytat": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga."
+      "cytat": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga.",
+      "wyrazenie": "od jutra, środa i czwartek",
+      "zrodlo_daty": "wniosek"
     },
     {
       "typ": "termin",
       "od": "2026-10-16",
-      "do": null,
+      "do": "2026-10-16",
       "dotyczy": "zestawienie-wynikow-wstepu",
-      "cytat": "W piątek dostaniesz zestawienie, ilu doszło do końca przy każdej wersji."
+      "cytat": "W piątek dostaniesz zestawienie, ilu doszło do końca przy każdej wersji.",
+      "wyrazenie": "W piątek",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-15",
-      "do": null,
+      "do": "2026-10-15",
       "dotyczy": "swieze-leady",
-      "cytat": "Wyślę do czwartku."
+      "cytat": "Wyślę do czwartku.",
+      "wyrazenie": "do czwartku",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-15",
-      "do": null,
+      "do": "2026-10-15",
       "dotyczy": "spotkanie-z-pawlem",
-      "cytat": "Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone."
+      "cytat": "Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone.",
+      "wyrazenie": "w czwartek o dziesiątej",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-15",
-      "do": null,
+      "do": "2026-10-15",
       "dotyczy": "prezentacja-integracji-crm",
-      "cytat": "Przygotuję się na czwartek konkretnie pod to."
+      "cytat": "Przygotuję się na czwartek konkretnie pod to.",
+      "wyrazenie": "na czwartek",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-18",
       "do": null,
       "dotyczy": "sciga-statusow",
-      "cytat": "Ściągę wyślę ci przed urlopem, żebyś zdążyła rzucić okiem."
+      "cytat": "Ściągę wyślę ci przed urlopem, żebyś zdążyła rzucić okiem.",
+      "wyrazenie": "przed urlopem",
+      "zrodlo_daty": "wniosek"
     },
     {
       "typ": "start_nie_wczesniej",
       "od": "2026-10-27",
       "do": null,
       "dotyczy": "szkolenie-handlowcow",
-      "cytat": "Dajmy dwudziesty siódmy, wtorek, jak wrócę z urlopu i pójdą już świeże leady."
+      "cytat": "Dajmy dwudziesty siódmy, wtorek, jak wrócę z urlopu i pójdą już świeże leady.",
+      "wyrazenie": "dwudziesty siódmy, wtorek",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-13",
-      "do": null,
+      "do": "2026-10-13",
       "dotyczy": "godziny-salonu-sobota",
-      "cytat": "Dziś naprawię Toruń."
+      "cytat": "Dziś naprawię Toruń.",
+      "wyrazenie": "Dziś",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "blokada",
       "od": "2026-10-13",
       "do": "2026-10-15",
       "dotyczy": "decyzja-opel-stara-baza",
-      "cytat": "Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek."
+      "cytat": "Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek.",
+      "wyrazenie": "w czwartek",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-11-01",
       "do": "2026-11-30",
       "dotyczy": "ryzyko-brak-integracji-crm",
-      "cytat": "to w listopadzie robią test z nimi."
+      "cytat": "to w listopadzie robią test z nimi.",
+      "wyrazenie": "w listopadzie",
+      "zrodlo_daty": "wniosek"
     }
   ],
   "okna_czasowe": [

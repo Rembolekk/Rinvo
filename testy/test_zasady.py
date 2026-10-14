@@ -201,20 +201,17 @@ class TestRyzykaICzeka(unittest.TestCase):
         self.assertEqual(komu(item), "ryzyko")
         self.assertEqual(zasady.etykiety_pozycji(item, Z, karta()), ["Ryzyko"])
 
-    def test_zadanie_przygotowawcze_do_ryzyka_idzie_do_agenta_mimo_slow_o_cenach(self):
-        ryzyko = poz(sekcja=5, typ="ryzyko_handlowe", klucz_sprawy="ryzyko-vd",
-                     tytul="VoiceDesk złożył ofertę z cennikiem")
-        prep = zasady.zadanie_przygotowawcze(ryzyko, "k", Z)
-        self.assertEqual(prep["klucz_sprawy"], "przygotowanie-ryzyko-vd")
-        self.assertIn("Notatka z argumentami przed spotkaniem", prep["tytul"])
-        self.assertTrue(zasady.kryteria_ok(prep))
-        self.assertEqual(prep["repo"], "rinvo-ops")
-        self.assertEqual(zasady.przypisz(prep, Z, karta())["komu"], "agent")
-
-    def test_zadanie_przygotowawcze_z_analizy_ma_pierwszenstwo_przed_szablonem(self):
-        ryzyko = poz(sekcja=5, zadanie_przygotowawcze={"cel": "Własny cel", "kryteria_akceptacji": ["A"]})
-        prep = zasady.zadanie_przygotowawcze(ryzyko, "k", Z)
-        self.assertEqual((prep["cel"], prep["kryteria_akceptacji"]), ("Własny cel", ["A"]))
+    def test_notatka_przed_spotkaniem_idzie_do_agenta_mimo_slow_o_cenach_w_ryzyku(self):
+        """ZMIENIONE ŚWIADOMIE: zamiast osobnego zadania na każde ryzyko jest jedna notatka na spotkanie
+        (szczegóły w test_notatki.py); tu sprawdzamy tylko routing: notatka zawsze idzie do agenta."""
+        import notatki
+        najn = {"r": (poz(sekcja=5, typ="ryzyko_handlowe", klucz_sprawy="r", tytul="VoiceDesk złożył ofertę z cennikiem"), "z.md"),
+                "sp": (poz(sekcja=1, typ="spotkanie", klucz_sprawy="sp", tytul="Spotkanie", termin="2026-10-20"), "z.md")}
+        k = {"otwarte_sprawy": {"r": {"identifier": "RIN-1", "url": "u"}, "sp": {"identifier": "RIN-2", "url": "u"}}}
+        item = notatki.zbierz_zadania("k", k, najn, Z, date(2026, 10, 14))[0]["item"]
+        self.assertIn("cennikiem", item["opis"])
+        self.assertTrue(zasady.kryteria_ok(item))
+        self.assertEqual(zasady.przypisz(item, Z, karta())["komu"], "agent")
 
     def test_sekcja_2_czeka_na_klienta_bez_przypisania(self):
         item = poz(sekcja=2, typ="czeka_na_klienta")
@@ -460,9 +457,10 @@ def tekst_widoczny(tekst):
 
 
 class TestWiadomoscPodsumowania(unittest.TestCase):
-    """ZMIENIONE ŚWIADOMIE (nowy wygląd): zamiast list per klient wiadomość do przeczytania w 10 sekund:
-    zdanie na górze, „Wymaga człowieka” (max 5), „Uwaga” tylko gdy są, linijka o agentach, o czekaniu
-    i link do Lineara. Bez „nowe od wczoraj” i bez technicznych nazw w tekście."""
+    """Wiadomość do przeczytania w 10 sekund: zdanie na górze, „Wymaga człowieka” (max 5), „Uwaga” tylko gdy są,
+    linijka o agentach, o czekaniu i link do Lineara. ZMIENIONE ŚWIADOMIE (podsumowanie bez powtórek): każde
+    zgłoszenie występuje raz, w najważniejszej kategorii (ryzyka, po terminie, decyzje, weryfikacja, czeka,
+    agenci, nowe), więc np. sprawa po terminie ze szkicem przypomnienia jest w „Uwadze”, a nie w „Wymaga człowieka”."""
 
     def _dane(self, dodatkowe=None, ryzyka=True):
         karty = {"k": karta_z_czekajacym({"limit": 1, "wykorzystane": 0, "nie_przypominac": False}),
@@ -470,7 +468,7 @@ class TestWiadomoscPodsumowania(unittest.TestCase):
         karty["k"]["otwarte_sprawy"]["sms"] = {"identifier": "RIN-8", "linear_id": "x",
                                                "przypisanie": {"komu": "czlowiek", "reguly": ["pieniadze"]}}
         otwarte = [
-            zgl("RIN-1", "Plik leadów", ["Czeka na klienta"], "2026-10-15"),
+            zgl("RIN-1", "Plik leadów", ["Czeka na klienta"], "2026-10-15"),     # po terminie, ze szkicem
             zgl("RIN-2", "Decyzja o integracji <!channel>", ["Decyzja człowieka"]),
             zgl("RIN-3", "Naprawa", ["Dla agenta"]),
             zgl("RIN-4", "Druga naprawa", ["Dla agenta"]),
@@ -488,30 +486,31 @@ class TestWiadomoscPodsumowania(unittest.TestCase):
         dane, _ = self._dane(**kw)
         return podsumowanie.buduj_wiadomosc(dane, DZIS)
 
+    def _msg_z(self, otwarte, skonczone=(), karty=None):
+        karty = karty or {"k": karta()}
+        return podsumowanie.buduj_wiadomosc(podsumowanie.przygotuj(otwarte, list(skonczone), karty, Z, DZIS), DZIS)
+
     def test_pierwsza_linijka_liczy_sprawy_wymagajace_czlowieka(self):
         tekst, _ = self._msg()
-        # 3 decyzje/weryfikacje + 1 szkic przypomnienia (RIN-1 po terminie)
-        self.assertEqual(tekst.splitlines()[0], "*Dziś potrzebujemy Cię w 4 sprawach*")
+        # decyzje (RIN-2, RIN-8) + weryfikacja (RIN-7); RIN-1 jest po terminie, więc w „Uwadze”
+        self.assertEqual(tekst.splitlines()[0], "*Dziś potrzebujemy Cię w 3 sprawach*")
 
     def test_forma_dla_jednej_sprawy_i_dla_zera(self):
-        karty = {"k": karta()}
-        dane = podsumowanie.przygotuj([zgl("RIN-2", "Jedna", ["Decyzja człowieka"])], [], karty, Z, DZIS)
-        self.assertEqual(podsumowanie.buduj_wiadomosc(dane, DZIS)[0].splitlines()[0],
-                         "*Dziś potrzebujemy Cię w 1 sprawie*")
-        dane = podsumowanie.przygotuj([zgl("RIN-3", "Agent", ["Dla agenta"])], [], karty, Z, DZIS)
-        self.assertEqual(podsumowanie.buduj_wiadomosc(dane, DZIS)[0].splitlines()[0],
-                         "*Dziś nic nie wymaga człowieka.*")
-        self.assertNotIn("Wymaga człowieka", podsumowanie.buduj_wiadomosc(dane, DZIS)[0])
+        tekst, _ = self._msg_z([zgl("RIN-2", "Jedna", ["Decyzja człowieka"])])
+        self.assertEqual(tekst.splitlines()[0], "*Dziś potrzebujemy Cię w 1 sprawie*")
+        tekst, _ = self._msg_z([zgl("RIN-3", "Agent", ["Dla agenta"])])
+        self.assertEqual(tekst.splitlines()[0], "*Dziś nic nie wymaga człowieka.*")
+        self.assertNotIn("Wymaga człowieka", tekst)
 
     def test_wymaga_czlowieka_jedna_linijka_na_pozycje_z_linkiem_klientem_i_slowem_powodu(self):
         tekst, _ = self._msg()
         sekcja = tekst.split("*Wymaga człowieka*\n")[1].split("\n\n")[0].splitlines()
+        self.assertEqual(len(sekcja), 3)
         self.assertTrue(all(l.startswith("• <https://linear.app/ws/issue/") for l in sekcja), sekcja)
-        sms = next(l for l in sekcja if "Wycena SMS-ów" in l)
-        self.assertTrue(sms.endswith("· k · pieniądze"), sms)
+        self.assertTrue(next(l for l in sekcja if "Wycena SMS-ów" in l).endswith("· k · pieniądze"))
         self.assertTrue(next(l for l in sekcja if "Brak kryteriów" in l).endswith("· k · weryfikacja"))
         self.assertTrue(next(l for l in sekcja if "Decyzja o integracji" in l).endswith("· k · decyzja"))
-        self.assertTrue(next(l for l in sekcja if "Plik leadów" in l).endswith("· k · klient"))
+        self.assertFalse(any("Plik leadów" in l for l in sekcja), "sprawa po terminie jest tylko w „Uwadze”")
         slowa = {l.rsplit(" · ", 1)[1] for l in sekcja}
         self.assertTrue(slowa <= {"pieniądze", "klient", "zakaz", "decyzja", "weryfikacja"}, slowa)
 
@@ -523,35 +522,72 @@ class TestWiadomoscPodsumowania(unittest.TestCase):
         self.assertRegex(sekcja[-1], r"^… i \d+ więcej")
 
     def test_tytul_do_60_znakow_bez_prefiksu_klienta(self):
-        dlugi = "A" * 100
-        tekst, _ = self._msg(dodatkowe=[zgl("RIN-90", dlugi, ["Decyzja człowieka"])])
+        tekst, _ = self._msg(dodatkowe=[zgl("RIN-90", "A" * 100, ["Decyzja człowieka"])])
         linia = next(l for l in tekst.splitlines() if "RIN-90" in l)
-        widoczny = tekst_widoczny(linia).removeprefix("• ")
-        tytul = widoczny.split(" · ")[0]
+        tytul = tekst_widoczny(linia).removeprefix("• ").split(" · ")[0]
         self.assertLessEqual(len(tytul), 60)
         self.assertTrue(tytul.endswith("…"))
         self.assertNotIn("[k]", tekst)
 
-    def test_uwaga_tylko_powtarzajace_sie_ryzyka_i_po_terminie_i_znika_gdy_pusta(self):
+    def test_uwaga_ryzyka_i_po_terminie_a_sekcja_znika_gdy_ich_nie_ma(self):
         tekst, _ = self._msg(dodatkowe=[zgl("RIN-91", "Zaległa sprawa", ["Czeka na klienta"], "2026-10-10")])
         uwaga = tekst.split("*Uwaga*\n")[1].split("\n\n")[0]
         self.assertIn("VoiceDesk", uwaga)
-        self.assertIn("· ryzyko", uwaga)
-        self.assertIn("Zaległa sprawa", uwaga)
+        self.assertTrue(next(l for l in uwaga.splitlines() if "VoiceDesk" in l).endswith("· k · ryzyko"))
         linia = next(l for l in uwaga.splitlines() if "Zaległa sprawa" in l)
         self.assertIn("termin 10.10", linia)
         self.assertTrue(linia.endswith("po terminie"), linia)
-        tekst2, _ = self._msg(ryzyka=False)
-        self.assertNotIn("*Uwaga*", tekst2, "sekcja znika, gdy nie ma ryzyk ani spraw po terminie")
+        self.assertLess(uwaga.index("VoiceDesk"), uwaga.index("Zaległa sprawa"), "ryzyka przed sprawami po terminie")
+        tekst2, _ = self._msg_z([zgl("RIN-2", "Decyzja", ["Decyzja człowieka"]), zgl("RIN-3", "Naprawa", ["Dla agenta"])])
+        self.assertNotIn("*Uwaga*", tekst2)
 
-    def test_nic_nie_powtarza_sie_w_kilku_miejscach(self):
-        # RIN-1 jest po terminie, ale ma szkic przypomnienia: jest w „Wymaga człowieka”, nie w „Uwaga”
+    def test_sprawa_po_terminie_ze_szkicem_jest_w_uwadze_z_dopiskiem_a_szkic_osobno(self):
         tekst, _ = self._msg()
-        uwaga = tekst.split("*Uwaga*\n")[1].split("\n\n")[0] if "*Uwaga*" in tekst else ""
-        self.assertNotIn("Plik leadów", uwaga, "sprawa ze szkicem jest tylko w „Wymaga człowieka”")
-        self.assertEqual(sum(1 for l in tekst.splitlines() if l.startswith("• ") and "Plik leadów" in l), 1)
-        tekst3, _ = self._msg(dodatkowe=[zgl("RIN-91", "Zaległa", ["Czeka na klienta"], "2026-10-10")])
-        self.assertEqual(tekst3.count("Zaległa"), 1)
+        uwaga = tekst.split("*Uwaga*\n")[1].split("\n\n")[0]
+        linia = next(l for l in uwaga.splitlines() if "Plik leadów" in l)
+        self.assertIn("po terminie", linia)
+        self.assertIn("szkic przypomnienia poniżej", linia)
+        self.assertIn("*Szkic przypomnienia*", tekst)
+        self.assertIn("> Cześć Kasia,", tekst)
+
+    def test_kazde_zgloszenie_tylko_raz_w_calej_wiadomosci(self):
+        dodatkowe = [
+            zgl("RIN-40", "Wszystkie etykiety naraz", ["Powtarzające się ryzyko", "Decyzja człowieka", "Do weryfikacji",
+                                                       "Czeka na klienta", "Dla agenta"], "2026-10-01"),
+            zgl("RIN-41", "Decyzja i agent", ["Decyzja człowieka", "Dla agenta", "Czeka na klienta"]),
+            zgl("RIN-42", "Weryfikacja i czeka", ["Do weryfikacji", "Czeka na klienta"]),
+            zgl("RIN-43", "Agent po terminie", ["Dla agenta"], "2026-10-12"),
+        ]
+        tekst, _ = self._msg(dodatkowe=dodatkowe)
+        for n in (1, 2, 3, 4, 5, 6, 7, 8, 40, 41, 42, 43):
+            self.assertLessEqual(tekst.count(f"/issue/RIN-{n}|"), 1, f"RIN-{n} występuje więcej niż raz")
+
+    def test_kategoria_wedlug_kolejnosci_waznosci(self):
+        E = lambda *n: zgl("RIN-1", "t", list(n), "2026-10-01" if "po" in n else None)
+        kat = lambda z, **kw: podsumowanie.kategoria(z, DZIS, Z, kw.get("nowe", ()))
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Powtarzające się ryzyko", "Decyzja człowieka"], "2026-10-01")), "ryzyko")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Decyzja człowieka"], "2026-10-01")), "po_terminie")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Dla agenta", "Czeka na klienta"], "2026-10-01")), "po_terminie")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Decyzja człowieka", "Do weryfikacji", "Dla agenta"])), "czlowiek")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Do weryfikacji", "Czeka na klienta", "Dla agenta"])), "weryfikacja")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Czeka na klienta", "Dla agenta"])), "czeka")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Dla agenta"]), nowe={"RIN-1"}), "agent")
+        self.assertEqual(kat(zgl("RIN-1", "t", ["Zadanie"]), nowe={"RIN-1"}), "nowe")
+        self.assertIsNone(kat(zgl("RIN-1", "t", ["Zadanie"])))
+        self.assertEqual(podsumowanie.KATEGORIE, ["ryzyko", "po_terminie", "czlowiek", "weryfikacja", "czeka", "agent", "nowe"])
+
+    def test_liczniki_agentow_i_czekania_nie_zawieraja_spraw_z_wazniejszej_kategorii(self):
+        tekst, _ = self._msg_z([
+            zgl("RIN-1", "Agent", ["Dla agenta"]),
+            zgl("RIN-2", "Agent po terminie", ["Dla agenta"], "2026-10-12"),          # → Uwaga, nie agenci
+            zgl("RIN-3", "Agent i decyzja", ["Dla agenta", "Decyzja człowieka"]),       # → człowiek, nie agenci
+            zgl("RIN-4", "Czeka", ["Czeka na klienta"], "2026-10-20"),
+            zgl("RIN-5", "Czeka po terminie", ["Czeka na klienta"], "2026-10-12"),     # → Uwaga, nie czeka
+        ], skonczone=[zgl("RIN-30", "Zrobione", ["Dla agenta"])])
+        self.assertIn("Agenci pracują nad 1 zadaniem, 1 skończone od wczoraj.", tekst)
+        self.assertIn("Czekamy na klientów w 1 sprawie, najbliższy termin: 20.10", tekst)
+        self.assertIn("Agent po terminie", tekst.split("*Uwaga*")[1])
+        self.assertIn("Agent i decyzja", tekst.split("*Wymaga człowieka*")[1].split("*Uwaga*")[0])
 
     def test_linijka_o_agentach(self):
         tekst, _ = self._msg()
@@ -560,9 +596,8 @@ class TestWiadomoscPodsumowania(unittest.TestCase):
     def test_linijka_o_czekaniu_z_najblizszym_terminem(self):
         tekst, _ = self._msg()
         linia = next(l for l in tekst.splitlines() if l.startswith("Czekamy na klientów"))
-        self.assertIn("w 2 sprawach", linia)
-        self.assertIn("najbliższy termin: 20.10, <https://linear.app/ws/issue/RIN-5|Czeka z terminem>", linia,
-                      "najbliższy przyszły termin, bez spraw po terminie")
+        self.assertIn("w 1 sprawie", linia, "RIN-1 jest po terminie, więc nie liczy się jako „czekamy”")
+        self.assertIn("najbliższy termin: 20.10, <https://linear.app/ws/issue/RIN-5|Czeka z terminem>", linia)
 
     def test_link_do_widoku_wszystkich_otwartych_zgloszen_na_dole(self):
         tekst, bloki = self._msg()
@@ -585,15 +620,10 @@ class TestWiadomoscPodsumowania(unittest.TestCase):
     def test_struktura_block_kit_sekcje_mrkdwn_i_kontekst_z_data(self):
         tekst, bloki = self._msg()
         self.assertTrue(all(b["type"] in ("section", "context") for b in bloki))
-        self.assertEqual(bloki[0]["text"], {"type": "mrkdwn", "text": "*Dziś potrzebujemy Cię w 4 sprawach*"})
+        self.assertEqual(bloki[0]["text"], {"type": "mrkdwn", "text": "*Dziś potrzebujemy Cię w 3 sprawach*"})
         self.assertEqual(bloki[-1]["type"], "context")
         self.assertIn("piątek 16.10.2026", bloki[-1]["elements"][0]["text"])
-        json.dumps(bloki)  # serializowalne dla webhooka
-
-    def test_szkic_przypomnienia_pokazany_krotko(self):
-        tekst, _ = self._msg()
-        self.assertIn("*Szkic przypomnienia*", tekst)
-        self.assertIn("> Cześć Kasia,", tekst)
+        json.dumps(bloki)
 
 
 class TestSlackWidok(unittest.TestCase):

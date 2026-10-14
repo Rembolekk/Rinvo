@@ -198,49 +198,72 @@ def zbierz(otwarte, nowe, karty, Z, dzis):
 
 KOLEJNOSC_POWODOW = ["zakaz", "pieniądze", "decyzja", "klient", "weryfikacja"]
 
+# Każde zgłoszenie występuje w wiadomości TYLKO RAZ, w najważniejszej z kategorii (od najważniejszej):
+KATEGORIE = ["ryzyko", "po_terminie", "czlowiek", "weryfikacja", "czeka", "agent", "nowe"]
 
-def przygotuj(otwarte, skonczone, karty, Z, dzis):
-    """Dane do wiadomości (jedna lista dla wszystkich klientów, bez powtórzeń)."""
-    klienci = zbierz(otwarte, [], karty, Z, dzis)
-    widziane, human, uwaga, szkice = set(), [], [], []
 
-    def wpis_i_powod(klient, z):
-        _, _, wpis = szukaj_sprawy({klient: karty[klient]}, z.get("identifier"))
-        return sw.slowo_powodu((wpis or {}).get("przypisanie"), _etykiety(z), Z)
+def kategoria(z, dzis, Z, nowe_ids=()):
+    """Jedyna kategoria zgłoszenia wg kolejności ważności: powtarzające się ryzyka, po terminie,
+    decyzje człowieka, do weryfikacji, czeka na klienta, u agentów, nowe (albo None)."""
+    E, et = Z["etykiety"], _etykiety(z)
+    termin = _data(z.get("dueDate"))
+    if "Powtarzające się ryzyko" in et:
+        return "ryzyko"
+    if termin and termin < dzis:
+        return "po_terminie"
+    if E["czlowiek"] in et:
+        return "czlowiek"
+    if E["weryfikacja"] in et:
+        return "weryfikacja"
+    if E["czeka"] in et:
+        return "czeka"
+    if E["agent"] in et:
+        return "agent"
+    if z.get("identifier") in nowe_ids:
+        return "nowe"
+    return None
 
-    for klient, d in klienci.items():
-        for z in d["czlowiek"] + d["weryfikacja"]:
-            if z["identifier"] in widziane:
-                continue
-            widziane.add(z["identifier"])
-            human.append({"z": z, "klient": klient, "powod": wpis_i_powod(klient, z)})
-        for sz in d["szkice"]:
-            z = sz["zgloszenie"]
-            widziane.add(z["identifier"])
-            human.append({"z": z, "klient": klient, "powod": "klient", "przypomnienie": True})
-            szkice.append({**sz, "klient": klient})
-    human.sort(key=lambda h: (KOLEJNOSC_POWODOW.index(h["powod"]) if h["powod"] in KOLEJNOSC_POWODOW else 9,
-                              h["z"]["identifier"]))
 
-    for klient, d in klienci.items():
-        for z in d["ryzyka"]:
-            if z["identifier"] not in widziane:
-                widziane.add(z["identifier"])
-                uwaga.append({"z": z, "klient": klient, "powod": "ryzyko"})
-        for z in d["po_terminie"]:
-            if z["identifier"] not in widziane:
-                widziane.add(z["identifier"])
-                uwaga.append({"z": z, "klient": klient, "powod": "po terminie",
-                              "termin": _data(z.get("dueDate"))})
+def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
+    """Dane do wiadomości: jedna lista dla wszystkich klientów, bez powtórzeń (jedna kategoria na zgłoszenie)."""
+    klienci = zbierz(otwarte, [], karty, Z, dzis)            # tylko dla szkiców przypomnień
+    szkice = [{**sz, "klient": k} for k, d in klienci.items() for sz in d["szkice"]]
+    z_szkicem = {sz["zgloszenie"]["identifier"] for sz in szkice}
+    nowe_ids = {z["identifier"] for z in nowe}
 
-    agenci = {z["identifier"] for d in klienci.values() for z in d["agent"]}
-    czeka = [(klient, z) for klient, d in klienci.items() for z in d["czeka"] + d["po_terminie"]]
-    przyszle = sorted(((_data(z.get("dueDate")), klient, z) for klient, z in czeka
-                       if _data(z.get("dueDate")) and _data(z["dueDate"]) >= dzis), key=lambda x: (x[0], x[2]["identifier"]))
+    grupy = {k: [] for k in KATEGORIE}
+    widziane = set()
+    for z in otwarte:
+        klient = klient_z_tytulu(z.get("title"))
+        if klient not in karty or z["identifier"] in widziane:
+            continue
+        widziane.add(z["identifier"])
+        kat = kategoria(z, dzis, Z, nowe_ids)
+        if kat is None:
+            continue
+        wpis = {"z": z, "klient": klient}
+        if kat in ("czlowiek", "weryfikacja"):
+            _, _, e = szukaj_sprawy({klient: karty[klient]}, z.get("identifier"))
+            wpis["powod"] = sw.slowo_powodu((e or {}).get("przypisanie"), _etykiety(z), Z)
+        elif kat == "ryzyko":
+            wpis["powod"] = "ryzyko"
+        elif kat == "po_terminie":
+            wpis.update(powod="po terminie", termin=_data(z.get("dueDate")),
+                        szkic=z["identifier"] in z_szkicem)
+        grupy[kat].append(wpis)
+
+    human = sorted(grupy["czlowiek"] + grupy["weryfikacja"],
+                   key=lambda h: (KOLEJNOSC_POWODOW.index(h["powod"]) if h["powod"] in KOLEJNOSC_POWODOW else 9,
+                                  h["z"]["identifier"]))
+    uwaga = grupy["ryzyko"] + sorted(grupy["po_terminie"], key=lambda u: (u["termin"], u["z"]["identifier"]))
+    przyszle = sorted(((_data(w["z"].get("dueDate")), w["klient"], w["z"]) for w in grupy["czeka"]
+                       if _data(w["z"].get("dueDate")) and _data(w["z"]["dueDate"]) >= dzis),
+                      key=lambda x: (x[0], x[2]["identifier"]))
     return {
         "human": human, "uwaga": uwaga, "szkice": szkice,
-        "agenci_otwarte": len(agenci), "agenci_skonczone": len({z["identifier"] for z in skonczone}),
-        "czeka_n": len(czeka), "czeka_najblizsze": przyszle[0] if przyszle else None,
+        "agenci_otwarte": len(grupy["agent"]), "agenci_skonczone": len({z["identifier"] for z in skonczone}),
+        "czeka_n": len(grupy["czeka"]), "czeka_najblizsze": przyszle[0] if przyszle else None,
+        "nowe_n": len(grupy["nowe"]),
         "widok": sw.widok_linear_url([z.get("url") for z in otwarte]),
     }
 
@@ -260,12 +283,13 @@ def buduj_wiadomosc(dane, dzis):
         linie = []
         for u in dane["uwaga"]:
             dod = f"termin {u['termin'].strftime('%d.%m')}" if u.get("termin") else None
+            if u.get("szkic"):
+                dod = (dod + ", " if dod else "") + "szkic przypomnienia poniżej"
             linie.append(sw.linia_pozycji(u["z"].get("url"), u["z"].get("title"), u["klient"], u["powod"], dod))
         sekcje.append("*Uwaga*\n" + "\n".join(sw.ogranicz(linie)))
     for sz in dane["szkice"]:
         tresc = "\n".join("> " + slack_bezpiecznie(l, 200) for l in sz["tekst"].splitlines() if l.strip())
-        sekcje.append(f"*Szkic przypomnienia* (do wysłania przez człowieka, pełny w komentarzu): "
-                      f"{sw.link(sz['zgloszenie'].get('url'), sz['zgloszenie'].get('title'))}\n{tresc}")
+        sekcje.append(f"*Szkic przypomnienia* (do wysłania przez człowieka; pełny w komentarzu zgłoszenia)\n{tresc}")
 
     x, y, z = dane["agenci_otwarte"], dane["agenci_skonczone"], dane["czeka_n"]
     linia_agentow = (f"Agenci pracują nad {x} {sw.forma(x, 'zadaniem', 'zadaniami', 'zadaniami')}, "

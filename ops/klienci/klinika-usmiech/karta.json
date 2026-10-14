@@ -43,7 +43,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "korekta-faktury-wrzesien": {
@@ -58,6 +59,9 @@
         "komu": "czlowiek",
         "powody": [
           "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)"
+        ],
+        "reguly": [
+          "pieniadze"
         ]
       }
     },
@@ -71,7 +75,8 @@
       ],
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "weryfikacja",
@@ -96,7 +101,8 @@
       ],
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "agent",
@@ -119,7 +125,8 @@
       ],
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "agent",
@@ -142,7 +149,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "ryzyko-zmiana-dostawcy": {
@@ -155,14 +163,15 @@
       ],
       "przypisanie": {
         "komu": "ryzyko",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
-    "przygotowanie-ryzyko-zmiana-dostawcy": {
+    "notatka-spotkanie-dr-nowak": {
       "linear_id": "38635d2b-29a7-4354-8872-66142640db97",
       "identifier": "RIN-81",
       "url": "https://linear.app/rinvo-demo/issue/RIN-81/klinika-usmiech-notatka-z-argumentami-przed-spotkaniem-dr-nowak",
-      "tytul": "Notatka z argumentami przed spotkaniem: Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji",
+      "tytul": "Notatka przed spotkaniem: Potwierdzenie spotkania Marek–dr Nowak (środa 21.10, 9:00)",
       "zrodla": [
         "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
       ],
@@ -170,7 +179,8 @@
       "przypisanie": {
         "komu": "agent",
         "powody": []
-      }
+      },
+      "opis_hash": "5edd0494374937c7"
     }
   },
   "ryzyka": {

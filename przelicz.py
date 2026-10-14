@@ -18,26 +18,19 @@ import argparse
 import json
 import sys
 from collections import Counter
+from datetime import date
 from pathlib import Path
 
+import copy
+
 import linear_sync
+import notatki
 import zasady
 
 ROUTING = ("agent", "czlowiek", "weryfikacja", "zablokowane", "wielu_klientow")
 
 
-def najnowsze_pozycje(klient, katalog=Path("wyniki")):
-    """klucz_sprawy → pozycja z najnowszego wyniku (data spotkania, potem nazwa folderu)."""
-    wyniki = []
-    for f in sorted((katalog / klient).glob("*/wynik.json")):
-        w = json.loads(f.read_text(encoding="utf-8"))
-        wyniki.append(((w.get("spotkanie", {}).get("data", ""), f.parent.name), w))
-    najnowsze = {}
-    for _, w in sorted(wyniki, key=lambda x: x[0]):
-        for p in w.get("pozycje", []):
-            if p.get("sekcja") in (1, 2, 3, 5) and p.get("klucz_sprawy"):
-                najnowsze[p["klucz_sprawy"]] = (p, w.get("zrodlo", ""))
-    return najnowsze
+najnowsze_pozycje = notatki.najnowsze_pozycje
 
 
 def stare_przypisanie(etykiety, Z):
@@ -107,8 +100,10 @@ def zastosuj(api_key, klient, karta, Z, wiersze, team, label_map, todo_id, najno
         ids = [l["id"] for l in st["labels"] if l["name"] not in w["usun"]]
         ids += [label_map[n] for n in w["dodaj"] if n in label_map and label_map[n] not in ids]
         opis = linear_sync.build_description(item, w["zrodlo"], karta, przyp, Z)
-        linear_sync.gql(api_key, linear_sync.M_UPDATE_ISSUE, {"id": linear_id, "input": {
-            "labelIds": ids, "description": opis}})
+        wejscie = {"labelIds": ids, "description": opis}
+        if item.get("termin_modelu"):                 # kod poprawił termin: tytuł z błędną datą też
+            wejscie["title"] = f"[{klient}] {item.get('tytul', '')}"
+        linear_sync.gql(api_key, linear_sync.M_UPDATE_ISSUE, {"id": linear_id, "input": wejscie})
         stare_przyp = wpis.get("przypisanie", {})
         linear_sync.zapisz_przypisanie(wpis, item, Z, karta, w["wielu"])
         nowe_przyp = wpis["przypisanie"]
@@ -119,15 +114,33 @@ def zastosuj(api_key, klient, karta, Z, wiersze, team, label_map, todo_id, najno
                 linear_sync.gql(api_key, linear_sync.M_ADD_COMMENT, {"issueId": linear_id, "body": kom})
         print(f"  ✓ {w['identifier']} ({w['klucz']}): {w['stare']} → {w['nowe']}")
 
-    # zadania przygotowawcze do ryzyk (osobne zgłoszenia dla agenta; samo ryzyko zostaje dla ludzi)
-    nowe_prep = 0
-    for klucz, (item, zrodlo) in najnowsze.items():
-        wpis = karta.get("otwarte_sprawy", {}).get(klucz)
-        if item.get("sekcja") == 5 and isinstance(wpis, dict):
-            if linear_sync.utworz_przygotowanie(api_key, team["id"], karta, item, klient, zrodlo,
-                                                wpis.get("data_spotkania", ""), Z, label_map, todo_id):
-                nowe_prep += 1
-    return nowe_prep
+    return None
+
+
+def przelicz_terminy(api_key, klient, karta, najnowsze, zastosuj_zmiany):
+    """Termin w Linearze = termin najnowszej pozycji (po przeliczeniu dat względnych przez kod).
+    Zwraca listę zmian [(identyfikator, klucz, stary, nowy)]."""
+    zmiany = []
+    for klucz, wpis in karta.get("otwarte_sprawy", {}).items():
+        if not isinstance(wpis, dict) or klucz not in najnowsze or not wpis.get("linear_id"):
+            continue
+        nowy = linear_sync.parse_due_date(najnowsze[klucz][0].get("termin"))
+        if not nowy:
+            continue
+        stary = (linear_sync.gql(api_key, 'query { issue(id: "%s") { dueDate } }' % wpis["linear_id"])
+                 .get("issue") or {}).get("dueDate")
+        if stary != nowy:
+            zmiany.append((wpis.get("identifier"), klucz, stary, nowy))
+            if zastosuj_zmiany:
+                linear_sync.gql(api_key, linear_sync.M_UPDATE_ISSUE,
+                                {"id": wpis["linear_id"], "input": {"dueDate": nowy}})
+    return zmiany
+
+
+def raport_terminow(zmiany):
+    print(f"\nTerminy w Linearze, które się zmieniają: {len(zmiany)}")
+    for ident, klucz, stary, nowy in zmiany:
+        print(f"  {ident:7} ({klucz}): {stary or 'brak'} → {nowy}")
 
 
 def main():
@@ -165,11 +178,22 @@ def main():
         wiersze = licz(klient, karta, Z, prosby, najnowsze, stan)
         print(f"\n===== {klient} =====")
         wszystkie += raport(wiersze)
+        zmiany_terminow = przelicz_terminy(api_key, klient, karta, najnowsze, args.zastosuj)
+        raport_terminow(zmiany_terminow)
+        stany = {"anulowana": linear_sync.find_state(
+            linear_sync.get_workflow_states(api_key, team["id"]), "Cancelled", "cancelled")}
+        zrodlo_notatek = max((v[1] for v in najnowsze.values()), default="")
+        zdarzenia = notatki.synchronizuj_notatki(
+            linear_sync, api_key, team["id"], karta if args.zastosuj else copy.deepcopy(karta), klient, najnowsze, Z,
+            label_map, todo_id, stany, zrodlo_notatek, "", date.today(),
+            dry_run=not args.zastosuj)
+        print(f"\nNotatki przed spotkaniem ({'zmiany' if args.zastosuj else 'plan'}):")
+        for z in zdarzenia or ["(bez zmian)"]:
+            print(f"  {z}")
         if args.zastosuj:
-            n = zastosuj(api_key, klient, karta, Z, wiersze, team, label_map, todo_id, najnowsze)
+            zastosuj(api_key, klient, karta, Z, wiersze, team, label_map, todo_id, najnowsze)
             linear_sync.save_karta(klient, karta)
             linear_sync.write_karta_md(klient, karta)
-            print(f"  Nowe zadania przygotowawcze dla agenta (do ryzyk): {n}")
     print(f"\nRAZEM zmieniło przypisanie: {len(wszystkie)}" + ("" if args.zastosuj else "  (raport; nic nie zmieniono)"))
 
 

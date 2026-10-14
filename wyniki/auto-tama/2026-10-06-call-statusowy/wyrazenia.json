@@ -1,0 +1,26 @@
+{
+  "fakty": {
+    "0": "W tym tygodniu",
+    "1": "do czwartku",
+    "2": "poniedziałek",
+    "3": "przyszły czwartek",
+    "4": "od dziewiętnastego do dwudziestego trzeciego",
+    "5": "od dziewiętnastego do dwudziestego trzeciego",
+    "6": "w tym tygodniu",
+    "7": "w tym tygodniu",
+    "8": "w przyszłym tygodniu",
+    "9": "w tym miesiącu"
+  },
+  "terminy": {
+    "T2": "dzisiaj",
+    "T4": "dzisiaj",
+    "T6": "dziś",
+    "T9": "w tym tygodniu",
+    "T11": "przyszły czwartek",
+    "K1": "do czwartku",
+    "K2": "poniedziałek",
+    "Z2": "W tym tygodniu",
+    "Z5": "od dziewiętnastego do dwudziestego trzeciego",
+    "Z11": "w tym tygodniu"
+  }
+}

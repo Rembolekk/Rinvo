@@ -4,7 +4,6 @@
 Jedno miejsce prawdy dla linear_sync.py, przetworz.py (Slack), testów i podsumowania:
   przypisz(item, zasady, karta, wielu_klientow)  → komu trafia pozycja i dlaczego
   etykiety_pozycji(...)                          → pełna lista etykiet Lineara
-  zadanie_przygotowawcze(item, klient, zasady)   → zadanie dla agenta do ryzyka
 
 Wynik przypisz():
   {"komu": "agent" | "czlowiek" | "weryfikacja" | "czeka",
@@ -206,29 +205,3 @@ def etykiety_pozycji(item, zasady, karta=None, wielu=False):
 
 def powody_tekst(przyp):
     return [p["powod"] for p in przyp.get("powody", [])]
-
-
-def zadanie_przygotowawcze(item, klient, zasady):
-    """Zadanie dla agenta do pozycji-ryzyka. Pola z analizy (zadanie_przygotowawcze) mają
-    pierwszeństwo; brakujące bierzemy z szablonu w ops/zasady.json."""
-    sz = zasady["ryzyka"]["zadanie_przygotowawcze"]
-    wlasne = item.get("zadanie_przygotowawcze") or {}
-    tytul = item.get("tytul", "")
-    return {
-        "sekcja": 1,
-        "typ": "zobowiazanie_nasze",
-        "przygotowawcze": True,
-        "klucz_sprawy": f"przygotowanie-{item.get('klucz_sprawy', 'ryzyko')}",
-        "tytul": sz["tytul"].format(tytul=tytul),
-        "opis": f"Zadanie przygotowawcze do ryzyka „{tytul}”. Samo ryzyko prowadzą ludzie (etykieta Ryzyko).",
-        "wlasciciel": item.get("wlasciciel", ""),
-        "termin": item.get("termin", "brak"),
-        "warunek": "brak",
-        "pewnosc": "wysoka",
-        "cytat": item.get("cytat", []),
-        "cel": wlasne.get("cel") or sz["cel"].format(tytul=tytul),
-        "kryteria_akceptacji": wlasne.get("kryteria_akceptacji") or list(sz["kryteria_akceptacji"]),
-        "jak_sprawdzic": wlasne.get("jak_sprawdzic") or sz["jak_sprawdzic"],
-        "repo": wlasne.get("repo") or sz["repo"],
-        "konflikt_z_zakazem": None,
-    }

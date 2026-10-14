@@ -1,0 +1,28 @@
+{
+  "fakty": {
+    "0": "od dziewiętnastego",
+    "1": "od jutra, środa i czwartek",
+    "2": "W piątek",
+    "3": "do czwartku",
+    "4": "w czwartek o dziesiątej",
+    "5": "na czwartek",
+    "6": "przed urlopem",
+    "7": "dwudziesty siódmy, wtorek",
+    "8": "Dziś",
+    "9": "w czwartek",
+    "10": "w listopadzie"
+  },
+  "terminy": {
+    "T1": "Dziś",
+    "T2": "od jutra",
+    "T3": "W piątek",
+    "T4": "w czwartek o dziesiątej",
+    "T5": "na czwartek",
+    "T6": "przed urlopem",
+    "T7": "dwudziesty siódmy, wtorek",
+    "K1": "do czwartku",
+    "K2": "w czwartek",
+    "Z15": "w czwartek",
+    "R2": "w czwartek"
+  }
+}

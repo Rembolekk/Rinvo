@@ -117,20 +117,7 @@
     "powod_braku_kryteriow": "brak kryteriów"
   },
   "ryzyka": {
-    "_opis": "Samo ryzyko ma etykietę Ryzyko (dla ludzi). Agent dostaje osobne zadanie przygotowawcze.",
-    "zadanie_przygotowawcze": {
-      "tytul": "Notatka z argumentami przed spotkaniem: {tytul}",
-      "cel": "Przygotować notatkę z argumentami i dowodami, którą człowiek weźmie na rozmowę z klientem w sprawie ryzyka: {tytul}.",
-      "kryteria_akceptacji": [
-        "Notatka streszcza ryzyko własnymi słowami i zawiera dosłowny cytat z rozmowy lub maila",
-        "Notatka opisuje, co proponuje klient albo konkurent, i czego jeszcze nie wiemy",
-        "Notatka zawiera nasze argumenty z dowodami (fakty, liczby, historia klienta z karty)",
-        "Notatka kończy się rekomendowanym stanowiskiem i listą pytań do klienta",
-        "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
-      ],
-      "jak_sprawdzic": "Człowiek czyta notatkę przed spotkaniem: 5 punktów kryteriów jest spełnione, a cytat zgadza się z zapisem źródła.",
-      "repo": "rinvo-ops"
-    }
+    "_opis": "Samo ryzyko ma etykietę Ryzyko (dla ludzi). Agent dostaje jedną notatkę na zaplanowane spotkanie z klientem (a gdy spotkania nie ma, jedną na klienta), zawierającą wszystkie ryzyka i otwarte tematy tego klienta (patrz notatki)."
   },
   "repo": {
     "rinvo": "kod aplikacji",
@@ -167,5 +154,30 @@
     "nadpisanie": "decyzja",
     "pewnosc_niska": "weryfikacja",
     "brak_kryteriow": "weryfikacja"
+  },
+  "notatki": {
+    "_opis": "Jedno zadanie dla agenta na każde zaplanowane spotkanie z klientem, z wszystkimi ryzykami i otwartymi tematami klienta. Bez zaplanowanego spotkania: jedno zadanie na klienta (o ile klient ma ryzyka). Opis zadania odświeża się przy każdej zmianie.",
+    "spotkanie": {
+      "tytul": "Notatka przed spotkaniem: {spotkanie}",
+      "cel": "Przygotować jedną notatkę przed spotkaniem „{spotkanie}” ({data}): wszystkie ryzyka i otwarte tematy klienta w jednym miejscu, z argumentami na rozmowę."
+    },
+    "klient": {
+      "tytul": "Notatka o kliencie: ryzyka i otwarte tematy",
+      "cel": "Przygotować jedną notatkę o kliencie: wszystkie ryzyka i otwarte tematy w jednym miejscu, z argumentami na najbliższą rozmowę (spotkanie nie jest jeszcze zaplanowane)."
+    },
+    "kryteria_akceptacji": [
+      "Każde ryzyko z listy ma w notatce streszczenie własnymi słowami i dosłowny cytat ze źródła",
+      "Każde ryzyko ma nasze argumenty z dowodami (fakty, liczby, historia klienta z karty) i otwarte pytania do klienta",
+      "Każdy otwarty temat ma w notatce aktualny status i następny krok",
+      "Notatka kończy się rekomendowanym stanowiskiem na rozmowę i listą pytań do klienta",
+      "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+    ],
+    "jak_sprawdzic": "Człowiek czyta notatkę przed spotkaniem: pięć punktów kryteriów jest spełnionych, a cytaty zgadzają się z zapisem źródła.",
+    "repo": "rinvo-ops",
+    "max_cytat": 160,
+    "pomijaj_spotkania_slowa": [
+      "szkolen"
+    ],
+    "_pomijaj_spotkania_slowa": "Spotkania, w których tytule albo opisie jest takie słowo (np. szkolenie dla handlowców), nie dostają osobnej notatki: to nie rozmowa o ryzykach z klientem."
   }
 }

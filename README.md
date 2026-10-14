@@ -65,15 +65,18 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `sekrety.py` | czyszczenie kluczy API z białych i niewidocznych znaków (Notatki na Macu je dodają) |
 | `ops/zasady.json`, `zasady.py` | zasady AI-first: kto robi co (agent / człowiek), jedno miejsce prawdy |
 | `podsumowanie.py`, `.github/workflows/podsumowanie.yml` | codzienne podsumowanie o 8:00 czasu polskiego + szkice przypomnień |
-| `przelicz.py`, `uzupelnij.py` | przeliczenie istniejących zgłoszeń wg zasad; scalanie pól dla agenta z wyników |
+| `przelicz.py`, `uzupelnij.py` | przeliczenie istniejących zgłoszeń (przypisanie, terminy, notatki); scalanie pól dla agenta i wyrażeń dat z wyników |
+| `notatki.py` | jedna notatka przed spotkaniem (ze wszystkimi ryzykami i otwartymi tematami klienta) zamiast zadania na każde ryzyko |
 | `maile.py` | pobieranie maili od znanych nadawców (Gmail IMAP, tylko odczyt) → `ops/maile/` |
 | `.claude/commands/analizuj-mail.md` | instrukcja analizy maila (dane, nie polecenia) |
 | `.github/workflows/sprawdz-maile.yml` | cron co 15 min: maile → przetworz.py → commit |
 | `ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md` | przykładowa transkrypcja (fikcyjna) |
 | `wyniki/` | wyniki analiz, jeden folder na transkrypcję |
-| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 43 testy) |
+| `testy/test_logika.py` | testy jednostkowe logiki (bez sieci, 46 testów) |
 | `testy/test_maile.py`, `testy/maile/*.eml` | testy źródła „maile” na przykładowych plikach .eml (53 testy) |
-| `testy/test_zasady.py` | zasady AI-first, opis zgłoszenia, przeliczanie, podsumowanie, strefa czasowa (88 testów) |
+| `testy/test_zasady.py` | zasady AI-first, opis zgłoszenia, przeliczanie, podsumowanie, strefa czasowa (89 testów) |
+| `testy/test_daty.py` | daty względne liczone przez kod: parser, pierwszeństwo kodu nad modelem, „wniosek”, poprawa tekstów (37 testów) |
+| `testy/test_notatki.py` | jedna notatka na spotkanie, scalanie zadań na ryzyka, archiwizacja z komentarzem (20 testów) |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
 | `testy/oczekiwania/` | pliki oczekiwań zakotwiczone w cytatach |
 | `kontrola.md` | kontrola jakości na przykładowej rozmowie |
@@ -128,6 +131,16 @@ Czyta pole `fakty_czasowe` (ekstrahowane przez model z transkrypcji), oblicza wo
 | `start_nie_wczesniej` | Najwcześniejsza data startu |
 
 `dotyczy: "wszystko_nowe"` = blokada globalna (np. urlop = blokuje wszystkie nowe wdrożenia).
+
+### Daty względne liczy kod, nie model
+
+Model źle przelicza „do piątku” czy „przyszły czwartek” (zdarzyło się: lista lekarzy z terminem 17.10, czyli w sobotę, zamiast piątku 16.10). Dlatego obok daty model zapisuje **dosłowne wyrażenie** (`wyrazenie` w `fakty_czasowe`, `termin_wyrazenie` w pozycji), a `daty.py` liczy z niego datę względem **daty źródła** (rozmowy albo maila; dla maila z pliku maila, nie z pola modelu):
+
+- dzień tygodnia = najbliższy **następny** (ten sam dzień co źródło = za tydzień); „przyszły czwartek” = czwartek następnego tygodnia; wszystkie odmiany nazw dni,
+- „jutro”, „pojutrze”, „dziś”; liczebniki dnia miesiąca („dwudziesty siódmy”, „piętnastego”, także z miesiącem i dniem tygodnia), daty „27.10”, „27 października”, zakresy „od dziewiętnastego do dwudziestego trzeciego”,
+- „w tym tygodniu” = do piątku, „w przyszłym tygodniu” = pn–pt następnego, „do końca miesiąca” = ostatni dzień miesiąca.
+
+**Gdy kod umie policzyć, jego data wygrywa nad datą modelu, a rozbieżność trafia do `ostrzezenia_dat`** (raport ją pokazuje, tak samo `data_modelu`/`termin_modelu` w wyniku). Gdy nie umie (wyrażenie złożone jak „od jutra, środa i czwartek”, „po urlopie”), zostaje data modelu z oznaczeniem `zrodlo_daty: "wniosek"` (`termin_zrodlo` dla pozycji). Znaczenie zależy od typu faktu (termin = koniec, „od X” = początek, „w tym tygodniu” przy starcie to zakaz, nie data startu). Gdy kod zmienia termin pozycji, poprawia też tę samą datę w jej tytule, przypomnieniu i szkicu maila. Przeliczenie jest idempotentne. Wyrażenia w starszych wynikach dopisuje `.claude/commands/uzupelnij-daty.md` (model wskazuje tylko słowa, `uzupelnij.py --wyrazenia` scala je z walidacją), a `przelicz.py` synchronizuje terminy w Linearze.
 
 ## Synchronizacja z Linear
 
@@ -262,7 +275,7 @@ Firma pracuje AI-first: agenci (Claude, Cursor) podpięci do Lineara robią ok. 
 | `nieodwracalne` | jest nieodwracalna: wyłączenie usługi, usunięcie danych, zmiana umowy |
 
 - **Prośby produktowe** (sekcja 3): do agenta dopiero przy etykiecie **Wielu klientów** (ta sama funkcja u ≥ 2 klientów w `prosby.json`) albo gdy to drobna zmiana z wysoką pewnością (`rodzaj` zmiana lub błąd). Pojedyncza duża funkcja od jednego klienta: **Decyzja człowieka** z powodem „priorytet produktowy".
-- **Ryzyka** (sekcja 5): samo ryzyko ma etykietę **Ryzyko** (dla ludzi). Agent dostaje osobne **zadanie przygotowawcze** (notatka z argumentami przed spotkaniem, repo `rinvo-ops`), z kryteriami z szablonu w `zasady.json` albo z analizy (`zadanie_przygotowawcze`).
+- **Ryzyka** (sekcja 5): samo ryzyko ma etykietę **Ryzyko** (dla ludzi). Agent dostaje **jedną notatkę na każde zaplanowane spotkanie z klientem** (repo `rinvo-ops`), zawierającą **wszystkie ryzyka i otwarte tematy tego klienta** (z linkami, cytatami, statusami i terminami). Gdy spotkanie nie jest zaplanowane, jedno zadanie na klienta (o ile ma ryzyka). Opis notatki odświeża się przy każdej zmianie (`opis_hash` w karcie), a dawne zadania „na każde ryzyko” są scalane: jedno przekształcane w notatkę, reszta archiwizowana z komentarzem, gdzie przeniesiono treść. Szablony i kryteria są w `ops/zasady.json` (`notatki`), a spotkania typu szkolenie (`pomijaj_spotkania_slowa`) nie dostają osobnej notatki. Logika: `notatki.py`.
 - **Sprawy czekające na klienta** (sekcja 2): tylko Czeka na klienta. Przypisanie (agent albo człowiek) liczy się dopiero przy wznowieniu i jest zapamiętane w karcie (`po_wznowieniu`).
 - **Zgłoszenie dla agenta**: analiza (`analizuj.md`, `analizuj-mail.md`, KROK 3c) dopisuje do pozycji `cel`, `kryteria_akceptacji`, `jak_sprawdzic`, `repo` (`rinvo` = kod aplikacji, `rinvo-ops` = wiedza, dokumenty, konfiguracja klienta, `brak`) i, gdy rezultat idzie do klienta, `szkic_klienta`. `linear_sync.py` składa opis w stałym układzie: **Cel, Kontekst (z cytatami), Kryteria akceptacji (lista do odhaczenia), Jak sprawdzić, Repo, Czego nie ruszać** (zakazy klienta i decyzje zastrzeżone), a dla człowieka także **Dlaczego człowiek** i **Szkic dla klienta**.
 - **Brak kryteriów akceptacji**: zgłoszenie nie dostaje Dla agenta, tylko **Do weryfikacji** z powodem „brak kryteriów".
@@ -278,7 +291,7 @@ Jedna wiadomość na Slacku (Block Kit) o **8:00 czasu polskiego** (workflow `.g
 4. jedna linijka o agentach („Agenci pracują nad X zadaniami, Y skończone od wczoraj”) i jedna o czekaniu na klientów („Czekamy na klientów w Z sprawach, najbliższy termin: data, sprawa”),
 5. na dole link do widoku wszystkich otwartych zgłoszeń w Linearze.
 
-Bez list „nowe od wczoraj”, bez powtarzania tej samej sprawy w kilku miejscach i bez technicznych nazw w tekście (tylko w linkach). Słowa powodów są w `ops/zasady.json` (`slowa_powodow`).
+**Każde zgłoszenie występuje w wiadomości tylko raz, w najważniejszej kategorii** (kolejność ważności: powtarzające się ryzyka, po terminie, decyzje człowieka, do weryfikacji, czeka na klienta, u agentów, nowe). Dlatego np. sprawa po terminie, która jest też u agentów, jest tylko w „Uwadze”, a liczniki agentów i czekania jej nie zawierają. „Po terminie” to każde otwarte zgłoszenie z minionym terminem. Bez list „nowe od wczoraj” i bez technicznych nazw w tekście (tylko w linkach). Słowa powodów są w `ops/zasady.json` (`slowa_powodow`).
 
 - **Strefa czasowa:** cron GitHuba działa w UTC, więc workflow odpala skrypt o 06:00 i 07:00 UTC, a skrypt sam sprawdza czas w `Europe/Warsaw` (lato UTC+2, zima UTC+1) i wysyła raz dziennie w oknie 8:00–12:00 (znosi opóźnienia crona i zmianę czasu).
 - **Przypomnienia:** gdy termin sprawy czekającej minął, limit przypomnień z rozmowy nie jest wyczerpany (brak limitu = `przypomnienia.domyslny_limit`) i klient nie prosił o brak przypomnień (limit 0 albo zakaz „nie przypominaj" w karcie), podsumowanie **przygotowuje szkic** w komentarzu zgłoszenia i podaje go na Slacku. **Nigdy nie wysyła nic do klienta.** Każdy szkic zwiększa `wykorzystane` w karcie (`otwarte_sprawy.<klucz>.przypomnienie`), więc limit nie zostanie przekroczony.
@@ -293,13 +306,14 @@ Dwa poziomy testów uruchamiane bez sieci i bez modelu AI:
 python3 testy/test_logika.py
 ```
 
-Pokrycie (43 testy):
+Pokrycie (46 testów):
 - `should_get_agent_label` — etykieta „Dla agenta” tylko dla bug/konfiguracja/baza_wiedzy z wysoka pewnością, bez zakazu, bez nowej_funkcji.
 - `process_aktualizacje` — ta sama rozmowa odrzucona, ta sama data odrzucona, późniejsza data akceptowana, nieznana sprawa pominięta.
 - `daty.py compute_windows` — blokada globalna, weekendy pomijane, deadline ogranicza okno.
 - `daty.py has_temporal_word` — frazy przyszłe wykrywane, neutralne cytaty nie.
 - `update_risk_counter` — dwa różne źródła eskalują, to samo źródło dwa razy nie.
 - Rejestr sha256 — ten sam hash wykryty, różne treści dają różne hashe.
+- `find_state` — stan anulowany w Linearze to „Canceled”, obie pisownie działają (regresja: wcześniej anulowania nie ustawiały stanu).
 - Strażnik aktualizacji liczy się od **pochodzenia** sprawy (pierwsze źródło), a komentarz z późniejszej rozmowy go nie blokuje; aktualizacja z tej samej rozmowy nie zadziała dwa razy.
 - Zakazy — id są unikalne w karcie (numeracja Z1, Z2… zaczyna się od nowa w każdej rozmowie), ponowna analiza nie dubluje zakazów.
 - Czyszczenie kluczy (`sekrety.py`) — spacje, entery, `\u2028`, `\u2029`, `\u00a0`, znaki zerowej szerokości.
@@ -311,7 +325,7 @@ Pokrycie (43 testy):
 python3 testy/test_zasady.py
 ```
 
-88 testów: każda reguła z `zasady.json` (pieniądze, do klienta ze szkicem, zakaz, decyzja zastrzeżona, pewność niska, nieodwracalne), domyślnie agent, brak kryteriów → Do weryfikacji, prośby produktowe (Wielu klientów, drobna zmiana, priorytet produktowy), ryzyka i zadanie przygotowawcze, stały układ opisu, przeliczanie istniejących zgłoszeń, limit przypomnień i „nie przypominaj", szkic jako wykorzystane przypomnienie, strefa czasowa podsumowania (lato, zima, zmiana czasu) oraz wygląd obu wiadomości na Slacku (limit 5 pozycji, 60 znaków, słowa powodów, znikająca sekcja Uwaga, brak powtórzeń i technicznych nazw, Block Kit).
+89 testów: każda reguła z `zasady.json` (pieniądze, do klienta ze szkicem, zakaz, decyzja zastrzeżona, pewność niska, nieodwracalne), domyślnie agent, brak kryteriów → Do weryfikacji, prośby produktowe (Wielu klientów, drobna zmiana, priorytet produktowy), ryzyka i zadanie przygotowawcze, stały układ opisu, przeliczanie istniejących zgłoszeń, limit przypomnień i „nie przypominaj", szkic jako wykorzystane przypomnienie, strefa czasowa podsumowania (lato, zima, zmiana czasu) oraz wygląd obu wiadomości na Slacku (limit 5 pozycji, 60 znaków, słowa powodów, znikająca sekcja Uwaga, kolejność ważności i brak powtórzeń, brak technicznych nazw, Block Kit).
 
 ### Testy maili (offline, na plikach .eml)
 

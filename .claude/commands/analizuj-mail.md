@@ -22,7 +22,7 @@ Zastosuj te same reguły i ten sam schemat wyniku co w .claude/commands/analizuj
 - „spotkanie": tytul = temat maila, data = data z nagłówka maila (RRRR-MM-DD, z pola Data), godziny = godzina wysłania, uczestnicy = [nadawca z pola Od, bez adresu e-mail], wspominani = osoby wymienione w treści.
 - Zgłoszenia dla agenta: dla każdej pozycji z sekcji 1 i 3 (oraz 2 na moment wznowienia) dodaj pola cel, kryteria_akceptacji (lista sprawdzalnych punktów; pusta, jeśli nie umiesz ich oprzeć na treści maila), jak_sprawdzic, repo („rinvo", „rinvo-ops", „brak") i, gdy rezultat trafia do klienta, szkic_klienta. Reguły i opis pól: KROK 3c w .claude/commands/analizuj.md; kto dostaje pozycję (agent czy człowiek), rozstrzyga kod wg ops/zasady.json.
 - „zrodlo" = dokładnie ścieżka pliku maila z argumentu.
-- Daty względne („w piątek", „do czwartku") przeliczaj od daty maila. fakty_czasowe jak w analizuj.md.
+- Daty względne („w piątek", „do czwartku") liczy kod od daty maila (z nagłówka): przy każdym wpisie fakty_czasowe zapisz dosłowne "wyrazenie", a przy terminie pozycji "termin_wyrazenie" (zasady jak w analizuj.md). Datę też podaj, ale data z kodu wygrywa. fakty_czasowe poza tym jak w analizuj.md.
 - Cytaty muszą być DOSŁOWNE z pliku maila (render.py --transkrypcja wskazuje na ten plik). Nie cytuj nagłówka z adresami; cytuj zdania z sekcji „Treść".
 - szkic_maila: krótka odpowiedź do klienta, tylko to, co faktycznie ustalono. Nic nie wysyłaj.
 

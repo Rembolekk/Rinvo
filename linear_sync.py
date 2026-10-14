@@ -21,6 +21,7 @@ from datetime import date
 from pathlib import Path
 
 from maile import czy_mail, kontakt_ma_prawo_decyzji, wczytaj_meta_maila, znajdz_kontakt
+import notatki
 import zasady
 from sekrety import czysc
 
@@ -261,12 +262,17 @@ def get_workflow_states(api_key, team_id):
     return data.get("workflowStates", {}).get("nodes", [])
 
 
+def _pisownia(tekst):
+    """Linear nazywa stan „Canceled” (typ „canceled”), a w kodzie bywa „Cancelled”: obie pisownie to to samo."""
+    return str(tekst).lower().replace("cancelled", "canceled")
+
+
 def find_state(states, preferred_name, fallback_type):
     for s in states:
-        if s["name"].lower() == preferred_name.lower():
+        if _pisownia(s["name"]) == _pisownia(preferred_name):
             return s["id"]
     for s in states:
-        if s.get("type") == fallback_type:
+        if _pisownia(s.get("type")) == _pisownia(fallback_type):
             return s["id"]
     return None
 
@@ -924,34 +930,6 @@ def process_aktualizacje(api_key, wynik, karta, state_ids, label_map, dry_run, m
     return processed
 
 
-def utworz_przygotowanie(api_key, team_id, karta, item, klient, source, meeting_date, Z, label_map,
-                         todo_id, dry_run=False):
-    """Ryzyko dla ludzi (etykieta Ryzyko) + osobne zadanie przygotowawcze dla agenta (notatka)."""
-    prep = zasady.zadanie_przygotowawcze(item, klient, Z)
-    klucz = prep["klucz_sprawy"]
-    otwarte = karta.setdefault("otwarte_sprawy", {})
-    if klucz in otwarte:
-        return None
-    etykiety = [label_map[n] for n in (Z["etykiety"]["agent"], "Zadanie") if n in label_map]
-    przyp = zasady.przypisz(prep, Z, karta)
-    desc = build_description(prep, source, karta, przyp, Z)
-    if dry_run:
-        print(f"  [utwórz] {klucz} (zadanie przygotowawcze dla agenta)")
-        return None
-    wynik = gql(api_key, M_CREATE_ISSUE, {"input": {
-        "teamId": team_id, "title": f"[{klient}] {prep['tytul']}", "description": desc,
-        "stateId": todo_id, "labelIds": etykiety}})
-    issue = (wynik.get("issueCreate") or {}).get("issue")
-    if not issue:
-        print(f"  ⚠ Nie udało się utworzyć: {klucz}")
-        return None
-    otwarte[klucz] = {"linear_id": issue["id"], "identifier": issue["identifier"], "url": issue["url"],
-                      "tytul": prep["tytul"], "zrodla": [source], "data_spotkania": meeting_date,
-                      "przypisanie": {"komu": przyp["komu"], "powody": []}}
-    print(f"  ✓ {issue['identifier']} ({klucz}): [{klient}] {prep['tytul'][:50]}")
-    return issue
-
-
 # ── main ──────────────────────────────────────────────────────────────────────
 
 def main():
@@ -1207,9 +1185,16 @@ def main():
                 gql(api_key, M_ADD_COMMENT, {"issueId": linear_id, "body": body})
 
         stats["utworzono"] += 1
-        if sekcja == 5:
-            utworz_przygotowanie(api_key, team_id, karta, item, klient, source, meeting_date, Z,
-                                 label_map, todo_id)
+
+    # jedna notatka przed spotkaniem (albo na klienta) ze wszystkimi ryzykami i otwartymi tematami
+    # zamiast osobnego zadania na każde ryzyko; dawne zadania na ryzyka są scalane (patrz notatki.py)
+    import copy
+    najnowsze = notatki.najnowsze_pozycje(klient)
+    for zdarzenie in notatki.synchronizuj_notatki(
+            sys.modules[__name__], api_key, team_id, karta if not args.dry_run else copy.deepcopy(karta),
+            klient, najnowsze, Z, label_map, todo_id, state_ids, source, meeting_date, date.today(),
+            dry_run=args.dry_run):
+        print(f"  [notatki] {zdarzenie}" if args.dry_run else f"  {zdarzenie}")
 
     if not args.dry_run:
         save_karta(klient, karta)

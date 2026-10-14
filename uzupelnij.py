@@ -3,6 +3,7 @@
 
 Użycie:
   python3 uzupelnij.py wyniki/<klient>/<nazwa>/wynik.json [pola-agenta.json]
+  python3 uzupelnij.py wyniki/<klient>/<nazwa>/wynik.json --wyrazenia [wyrazenia.json]
 
 Model zapisuje tylko małe pola-agenta.json (id pozycji → pola), a kod dopisuje je do pozycji:
   * tylko dozwolone pola (cel, kryteria_akceptacji, jak_sprawdzic, repo, szkic_klienta,
@@ -68,14 +69,46 @@ def scal(wynik, pola_wg_id):
     return n, ostrzezenia
 
 
+def scal_wyrazenia(wynik, wyrazenia):
+    """Dopisuje dosłowne wyrażenia dat: fakty_czasowe[i]["wyrazenie"] i pozycje[id]["termin_wyrazenie"].
+    Nie nadpisuje istniejących wyrażeń. Zwraca (liczba_dopisanych, ostrzeżenia)."""
+    ostrzezenia, n = [], 0
+    fakty = wynik.get("fakty_czasowe", [])
+    for indeks, wyr in (wyrazenia.get("fakty") or {}).items():
+        try:
+            f = fakty[int(indeks)]
+        except (ValueError, IndexError):
+            ostrzezenia.append(f"fakt {indeks}: brak takiego wpisu w fakty_czasowe")
+            continue
+        if not isinstance(wyr, str) or not wyr.strip():
+            ostrzezenia.append(f"fakt {indeks}: wyrażenie musi być tekstem")
+        elif "wyrazenie" not in f:
+            f["wyrazenie"] = wyr.strip()
+            n += 1
+    po_id = {p.get("id"): p for p in wynik.get("pozycje", [])}
+    for pid, wyr in (wyrazenia.get("terminy") or {}).items():
+        p = po_id.get(pid)
+        if p is None:
+            ostrzezenia.append(f"{pid}: brak takiej pozycji")
+        elif not isinstance(wyr, str) or not wyr.strip():
+            ostrzezenia.append(f"{pid}: wyrażenie musi być tekstem")
+        elif "termin_wyrazenie" not in p:
+            p["termin_wyrazenie"] = wyr.strip()
+            n += 1
+    return n, ostrzezenia
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit("Użycie: python3 uzupelnij.py wynik.json [pola-agenta.json]")
     wynik_path = Path(sys.argv[1])
-    pola_path = Path(sys.argv[2]) if len(sys.argv) > 2 else wynik_path.parent / "pola-agenta.json"
+    reszta = [a for a in sys.argv[2:] if a != "--wyrazenia"]
+    tryb_wyrazen = "--wyrazenia" in sys.argv[2:]
+    domyslny = "wyrazenia.json" if tryb_wyrazen else "pola-agenta.json"
+    pola_path = Path(reszta[0]) if reszta else wynik_path.parent / domyslny
     wynik = json.loads(wynik_path.read_text(encoding="utf-8"))
     pola = json.loads(pola_path.read_text(encoding="utf-8"))
-    n, ostrz = scal(wynik, pola)
+    n, ostrz = (scal_wyrazenia if tryb_wyrazen else scal)(wynik, pola)
     wynik_path.write_text(json.dumps(wynik, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     print(f"Uzupełniono pozycji: {n}")
     for o in ostrz:

@@ -227,7 +227,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "godziny-dzwonienia": {
@@ -240,7 +241,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "godziny-salonu-sobota": {
@@ -254,7 +256,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "rozliczenie-krotkich-polaczen": {
@@ -269,6 +272,9 @@
         "komu": "czlowiek",
         "powody": [
           "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)"
+        ],
+        "reguly": [
+          "pieniadze"
         ]
       }
     },
@@ -282,7 +288,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "cena-smsow": {
@@ -298,6 +305,10 @@
         "powody": [
           "kosztuje pieniądze albo dotyczy cen i umów (słowo: „cenę”)",
           "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłanie”)"
+        ],
+        "reguly": [
+          "pieniadze",
+          "do_klienta"
         ]
       }
     },
@@ -314,6 +325,9 @@
         "komu": "czlowiek",
         "powody": [
           "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłać”)"
+        ],
+        "reguly": [
+          "do_klienta"
         ]
       }
     },
@@ -333,6 +347,9 @@
         "komu": "czlowiek",
         "powody": [
           "pewność niska: nie wiadomo na pewno, czego dotyczy"
+        ],
+        "reguly": [
+          "pewnosc_niska"
         ]
       }
     },
@@ -351,7 +368,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "mail-przeglad-ola": {
@@ -364,7 +382,8 @@
       ],
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "agent",
@@ -393,6 +412,9 @@
         "komu": "czlowiek",
         "powody": [
           "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłać”)"
+        ],
+        "reguly": [
+          "do_klienta"
         ]
       }
     },
@@ -406,7 +428,8 @@
       ],
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "czlowiek",
@@ -434,6 +457,9 @@
         "komu": "czlowiek",
         "powody": [
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "produkt"
         ]
       }
     },
@@ -449,6 +475,9 @@
         "komu": "czlowiek",
         "powody": [
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "produkt"
         ]
       }
     },
@@ -464,6 +493,9 @@
         "komu": "czlowiek",
         "powody": [
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "produkt"
         ]
       }
     },
@@ -477,7 +509,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "sms-po-nieodebranym": {
@@ -493,6 +526,10 @@
         "powody": [
           "kosztuje pieniądze albo dotyczy cen i umów (słowo: „koszt”)",
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "pieniadze",
+          "produkt"
         ]
       }
     },
@@ -508,6 +545,9 @@
         "komu": "czlowiek",
         "powody": [
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "produkt"
         ]
       }
     },
@@ -524,6 +564,10 @@
         "powody": [
           "dotyczy decyzji zastrzeżonej w karcie dla konkretnej osoby (decyduje: Kasia Malinowska)",
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "decyzja_zastrzezona",
+          "produkt"
         ]
       }
     },
@@ -540,6 +584,10 @@
         "powody": [
           "pewność niska: nie wiadomo na pewno, czego dotyczy",
           "priorytet produktowy"
+        ],
+        "reguly": [
+          "pewnosc_niska",
+          "produkt"
         ]
       }
     },
@@ -557,7 +605,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "ryzyko-voicedesk": {
@@ -571,7 +620,8 @@
       ],
       "przypisanie": {
         "komu": "ryzyko",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "ryzyko-zla-interpretacja-wynikow": {
@@ -584,7 +634,8 @@
       ],
       "przypisanie": {
         "komu": "ryzyko",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "ryzyko-brak-integracji-crm": {
@@ -598,7 +649,8 @@
       ],
       "przypisanie": {
         "komu": "ryzyko",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "case-study-208": {
@@ -611,7 +663,8 @@
       ],
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "zestawienie-wynikow-wstepu": {
@@ -627,6 +680,9 @@
         "komu": "czlowiek",
         "powody": [
           "trafia do klienta (mail, przypomnienie, oferta): agent przygotowuje gotowy szkic w zgłoszeniu, człowiek tylko wysyła (słowo: „wysłać”)"
+        ],
+        "reguly": [
+          "do_klienta"
         ]
       }
     },
@@ -641,7 +697,8 @@
       "data_spotkania": "2026-10-13",
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "decyzja-opel-stara-baza": {
@@ -655,7 +712,8 @@
       "data_spotkania": "2026-10-13",
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "czlowiek",
@@ -681,7 +739,8 @@
       "data_spotkania": "2026-10-13",
       "przypisanie": {
         "komu": "agent",
-        "powody": []
+        "powody": [],
+        "reguly": []
       }
     },
     "start-swiezych-leadow": {
@@ -695,7 +754,8 @@
       "data_spotkania": "2026-10-14",
       "przypisanie": {
         "komu": "czeka",
-        "powody": []
+        "powody": [],
+        "reguly": []
       },
       "po_wznowieniu": {
         "komu": "czlowiek",
@@ -711,11 +771,11 @@
         "nie_przypominac": true
       }
     },
-    "przygotowanie-ryzyko-voicedesk": {
+    "notatka-spotkanie-z-pawlem": {
       "linear_id": "90cef0b1-e59e-45d9-967e-5afa5b626bf7",
       "identifier": "RIN-78",
       "url": "https://linear.app/rinvo-demo/issue/RIN-78/auto-tama-notatka-z-argumentami-przed-spotkaniem-voicedesk-zlozyl",
-      "tytul": "Notatka z argumentami przed spotkaniem: VoiceDesk złożył Pawłowi pisemną ofertę z cennikiem",
+      "tytul": "Notatka przed spotkaniem: Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)",
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ],
@@ -723,35 +783,8 @@
       "przypisanie": {
         "komu": "agent",
         "powody": []
-      }
-    },
-    "przygotowanie-ryzyko-zla-interpretacja-wynikow": {
-      "linear_id": "72e62bef-8c71-4b79-b4b4-d1b973509c37",
-      "identifier": "RIN-79",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-79/auto-tama-notatka-z-argumentami-przed-spotkaniem-pawel-chcial-wylaczyc",
-      "tytul": "Notatka z argumentami przed spotkaniem: Paweł chciał wyłączyć agenta po złej interpretacji wyników",
-      "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ],
-      "data_spotkania": "",
-      "przypisanie": {
-        "komu": "agent",
-        "powody": []
-      }
-    },
-    "przygotowanie-ryzyko-brak-integracji-crm": {
-      "linear_id": "fde1de18-d84a-4dcc-8b6b-6a45fe0950da",
-      "identifier": "RIN-80",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-80/auto-tama-notatka-z-argumentami-przed-spotkaniem-bez-konkretow-o",
-      "tytul": "Notatka z argumentami przed spotkaniem: Bez konkretów o integracji w czwartek Paweł testuje VoiceDesk w listopadzie",
-      "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-      ],
-      "data_spotkania": "",
-      "przypisanie": {
-        "komu": "agent",
-        "powody": []
-      }
+      },
+      "opis_hash": "40777bb84876b68d"
     }
   },
   "ryzyka": {
@@ -815,6 +848,38 @@
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
       ],
       "status_koncowy": "zamknieta"
+    },
+    "przygotowanie-ryzyko-zla-interpretacja-wynikow": {
+      "linear_id": "72e62bef-8c71-4b79-b4b4-d1b973509c37",
+      "identifier": "RIN-79",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-79/auto-tama-notatka-z-argumentami-przed-spotkaniem-pawel-chcial-wylaczyc",
+      "tytul": "Notatka z argumentami przed spotkaniem: Paweł chciał wyłączyć agenta po złej interpretacji wyników",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ],
+      "data_spotkania": "",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      },
+      "status_koncowy": "anulowana",
+      "przeniesiono_do": "notatka-spotkanie-z-pawlem"
+    },
+    "przygotowanie-ryzyko-brak-integracji-crm": {
+      "linear_id": "fde1de18-d84a-4dcc-8b6b-6a45fe0950da",
+      "identifier": "RIN-80",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-80/auto-tama-notatka-z-argumentami-przed-spotkaniem-bez-konkretow-o",
+      "tytul": "Notatka z argumentami przed spotkaniem: Bez konkretów o integracji w czwartek Paweł testuje VoiceDesk w listopadzie",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": []
+      },
+      "status_koncowy": "anulowana",
+      "przeniesiono_do": "notatka-spotkanie-z-pawlem"
     }
   },
   "historia_zakazow": [

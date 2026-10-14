@@ -34,7 +34,7 @@ W tygodniu urlopu Ani (2–6 listopada) żadnych nowych wdrożeń. Uwaga: Marek 
 - [RIN-69](https://linear.app/rinvo-demo/issue/RIN-69/klinika-usmiech-potwierdzenie-spotkania-marek-dr-nowak-sroda-2110-900) – Potwierdzenie spotkania Marek–dr Nowak (środa 21.10, 9:00)
 - [RIN-70](https://linear.app/rinvo-demo/issue/RIN-70/klinika-usmiech-eksport-listy-potwierdzen-do-excela) – Eksport listy potwierdzeń do Excela
 - [RIN-71](https://linear.app/rinvo-demo/issue/RIN-71/klinika-usmiech-dr-nowak-rozwaza-zmiane-dostawcy-oferta-konkurenta-z) – Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji
-- [RIN-81](https://linear.app/rinvo-demo/issue/RIN-81/klinika-usmiech-notatka-z-argumentami-przed-spotkaniem-dr-nowak) – Notatka z argumentami przed spotkaniem: Dr Nowak rozważa zmianę dostawcy – oferta konkurenta z integracją systemu rezerwacji
+- [RIN-81](https://linear.app/rinvo-demo/issue/RIN-81/klinika-usmiech-notatka-z-argumentami-przed-spotkaniem-dr-nowak) – Notatka przed spotkaniem: Potwierdzenie spotkania Marek–dr Nowak (środa 21.10, 9:00)
 
 ## Ryzyka powtarzające się
 

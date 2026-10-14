@@ -79,7 +79,9 @@
       ],
       "jak_sprawdzic": "Rozmowa testowa z pytaniem o adres salonu we Włocławku, następnie sprawdzenie wpisu w bazie wiedzy agenta. Kasia sama puści własny test, więc nagrania testowego nie wysyłamy.",
       "repo": "rinvo-ops",
-      "szkic_klienta": "Cześć Kasiu,\n\nadres salonu we Włocławku w bazie wiedzy agenta jest już poprawiony: agent podaje teraz Toruńska 120. Godziny w tygodniu (9–18) zostają bez zmian, a dane salonu w Toruniu też. Możesz puścić swój test.\n\nPozdrawiam,\nMarek"
+      "szkic_klienta": "Cześć Kasiu,\n\nadres salonu we Włocławku w bazie wiedzy agenta jest już poprawiony: agent podaje teraz Toruńska 120. Godziny w tygodniu (9–18) zostają bez zmian, a dane salonu w Toruniu też. Możesz puścić swój test.\n\nPozdrawiam,\nMarek",
+      "termin_wyrazenie": "dzisiaj",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T3",
@@ -138,7 +140,9 @@
         "Godziny w tygodniu pozostają bez zmian"
       ],
       "jak_sprawdzic": "Dwie rozmowy testowe z pytaniem o godziny w sobotę (po jednej na salon) oraz sprawdzenie wpisów w bazie wiedzy.",
-      "repo": "rinvo-ops"
+      "repo": "rinvo-ops",
+      "termin_wyrazenie": "dzisiaj",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T5",
@@ -192,7 +196,9 @@
         "Korekta trafia do Kasi (zapowiedziana na przyszły tydzień po rozmowie)"
       ],
       "jak_sprawdzic": "Potwierdzenie od Michała, że prośba została przyjęta, oraz kopia wystawionej korekty z poprawną nazwą firmy.",
-      "repo": "brak"
+      "repo": "brak",
+      "termin_wyrazenie": "dziś",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T7",
@@ -278,7 +284,9 @@
       ],
       "jak_sprawdzic": "Przejrzeć wysłaną wiadomość pod kątem czterech punktów i sprawdzić, że podana cena zgadza się z aktualnym cennikiem SMS.",
       "repo": "brak",
-      "szkic_klienta": "Cześć Kasiu,\n\nprzesyłam cenę SMS-ów, o którą pytał Paweł: [cena za jedną wiadomość, uzupełnić z cennika]. SMS-y rozliczamy osobno, za każdą wysłaną wiadomość.\n\nTreść napiszesz Ty, tak jak przy tekście wstępu. Uruchomienie SMS-a po dwóch nieudanych próbach wymaga zatwierdzenia przez Pawła.\n\nPozdrawiam,\nMarek"
+      "szkic_klienta": "Cześć Kasiu,\n\nprzesyłam cenę SMS-ów, o którą pytał Paweł: [cena za jedną wiadomość, uzupełnić z cennika]. SMS-y rozliczamy osobno, za każdą wysłaną wiadomość.\n\nTreść napiszesz Ty, tak jak przy tekście wstępu. Uruchomienie SMS-a po dwóch nieudanych próbach wymaga zatwierdzenia przez Pawła.\n\nPozdrawiam,\nMarek",
+      "termin_wyrazenie": "w tym tygodniu",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "T10",
@@ -335,7 +343,9 @@
         "Pytanie o zgodę na nazwę firmy jest wpisane do agendy spotkania z Pawłem 15.10"
       ],
       "jak_sprawdzic": "Przeczytać gotowy materiał i sprawdzić, że nie ma w nim nazwy firmy ani nazwiska, a agenda spotkania zawiera pytanie o zgodę.",
-      "repo": "rinvo-ops"
+      "repo": "rinvo-ops",
+      "termin_wyrazenie": "przyszły czwartek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "K1",
@@ -370,7 +380,9 @@
       ],
       "jak_sprawdzic": "Sprawdzić konfigurację kampanii (która wersja idzie na które miasto lub dzień), odsłuchać po jednej rozmowie z każdej wersji i porównać zestawienie z danymi z panelu.",
       "repo": "rinvo-ops",
-      "szkic_klienta": "Cześć Kasiu,\n\nprzypominam o dwóch wersjach tekstu wstępu rozmowy: miały być do czwartku (8.10). Jak je prześlesz, puścimy test, a wybór wersji zostaje po Twojej stronie.\n\nPozdrawiam,\nMarek"
+      "szkic_klienta": "Cześć Kasiu,\n\nprzypominam o dwóch wersjach tekstu wstępu rozmowy: miały być do czwartku (8.10). Jak je prześlesz, puścimy test, a wybór wersji zostaje po Twojej stronie.\n\nPozdrawiam,\nMarek",
+      "termin_wyrazenie": "do czwartku",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "K2",
@@ -403,7 +415,9 @@
         "Kampania nie startuje w dniach 19–23.10 (urlop Kasi)"
       ],
       "jak_sprawdzic": "Porównać liczbę numerów w kampanii z plikiem od Kasi, sprawdzić przypisanie do salonów i potwierdzić, że żaden numer nie pochodzi ze starej bazy.",
-      "repo": "brak"
+      "repo": "brak",
+      "termin_wyrazenie": "poniedziałek",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "K3",
@@ -780,7 +794,7 @@
       "tytul": "Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10",
       "opis": "Kasia odsłuchuje starą bazę i nowy wstęp by się 'zlał'. Test można uruchomić dopiero po wysłaniu przez Kasię obu wersji.",
       "wlasciciel": "Marek Rewoliński",
-      "termin": "2026-10-12",
+      "termin": "2026-10-09",
       "warunek": "brak",
       "status": "nigdy",
       "cytat": [
@@ -788,7 +802,10 @@
       ],
       "klucz_sprawy": "zakaz-testy-wstepu-ten-tydzien",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "termin_wyrazenie": "W tym tygodniu",
+      "termin_zrodlo": "kod",
+      "termin_modelu": "2026-10-12"
     },
     {
       "id": "Z3",
@@ -842,7 +859,9 @@
       ],
       "klucz_sprawy": "zakaz-dzialania-urlop-kasi",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "termin_wyrazenie": "od dziewiętnastego do dwudziestego trzeciego",
+      "termin_zrodlo": "kod"
     },
     {
       "id": "Z6",
@@ -941,7 +960,7 @@
       "tytul": "Nie modyfikować maila po walidacji w tygodniu 6–12.10",
       "opis": "Salon zamyka miesiąc i nikt nie powie Kasi, czy nowy mail jest lepszy. Mail modyfikujemy po uruchomieniu świeżych leadów.",
       "wlasciciel": "Marek Rewoliński",
-      "termin": "2026-10-12",
+      "termin": "2026-10-09",
       "warunek": "brak",
       "status": "nigdy",
       "cytat": [
@@ -949,7 +968,10 @@
       ],
       "klucz_sprawy": "zakaz-mail-walidacji-ten-tydzien",
       "pewnosc": "wysoka",
-      "konflikt_z_zakazem": null
+      "konflikt_z_zakazem": null,
+      "termin_wyrazenie": "w tym tygodniu",
+      "termin_zrodlo": "kod",
+      "termin_modelu": "2026-10-12"
     },
     {
       "id": "Z12",
@@ -1183,72 +1205,92 @@
     {
       "typ": "blokada",
       "od": "2026-10-06",
-      "do": "2026-10-11",
+      "do": "2026-10-09",
       "dotyczy": "tekst-wstepu-dwie-wersje",
-      "cytat": "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
+      "cytat": "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje.",
+      "wyrazenie": "W tym tygodniu",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-08",
       "do": "2026-10-08",
       "dotyczy": "tekst-wstepu-dwie-wersje",
-      "cytat": "Jak do czwartku nie wyślę obu wersji, przypomnij mi. Raz."
+      "cytat": "Jak do czwartku nie wyślę obu wersji, przypomnij mi. Raz.",
+      "wyrazenie": "do czwartku",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-12",
       "do": "2026-10-12",
       "dotyczy": "swieze-leady",
-      "cytat": "Powiedzmy poniedziałek."
+      "cytat": "Powiedzmy poniedziałek.",
+      "wyrazenie": "poniedziałek",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-15",
       "do": "2026-10-15",
       "dotyczy": "spotkanie-z-pawlem",
-      "cytat": "Zaproponuj przyszły czwartek o dziesiątej, on wtedy jest w Toruniu."
+      "cytat": "Zaproponuj przyszły czwartek o dziesiątej, on wtedy jest w Toruniu.",
+      "wyrazenie": "przyszły czwartek",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "urlop",
       "od": "2026-10-19",
       "do": "2026-10-23",
       "dotyczy": "wszystko_nowe",
-      "cytat": "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień."
+      "cytat": "od dziewiętnastego do dwudziestego trzeciego mam urlop. Cały tydzień.",
+      "wyrazenie": "od dziewiętnastego do dwudziestego trzeciego",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "blokada",
       "od": "2026-10-19",
       "do": "2026-10-23",
       "dotyczy": "wszystko_nowe",
-      "cytat": "W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie."
+      "cytat": "W tym czasie nic nowego nie odpalajcie, nawet jak plik ze świeżymi leadami już będzie i coś się wysypie.",
+      "wyrazenie": "od dziewiętnastego do dwudziestego trzeciego",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "blokada",
       "od": "2026-10-06",
-      "do": "2026-10-11",
+      "do": "2026-10-09",
       "dotyczy": "mail-walidacji-model-salon",
-      "cytat": "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy."
+      "cytat": "Ale nie w tym tygodniu. Zamykają miesiąc i nikt mi nie powie, czy nowy mail jest lepszy.",
+      "wyrazenie": "w tym tygodniu",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-09",
       "do": "2026-10-09",
       "dotyczy": "cena-smsow",
-      "cytat": "cenę wyślę w tym tygodniu."
+      "cytat": "cenę wyślę w tym tygodniu.",
+      "wyrazenie": "w tym tygodniu",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "termin",
       "od": "2026-10-16",
       "do": "2026-10-16",
       "dotyczy": "korekta-faktury",
-      "cytat": "Korekta powinna przyjść w przyszłym tygodniu."
+      "cytat": "Korekta powinna przyjść w przyszłym tygodniu.",
+      "wyrazenie": "w przyszłym tygodniu",
+      "zrodlo_daty": "kod"
     },
     {
       "typ": "blokada",
       "od": "2026-10-06",
       "do": "2026-10-31",
       "dotyczy": "agent-po-godzinach",
-      "cytat": "Nie w tym miesiącu."
+      "cytat": "Nie w tym miesiącu.",
+      "wyrazenie": "w tym miesiącu",
+      "zrodlo_daty": "kod"
     }
   ],
   "okna_czasowe": [
@@ -1498,6 +1540,18 @@
   },
   "szkic_maila": "Cześć Kasiu,\n\nPodsumowanie rozmowy z 6 października:\n\nCo robimy dziś:\n- Poprawiam adres salonu we Włocławku na Toruńska 120. Napiszę, jak będzie gotowe.\n- Zmieniam godziny dzwonienia: tydzień 9:00–19:00, sobota 9:00–15:00.\n- Aktualizuję godziny otwarcia salonu podawane przez agenta: sobota do 15:00, oba salony.\n- Sprawdzam błąd podwójnego telefonu po 3-sekundowym rozłączeniu. Napiszę wynik i ile takich połączeń było (błędne odejmiemy z faktury).\n- Naprawiam filtr statusu na liście kontaktów. Przy okazji przesunę kolumnę z nazwiskiem.\n- Przekazuję Michałowi fakturę za wrzesień do korekty (błędna nazwa firmy). Korekta powinna przyjść w przyszłym tygodniu.\n- Sprawdzam zasady liczenia połączeń poniżej minuty i napiszę.\n- Cena SMS-ów: wyślę w tym tygodniu.\n\nCzekam od ciebie:\n- Dwie wersje tekstu wstępu – do czwartku (8.10). Jeśli do czwartku nic nie przyjdzie, wyślę jedno przypomnienie.\n- Plik świeżych leadów – do poniedziałku (12.10). Jeśli nie będzie, wyślę jeden mail. Wzoru nie wysyłam.\n- Numer maila o przeglądzie od Oli – jak znajdzie, prześlij. Bez tego nie ruszam tej sprawy.\n- Potwierdzenie spotkania z Pawłem na czwartek 15.10 o 10:00 (Toruń). Zaproszenie wyślę po twoim potwierdzeniu.\n\nCo stoi:\n- Opel: czeka na wyniki świeżych leadów. Jeśli Paweł napisze, że każe włączyć – najpierw dzwonię do ciebie.\n- Agent po godzinach: stoi. Jeśli wyślesz numery assistance, odkładam u siebie, nic nie podpinam.\n- Mail po walidacji (model i salon na górze): po świeżych leadach.\n- Szkolenie handlowców: po świeżych leadach, termin ustalasz ty. Ściągę wyślę wcześniej.\n\nTydzień 19–23.10 (twój urlop): nic nowego nie startuję. Pilne sprawy → Paweł, ale Opel i tekst wstępu czekają na ciebie.\n\nPozdrawiam,\nMarek",
   "ostrzezenia_dat": [
+    {
+      "id": "Z2",
+      "klucz_sprawy": "zakaz-testy-wstepu-ten-tydzien",
+      "tytul": "„W tym tygodniu”",
+      "uwaga": "termin: model podał 2026-10-12, kod policzył 2026-10-09 (względem 2026-10-06); użyto daty z kodu"
+    },
+    {
+      "id": "Z11",
+      "klucz_sprawy": "zakaz-mail-walidacji-ten-tydzien",
+      "tytul": "„w tym tygodniu”",
+      "uwaga": "termin: model podał 2026-10-12, kod policzył 2026-10-09 (względem 2026-10-06); użyto daty z kodu"
+    },
     {
       "id": "B6",
       "klucz_sprawy": "integracja-crm",

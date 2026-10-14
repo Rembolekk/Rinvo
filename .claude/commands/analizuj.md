@@ -38,6 +38,7 @@ Sprawdź listę z kroku 1:
 - jeśli brakuje danych do działania (numer, nagranie, plik), status = czeka, nie zgaduj,
 - przypomnienia: gdy klient mówi, ile razy wolno przypomnieć („raz", „jeden mail"), wpisz to w przypomnienie.limit. Gdy klient wprost prosi, żeby NIE przypominać („drugi raz nie przypominaj, sama pamiętam"), ustaw przypomnienie = {"data": "brak", "limit": "0", "uwagi": "klient prosi, żeby nie przypominać"}, a samo „nie przypominaj" zapisz dodatkowo jako zakaz w sekcji 4 (z cytatem), bo tylko zakazy z karty obowiązują w kolejnych rozmowach. Termin, do którego klient ma dostarczyć (np. „do czwartku"), zostaje w polu "termin" pozycji i w fakty_czasowe — nie wpisuj go jako przypomnienie.data ani limit,
 - wypisz pole fakty_czasowe: każdy urlop, blokadę, termin i okno testów jako osobny wpis z polami typ (blokada/urlop/termin/start_nie_wczesniej), od i do (daty bezwzględne RRRR-MM-DD, przeliczone od daty spotkania; np. „w piątek" zamieniasz na datę), dotyczy (klucz_sprawy z sekcji 1–3 lub „wszystko_nowe" dla blokad globalnych jak urlop) i dosłowny cytat. Nie obliczaj konfliktów — zostaw konflikty_dat: []. Okna wolne oblicza skrypt daty.py po zapisaniu wynik.json,
+- DATY WZGLĘDNE LICZY KOD, nie Ty: przy każdym wpisie fakty_czasowe i każdym terminie pozycji zapisz dosłowne wyrażenie ("wyrazenie", "termin_wyrazenie": „do piątku”, „w czwartek”, „przyszły czwartek”, „dwudziesty siódmy”, „od jutra”, „w tym tygodniu”, „do końca miesiąca”). Datę też podaj (najlepiej, jak umiesz), ale daty względne z kodu (daty.py, względem daty rozmowy albo maila) wygrywają, a rozbieżność trafia do ostrzeżeń. Dzień tygodnia bez „przyszły” to najbliższy następny; „przyszły czwartek” to czwartek następnego tygodnia. Nie uzasadniaj dat w polu wyrazenie: tylko słowa z rozmowy.
 - dla każdej pozycji z sekcji 1–3: jeśli jej cytat zawiera ograniczenie czasowe odnoszące się wprost do tej sprawy (np. „tego nie robimy w tym tygodniu", „po urlopie", „do czwartku"), dodaj odpowiedni wpis do fakty_czasowe z dotyczy = klucz_sprawy tej pozycji. Jeśli jedno zdanie dotyczy wielu spraw, osobny wpis dla każdej. Urlopy i blokady globalne (dotyczy = „wszystko_nowe") wystarczą jako jeden wpis — nie trzeba ich powielać per sprawa,
 - każde stwierdzenie, które nie wynika wprost z cytatu (np. przeliczona data przypomnienia, domysł o intencji), przenieś do pola "wnioski",
 - połącz duplikaty.
@@ -101,7 +102,7 @@ Schemat wynik.json:
     "id": "T1",                 // T = sekcja 1, K = 2, B = 3, Z = 4, R = 5; numeracja po kolei
     "sekcja": 1,                // 1 do zrobienia teraz, 2 czeka na klienta, 3 backlog, 4 zakazy, 5 ryzyka
     "typ", "rodzaj" (opcjonalnie: błąd / nowa_funkcja / zmiana),
-    "tytul", "opis", "wlasciciel", "termin", "warunek",
+    "tytul", "opis", "wlasciciel", "termin", "termin_wyrazenie" (dosłowne wyrażenie, z którego wynika termin, np. „do piątku”; gdy termin jest „brak”, pomiń), "warunek",
     "status": "zrob_teraz | czeka | backlog | nigdy",
     "cytat": ["dosłowny fragment", ...],
     "wnioski": ["stwierdzenie, które nie wynika wprost z cytatu", ...] (opcjonalnie),
@@ -128,7 +129,8 @@ Schemat wynik.json:
     "od": "RRRR-MM-DD",
     "do": "RRRR-MM-DD lub null",
     "dotyczy": "klucz_sprawy lub 'wszystko_nowe'",
-    "cytat": "dosłowny cytat"
+    "cytat": "dosłowny cytat",
+    "wyrazenie": "dosłowne wyrażenie daty z cytatu, np. „do piątku”, „przyszły czwartek”, „dwudziesty siódmy”, „od jutra” (bez przeliczania); pomiń tylko, gdy w cytacie nie ma żadnego wyrażenia daty"
   }],
   "okna_czasowe": [],           // wypełnia daty.py po uruchomieniu — nie pisz tu nic
   "weryfikacja": { "usuniete_bez_cytatu": [..], "zastapione_lub_scalone": [..], "pominiete": [..] },
