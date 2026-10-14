@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Raport: Grupa Auto Tama × Rinvo: call statusowy</title>
+<style>
+:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1b;--mut:#62615c;--line:#e3e1db;--acc:#2f5bd3;--accbg:#e8eefc;
+--now:#0f7a43;--nowbg:#e2f4ea;--wait:#9a5b00;--waitbg:#fdf0d9;--back:#5b4bb7;--backbg:#ece9fb;--no:#b42318;--nobg:#fde7e5;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#151514;--card:#1f1f1d;--ink:#ecebe6;--mut:#a3a29b;--line:#34332f;--acc:#8aa8ff;--accbg:#232c45;
+--now:#6fd39c;--nowbg:#173326;--wait:#f3b75a;--waitbg:#382a12;--back:#b3a8ff;--backbg:#2a2545;--no:#ff8a80;--nobg:#3d1d1a;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
+.wrap{max-width:1080px;margin:0 auto;padding:32px 20px 64px}
+h1{font-size:1.6rem;margin:0 0 4px;letter-spacing:-.01em}
+.meta{color:var(--mut);margin:0 0 24px}
+.tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-bottom:28px}
+.tile{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 14px;text-decoration:none;color:inherit;display:flex;flex-direction:column}
+.tile b{font-size:1.7rem;line-height:1.1} .tile span{color:var(--mut);font-size:.85rem}
+.tile.alt b{color:var(--acc)}
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin-bottom:20px}
+.panel h2{font-size:1.1rem;margin:0 0 10px}
+.panel ol,.panel ul{margin:0;padding-left:20px} .panel li{margin:0 0 12px}
+.was{text-decoration:line-through;color:var(--mut)} .now{color:var(--now);font-weight:600}
+.refs a,.panel li>a{font:600 .75rem ui-monospace,Consolas,monospace;background:var(--accbg);color:var(--acc);padding:1px 6px;border-radius:5px;text-decoration:none;margin-left:2px}
+section{margin-top:36px}
+h2{display:flex;align-items:center;gap:10px;font-size:1.3rem;margin:0}
+h2 small{color:var(--mut);font-weight:500;font-size:.95rem}
+.num{display:inline-grid;place-items:center;width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.9rem}
+.sub{color:var(--mut);margin:4px 0 14px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:12px}
+@media (max-width:420px){.grid{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;scroll-margin-top:16px}
+.card:target{outline:2px solid var(--acc)}
+.card header{display:flex;gap:10px;align-items:baseline}
+.card h3{font-size:1rem;margin:0;line-height:1.35}
+.pid{font:600 .75rem ui-monospace,Consolas,monospace;color:var(--mut);flex:none}
+.tags{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.tag{font-size:.72rem;padding:2px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut)}
+.tag.kind{background:var(--accbg);color:var(--acc);border-color:transparent}
+.st-zrob_teraz{background:var(--nowbg);color:var(--now);border-color:transparent;font-weight:600}
+.st-czeka{background:var(--waitbg);color:var(--wait);border-color:transparent;font-weight:600}
+.st-backlog{background:var(--backbg);color:var(--back);border-color:transparent;font-weight:600}
+.st-nigdy{background:var(--nobg);color:var(--no);border-color:transparent;font-weight:600}
+.st-zamknieta{background:var(--nowbg);color:var(--now);border-color:transparent;font-weight:600}
+.st-anulowana{background:var(--nobg);color:var(--no);border-color:transparent;font-weight:600}
+.desc{margin:6px 0}
+.infer{list-style:none;margin:6px 0;padding:0;font-size:.86rem;color:var(--mut)}
+.infer li{margin:3px 0 !important}
+.wn{display:inline-block;font-size:.68rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--back);background:var(--backbg);border-radius:4px;padding:0 5px;margin-right:6px}
+.change{margin:6px 0;font-size:.88rem;color:var(--wait);background:var(--waitbg);padding:6px 10px;border-radius:8px}
+dl{display:grid;grid-template-columns:auto 1fr;gap:3px 12px;margin:8px 0;font-size:.88rem}
+dt{color:var(--mut)} dd{margin:0}
+details summary{cursor:pointer;color:var(--acc);font-size:.85rem}
+blockquote{margin:8px 0 0;padding:6px 10px;border-left:3px solid var(--line);color:var(--mut);font-style:italic;font-size:.88rem}
+.mail{position:relative;background:var(--card);border:1px solid var(--line);border-radius:12px}
+.mail pre{margin:0;padding:18px 20px;white-space:pre-wrap;font:14px/1.6 system-ui,-apple-system,"Segoe UI",sans-serif;overflow-x:auto}
+#copy{position:absolute;top:10px;right:10px;font:inherit;font-size:.82rem;padding:5px 12px;border-radius:8px;border:1px solid var(--line);background:var(--bg);color:var(--ink);cursor:pointer}
+footer{margin-top:40px;color:var(--mut);font-size:.85rem}
+</style></head><body><div class="wrap">
+<h1>Grupa Auto Tama × Rinvo: call statusowy</h1>
+<p class="meta">Spotkanie 2026-10-13, 11:00–11:24 · Uczestnicy: Kasia Malinowska (BDC, Grupa Auto Tama), Marek Rewoliński (Rinvo) · Raport z 2026-10-14</p>
+<div class="tiles"><a class="tile" href="#s1"><b>6</b><span>Do zrobienia teraz</span></a><a class="tile" href="#s2"><b>3</b><span>Czeka na klienta</span></a><a class="tile" href="#s3"><b>1</b><span>Backlog produktowy</span></a><a class="tile" href="#s4"><b>4</b><span>Zakazy i ograniczenia</span></a><a class="tile" href="#s5"><b>2</b><span>Ryzyka handlowe</span></a><a class="tile alt" href="#zmiany"><b>0</b><span>Zmiany zdania</span></a><a class="tile alt" href="#konflikty"><b>0</b><span>Konflikty dat</span></a><a class="tile alt" href="#aktualizacje"><b>6</b><span>Zmiany w otwartych sprawach</span></a><a class="tile alt" href="#ostrzezenia"><b>0</b><span>Ostrzeżenia dat</span></a></div>
+<div class="panel" id="zmiany"><h2>Zmiany zdania wykryte w rozmowie</h2><ol><li>Nie wykryto zmian zdania.</li></ol></div>
+<div class="panel" id="konflikty"><h2>Konflikty i zależności dat</h2><ol><li>Brak zidentyfikowanych konfliktów.</li></ol><h3 style="font-size:.95rem;margin:14px 0 6px">Okna robocze (obliczone przez daty.py)</h3><ul><li><code>decyzja-opel-stara-baza</code> 2026-10-16 – 2026-10-16; 2026-10-26 – → otwarty <span class="tag">policzone przez kod</span></li><li><code>prezentacja-integracji-crm</code> 2026-10-14 – 2026-10-15 <span class="tag">policzone przez kod</span></li><li><code>sciga-statusow</code> 2026-10-14 – 2026-10-16 <span class="tag">policzone przez kod</span></li><li><code>spotkanie-z-pawlem</code> 2026-10-14 – 2026-10-15 <span class="tag">policzone przez kod</span></li><li><code>swieze-leady</code> 2026-10-14 – 2026-10-15 <span class="tag">policzone przez kod</span></li><li><code>szkolenie-handlowcow</code> 2026-10-27 – 2026-10-27 <span class="tag">policzone przez kod</span></li><li><code>tekst-wstepu-dwie-wersje</code> 2026-10-14 – 2026-10-15 <span class="tag">policzone przez kod</span></li><li><code>zestawienie-wynikow-wstepu</code> 2026-10-14 – 2026-10-16 <span class="tag">policzone przez kod</span></li></ul></div>
+<div class="panel" id="aktualizacje"><h2>Zmiany w otwartych sprawach</h2><ul><li><b>adres-wloclawek</b> <span class="tag st-zamknieta">zamknięta</span><br>Kasia sama przetestowała agenta i potwierdziła poprawny adres; Marek zamyka sprawę.<blockquote>„Adres we Włocławku działa, puściłam sobie test, mówi Toruńska."</blockquote></li><li><b>filtr-statusu</b> <span class="tag st-zamknieta">zamknięta</span><br>Kasia sprawdziła, że filtr działa; Marek zamyka sprawę.<blockquote>„Filtr „zainteresowany” też już zawęża, sprawdziłam wczoraj."</blockquote></li><li><b>korekta-faktury</b> <span class="tag st-zamknieta">zamknięta</span><br>Klient potwierdził, że korekta dotarła i jest poprawna; Marek zamyka sprawę.<blockquote>„Pani Grażyna dostała korektę od Michała w piątek, wszystko się zgadza."</blockquote></li><li><b>tekst-wstepu-dwie-wersje</b> <span class="tag st-zrob_teraz">zrób teraz</span><br>Kasia dostarczyła oba teksty, na które czekaliśmy, i dała zielone światło na test od 14.10.<blockquote>„Teksty wstępu wysłałam ci wczoraj wieczorem mailem, obie wersje."</blockquote></li><li><b>spotkanie-z-pawlem</b> <span class="tag st-zrob_teraz">zrób teraz</span><br>Kasia potwierdziła termin, na co czekaliśmy; można wysłać zaproszenie.<blockquote>„Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone. Możesz wysłać zaproszenie."</blockquote></li><li><b>Z2</b> <span class="tag st-anulowana">anulowana</span><br>Zakaz Z2 (nie uruchamiać testu wstępu w tygodniu 6–12.10) uchyla Kasia, wskazana w karcie jako decydent; sama podała też okno testu 14–15.10.<blockquote>„Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga."</blockquote></li></ul></div>
+<section id="s1"><h2><span class="num">1</span>Do zrobienia teraz <small>6</small></h2><p class="sub">Zadania po stronie naszego zespołu, z właścicielem.</p><div class="grid"><article class="card" id="T1">
+<header><span class="pid">T1</span><h3>Toruń: agent podaje sobotę do 14:00 zamiast do 15:00</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">poprawka_bazy_wiedzy</span><span class="tag kind">błąd</span></div><p class="desc">Przy wcześniejszej poprawce godzin soboty poprawiono tylko Włocławek. Agent w Toruniu dalej podaje starą godzinę zamknięcia. Oba salony mają w sobotę do 15:00.</p><ul class="infer"><li><span class="wn">wniosek</span>Sprawa jest już otwarta w Linear (godziny-salonu-sobota); Włocławek jest poprawiony, zostaje Toruń.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-13</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (3)</summary><blockquote>„Zauważyłam w piątek, że agent w Toruniu podaje sobotę do czternastej.”</blockquote><blockquote>„Oba salony mają do piętnastej.”</blockquote><blockquote>„To nasz błąd, przy poprawce poprawiłem tylko Włocławek. Dziś naprawię Toruń.”</blockquote></details></article><article class="card" id="T2">
+<header><span class="pid">T2</span><h3>Uruchomić test dwóch wersji wstępu: Toruń vs Włocławek, środa–czwartek</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">zmiana_konfiguracji</span><span class="tag kind">zmiana</span></div><p class="desc">Kasia dostarczyła obie wersje tekstu wstępu i skończyła odsłuchiwać starą bazę. Test idzie przez dwa dni, po jednej wersji na salon.</p><ul class="infer"><li><span class="wn">wniosek</span>W rozmowie nie padło, która wersja (krótsza czy druga) idzie do którego salonu; trzeba to sprawdzić w mailu od Kasi przed startem.</li><li><span class="wn">wniosek</span>W rozmowie nie padło, na jakich kontaktach idzie test; stara baza nie wchodzi w grę (zakaz z karty Z9).</li><li><span class="wn">wniosek</span>Zakaz Z2 z karty (test wstępu w tygodniu 6–12.10) wygasł; Kasia sama go uchyliła tą rozmową.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-14 – 2026-10-15</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Skończyłam w piątek. Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga.”</blockquote><blockquote>„Dobra, od jutra, dwa dni, Toruń i Włocławek.”</blockquote></details></article><article class="card" id="T3">
+<header><span class="pid">T3</span><h3>W piątek wysłać Kasi zestawienie: ilu doszło do końca przy każdej wersji wstępu</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">zobowiazanie_nasze</span></div><p class="desc">Mierzymy pełne rozmowy (doszły do końca), nie rozłączenia. Zestawienie osobno dla każdej wersji.</p><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-16</dd><dt>Warunek</dt><dd>Test wstępu zakończony (14–15.10)</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„W piątek dostaniesz zestawienie, ilu doszło do końca przy każdej wersji.”</blockquote><blockquote>„Pełne rozmowy, nie rozłączenia, tak jak mówiłam.”</blockquote></details></article><article class="card" id="T4">
+<header><span class="pid">T4</span><h3>Wysłać zaproszenie dla Pawła na czwartek 15.10, godz. 10:00</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">spotkanie</span></div><p class="desc">Spotkanie z Pawłem jest potwierdzone przez Kasię. Marek wysyła zaproszenie. Kasia mówi też, że na spotkaniu rozmawiają we trzech.</p><ul class="infer"><li><span class="wn">wniosek</span>Data 15.10 to przeliczone „w czwartek” od 13.10 (wtorek).</li><li><span class="wn">wniosek</span>Miejsce spotkania nie padło w tej rozmowie.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-15</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (1)</summary><blockquote>„Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone. Możesz wysłać zaproszenie.”</blockquote></details></article><article class="card" id="T5">
+<header><span class="pid">T5</span><h3>Przygotować na czwartek coś konkretnego o połączeniu Rinvo z systemem klienta</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">zobowiazanie_nasze</span></div><p class="desc">Paweł ma na biurku ofertę konkurenta. Jeśli w czwartek nie zobaczy konkretów o połączeniu z systemem, w listopadzie zrobi test z konkurentem. Marek zobowiązał się przygotować pod to.</p><ul class="infer"><li><span class="wn">wniosek</span>Z rozmowy nie wynika, co dokładnie ma być „konkretne”; do doprecyzowania.</li><li><span class="wn">wniosek</span>Integracja z CRM jest w backlogu (integracja-crm); w kartach wcześniejszej rozmowy Marek nie obiecywał terminu.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-15</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Ale powiedział, że jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi.”</blockquote><blockquote>„Rozumiem. Przygotuję się na czwartek konkretnie pod to.”</blockquote></details></article><article class="card" id="T6">
+<header><span class="pid">T6</span><h3>Wysłać Kasi ściągę statusów dla handlowców przed jej urlopem</h3></header>
+<div class="tags"><span class="tag st-zrob_teraz">zrób teraz</span><span class="tag">zobowiazanie_nasze</span></div><p class="desc">Ściąga ma dotrzeć do Kasi, żeby zdążyła ją obejrzeć przed szkoleniem 27.10.</p><ul class="infer"><li><span class="wn">wniosek</span>„Przed urlopem” przeliczone na dzień przed 19.10; ostatni dzień roboczy to piątek 16.10.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>przed 2026-10-19</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (1)</summary><blockquote>„Dwudziesty siódmy, dziesiąta. Ściągę wyślę ci przed urlopem, żebyś zdążyła rzucić okiem.”</blockquote></details></article></div></section><section id="s2"><h2><span class="num">2</span>Czeka na klienta <small>3</small></h2><p class="sub">Dane, decyzje i potwierdzenia, na które czekamy. Podano datę i limit przypomnień, jeśli padły w rozmowie.</p><div class="grid"><article class="card" id="K1">
+<header><span class="pid">K1</span><h3>Plik ze świeżymi leadami od Kasi do czwartku</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">czeka_na_klienta</span></div><p class="desc">Kasia miała plik wcześniej, spóźnia się przez zamknięcie miesiąca. Nowy termin: do czwartku. Marek nie przypomina więcej.</p><ul class="infer"><li><span class="wn">wniosek</span>„Do czwartku” interpretujemy jako najpóźniej 15.10 (dzień spotkania z Pawłem).</li><li><span class="wn">wniosek</span>Przypomnienie z poniedziałku 12.10 już poszło (Kasia: „Dostałam twojego maila w poniedziałek”), więc limit przypomnień jest wyczerpany.</li></ul><dl><dt>Właściciel</dt><dd>Kasia Malinowska</dd><dt>Termin</dt><dd>2026-10-15</dd><dt>Warunek</dt><dd>brak</dd><dt>Przypomnienie</dt><dd>brak · limit: 0 dalszych przypomnień · Kasia: „Drugi raz nie przypominaj”; Marek potwierdził</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Wyślę do czwartku. Drugi raz nie przypominaj, sama pamiętam.”</blockquote><blockquote>„Dobra, nie przypominam. Czekam do czwartku.”</blockquote></details></article><article class="card" id="K2">
+<header><span class="pid">K2</span><h3>Decyzja o puszczeniu Opla na starej bazie: ustalamy we trzech w czwartek</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">czeka_na_klienta</span></div><p class="desc">Paweł chce od przyszłego tygodnia puścić Opla na starej bazie. Kasia przekazuje to z zastrzeżeniem i nie jest przekonana. Do czwartkowego spotkania Marek nic nie rusza.</p><ul class="infer"><li><span class="wn">wniosek</span>Prośba Pawła jest przekazana przez Kasię z zastrzeżeniem, nie jest bezpośrednim zleceniem Pawła.</li><li><span class="wn">wniosek</span>Prośba stoi w sprzeczności z zakazami z karty: Z4 (Opel czeka na wyniki świeżych leadów) i Z9 (stara baza nie jest puszczana drugi raz).</li><li><span class="wn">wniosek</span>„Od przyszłego tygodnia” wypada na 19–23.10, czyli na urlop Kasi, kiedy według zakazu Z5 nic nowego nie startuje.</li></ul><dl><dt>Właściciel</dt><dd>Paweł</dd><dt>Termin</dt><dd>2026-10-15</dd><dt>Warunek</dt><dd>Spotkanie Kasia – Paweł – Marek w czwartek 15.10</dd><dt>Przypomnienie</dt><dd>nie ustalono · limit: nie ustalono · temat wraca na spotkaniu 15.10</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„On chce, żebyście od przyszłego tygodnia puścili Opla na starej bazie, „żeby zobaczyć, jak to wygląda”.”</blockquote><blockquote>„Jasne. Opla nie ruszam, wracamy do tego w czwartek.”</blockquote></details></article><article class="card" id="K3">
+<header><span class="pid">K3</span><h3>Szkolenie handlowców ze statusów: wtorek 27.10, godz. 10:00</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">spotkanie</span></div><p class="desc">Termin ustalony przez Kasię na dzień po jej powrocie z urlopu, pod warunkiem, że do tego czasu ruszą świeże leady.</p><ul class="infer"><li><span class="wn">wniosek</span>Plik z leadami ma dojść do czwartku 15.10, ale w tym tygodniu nic nowego poza testem wstępu, a 19–23.10 Kasia ma urlop; świeże leady mogą więc ruszyć najwcześniej w poniedziałek 26.10, tuż przed szkoleniem. Termin jest napięty i warto go potwierdzić po starcie.</li><li><span class="wn">wniosek</span>Zakaz Z13 z karty (szkolenie dopiero po świeżych leadach, termin ustala Kasia) jest spełniony co do terminu, warunek startu leadów pozostaje.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-27</dd><dt>Warunek</dt><dd>Świeże leady muszą wcześniej ruszyć</dd><dt>Przypomnienie</dt><dd>nie ustalono · limit: nie ustalono · ściąga dla Kasi idzie wcześniej (T6)</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Dajmy dwudziesty siódmy, wtorek, jak wrócę z urlopu i pójdą już świeże leady. Godzina dziesiąta.”</blockquote><blockquote>„Dwudziesty siódmy, dziesiąta.”</blockquote></details></article></div></section><section id="s3"><h2><span class="num">3</span>Backlog produktowy <small>1</small></h2><p class="sub">Pomysły i prośby o funkcje. Odróżniamy nową funkcję od zmiany istniejącej.</p><div class="grid"><article class="card" id="B1">
+<header><span class="pid">B1</span><h3>Eksport listy kontaktów do Excela</h3></header>
+<div class="tags"><span class="tag st-backlog">backlog</span><span class="tag">pomysl_produktowy</span><span class="tag kind">nowa_funkcja</span></div><p class="desc">Pracownice chcą wyciągnąć zainteresowanych i rozdzielić ich między handlowców. Dziś przepisują ręcznie. Marek zapisał prośbę i nie obiecał terminu.</p><ul class="infer"><li><span class="wn">wniosek</span>Prośba pokrywa się z wpisem eksport-excel-potwierdzenia (inny klient, eksport listy do Excela) w prosby.json.</li><li><span class="wn">wniosek</span>Karta wspomina „eksport z panelu” (zakaz Z7, pliki z leadami); Marek mówi, że eksportu listy kontaktów nie ma, więc traktujemy to jako nową funkcję.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Dziewczyny chcą eksportu listy kontaktów do Excela. Żeby wyciągnąć tych zainteresowanych i rozdzielić między handlowców. Teraz przepisują ręcznie.”</blockquote><blockquote>„Eksportu nie ma. Zapisuję. Pyta o to też inny klient, więc to może pójść szybciej niż inne rzeczy, ale terminu nie obiecuję.”</blockquote></details></article></div></section><section id="s4"><h2><span class="num">4</span>Zakazy i ograniczenia <small>4</small></h2><p class="sub">Czego dla tego klienta nie robimy albo czego nie robimy przed określonym terminem.</p><div class="grid"><article class="card" id="Z1">
+<header><span class="pid">Z1</span><h3>Opla na starej bazie nie ruszać do czwartkowego spotkania we trzech</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">zakaz</span></div><p class="desc">Kasia prosi, żeby nie puszczać Opla na starej bazie przed rozmową Kasia – Paweł – Marek. Marek potwierdził.</p><ul class="infer"><li><span class="wn">wniosek</span>Powtarza i wzmacnia zakazy z karty Z4 (Opel) oraz Z9 (stara baza nie jest puszczana drugi raz).</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-15</dd><dt>Warunek</dt><dd>Spotkanie we trzech w czwartek 15.10</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek.”</blockquote><blockquote>„Opla nie ruszam”</blockquote></details></article><article class="card" id="Z2">
+<header><span class="pid">Z2</span><h3>Nie przypominać Kasi o pliku ze świeżymi leadami</h3></header>
+<div class="tags"><span class="tag st-nigdy">nigdy</span><span class="tag">zakaz</span></div><p class="desc">Kasia pamięta o pliku i nie chce kolejnych przypomnień. Marek się zgodził.</p><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Drugi raz nie przypominaj, sama pamiętam.”</blockquote><blockquote>„Dobra, nie przypominam.”</blockquote></details></article><article class="card" id="Z3">
+<header><span class="pid">Z3</span><h3>Urlop Kasi od 19.10: poza testem wstępu nic nowego</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">zakaz</span></div><p class="desc">Kasia przypomina o urlopie od 19.10. Marek potwierdza, że poza testem wstępu nic nowego nie startuje.</p><ul class="infer"><li><span class="wn">wniosek</span>W rozmowie nie padła data końca urlopu; 23.10 pochodzi z karty (zakaz Z5: 19–23.10) i z faktu, że Kasia wraca przed 27.10.</li><li><span class="wn">wniosek</span>Zdanie Marka „w tym tygodniu” jest niejednoznaczne (bieżący tydzień 13–16.10 albo tydzień urlopu); dlatego pewność niska i brak osobnej blokady na bieżący tydzień w fakty_czasowe (blokada globalna wykluczyłaby także test wstępu, który jest wyjątkiem).</li><li><span class="wn">wniosek</span>Powtarza zakaz Z5 z karty.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„I od dziewiętnastego mnie nie ma, pamiętasz.”</blockquote><blockquote>„Pamiętam, w tym tygodniu nic nowego poza testem wstępu.”</blockquote></details></article><article class="card" id="Z4">
+<header><span class="pid">Z4</span><h3>Agent nie proponuje aut używanych; nie wierzyć relacji, że Kasia się zgodziła</h3></header>
+<div class="tags"><span class="tag st-nigdy">nigdy</span><span class="tag">zakaz</span></div><p class="desc">Ola miała powiedzieć, że Kasia zgodziła się na propozycje aut używanych przy odmowie. Kasia temu zaprzecza. Agent nie sprzedaje.</p><ul class="infer"><li><span class="wn">wniosek</span>Powtarza zakaz Z6 z karty.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Nie zgodziłam się. Gdyby ktoś wam tak napisał, nie wierzcie.”</blockquote><blockquote>„Jasne, zostaje tak, jak było. Agent nie sprzedaje.”</blockquote></details></article></div></section><section id="s5"><h2><span class="num">5</span>Ryzyka handlowe <small>2</small></h2><p class="sub">Co może zagrozić współpracy lub budżetowi.</p><div class="grid"><article class="card" id="R1">
+<header><span class="pid">R1</span><h3>Paweł ma na piśmie ofertę VoiceDesk z cennikiem</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">ryzyko_handlowe</span></div><p class="desc">Konkurent złożył Pawłowi pisemną ofertę z cennikiem. Kasia nie zna kwot, bo Paweł jej nie pokazał.</p><ul class="infer"><li><span class="wn">wniosek</span>Wysokość oferty konkurenta jest nieznana.</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>brak</dd><dt>Warunek</dt><dd>brak</dd></dl>
+<details><summary>Cytat (2)</summary><blockquote>„Paweł dostał od VoiceDesk ofertę na piśmie. Z cennikiem. Leży mu na biurku.”</blockquote><blockquote>„Nie pokazał mi.”</blockquote></details></article><article class="card" id="R2">
+<header><span class="pid">R2</span><h3>Bez konkretów o połączeniu z systemem w czwartek: w listopadzie test z VoiceDesk</h3></header>
+<div class="tags"><span class="tag st-czeka">czeka</span><span class="tag">ryzyko_handlowe</span></div><p class="desc">Paweł postawił warunek: w czwartek chce zobaczyć coś konkretnego o połączeniu z systemem klienta, inaczej w listopadzie robi test z konkurentem.</p><ul class="infer"><li><span class="wn">wniosek</span>Powiązane z zadaniem T5 (przygotowanie na czwartek).</li></ul><dl><dt>Właściciel</dt><dd>Marek Rewoliński</dd><dt>Termin</dt><dd>2026-10-15</dd><dt>Warunek</dt><dd>Brak konkretów o połączeniu z systemem na spotkaniu w czwartek</dd></dl>
+<details><summary>Cytat (1)</summary><blockquote>„Ale powiedział, że jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi.”</blockquote></details></article></div></section><section id="s6"><h2><span class="num">6</span>Szkic maila podsumowującego do klienta</h2>
+<p class="sub">Zawiera tylko ustalenia z rozmowy.</p>
+<div class="mail"><button type="button" id="copy">Kopiuj</button><pre id="mailtxt">Temat: Podsumowanie rozmowy z 13.10 i plan na ten tydzień
+
+Dzień dobry Kasiu,
+
+dziękuję za dzisiejszą rozmowę. Podsumowuję to, co ustaliliśmy.
+
+Zamknięte:
+- Adres salonu we Włocławku jest poprawny.
+- Filtr „zainteresowany” zawęża listę.
+- Korekta faktury dotarła do Pani Grażyny i wszystko się zgadza.
+
+Co robimy my:
+- Dziś poprawiam godzinę soboty dla Torunia (do 15:00), tak jak już jest we Włocławku.
+- Od jutra, w środę i czwartek, puszczamy test dwóch wersji wstępu: jedna wersja w Toruniu, druga we Włocławku. W piątek wyślę Ci zestawienie, ilu rozmów w każdej wersji doszło do końca (pełne rozmowy, nie rozłączenia).
+- Wyślę zaproszenie dla Pawła na czwartek 15.10 o 10:00.
+- Na czwartek przygotuję konkrety dotyczące połączenia z systemem.
+- Ściągę ze statusów dla handlowców wyślę Ci przed Twoim urlopem, żebyś zdążyła ją przejrzeć.
+- Szkolenie dla handlowców ze statusów: wtorek 27.10, godz. 10:00.
+
+Co czeka na Ciebie:
+- Plik ze świeżymi leadami do czwartku. Nie będę już przypominać.
+
+Czego nie robimy:
+- Opla na starej bazie nie ruszam, wracamy do tego w czwartek we trzech.
+- Agent nadal nie sprzedaje i nie proponuje aut używanych.
+- Od 19.10 do Twojego powrotu nic nowego nie startuje.
+
+Eksport listy kontaktów do Excela zapisałem jako prośbę. Terminu nie obiecuję.
+
+Pozdrawiam
+Marek Rewoliński</pre></div></section>
+<footer><div class="panel" id="ostrzezenia"><h2>Weryfikacja</h2><p>Wszystkie 16 pozycji mają dosłowny cytat, sprawdzony automatycznie z transkrypcją. Usunięte z powodu braku cytatu: 0. Wnioski, czyli stwierdzenia niewynikające wprost z cytatu, oznaczono etykietą „wniosek” (25).</p><ul><li>Adres Włocławka, filtr statusu i korekta faktury: nie osobne pozycje, tylko zamknięcia w aktualizacje_spraw.</li><li>Poprawka godzin soboty dla Torunia (T1): scalona z wcześniejszą naprawą Włocławka, która jest już zrobiona.</li><li>Pierwotnie osobne pozycje „test wstępu” i „okno 14–15.10” scalone w T2.</li><li>Oferta VoiceDesk i warunek z czwartku rozdzielone na R1 i R2 (różne klucze z karty: ryzyko-voicedesk, ryzyko-brak-integracji-crm); przygotowanie na czwartek to osobne zadanie T5.</li><li>Szkolenie Kasi z nowego modelu o 12:00: informacja poboczna, bez zadania dla nas.</li><li>Wysokość oferty VoiceDesk: Kasia jej nie zna, nie zgadywano.</li><li>Przypisanie wersji wstępu do salonu: nie padło w rozmowie, oznaczone w T2 jako pewność niska.</li><li>Sprawy z karty bez nowych informacji w tej rozmowie (m.in. podwójny telefon, godziny dzwonienia, kolumna nazwisko, wycena SMS-ów, przegląd Oli, materiały po godzinach) nie mają wpisów w aktualizacje_spraw.</li></ul></div>
+Źródło: ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md · dane: wynik.json</footer>
+</div>
+<script>
+document.getElementById('copy').addEventListener('click',function(){
+  var b=this,t=document.getElementById('mailtxt').innerText;
+  (navigator.clipboard?navigator.clipboard.writeText(t):Promise.reject()).then(function(){b.textContent='Skopiowano';},function(){
+    var r=document.createRange();r.selectNodeContents(document.getElementById('mailtxt'));var s=getSelection();s.removeAllRanges();s.addRange(r);b.textContent='Zaznaczono — Ctrl+C';});
+  setTimeout(function(){b.textContent='Kopiuj';},2500);
+});
+</script></body></html>

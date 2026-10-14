@@ -16,13 +16,6 @@ Limit pięciu prób nie jest zmieniany. Ktoś pytał Kasię o trzy próby, ale o
 > Zostaw pięć. Nie kazałam schodzić do trzech. Mówiłam tylko, że ktoś mnie o to pytał.
 
 
-### Z2: Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10
-
-Kasia odsłuchuje starą bazę i nowy wstęp by się 'zlał'. Test można uruchomić dopiero po wysłaniu przez Kasię obu wersji.
-
-> W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje.
-
-
 ### Z3: Nie podpinać agenta po godzinach nawet po otrzymaniu materiałów
 
 Nawet jeśli Kasia wyśle numery assistance i listę pól, Rinvo ma je trzymać u siebie i nie podpinać. Projekt startuje tylko po wyraźnym zielonym świetle od Kasi.
@@ -123,14 +116,15 @@ Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzieln
 > Dobra. Bez pliku nic nie puszczam.
 
 
+## Historia zakazów (uchylone)
+
+- ~~Z2: Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10~~ — uchylony: _Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga._
+
 ## Otwarte sprawy w Linearze
 
 - [RIN-38](https://linear.app/rinvo-demo/issue/RIN-38/auto-tama-blad-podwojnego-telefonu-po-rozlaczeniu-w-ciagu-3-sekund) – Błąd podwójnego telefonu po rozłączeniu w ciągu 3 sekund
-- [RIN-39](https://linear.app/rinvo-demo/issue/RIN-39/auto-tama-nieaktualny-adres-salonu-wloclawek-w-bazie-wiedzy-agenta) – Nieaktualny adres salonu Włocławek w bazie wiedzy agenta
 - [RIN-40](https://linear.app/rinvo-demo/issue/RIN-40/auto-tama-zmiana-godzin-dzwonienia-tydzien-9-19-sobota-9-15) – Zmiana godzin dzwonienia: tydzień 9–19, sobota 9–15
 - [RIN-41](https://linear.app/rinvo-demo/issue/RIN-41/auto-tama-aktualizacja-godzin-otwarcia-salonu-w-sobote-oba-salony-do) – Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)
-- [RIN-42](https://linear.app/rinvo-demo/issue/RIN-42/auto-tama-filtr-statusu-nie-zaweza-listy-kontaktow) – Filtr statusu nie zawęża listy kontaktów
-- [RIN-43](https://linear.app/rinvo-demo/issue/RIN-43/auto-tama-przekazanie-faktury-do-korekty-bledna-nazwa-firmy-na) – Przekazanie faktury do korekty (błędna nazwa firmy na fakturze)
 - [RIN-44](https://linear.app/rinvo-demo/issue/RIN-44/auto-tama-sprawdzenie-rozliczenia-krotkich-polaczen-i-blednych) – Sprawdzenie rozliczenia krótkich połączeń i błędnych podwójnych telefonów
 - [RIN-45](https://linear.app/rinvo-demo/issue/RIN-45/auto-tama-przesuniecie-kolumny-nazwisko-na-liscie-kontaktow) – Przesunięcie kolumny 'nazwisko' na liście kontaktów
 - [RIN-46](https://linear.app/rinvo-demo/issue/RIN-46/auto-tama-wyslanie-kasi-wyceny-sms-ow-po-nieodebranych) – Wysłanie Kasi wyceny SMS-ów po nieodebranych
@@ -153,6 +147,10 @@ Bez pliku nic nie rusza. Marek nie improwizuje ani nie szuka numerów samodzieln
 - [RIN-63](https://linear.app/rinvo-demo/issue/RIN-63/auto-tama-pawel-chcial-wylaczyc-agenta-po-zlej-interpretacji-wynikow) – Paweł chciał wyłączyć agenta po złej interpretacji wyników
 - [RIN-64](https://linear.app/rinvo-demo/issue/RIN-64/auto-tama-brak-integracji-z-crm-jako-kluczowy-argument-konkurenta) – Brak integracji z CRM jako kluczowy argument konkurenta
 - [RIN-72](https://linear.app/rinvo-demo/issue/RIN-72/auto-tama-uzycie-case-study-peugeot-208-anonimowo-od-razu-z-nazwa-po) – Użycie case study Peugeot 208 (anonimowo od razu; z nazwą po akceptacji Pawła)
+- [RIN-73](https://linear.app/rinvo-demo/issue/RIN-73/auto-tama-w-piatek-wyslac-kasi-zestawienie-ilu-doszlo-do-konca-przy) – W piątek wysłać Kasi zestawienie: ilu doszło do końca przy każdej wersji wstępu
+- [RIN-74](https://linear.app/rinvo-demo/issue/RIN-74/auto-tama-przygotowac-na-czwartek-cos-konkretnego-o-polaczeniu-rinvo-z) – Przygotować na czwartek coś konkretnego o połączeniu Rinvo z systemem klienta
+- [RIN-75](https://linear.app/rinvo-demo/issue/RIN-75/auto-tama-decyzja-o-puszczeniu-opla-na-starej-bazie-ustalamy-we-trzech) – Decyzja o puszczeniu Opla na starej bazie: ustalamy we trzech w czwartek
+- [RIN-76](https://linear.app/rinvo-demo/issue/RIN-76/auto-tama-eksport-listy-kontaktow-do-excela) – Eksport listy kontaktów do Excela
 
 ## Ryzyka powtarzające się
 

@@ -106,6 +106,12 @@
         "cytat": "Chciałabym mieć w panelu przycisk eksportu do Excela, z listą kto potwierdził, a kto nie. Teraz przepisuję ręcznie.",
         "data": "2026-10-13",
         "zrodlo": "ops/transkrypcje/klinika-usmiech/2026-10-13-call-statusowy.md"
+      },
+      {
+        "klient": "auto-tama",
+        "cytat": "Dziewczyny chcą eksportu listy kontaktów do Excela. Żeby wyciągnąć tych zainteresowanych i rozdzielić między handlowców. Teraz przepisują ręcznie.",
+        "data": "2026-10-14",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       }
     ]
   }

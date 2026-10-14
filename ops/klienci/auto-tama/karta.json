@@ -22,15 +22,6 @@
       "wlasciciel": "Marek Rewoliński"
     },
     {
-      "id": "Z2",
-      "tytul": "Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10",
-      "opis": "Kasia odsłuchuje starą bazę i nowy wstęp by się 'zlał'. Test można uruchomić dopiero po wysłaniu przez Kasię obu wersji.",
-      "cytat": [
-        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
-      ],
-      "wlasciciel": "Marek Rewoliński"
-    },
-    {
       "id": "Z3",
       "tytul": "Nie podpinać agenta po godzinach nawet po otrzymaniu materiałów",
       "opis": "Nawet jeśli Kasia wyśle numery assistance i listę pól, Rinvo ma je trzymać u siebie i nie podpinać. Projekt startuje tylko po wyraźnym zielonym świetle od Kasi.",
@@ -157,15 +148,6 @@
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
       ]
     },
-    "adres-wloclawek": {
-      "linear_id": "6d340410-b31c-44ab-9657-d069f460cbea",
-      "identifier": "RIN-39",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-39/auto-tama-nieaktualny-adres-salonu-wloclawek-w-bazie-wiedzy-agenta",
-      "tytul": "Nieaktualny adres salonu Włocławek w bazie wiedzy agenta",
-      "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
-    },
     "godziny-dzwonienia": {
       "linear_id": "0c453a8a-d683-42c5-bf58-63f508a0ec62",
       "identifier": "RIN-40",
@@ -181,25 +163,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-41/auto-tama-aktualizacja-godzin-otwarcia-salonu-w-sobote-oba-salony-do",
       "tytul": "Aktualizacja godzin otwarcia salonu w sobotę (oba salony do 15:00)",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
-    },
-    "filtr-statusu": {
-      "linear_id": "5bfd24f9-027c-4fca-b87c-1204e453916a",
-      "identifier": "RIN-42",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-42/auto-tama-filtr-statusu-nie-zaweza-listy-kontaktow",
-      "tytul": "Filtr statusu nie zawęża listy kontaktów",
-      "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-      ]
-    },
-    "korekta-faktury": {
-      "linear_id": "09c102ac-e4f2-4f8b-b2ec-87267b5ca0e2",
-      "identifier": "RIN-43",
-      "url": "https://linear.app/rinvo-demo/issue/RIN-43/auto-tama-przekazanie-faktury-do-korekty-bledna-nazwa-firmy-na",
-      "tytul": "Przekazanie faktury do korekty (błędna nazwa firmy na fakturze)",
-      "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "rozliczenie-krotkich-polaczen": {
@@ -235,7 +200,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-47/auto-tama-sciaga-statusow-dla-handlowcow-jedna-strona",
       "tytul": "Ściąga statusów dla handlowców (jedna strona)",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "tekst-wstepu-dwie-wersje": {
@@ -244,7 +210,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-48/auto-tama-dwie-wersje-tekstu-wstepu-rozmowy-od-kasi",
       "tytul": "Dwie wersje tekstu wstępu rozmowy od Kasi",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "swieze-leady": {
@@ -253,7 +220,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-49/auto-tama-plik-swiezych-leadow-ostatni-miesiac-strona-facebook",
       "tytul": "Plik świeżych leadów (ostatni miesiąc, strona + Facebook)",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "mail-przeglad-ola": {
@@ -271,7 +239,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-51/auto-tama-potwierdzenie-spotkania-marek-pawel-1510-1000-torun",
       "tytul": "Potwierdzenie spotkania Marek–Paweł (15.10, 10:00, Toruń)",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "material-po-godzinach": {
@@ -361,7 +330,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-61/auto-tama-szkolenie-handlowcow-ze-statusow-kwadrans-online-po-swiezych",
       "tytul": "Szkolenie handlowców ze statusów (kwadrans online, po świeżych leadach)",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "ryzyko-voicedesk": {
@@ -370,7 +340,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-62/auto-tama-konkurent-voicedesk-tanszy-i-z-integracja-crm",
       "tytul": "Konkurent VoiceDesk: tańszy i z integracją CRM",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "ryzyko-zla-interpretacja-wynikow": {
@@ -388,7 +359,8 @@
       "url": "https://linear.app/rinvo-demo/issue/RIN-64/auto-tama-brak-integracji-z-crm-jako-kluczowy-argument-konkurenta",
       "tytul": "Brak integracji z CRM jako kluczowy argument konkurenta",
       "zrodla": [
-        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       ]
     },
     "case-study-208": {
@@ -399,6 +371,46 @@
       "zrodla": [
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
       ]
+    },
+    "zestawienie-wynikow-wstepu": {
+      "linear_id": "47a23f04-7c8c-47fd-8f52-b81a0a347e94",
+      "identifier": "RIN-73",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-73/auto-tama-w-piatek-wyslac-kasi-zestawienie-ilu-doszlo-do-konca-przy",
+      "tytul": "W piątek wysłać Kasi zestawienie: ilu doszło do końca przy każdej wersji wstępu",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "2026-10-13"
+    },
+    "prezentacja-integracji-crm": {
+      "linear_id": "4299cf56-fb55-4d0c-af59-236b1a595048",
+      "identifier": "RIN-74",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-74/auto-tama-przygotowac-na-czwartek-cos-konkretnego-o-polaczeniu-rinvo-z",
+      "tytul": "Przygotować na czwartek coś konkretnego o połączeniu Rinvo z systemem klienta",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "2026-10-13"
+    },
+    "decyzja-opel-stara-baza": {
+      "linear_id": "f4cc3d3f-747b-4fd0-8b17-6d9e45cf23d4",
+      "identifier": "RIN-75",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-75/auto-tama-decyzja-o-puszczeniu-opla-na-starej-bazie-ustalamy-we-trzech",
+      "tytul": "Decyzja o puszczeniu Opla na starej bazie: ustalamy we trzech w czwartek",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "2026-10-13"
+    },
+    "eksport-kontaktow-excel": {
+      "linear_id": "554fe144-7907-4b6d-9fb3-d2eb19dc42bf",
+      "identifier": "RIN-76",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-76/auto-tama-eksport-listy-kontaktow-do-excela",
+      "tytul": "Eksport listy kontaktów do Excela",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      ],
+      "data_spotkania": "2026-10-13"
     }
   },
   "ryzyka": {
@@ -421,5 +433,50 @@
         "cytat": "Paweł zobaczył tylko te dziewięć na siedemdziesiąt i chciał wszystko wyłączyć. Powiedziałam mu, że to trupy, a nie świeże leady."
       }
     ]
-  }
+  },
+  "zamkniete_sprawy": {
+    "adres-wloclawek": {
+      "linear_id": "6d340410-b31c-44ab-9657-d069f460cbea",
+      "identifier": "RIN-39",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-39/auto-tama-nieaktualny-adres-salonu-wloclawek-w-bazie-wiedzy-agenta",
+      "tytul": "Nieaktualny adres salonu Włocławek w bazie wiedzy agenta",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ],
+      "status_koncowy": "zamknieta"
+    },
+    "filtr-statusu": {
+      "linear_id": "5bfd24f9-027c-4fca-b87c-1204e453916a",
+      "identifier": "RIN-42",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-42/auto-tama-filtr-statusu-nie-zaweza-listy-kontaktow",
+      "tytul": "Filtr statusu nie zawęża listy kontaktów",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ],
+      "status_koncowy": "zamknieta"
+    },
+    "korekta-faktury": {
+      "linear_id": "09c102ac-e4f2-4f8b-b2ec-87267b5ca0e2",
+      "identifier": "RIN-43",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-43/auto-tama-przekazanie-faktury-do-korekty-bledna-nazwa-firmy-na",
+      "tytul": "Przekazanie faktury do korekty (błędna nazwa firmy na fakturze)",
+      "zrodla": [
+        "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      ],
+      "status_koncowy": "zamknieta"
+    }
+  },
+  "historia_zakazow": [
+    {
+      "id": "Z2",
+      "tytul": "Nie uruchamiać testu nowego wstępu w tygodniu 6–12.10",
+      "opis": "Kasia odsłuchuje starą bazę i nowy wstęp by się 'zlał'. Test można uruchomić dopiero po wysłaniu przez Kasię obu wersji.",
+      "cytat": [
+        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "uchylony": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga.",
+      "kiedy": "2026-10-14"
+    }
+  ]
 }

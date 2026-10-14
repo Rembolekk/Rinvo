@@ -1,0 +1,623 @@
+{
+  "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
+  "wygenerowano": "2026-10-14",
+  "spotkanie": {
+    "tytul": "Grupa Auto Tama × Rinvo: call statusowy",
+    "data": "2026-10-13",
+    "godziny": "11:00–11:24",
+    "uczestnicy": [
+      "Kasia Malinowska (BDC, Grupa Auto Tama)",
+      "Marek Rewoliński (Rinvo)"
+    ],
+    "wspominani": [
+      "Paweł (przełożony Kasi)",
+      "Ola (handlowiec)",
+      "Michał (Rinvo)",
+      "Pani Grażyna"
+    ]
+  },
+  "pozycje": [
+    {
+      "id": "T1",
+      "sekcja": 1,
+      "typ": "poprawka_bazy_wiedzy",
+      "rodzaj": "błąd",
+      "tytul": "Toruń: agent podaje sobotę do 14:00 zamiast do 15:00",
+      "opis": "Przy wcześniejszej poprawce godzin soboty poprawiono tylko Włocławek. Agent w Toruniu dalej podaje starą godzinę zamknięcia. Oba salony mają w sobotę do 15:00.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-13",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Zauważyłam w piątek, że agent w Toruniu podaje sobotę do czternastej.",
+        "Oba salony mają do piętnastej.",
+        "To nasz błąd, przy poprawce poprawiłem tylko Włocławek. Dziś naprawię Toruń."
+      ],
+      "wnioski": [
+        "Sprawa jest już otwarta w Linear (godziny-salonu-sobota); Włocławek jest poprawiony, zostaje Toruń."
+      ],
+      "klucz_sprawy": "godziny-salonu-sobota",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T2",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Uruchomić test dwóch wersji wstępu: Toruń vs Włocławek, środa–czwartek",
+      "opis": "Kasia dostarczyła obie wersje tekstu wstępu i skończyła odsłuchiwać starą bazę. Test idzie przez dwa dni, po jednej wersji na salon.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-14 – 2026-10-15",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Skończyłam w piątek. Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga.",
+        "Dobra, od jutra, dwa dni, Toruń i Włocławek."
+      ],
+      "wnioski": [
+        "W rozmowie nie padło, która wersja (krótsza czy druga) idzie do którego salonu; trzeba to sprawdzić w mailu od Kasi przed startem.",
+        "W rozmowie nie padło, na jakich kontaktach idzie test; stara baza nie wchodzi w grę (zakaz z karty Z9).",
+        "Zakaz Z2 z karty (test wstępu w tygodniu 6–12.10) wygasł; Kasia sama go uchyliła tą rozmową."
+      ],
+      "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T3",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "W piątek wysłać Kasi zestawienie: ilu doszło do końca przy każdej wersji wstępu",
+      "opis": "Mierzymy pełne rozmowy (doszły do końca), nie rozłączenia. Zestawienie osobno dla każdej wersji.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-16",
+      "warunek": "Test wstępu zakończony (14–15.10)",
+      "status": "zrob_teraz",
+      "cytat": [
+        "W piątek dostaniesz zestawienie, ilu doszło do końca przy każdej wersji.",
+        "Pełne rozmowy, nie rozłączenia, tak jak mówiłam."
+      ],
+      "klucz_sprawy": "zestawienie-wynikow-wstepu",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T4",
+      "sekcja": 1,
+      "typ": "spotkanie",
+      "tytul": "Wysłać zaproszenie dla Pawła na czwartek 15.10, godz. 10:00",
+      "opis": "Spotkanie z Pawłem jest potwierdzone przez Kasię. Marek wysyła zaproszenie. Kasia mówi też, że na spotkaniu rozmawiają we trzech.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone. Możesz wysłać zaproszenie."
+      ],
+      "wnioski": [
+        "Data 15.10 to przeliczone „w czwartek” od 13.10 (wtorek).",
+        "Miejsce spotkania nie padło w tej rozmowie."
+      ],
+      "klucz_sprawy": "spotkanie-z-pawlem",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T5",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Przygotować na czwartek coś konkretnego o połączeniu Rinvo z systemem klienta",
+      "opis": "Paweł ma na biurku ofertę konkurenta. Jeśli w czwartek nie zobaczy konkretów o połączeniu z systemem, w listopadzie zrobi test z konkurentem. Marek zobowiązał się przygotować pod to.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Ale powiedział, że jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi.",
+        "Rozumiem. Przygotuję się na czwartek konkretnie pod to."
+      ],
+      "wnioski": [
+        "Z rozmowy nie wynika, co dokładnie ma być „konkretne”; do doprecyzowania.",
+        "Integracja z CRM jest w backlogu (integracja-crm); w kartach wcześniejszej rozmowy Marek nie obiecywał terminu."
+      ],
+      "klucz_sprawy": "prezentacja-integracji-crm",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "T6",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Wysłać Kasi ściągę statusów dla handlowców przed jej urlopem",
+      "opis": "Ściąga ma dotrzeć do Kasi, żeby zdążyła ją obejrzeć przed szkoleniem 27.10.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "przed 2026-10-19",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Dwudziesty siódmy, dziesiąta. Ściągę wyślę ci przed urlopem, żebyś zdążyła rzucić okiem."
+      ],
+      "wnioski": [
+        "„Przed urlopem” przeliczone na dzień przed 19.10; ostatni dzień roboczy to piątek 16.10."
+      ],
+      "klucz_sprawy": "sciga-statusow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Plik ze świeżymi leadami od Kasi do czwartku",
+      "opis": "Kasia miała plik wcześniej, spóźnia się przez zamknięcie miesiąca. Nowy termin: do czwartku. Marek nie przypomina więcej.",
+      "wlasciciel": "Kasia Malinowska",
+      "termin": "2026-10-15",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Wyślę do czwartku. Drugi raz nie przypominaj, sama pamiętam.",
+        "Dobra, nie przypominam. Czekam do czwartku."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "0 dalszych przypomnień",
+        "uwagi": "Kasia: „Drugi raz nie przypominaj”; Marek potwierdził"
+      },
+      "wnioski": [
+        "„Do czwartku” interpretujemy jako najpóźniej 15.10 (dzień spotkania z Pawłem).",
+        "Przypomnienie z poniedziałku 12.10 już poszło (Kasia: „Dostałam twojego maila w poniedziałek”), więc limit przypomnień jest wyczerpany."
+      ],
+      "klucz_sprawy": "swieze-leady",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K2",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Decyzja o puszczeniu Opla na starej bazie: ustalamy we trzech w czwartek",
+      "opis": "Paweł chce od przyszłego tygodnia puścić Opla na starej bazie. Kasia przekazuje to z zastrzeżeniem i nie jest przekonana. Do czwartkowego spotkania Marek nic nie rusza.",
+      "wlasciciel": "Paweł",
+      "termin": "2026-10-15",
+      "warunek": "Spotkanie Kasia – Paweł – Marek w czwartek 15.10",
+      "status": "czeka",
+      "cytat": [
+        "On chce, żebyście od przyszłego tygodnia puścili Opla na starej bazie, „żeby zobaczyć, jak to wygląda”.",
+        "Jasne. Opla nie ruszam, wracamy do tego w czwartek."
+      ],
+      "przypomnienie": {
+        "data": "nie ustalono",
+        "limit": "nie ustalono",
+        "uwagi": "temat wraca na spotkaniu 15.10"
+      },
+      "wnioski": [
+        "Prośba Pawła jest przekazana przez Kasię z zastrzeżeniem, nie jest bezpośrednim zleceniem Pawła.",
+        "Prośba stoi w sprzeczności z zakazami z karty: Z4 (Opel czeka na wyniki świeżych leadów) i Z9 (stara baza nie jest puszczana drugi raz).",
+        "„Od przyszłego tygodnia” wypada na 19–23.10, czyli na urlop Kasi, kiedy według zakazu Z5 nic nowego nie startuje."
+      ],
+      "klucz_sprawy": "decyzja-opel-stara-baza",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "K3",
+      "sekcja": 2,
+      "typ": "spotkanie",
+      "tytul": "Szkolenie handlowców ze statusów: wtorek 27.10, godz. 10:00",
+      "opis": "Termin ustalony przez Kasię na dzień po jej powrocie z urlopu, pod warunkiem, że do tego czasu ruszą świeże leady.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-27",
+      "warunek": "Świeże leady muszą wcześniej ruszyć",
+      "status": "czeka",
+      "cytat": [
+        "Dajmy dwudziesty siódmy, wtorek, jak wrócę z urlopu i pójdą już świeże leady. Godzina dziesiąta.",
+        "Dwudziesty siódmy, dziesiąta."
+      ],
+      "przypomnienie": {
+        "data": "nie ustalono",
+        "limit": "nie ustalono",
+        "uwagi": "ściąga dla Kasi idzie wcześniej (T6)"
+      },
+      "wnioski": [
+        "Plik z leadami ma dojść do czwartku 15.10, ale w tym tygodniu nic nowego poza testem wstępu, a 19–23.10 Kasia ma urlop; świeże leady mogą więc ruszyć najwcześniej w poniedziałek 26.10, tuż przed szkoleniem. Termin jest napięty i warto go potwierdzić po starcie.",
+        "Zakaz Z13 z karty (szkolenie dopiero po świeżych leadach, termin ustala Kasia) jest spełniony co do terminu, warunek startu leadów pozostaje."
+      ],
+      "klucz_sprawy": "szkolenie-handlowcow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "B1",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Eksport listy kontaktów do Excela",
+      "opis": "Pracownice chcą wyciągnąć zainteresowanych i rozdzielić ich między handlowców. Dziś przepisują ręcznie. Marek zapisał prośbę i nie obiecał terminu.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Dziewczyny chcą eksportu listy kontaktów do Excela. Żeby wyciągnąć tych zainteresowanych i rozdzielić między handlowców. Teraz przepisują ręcznie.",
+        "Eksportu nie ma. Zapisuję. Pyta o to też inny klient, więc to może pójść szybciej niż inne rzeczy, ale terminu nie obiecuję."
+      ],
+      "wnioski": [
+        "Prośba pokrywa się z wpisem eksport-excel-potwierdzenia (inny klient, eksport listy do Excela) w prosby.json.",
+        "Karta wspomina „eksport z panelu” (zakaz Z7, pliki z leadami); Marek mówi, że eksportu listy kontaktów nie ma, więc traktujemy to jako nową funkcję."
+      ],
+      "klucz_sprawy": "eksport-kontaktow-excel",
+      "klucz_funkcji": "eksport-excel-potwierdzenia",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z1",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Opla na starej bazie nie ruszać do czwartkowego spotkania we trzech",
+      "opis": "Kasia prosi, żeby nie puszczać Opla na starej bazie przed rozmową Kasia – Paweł – Marek. Marek potwierdził.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "warunek": "Spotkanie we trzech w czwartek 15.10",
+      "status": "czeka",
+      "cytat": [
+        "Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek.",
+        "Opla nie ruszam"
+      ],
+      "wnioski": [
+        "Powtarza i wzmacnia zakazy z karty Z4 (Opel) oraz Z9 (stara baza nie jest puszczana drugi raz)."
+      ],
+      "klucz_sprawy": "zakaz-opel-stara-baza",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z2",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie przypominać Kasi o pliku ze świeżymi leadami",
+      "opis": "Kasia pamięta o pliku i nie chce kolejnych przypomnień. Marek się zgodził.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Drugi raz nie przypominaj, sama pamiętam.",
+        "Dobra, nie przypominam."
+      ],
+      "klucz_sprawy": "brak-przypomnien-plik-leadow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z3",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Urlop Kasi od 19.10: poza testem wstępu nic nowego",
+      "opis": "Kasia przypomina o urlopie od 19.10. Marek potwierdza, że poza testem wstępu nic nowego nie startuje.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "I od dziewiętnastego mnie nie ma, pamiętasz.",
+        "Pamiętam, w tym tygodniu nic nowego poza testem wstępu."
+      ],
+      "wnioski": [
+        "W rozmowie nie padła data końca urlopu; 23.10 pochodzi z karty (zakaz Z5: 19–23.10) i z faktu, że Kasia wraca przed 27.10.",
+        "Zdanie Marka „w tym tygodniu” jest niejednoznaczne (bieżący tydzień 13–16.10 albo tydzień urlopu); dlatego pewność niska i brak osobnej blokady na bieżący tydzień w fakty_czasowe (blokada globalna wykluczyłaby także test wstępu, który jest wyjątkiem).",
+        "Powtarza zakaz Z5 z karty."
+      ],
+      "klucz_sprawy": "urlop-kasi-19-23-10",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "Z4",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Agent nie proponuje aut używanych; nie wierzyć relacji, że Kasia się zgodziła",
+      "opis": "Ola miała powiedzieć, że Kasia zgodziła się na propozycje aut używanych przy odmowie. Kasia temu zaprzecza. Agent nie sprzedaje.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Nie zgodziłam się. Gdyby ktoś wam tak napisał, nie wierzcie.",
+        "Jasne, zostaje tak, jak było. Agent nie sprzedaje."
+      ],
+      "wnioski": [
+        "Powtarza zakaz Z6 z karty."
+      ],
+      "klucz_sprawy": "agent-nie-sprzedaje-uzywane",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "R1",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Paweł ma na piśmie ofertę VoiceDesk z cennikiem",
+      "opis": "Konkurent złożył Pawłowi pisemną ofertę z cennikiem. Kasia nie zna kwot, bo Paweł jej nie pokazał.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Paweł dostał od VoiceDesk ofertę na piśmie. Z cennikiem. Leży mu na biurku.",
+        "Nie pokazał mi."
+      ],
+      "wnioski": [
+        "Wysokość oferty konkurenta jest nieznana."
+      ],
+      "klucz_sprawy": "ryzyko-voicedesk",
+      "temat_ryzyka": "konkurencja",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    },
+    {
+      "id": "R2",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Bez konkretów o połączeniu z systemem w czwartek: w listopadzie test z VoiceDesk",
+      "opis": "Paweł postawił warunek: w czwartek chce zobaczyć coś konkretnego o połączeniu z systemem klienta, inaczej w listopadzie robi test z konkurentem.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "warunek": "Brak konkretów o połączeniu z systemem na spotkaniu w czwartek",
+      "status": "czeka",
+      "cytat": [
+        "Ale powiedział, że jak w czwartek nie zobaczy czegoś konkretnego o połączeniu z systemem, to w listopadzie robią test z nimi."
+      ],
+      "wnioski": [
+        "Powiązane z zadaniem T5 (przygotowanie na czwartek)."
+      ],
+      "klucz_sprawy": "ryzyko-brak-integracji-crm",
+      "temat_ryzyka": "konkurencja",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null
+    }
+  ],
+  "aktualizacje_spraw": [
+    {
+      "klucz_sprawy": "adres-wloclawek",
+      "nowy_status": "zamknieta",
+      "cytat": "Adres we Włocławku działa, puściłam sobie test, mówi Toruńska.",
+      "uzasadnienie": "Kasia sama przetestowała agenta i potwierdziła poprawny adres; Marek zamyka sprawę.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "filtr-statusu",
+      "nowy_status": "zamknieta",
+      "cytat": "Filtr „zainteresowany” też już zawęża, sprawdziłam wczoraj.",
+      "uzasadnienie": "Kasia sprawdziła, że filtr działa; Marek zamyka sprawę.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "korekta-faktury",
+      "nowy_status": "zamknieta",
+      "cytat": "Pani Grażyna dostała korektę od Michała w piątek, wszystko się zgadza.",
+      "uzasadnienie": "Klient potwierdził, że korekta dotarła i jest poprawna; Marek zamyka sprawę.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Teksty wstępu wysłałam ci wczoraj wieczorem mailem, obie wersje.",
+      "uzasadnienie": "Kasia dostarczyła oba teksty, na które czekaliśmy, i dała zielone światło na test od 14.10.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "spotkanie-z-pawlem",
+      "nowy_status": "zrob_teraz",
+      "cytat": "Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone. Możesz wysłać zaproszenie.",
+      "uzasadnienie": "Kasia potwierdziła termin, na co czekaliśmy; można wysłać zaproszenie.",
+      "pewnosc": "wysoka"
+    },
+    {
+      "klucz_sprawy": "Z2",
+      "nowy_status": "anulowana",
+      "cytat": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga.",
+      "uzasadnienie": "Zakaz Z2 (nie uruchamiać testu wstępu w tygodniu 6–12.10) uchyla Kasia, wskazana w karcie jako decydent; sama podała też okno testu 14–15.10.",
+      "pewnosc": "wysoka"
+    }
+  ],
+  "zmiany_zdania": [],
+  "konflikty_dat": [],
+  "fakty_czasowe": [
+    {
+      "typ": "urlop",
+      "od": "2026-10-19",
+      "do": "2026-10-23",
+      "dotyczy": "wszystko_nowe",
+      "cytat": "I od dziewiętnastego mnie nie ma, pamiętasz."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-13",
+      "do": null,
+      "dotyczy": "godziny-salonu-sobota",
+      "cytat": "Dziś naprawię Toruń."
+    },
+    {
+      "typ": "start_nie_wczesniej",
+      "od": "2026-10-14",
+      "do": null,
+      "dotyczy": "tekst-wstepu-dwie-wersje",
+      "cytat": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": null,
+      "dotyczy": "tekst-wstepu-dwie-wersje",
+      "cytat": "Możecie puścić od jutra, środa i czwartek, Toruń jedna wersja, Włocławek druga."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-16",
+      "do": null,
+      "dotyczy": "zestawienie-wynikow-wstepu",
+      "cytat": "W piątek dostaniesz zestawienie, ilu doszło do końca przy każdej wersji."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": null,
+      "dotyczy": "spotkanie-z-pawlem",
+      "cytat": "Spotkanie z Pawłem w czwartek o dziesiątej jest potwierdzone."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": null,
+      "dotyczy": "prezentacja-integracji-crm",
+      "cytat": "Przygotuję się na czwartek konkretnie pod to."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-18",
+      "do": null,
+      "dotyczy": "sciga-statusow",
+      "cytat": "Ściągę wyślę ci przed urlopem, żebyś zdążyła rzucić okiem."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": null,
+      "dotyczy": "swieze-leady",
+      "cytat": "Wyślę do czwartku."
+    },
+    {
+      "typ": "blokada",
+      "od": "2026-10-13",
+      "do": "2026-10-15",
+      "dotyczy": "decyzja-opel-stara-baza",
+      "cytat": "Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": null,
+      "dotyczy": "decyzja-opel-stara-baza",
+      "cytat": "wracamy do tego w czwartek."
+    },
+    {
+      "typ": "start_nie_wczesniej",
+      "od": "2026-10-27",
+      "do": null,
+      "dotyczy": "szkolenie-handlowcow",
+      "cytat": "Dajmy dwudziesty siódmy, wtorek, jak wrócę z urlopu i pójdą już świeże leady."
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-27",
+      "do": null,
+      "dotyczy": "szkolenie-handlowcow",
+      "cytat": "Dajmy dwudziesty siódmy, wtorek, jak wrócę z urlopu i pójdą już świeże leady."
+    }
+  ],
+  "okna_czasowe": [
+    {
+      "klucz_sprawy": "decyzja-opel-stara-baza",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-16"
+        },
+        {
+          "od": "2026-10-26",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "prezentacja-integracji-crm",
+      "okna": [
+        {
+          "od": "2026-10-14",
+          "do": "2026-10-15"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "sciga-statusow",
+      "okna": [
+        {
+          "od": "2026-10-14",
+          "do": "2026-10-16"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "spotkanie-z-pawlem",
+      "okna": [
+        {
+          "od": "2026-10-14",
+          "do": "2026-10-15"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "swieze-leady",
+      "okna": [
+        {
+          "od": "2026-10-14",
+          "do": "2026-10-15"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "szkolenie-handlowcow",
+      "okna": [
+        {
+          "od": "2026-10-27",
+          "do": "2026-10-27"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "tekst-wstepu-dwie-wersje",
+      "okna": [
+        {
+          "od": "2026-10-14",
+          "do": "2026-10-15"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "zestawienie-wynikow-wstepu",
+      "okna": [
+        {
+          "od": "2026-10-14",
+          "do": "2026-10-16"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    }
+  ],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [
+      "Adres Włocławka, filtr statusu i korekta faktury: nie osobne pozycje, tylko zamknięcia w aktualizacje_spraw.",
+      "Poprawka godzin soboty dla Torunia (T1): scalona z wcześniejszą naprawą Włocławka, która jest już zrobiona.",
+      "Pierwotnie osobne pozycje „test wstępu” i „okno 14–15.10” scalone w T2.",
+      "Oferta VoiceDesk i warunek z czwartku rozdzielone na R1 i R2 (różne klucze z karty: ryzyko-voicedesk, ryzyko-brak-integracji-crm); przygotowanie na czwartek to osobne zadanie T5."
+    ],
+    "pominiete": [
+      "Szkolenie Kasi z nowego modelu o 12:00: informacja poboczna, bez zadania dla nas.",
+      "Wysokość oferty VoiceDesk: Kasia jej nie zna, nie zgadywano.",
+      "Przypisanie wersji wstępu do salonu: nie padło w rozmowie, oznaczone w T2 jako pewność niska.",
+      "Sprawy z karty bez nowych informacji w tej rozmowie (m.in. podwójny telefon, godziny dzwonienia, kolumna nazwisko, wycena SMS-ów, przegląd Oli, materiały po godzinach) nie mają wpisów w aktualizacje_spraw."
+    ]
+  },
+  "szkic_maila": "Temat: Podsumowanie rozmowy z 13.10 i plan na ten tydzień\n\nDzień dobry Kasiu,\n\ndziękuję za dzisiejszą rozmowę. Podsumowuję to, co ustaliliśmy.\n\nZamknięte:\n- Adres salonu we Włocławku jest poprawny.\n- Filtr „zainteresowany” zawęża listę.\n- Korekta faktury dotarła do Pani Grażyny i wszystko się zgadza.\n\nCo robimy my:\n- Dziś poprawiam godzinę soboty dla Torunia (do 15:00), tak jak już jest we Włocławku.\n- Od jutra, w środę i czwartek, puszczamy test dwóch wersji wstępu: jedna wersja w Toruniu, druga we Włocławku. W piątek wyślę Ci zestawienie, ilu rozmów w każdej wersji doszło do końca (pełne rozmowy, nie rozłączenia).\n- Wyślę zaproszenie dla Pawła na czwartek 15.10 o 10:00.\n- Na czwartek przygotuję konkrety dotyczące połączenia z systemem.\n- Ściągę ze statusów dla handlowców wyślę Ci przed Twoim urlopem, żebyś zdążyła ją przejrzeć.\n- Szkolenie dla handlowców ze statusów: wtorek 27.10, godz. 10:00.\n\nCo czeka na Ciebie:\n- Plik ze świeżymi leadami do czwartku. Nie będę już przypominać.\n\nCzego nie robimy:\n- Opla na starej bazie nie ruszam, wracamy do tego w czwartek we trzech.\n- Agent nadal nie sprzedaje i nie proponuje aut używanych.\n- Od 19.10 do Twojego powrotu nic nowego nie startuje.\n\nEksport listy kontaktów do Excela zapisałem jako prośbę. Terminu nie obiecuję.\n\nPozdrawiam\nMarek Rewoliński",
+  "ostrzezenia_dat": []
+}
