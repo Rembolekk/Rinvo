@@ -145,16 +145,22 @@ class GitRepo:
             if plik.exists() and s in self.zmienione(katalog):      # nowy plik spoza dozwolonych ścieżek
                 plik.unlink()
 
-    def diff(self, katalog):
-        self._git(katalog, "add", "-A")
+    def diff(self, katalog, pliki):
+        """Diff tylko wskazanych plików (nigdy `git add -A`)."""
+        if not pliki:
+            return ""
+        self._git(katalog, "add", "--", *pliki)
         return self._git(katalog, "diff", "--cached", "--no-color").stdout
 
     def testy(self, katalog):
         r = subprocess.run(self.komenda_testow, cwd=katalog, capture_output=True, text=True, timeout=300)
         return r.returncode == 0, (r.stdout + r.stderr)[-4000:]
 
-    def commit_push(self, katalog, komunikat, galaz):
-        self._git(katalog, "add", "-A")
+    def commit_push(self, katalog, komunikat, galaz, pliki):
+        """Commituje WYŁĄCZNIE wskazane pliki (agent przekazuje tylko te z dozwolonych ścieżek)."""
+        if not pliki:
+            raise RuntimeError("brak plików do commita")
+        self._git(katalog, "add", "--", *pliki)
         self._git(katalog, "commit", "--quiet", "-m", komunikat)
         self._git(katalog, "push", "--quiet", "origin", f"HEAD:refs/heads/{galaz}")
 

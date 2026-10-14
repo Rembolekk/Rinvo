@@ -241,5 +241,82 @@
       "imie": "Rinvo Agent",
       "email": "agent@rinvo.invalid"
     }
+  },
+  "tematy_konfiguracji": {
+    "_opis": "Zakazy dotyczące tej samej części konfiguracji co zgłoszenie idą na górę sekcji „Czego nie ruszać”. Temat jest aktywny, gdy w tytule, celu, opisie lub kryteriach zgłoszenia występuje któreś ze słów z „zgloszenie”; zakaz jest powiązany, gdy w jego tytule występuje słowo z „zakaz”.",
+    "godziny": {
+      "zgloszenie": [
+        "godzin",
+        "dzwonieni",
+        "otwarci",
+        "sobot",
+        "piąt",
+        "piat"
+      ],
+      "zakaz": [
+        "godzin",
+        "dzwoni",
+        "otwarci"
+      ]
+    },
+    "limit_prob": {
+      "zgloszenie": [
+        "limit",
+        "prób",
+        "prob"
+      ],
+      "zakaz": [
+        "limit",
+        "prób",
+        "prob"
+      ]
+    },
+    "marki": {
+      "zgloszenie": [
+        "opl",
+        "peugeot",
+        "citro",
+        "marka",
+        "marki",
+        "marek",
+        "kampani"
+      ],
+      "zakaz": [
+        "opl",
+        "peugeot",
+        "citro",
+        "marka",
+        "marki",
+        "marek",
+        "kampani",
+        "stara baza",
+        "starej bazy"
+      ]
+    },
+    "teksty": {
+      "zgloszenie": [
+        "tekst",
+        "wstęp",
+        "wstep",
+        "powitani",
+        "przedstawi"
+      ],
+      "zakaz": [
+        "tekst",
+        "wstęp",
+        "wstep",
+        "mail"
+      ]
+    },
+    "ortodoncja": {
+      "zgloszenie": [
+        "ortodonc",
+        "grup"
+      ],
+      "zakaz": [
+        "ortodonc",
+        "grup"
+      ]
+    }
   }
 }

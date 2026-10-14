@@ -154,8 +154,6 @@ Kasia pamięta o pliku i prosi, żeby nie przypominać.
 
 Marek potwierdza, że poza testem wstępu nic nowego nie startuje. Powiązane z urlopem Kasi od 19.10 (Z5).
 
-> I od dziewiętnastego mnie nie ma, pamiętasz.
-
 > Pamiętam, w tym tygodniu nic nowego poza testem wstępu.
 
 

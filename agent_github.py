@@ -101,6 +101,10 @@ class GitHub:
         return self._zapytaj("PUT", f"/pulls/{numer}/merge",
                              {"merge_method": "squash", "commit_title": tytul, "commit_message": opis})
 
+    def data_commita(self, sha):
+        """Data (ISO) ostatniego commita: od niej liczymy czekanie na testy i CodeRabbit."""
+        return self._zapytaj("GET", f"/commits/{sha}")["commit"]["committer"]["date"]
+
     # ── testy i recenzje ─────────────────────────────────────────────────────
     def check_runs(self, sha):
         return self._lista(f"/commits/{sha}/check-runs")

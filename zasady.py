@@ -222,3 +222,20 @@ def etykieta_repo(item, zasady):
     """Etykieta Lineara „repo: …” dla pozycji (albo None)."""
     repo = repo_pozycji(item, zasady)
     return zasady["repo_etykiety"][repo] if repo else None
+
+
+def zakazy_wg_tematu(item, karta, zasady_json):
+    """Zakazy klienta podzielone na (powiązane z tą częścią konfiguracji, pozostałe); kolejność w grupach jak w karcie.
+    Powiązanie: słowa kluczowe tematów z ops/zasady.json (tematy_konfiguracji) w zgłoszeniu i w zakazie."""
+    tematy = {k: v for k, v in zasady_json.get("tematy_konfiguracji", {}).items() if not k.startswith("_")}
+    tekst = " ".join([str(item.get("tytul", "")), str(item.get("cel", "")), str(item.get("opis", ""))]
+                     + [str(k) for k in item.get("kryteria_akceptacji", [])]).lower()
+    aktywne = [t for t, v in tematy.items() if any(w in tekst for w in v["zgloszenie"])]
+    powiazane, pozostale = [], []
+    for zk in (karta or {}).get("zakazy", []):
+        t = zk.get("tytul", "").lower()          # tylko tytuł: opisy są długie i łapią przypadkowe słowa
+        if any(w in t for a in aktywne for w in tematy[a]["zakaz"]):
+            powiazane.append(zk)
+        else:
+            pozostale.append(zk)
+    return powiazane, pozostale

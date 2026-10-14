@@ -22,7 +22,7 @@ from datetime import datetime, timezone
 
 import slack_widok as sw
 import zasady
-from agent import (NAZWY_SEKRETOW_ENV, czy_dozwolona_sciezka, sciezki_niedozwolone, tytul_bez_prefiksu, znajdz_sekrety,
+from agent import (NAZWY_SEKRETOW_ENV, pliki_do_commita, czy_dozwolona_sciezka, sciezki_niedozwolone, tytul_bez_prefiksu, znajdz_sekrety,
                    rozbij_opis, klient_z_tytulu)
 from agent_github import ostatnia_recenzja_coderabbit, stan_coderabbit_ci, stan_testow
 from maile import slack_bezpiecznie
@@ -83,6 +83,14 @@ def ocen_pr(f, A):
     return {"akcja": "scal", "powod": "testy zielone, CodeRabbit bez uwag, zmiana tylko w config/ lub wiedza/"}
 
 
+def _data_od_ktorej_czekamy(gh, pr):
+    """Czekanie na testy i CodeRabbit liczymy od ostatniego commita (po poprawce zaczyna się od nowa), nie od utworzenia PR."""
+    try:
+        return gh.data_commita(pr["head"]["sha"])
+    except Exception:  # noqa: BLE001
+        return pr["created_at"]
+
+
 def zbierz_fakty(gh, pr, zg, A, teraz):
     sha = pr["head"]["sha"]
     runy, statusy = gh.check_runs(sha), gh.statusy(sha)
@@ -94,7 +102,7 @@ def zbierz_fakty(gh, pr, zg, A, teraz):
         "recenzja": ostatnia_recenzja_coderabbit(gh.recenzje(pr["number"]), gh.komentarze_inline(pr["number"])),
         "sha": sha,
         "poprawki": sum(1 for k in gh.komentarze(pr["number"]) if ZNACZNIK_POPRAWKI in (k.get("body") or "")),
-        "wiek_godzin": _godziny_od(pr["created_at"], teraz),
+        "wiek_godzin": _godziny_od(_data_od_ktorej_czekamy(gh, pr), teraz),
     }
 
 
@@ -143,15 +151,17 @@ def popraw_pr(s, pr, zg, recenzja):
         zle = sciezki_niedozwolone(s.git.zmienione(katalog), A)
         if zle:
             s.git.cofnij(katalog, zle)
-        if not s.git.zmienione(katalog):
+        do_commita, _ = pliki_do_commita(s.git.zmienione(katalog), A)
+        if not do_commita:
             return {"ok": True, "zmiany": False}
-        sekrety = znajdz_sekrety(s.git.diff(katalog), [os.environ.get(n, "") for n in NAZWY_SEKRETOW_ENV])
+        sekrety = znajdz_sekrety(s.git.diff(katalog, do_commita), [os.environ.get(n, "") for n in NAZWY_SEKRETOW_ENV])
         if sekrety:
             return {"ok": False, "powod": "poprawka zawiera dane przypominające sekret"}
         zdane, wynik = s.git.testy(katalog)
         if not zdane:
             return {"ok": False, "powod": "testy nie przechodzą po poprawce uwag CodeRabbit"}
-        s.git.commit_push(katalog, f"Poprawka po recenzji CodeRabbit ({zg['identifier']})", galaz)
+        do_commita, _ = pliki_do_commita(s.git.zmienione(katalog), A)       # testy mogły zostawić śmieci
+        s.git.commit_push(katalog, f"Poprawka po recenzji CodeRabbit ({zg['identifier']})", galaz, do_commita)
         return {"ok": True, "zmiany": True}
     finally:
         if hasattr(s.git, "sprzatnij"):

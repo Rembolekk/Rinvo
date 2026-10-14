@@ -94,7 +94,8 @@ class AtrapaGit:
     def cofnij(self, katalog, sciezki):
         self.cofniete += list(sciezki)
 
-    def diff(self, katalog):
+    def diff(self, katalog, pliki):
+        self.diff_pliki = list(pliki)
         return self._diff
 
     def testy(self, katalog):
@@ -102,8 +103,9 @@ class AtrapaGit:
         i = min(self.testy_uruchomienia - 1, len(self.wyniki_testow) - 1)
         return self.wyniki_testow[i]
 
-    def commit_push(self, katalog, komunikat, galaz):
+    def commit_push(self, katalog, komunikat, galaz, pliki):
         self.push.append((galaz, komunikat))
+        self.commitowane = list(pliki)
 
     def sprzatnij(self):
         pass
@@ -298,6 +300,60 @@ class TestLimit(unittest.TestCase):
         self.assertEqual([w["status"] for w in wyniki], ["zablokowane", "zablokowane", "pr", "pr", "pr"])
 
 
+class TestCzegoNieRuszac(unittest.TestCase):
+    """Sekcja „Czego nie ruszać”: krótkie tytuły zakazów, powiązane z tematem zgłoszenia na górze, bez cytatów."""
+
+    KARTA2 = {"zakazy": [
+        {"id": "Z1", "tytul": "Limit prób pozostaje 5", "opis": "x", "cytat": ["Zostaw pięć, to dosłowny cytat."]},
+        {"id": "Z2", "tytul": "Nie podpinać agenta po godzinach", "opis": "x", "cytat": ["Trzymajcie u siebie."]},
+        {"id": "Z3", "tytul": "Nie włączać Opla", "opis": "godzin dzwonienia w opisie nie liczą się", "cytat": ["Opla nie puszczamy."]},
+        {"id": "Z4", "tytul": "Nic nowego w urlop Kasi", "opis": "", "cytat": ["urlop"]}], "decyzje_zastrzezone": []}
+
+    def _sekcja(self, tytul, cel="", kryteria=()):
+        item = {"sekcja": 1, "typ": "bug", "tytul": tytul, "cel": cel, "kryteria_akceptacji": list(kryteria), "opis": "o",
+                "klucz_sprawy": "k", "cytat": ["c"], "repo": "rinvo-app"}
+        d = linear_sync.build_description(item, "s.md", self.KARTA2, None, Z)
+        return d[d.index("## Czego nie ruszać"):d.index("## Źródło")]
+
+    def test_tylko_tytuly_bez_cytatow(self):
+        t = self._sekcja("Zmiana godzin dzwonienia")
+        self.assertIn("- Zakaz Z1: Limit prób pozostaje 5", t)
+        for cytat in ("Zostaw pięć", "Trzymajcie u siebie", "Opla nie puszczamy"):
+            self.assertNotIn(cytat, t)
+        self.assertNotIn("_", t.replace("_brak", ""), "bez kursywy z cytatem")
+
+    def test_zakazy_tej_samej_czesci_konfiguracji_na_gorze(self):
+        t = self._sekcja("Zmiana godzin dzwonienia", "Godziny dzwonienia 9–19")
+        self.assertLess(t.index("Zakaz Z2"), t.index("Zakaz Z1"))
+        self.assertLess(t.index("Dotyczą tej samej części konfiguracji"), t.index("Zakaz Z2"))
+        self.assertLess(t.index("Zakaz Z2"), t.index("Pozostałe zakazy klienta"))
+        self.assertLess(t.index("Pozostałe zakazy klienta"), t.index("Zakaz Z1"))
+
+    def test_limit_prob_i_marki_to_osobne_tematy(self):
+        self.assertLess(self._sekcja("Limit prób do 3").index("Zakaz Z1"), self._sekcja("Limit prób do 3").index("Pozostałe"))
+        t = self._sekcja("Włączyć Opla we Włocławku")
+        self.assertLess(t.index("Zakaz Z3"), t.index("Pozostałe"))
+        self.assertGreater(t.index("Zakaz Z2"), t.index("Pozostałe"), "godziny to inny temat niż marki")
+
+    def test_temat_nie_pasuje_to_jedna_lista_bez_naglowkow(self):
+        t = self._sekcja("Zmiana koloru logo")
+        self.assertNotIn("Dotyczą tej samej", t)
+        self.assertNotIn("Pozostałe zakazy", t)
+        self.assertEqual(t.count("- Zakaz"), 4)
+
+    def test_opis_zakazu_nie_decyduje_o_powiazaniu(self):
+        t = self._sekcja("Zmiana godzin dzwonienia")
+        self.assertGreater(t.index("Zakaz Z3"), t.index("Pozostałe"))
+
+    def test_pr_przenosi_krotka_liste_ze_zgloszenia(self):
+        item = {"sekcja": 1, "typ": "bug", "tytul": "Godziny", "cel": "godziny", "opis": "o", "klucz_sprawy": "k", "cytat": ["Toruń dalej."], "repo": "rinvo-app"}
+        zg = {"id": "i", "identifier": "RIN-5", "title": "[x] Godziny", "url": "u",
+              "description": linear_sync.build_description(item, "s.md", self.KARTA2, None, Z)}
+        opis = agent.buduj_opis_pr(zg, agent.rozbij_opis(zg["description"]))
+        self.assertIn("- Zakaz Z2: Nie podpinać agenta po godzinach", opis)
+        self.assertNotIn("Trzymajcie u siebie", opis)
+
+
 # ── ponowne sprawdzenie zakazów ───────────────────────────────────────────────
 
 class TestPonowneSprawdzenieZakazow(unittest.TestCase):
@@ -421,6 +477,27 @@ class TestPrzebiegZgloszenia(unittest.TestCase):
         self.assertEqual(w["status"], "pr")
         self.assertEqual(sorted(git.cofniete), [".github/workflows/testy.yml", "tests/test_config.py", "zakazy/auto-tama.json"])
         self.assertTrue(any("Cofnięto zmiany poza dozwolonymi ścieżkami" in k[2] for k in s.linear.zdarzenia if k[0] == "komentarz"))
+
+    def test_commit_zawiera_tylko_dozwolone_pliki_nawet_gdy_testy_zostawily_smieci(self):
+        """Regresja: tests/__pycache__/*.pyc po uruchomieniu testów trafiały do commita."""
+        git = AtrapaGit(zmienione=["config/auto-tama.yaml", "wiedza/auto-tama.md", "tests/__pycache__/wspolne.cpython-312.pyc",
+                                   "tests/__pycache__/test_config.cpython-312.pyc"])
+        git.cofnij = lambda katalog, sciezki: None            # strażnik po edycji nie widzi śmieci: powstają dopiero przy testach
+        s = Srodowisko([zgloszenie(41)], git=git)
+        w = agent.uruchom(s)[0]
+        self.assertEqual(w["status"], "pr")
+        self.assertEqual(git.commitowane, ["config/auto-tama.yaml", "wiedza/auto-tama.md"])
+        self.assertEqual(git.diff_pliki, ["config/auto-tama.yaml", "wiedza/auto-tama.md"], "sekrety skanowane w tym, co idzie do commita")
+
+    def test_pliki_do_commita_loguje_pominiete(self):
+        logi = []
+        ok, pom = agent.pliki_do_commita(["config/a.yaml", "tests/__pycache__/x.pyc", ".github/x.yml", "wiedza/b.md"], A, logi.append)
+        self.assertEqual(ok, ["config/a.yaml", "wiedza/b.md"])
+        self.assertEqual(pom, ["tests/__pycache__/x.pyc", ".github/x.yml"])
+        self.assertIn("tests/__pycache__/x.pyc", logi[0])
+        logi.clear()
+        agent.pliki_do_commita(["config/a.yaml"], A, logi.append)
+        self.assertEqual(logi, [])
 
     def test_tylko_zmiany_zabronione_to_oddanie_bo_nic_nie_zostaje(self):
         git = AtrapaGit(zmienione=[".github/workflows/testy.yml", "tests/t.py"])
@@ -638,6 +715,16 @@ def srodowisko_scalania(zg=None, **gh_kw):
 
 
 class TestPrzebiegScalania(unittest.TestCase):
+
+    def test_czekanie_na_coderabbit_liczone_od_ostatniego_commita_a_nie_od_utworzenia_pr(self):
+        """Po wypchnięciu poprawki stary PR dostaje pełny czas na nową recenzję."""
+        s = srodowisko_scalania(recenzje=[])                     # PR z 11:00, jest 12:00; brak recenzji
+        s.github.prs = [{**pr(), "created_at": "2026-10-10T11:00:00Z"}]     # PR sprzed 4 dni
+        s.github.data_commita = lambda sha: "2026-10-14T11:45:00Z"           # ale commit sprzed 15 minut
+        self.assertEqual(agent_scal.uruchom_scalanie(s)[0]["akcja"], "czekaj")
+        s2 = srodowisko_scalania(recenzje=[])
+        s2.github.data_commita = lambda sha: "2026-10-10T11:00:00Z"
+        self.assertEqual(agent_scal.uruchom_scalanie(s2)[0]["akcja"], "oddane", "stary commit bez recenzji: oddanie")
 
     def test_pr_agenta_rozpoznawany_po_galezi_i_fixes(self):
         self.assertTrue(agent_scal.pr_agenta(pr()))

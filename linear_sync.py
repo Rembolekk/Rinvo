@@ -464,9 +464,13 @@ def build_description(item, source_path, karta=None, przyp=None, Z=None):
         parts.append("## Do weryfikacji\n\n" + "\n".join(f"- {t}" for t in zasady.powody_tekst(przyp)))
 
     nie_ruszac = []
-    for z in karta.get("zakazy", []):
-        cyt = f" — _{z['cytat'][0]}_" if z.get("cytat") else ""
-        nie_ruszac.append(f"- **Zakaz {z['id']}: {z['tytul']}**{cyt}")
+    powiazane, pozostale = zasady.zakazy_wg_tematu(item, karta, Z)      # tylko krótkie tytuły, bez cytatów
+    if powiazane:
+        nie_ruszac.append("**Dotyczą tej samej części konfiguracji:**")
+        nie_ruszac += [f"- Zakaz {z['id']}: {z['tytul']}" for z in powiazane]
+        if pozostale:
+            nie_ruszac.append("\n**Pozostałe zakazy klienta:**")
+    nie_ruszac += [f"- Zakaz {z['id']}: {z['tytul']}" for z in pozostale]
     for d in karta.get("decyzje_zastrzezone", []):
         osoby = d.get("zastrzezone_dla")
         osoby = osoby if isinstance(osoby, str) else ", ".join(osoby or [])

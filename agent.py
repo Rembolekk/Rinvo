@@ -91,6 +91,16 @@ def sciezki_niedozwolone(zmienione, A):
     return [s for s in zmienione if not czy_dozwolona_sciezka(s, A)]
 
 
+def pliki_do_commita(zmienione, A, log=print):
+    """Z listy zmienionych plików zostają tylko te z dozwolonych ścieżek; resztę logujemy i NIE commitujemy
+    (np. tests/__pycache__/*.pyc powstałe przy uruchamianiu testów)."""
+    ok = [s for s in zmienione if czy_dozwolona_sciezka(s, A)]
+    pominiete = [s for s in zmienione if s not in ok]
+    if pominiete:
+        log(f"  Pominięto w commicie (poza dozwolonymi ścieżkami): {', '.join(pominiete)}")
+    return ok, pominiete
+
+
 def znajdz_sekrety(tekst, wartosci_env=()):
     """Wzorce kluczy albo wartości sekretów ze środowiska w tekście (np. w diffie)."""
     znalezione = [w for w in WZORCE_SEKRETOW if re.search(w, tekst)]
@@ -277,7 +287,7 @@ def obsluz_zgloszenie(s, zg):
             return oddaj(s, zg, "agent nie wprowadził żadnych zmian w config/ ani wiedza/")
         if len(zmienione) > A["max_plikow"]:
             return oddaj(s, zg, f"zmiana dotyka {len(zmienione)} plików (limit {A['max_plikow']})")
-        sekrety = znajdz_sekrety(s.git.diff(katalog), [os.environ.get(n, "") for n in NAZWY_SEKRETOW_ENV])
+        sekrety = znajdz_sekrety(s.git.diff(katalog, pliki_do_commita(s.git.zmienione(katalog), A)[0]), [os.environ.get(n, "") for n in NAZWY_SEKRETOW_ENV])
         if sekrety:
             return oddaj(s, zg, "zmiana zawiera dane przypominające sekret; nie wypychamy jej")
 
@@ -291,11 +301,14 @@ def obsluz_zgloszenie(s, zg):
         if not ok:
             koniec = " ".join(wynik.strip().splitlines()[-3:])
             return oddaj(s, zg, f"testy nie przechodzą po {A['max_napraw_testow']} poprawce: {slack_bezpiecznie(koniec, 220)}")
-        if not s.git.zmienione(katalog):
-            return oddaj(s, zg, "po poprawkach nie zostały żadne zmiany")
+        # testy mogły zostawić pliki (np. __pycache__): do commita idą tylko pliki z dozwolonych ścieżek
+        do_commita, _ = pliki_do_commita(s.git.zmienione(katalog), A)
+        if not do_commita:
+            return oddaj(s, zg, "po poprawkach nie zostały żadne zmiany w config/ ani wiedza/")
 
         # 4) PR
-        s.git.commit_push(katalog, f"{tytul_bez_prefiksu(zg.get('title'))} ({zg['identifier']})\n\nFixes {zg['identifier']}", galaz)
+        s.git.commit_push(katalog, f"{tytul_bez_prefiksu(zg.get('title'))} ({zg['identifier']})\n\nFixes {zg['identifier']}",
+                          galaz, do_commita)
         pr = s.github.utworz_pr(zg["title"], galaz, buduj_opis_pr(zg, sekcje))
         uwaga = f"\n\nCofnięto zmiany poza dozwolonymi ścieżkami: {', '.join(cofniete)}." if cofniete else ""
         s.linear.komentarz(zg, f"**Agent otworzył PR:** {pr['html_url']}{uwaga}")
