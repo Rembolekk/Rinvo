@@ -326,6 +326,9 @@ Agent sam wykonuje zgłoszenia z Lineara w osobnym repozytorium [Rinvo-app](http
 
 **Workflow** `Agent wykonawczy` (`agent.yml`): ręcznie (zawsze), co 15 minut i po każdym udanym przetworzeniu rozmowy lub maila (te dwa dopiero po ustawieniu zmiennej repozytorium `AGENT_WLACZONY=true`). Sekret `AGENT_GITHUB_TOKEN` (dostęp tylko do Rinvo-app) istnieje wyłącznie w sekretach GitHuba; agent nie działa lokalnie. Testy logiki bez sieci: `python3 testy/test_agent.py`.
 
+
+**Stan już zgodny:** gdy agent nie wprowadza zmian, kod sprawdza kryteria akceptacji na obecnym `config/` i `wiedza/` (model ocenia, ale musi podać dosłowne cytaty z plików, weryfikowane kodem; kryteria spoza plików, np. wiadomość do klienta, są pomijane i wymienione w komentarzu). Gdy są spełnione: komentarz „Agent: stan już zgodny z oczekiwaniem” z cytatami, Done, bez PR. Oddanie człowiekowi tylko przy niespełnionych kryteriach albo gdy nie da się ich sprawdzić.
+
 ## Kontakt z klientem
 
 Pętla: agent pisze szkic maila, człowiek daje jedną zgodę, automat wysyła.

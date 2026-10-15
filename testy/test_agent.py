@@ -87,7 +87,9 @@ class AtrapaGit:
     """Atrapa gita: kolejne wyniki testów i zmian są zadane z góry."""
 
     def __init__(self, wyniki_testow=((True, "OK"),), zmienione=("config/auto-tama.yaml", "wiedza/auto-tama.md"),
-                 diff="-14:00\n+15:00\n"):
+                 diff="-14:00\n+15:00\n", pliki=None):
+        self.pliki = pliki if pliki is not None else {"config/auto-tama.yaml": 'sobota: {od: "09:00", do: "15:00"}\n',
+                                                       "wiedza/auto-tama.md": "- Sobota: 9:00–15:00\n"}
         self.wyniki_testow, self.zmienione_lista, self._diff = list(wyniki_testow), list(zmienione), diff
         self.wywolania, self.cofniete, self.push, self.testy_uruchomienia = [], [], [], 0
 
@@ -97,6 +99,9 @@ class AtrapaGit:
     def przygotuj(self, galaz, istniejaca=False):
         self.wywolania.append(("przygotuj", galaz))
         return Path("/tmp/atrapa")
+
+    def czytaj(self, katalog, sciezka):
+        return self.pliki.get(sciezka)
 
     def zmienione(self, katalog):
         return [s for s in self.zmienione_lista if s not in self.cofniete]
@@ -525,9 +530,56 @@ class TestPrzebiegZgloszenia(unittest.TestCase):
         self.assertEqual(w["status"], "oddane")
         self.assertEqual(s.github.utworzone, [])
 
+    def _bez_zmian(self, odp, git=None):
+        s = Srodowisko([zgloszenie(41)], git=git or AtrapaGit(zmienione=[]), claude=AtrapaClaude(
+            lambda prompt: odp if "KRYTERIA AKCEPTACJI" in prompt and "PLIK" in prompt else '{"konflikt": false, "zakaz": null, "powod": ""}'))
+        return s, agent.uruchom(s)[0]
+
+    def test_bez_zmian_i_kryteria_spelnione_to_done_z_cytatem_bez_pr(self):
+        """ZMIANA ŚWIADOMA: wcześniej brak zmian = zawsze oddanie człowiekowi (RIN-84: config już był poprawny)."""
+        odp = json.dumps({"spelnione": True, "cytaty": [{"plik": "config/auto-tama.yaml", "fragment": 'sobota: {od: "09:00", do: "15:00"}'},
+                                                         {"plik": "wiedza/auto-tama.md", "fragment": "Sobota: 9:00–15:00"}],
+                          "pominiete": ["Kasia dostaje wiadomość, że adres jest poprawiony"]})
+        s, w = self._bez_zmian(odp)
+        self.assertEqual(w["status"], "zgodne")
+        self.assertIn(("stan", "RIN-41", "Done"), s.linear.zdarzenia)
+        kom = next(z[2] for z in s.linear.zdarzenia if z[0] == "komentarz" and "zgodny" in z[2])
+        self.assertTrue(kom.startswith("Stan już zgodny z oczekiwaniem"))
+        self.assertIn('`config/auto-tama.yaml`: `sobota: {od: "09:00", do: "15:00"}`', kom, "cytat z pliku")
+        self.assertIn("Nie dotyczą plików, więc nie były oceniane: Kasia dostaje wiadomość", kom)
+        self.assertEqual((s.github.utworzone, s.git.push), ([], []), "bez PR")
+        self.assertTrue(any("stan już zgodny" in m for m in s.slack.wiadomosci))
+
+    def test_bez_zmian_i_kryteria_niespelnione_to_oddanie(self):
+        s, w = self._bez_zmian(json.dumps({"spelnione": False, "cytaty": [], "powod": "Toruń nadal do 14:00"}))
+        self.assertEqual(w["status"], "oddane")
+        self.assertIn("kryteria akceptacji nie są spełnione", w["powod"])
+        self.assertIn("Do weryfikacji", s.linear.zgloszenia[0]["labels"])
+
+    def test_bez_zmian_cytat_spoza_pliku_albo_brak_cytatu_to_oddanie(self):
+        for cytaty in ([{"plik": "config/auto-tama.yaml", "fragment": "wymyślony fragment"}], [], [{"plik": "inny.yaml", "fragment": "x"}]):
+            s, w = self._bez_zmian(json.dumps({"spelnione": True, "cytaty": cytaty}))
+            self.assertEqual(w["status"], "oddane", cytaty)
+            self.assertIn("nie da się sprawdzić", w["powod"])
+            self.assertNotIn(("stan", "RIN-41", "Done"), s.linear.zdarzenia)
+
+    def test_bez_zmian_nie_da_sie_sprawdzic_to_oddanie(self):
+        s, w = self._bez_zmian("to nie jest json")
+        self.assertEqual(w["status"], "oddane")
+        s2, w2 = self._bez_zmian("{}", git=AtrapaGit(zmienione=[], pliki={}))
+        self.assertIn("brak plików klienta", w2["powod"])
+        s3 = Srodowisko([{**zgloszenie(41), "description": "## Cel\n\nX"}], git=AtrapaGit(zmienione=[]))
+        self.assertIn("brak kryteriów", agent.uruchom(s3)[0]["powod"])
+
     def test_agent_nie_wprowadzil_zmian_to_oddanie(self):
         s = Srodowisko([zgloszenie(41)], git=AtrapaGit(zmienione=[]))
         self.assertEqual(agent.uruchom(s)[0]["status"], "oddane")
+
+    def test_zgodne_liczy_sie_jak_przejete_zadanie_do_limitu(self):
+        odp = json.dumps({"spelnione": True, "cytaty": [{"plik": "wiedza/a.md", "fragment": "Sobota: 9:00–15:00"}]})
+        s = Srodowisko([zgloszenie(41, klient="a"), zgloszenie(42, klient="b")], git=AtrapaGit(zmienione=[], pliki={"wiedza/a.md": "Sobota: 9:00–15:00", "wiedza/b.md": "Sobota: 9:00–15:00"}), claude=AtrapaClaude(
+            lambda prompt: odp if "KRYTERIA AKCEPTACJI" in prompt and "PLIK" in prompt else '{"konflikt": false, "zakaz": null, "powod": ""}'))
+        self.assertEqual([w["status"] for w in agent.uruchom(s, max_n=1)], ["zgodne"])
 
     def test_twardy_limit_plikow_to_oddanie_a_zwykla_duza_zmiana_zostaje_jako_pr(self):
         """ZMIANA ŚWIADOMA (utwardzanie cz. 2): wcześniej już 6 plików kończyło się oddaniem bez PR. Teraz duża zmiana (powyżej 3 plików

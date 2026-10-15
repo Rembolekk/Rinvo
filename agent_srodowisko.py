@@ -184,6 +184,13 @@ class GitRepo:
         r = self._git(katalog, "ls-remote", "--heads", f"https://github.com/{self.repo}.git", galaz, sprawdz=False)
         return bool(r.stdout.strip())
 
+    def czytaj(self, katalog, sciezka):
+        """Zawartość pliku z klona (None, gdy go nie ma). Ścieżka względem katalogu, bez wychodzenia poza niego."""
+        p = (Path(katalog) / sciezka).resolve()
+        if Path(katalog).resolve() not in p.parents or not p.is_file():
+            return None
+        return p.read_text(encoding="utf-8")
+
     def zmienione(self, katalog):
         """Ścieżki zmienione albo nowe (względem HEAD), także nieśledzone."""
         r = self._git(katalog, "status", "--porcelain", "-uall", "-z")
