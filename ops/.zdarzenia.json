@@ -1,0 +1,18 @@
+[
+ {
+  "data": "2026-10-15T09:42:14+00:00",
+  "typ": "pr_otwarty",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-116",
+  "tytul": "Zmienić godziny salonów podawane klientom: sobota do 15:00",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/5"
+ },
+ {
+  "data": "2026-10-15T09:42:53+00:00",
+  "typ": "material",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-122",
+  "tytul": "Ściąga: statusy leadów po walidacji",
+  "url": "ops/materialy/auto-tama/rin-122-przygotowac-jednostronicowa-sciage-ze-st.pdf"
+ }
+]
