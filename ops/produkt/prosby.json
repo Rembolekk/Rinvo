@@ -1,1 +1,101 @@
-{}
+{
+  "testy-ab-w-panelu": {
+    "tytul": "Testy A/B wstępu rozmowy i kolejności pytań, ustawiane i czytane w panelu",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Chciałabym mieć w panelu coś takiego, że wrzucam dwie albo trzy wersje początku rozmowy, system sam dzieli połowę telefonów na jedną, połowę na drugą, a po tygodniu widzę, przy której ludzie rzadziej się rozłączają i częściej dochodzą do końca.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "kafelek-do-listy-zainteresowanych": {
+    "tytul": "Kliknięcie w kafelek „zainteresowani” na dashboardzie otwiera listę tych osób",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Jest kafelek „zainteresowani”, dziewięć. Klikam w tę dziewiątkę. Nic. Zostaję na kafelku. A ja chcę zobaczyć tych dziewięciu ludzi, a nie siedemdziesiąt wierszy.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "kolumna-nazwisko-lista-kontaktow": {
+    "tytul": "Nazwisko zaraz po statusie na liście kontaktów (tylko przy okazji prac nad listą)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "I kolumny. Na liście kontaktów chcę mieć nazwisko zaraz po statusie. Wczoraj próbowałam przeciągnąć kolumnę i się nie da. Mail jest pierwszy, a nazwiska nie widzę bez przewijania. To nie jest pożar.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "raport-mailowy-tygodniowy": {
+    "tytul": "Tygodniowy raport mailowy dla Pawła w poniedziałek rano (zadzwoniono, odebrało, zainteresowani)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Paweł pyta mnie co tydzień o te same liczby: ile zadzwoniliśmy, ile odebrało, ilu zainteresowanych. Ja to przepisuję ręcznie do maila. Da się, żeby to samo do niego przychodziło? W poniedziałek rano, na przykład.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "integracja-z-systemem-klienta": {
+    "tytul": "Integracja z systemem (CRM) dealera, aby leady wpadały handlowcom same",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "mail-model-salon-na-gorze": {
+    "tytul": "Mail do handlowców po walidacji: model i salon na górze, nie ściana tekstu",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Mail, który dostaje po walidacji, to ściana tekstu z transkrypcją. Nie wie, czy chodzi o Peugeota 308 kombi, czy ktoś pytał o serwis.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "sms-po-nieodebranych": {
+    "tytul": "SMS do osoby, do której agent dwa razy się nie dodzwonił",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Jak bot dwa razy nie dodzwoni się do kogoś, to czy nie mógłby wysłać SMS-a? Coś w stylu „dzwoniliśmy w sprawie Twojego zapytania o Peugeota, oddzwoń albo kliknij tutaj”.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "pory-prob-obiad": {
+    "tytul": "Przesunąć pierwszą próbę dzwonienia na przerwę obiadową (12–13)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Najwięcej ludzi odbierało w okolicach dwunastej, trzynastej i po siedemnastej. Rano, przed dziesiątą, prawie nikt.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "agent-po-godzinach": {
+    "tytul": "Agent po godzinach na wszystkie numery salonu (sprzedaż, części, assistance, BOK)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Jak salon jest zamknięty, ma odbierać jeden agent, na wszystkie numery.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  }
+}

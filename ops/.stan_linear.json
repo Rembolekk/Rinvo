@@ -1,0 +1,487 @@
+{
+ "zapisano": "2026-10-15T09:13:25+00:00",
+ "zgloszenia": {
+  "RIN-100": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt"
+   ],
+   "id": "bc4aaba3-1eb8-4047-989d-213ea2c34f3d",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: Testy A/B wstępu rozmowy i kolejności pytań, ustawiane i…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-100/auto-tama-zdecyduj-testy-ab-wstepu-rozmowy-i-kolejnosci-pytan",
+   "utworzono": "2026-10-15T09:13:17.354Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:17.354Z"
+  },
+  "RIN-101": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt"
+   ],
+   "id": "2b71217d-0abc-4272-b37e-cb50bfb12521",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: Kliknięcie w kafelek „zainteresowani” na dashboardzie…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-101/auto-tama-zdecyduj-klikniecie-w-kafelek-zainteresowani-na-dashboardzie",
+   "utworzono": "2026-10-15T09:13:17.966Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:17.966Z"
+  },
+  "RIN-102": {
+   "etykiety": [
+    "Dla agenta",
+    "Produkt",
+    "repo: rinvo"
+   ],
+   "id": "83d5e30e-828a-42e4-bd89-7f84f9547c1c",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Nazwisko zaraz po statusie na liście kontaktów (tylko przy okazji prac nad listą)",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-102/auto-tama-nazwisko-zaraz-po-statusie-na-liscie-kontaktow-tylko-przy",
+   "utworzono": "2026-10-15T09:13:18.578Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:18.578Z"
+  },
+  "RIN-103": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt"
+   ],
+   "id": "3d44f14f-c8c8-4064-86c6-4c56bdfc956e",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: Tygodniowy raport mailowy dla Pawła w poniedziałek rano…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-103/auto-tama-zdecyduj-tygodniowy-raport-mailowy-dla-pawla-w-poniedzialek",
+   "utworzono": "2026-10-15T09:13:18.897Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:18.897Z"
+  },
+  "RIN-104": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Produkt"
+   ],
+   "id": "4423179f-7ca4-480a-9503-5b0c0982aaaf",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: Integracja z systemem (CRM) dealera, aby leady wpadały…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-104/auto-tama-zdecyduj-integracja-z-systemem-crm-dealera-aby-leady-wpadaly",
+   "utworzono": "2026-10-15T09:13:19.655Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:19.655Z"
+  },
+  "RIN-105": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt",
+    "repo: rinvo"
+   ],
+   "id": "a70ff487-f494-41d6-8873-1df233d290ba",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Wyślij: Mail do handlowców po walidacji: model i salon na górze…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-105/auto-tama-wyslij-mail-do-handlowcow-po-walidacji-model-i-salon-na",
+   "utworzono": "2026-10-15T09:13:20.479Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:20.479Z"
+  },
+  "RIN-106": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt"
+   ],
+   "id": "3834436d-786e-484c-a9c9-ce65316dd3fb",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: SMS do osoby, do której agent dwa razy się nie dodzwonił",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-106/auto-tama-zdecyduj-sms-do-osoby-do-ktorej-agent-dwa-razy-sie-nie",
+   "utworzono": "2026-10-15T09:13:21.028Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:21.028Z"
+  },
+  "RIN-107": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Produkt"
+   ],
+   "id": "17610193-5253-4258-a827-b40ec4917169",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: Przesunąć pierwszą próbę dzwonienia na przerwę obiadową…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-107/auto-tama-zdecyduj-przesunac-pierwsza-probe-dzwonienia-na-przerwe",
+   "utworzono": "2026-10-15T09:13:21.567Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:21.567Z"
+  },
+  "RIN-108": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt"
+   ],
+   "id": "0ad5a4d1-617a-4c77-a815-7dc00ffde3c3",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Zdecyduj: Agent po godzinach na wszystkie numery salonu (sprzedaż…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-108/auto-tama-zdecyduj-agent-po-godzinach-na-wszystkie-numery-salonu",
+   "utworzono": "2026-10-15T09:13:22.150Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:22.150Z"
+  },
+  "RIN-109": {
+   "etykiety": [
+    "Ryzyko"
+   ],
+   "id": "cbccf3f9-872e-4360-b454-10463c680f09",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": "2026-10-15",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Konkurent VoiceDesk u Pawła: taniej i z integracją z systemem",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-109/auto-tama-konkurent-voicedesk-u-pawla-taniej-i-z-integracja-z-systemem",
+   "utworzono": "2026-10-15T09:13:23.482Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:23.482Z"
+  },
+  "RIN-110": {
+   "etykiety": [
+    "Ryzyko"
+   ],
+   "id": "6cd67b27-733c-4e02-b0b2-3a4e9774da7f",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Paweł po statystyce 9 na 70 chciał wyłączyć wszystko",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-110/auto-tama-pawel-po-statystyce-9-na-70-chcial-wylaczyc-wszystko",
+   "utworzono": "2026-10-15T09:13:23.814Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:23.814Z"
+  },
+  "RIN-111": {
+   "etykiety": [
+    "Ryzyko"
+   ],
+   "id": "becb40f8-8129-4fe7-9c8b-8d75bcdeb075",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Jakość rozmów: ludzie orientują się, że to robot; błędny adres i podwójne telefony",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-111/auto-tama-jakosc-rozmow-ludzie-orientuja-sie-ze-to-robot-bledny-adres",
+   "utworzono": "2026-10-15T09:13:24.188Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:24.188Z"
+  },
+  "RIN-112": {
+   "etykiety": [
+    "Ryzyko"
+   ],
+   "id": "f1c0238e-e53d-428c-856d-54c10e68f370",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Rozliczenia: faktura na zły podmiot i płatność za podwójne telefony",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-112/auto-tama-rozliczenia-faktura-na-zly-podmiot-i-platnosc-za-podwojne",
+   "utworzono": "2026-10-15T09:13:24.488Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:24.488Z"
+  },
+  "RIN-113": {
+   "etykiety": [
+    "Dla agenta",
+    "Zadanie"
+   ],
+   "id": "4e5e2eac-0c51-4274-b27d-6f34ab301082",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-15",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Notatka przed spotkaniem: Potwierdzenie od Kasi: spotkanie z Pawłem w czwartek 15 października o 10:00",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-113/auto-tama-notatka-przed-spotkaniem-potwierdzenie-od-kasi-spotkanie-z",
+   "utworzono": "2026-10-15T09:13:24.820Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:24.820Z"
+  },
+  "RIN-84": {
+   "etykiety": [
+    "Dla agenta",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "69e744b3-6adc-4443-ad5f-99d10094d0d6",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-06",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Poprawić adres salonu we Włocławku na Toruńską 120",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-84/auto-tama-poprawic-adres-salonu-we-wloclawku-na-torunska-120",
+   "utworzono": "2026-10-15T09:13:09.967Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:09.967Z"
+  },
+  "RIN-85": {
+   "etykiety": [
+    "Dla agenta",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "7db212f9-1516-4606-972e-669ac0b5e43c",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-06",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Zmienić godziny salonów w wiedzy agenta: sobota 9–15 w obu salonach",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-85/auto-tama-zmienic-godziny-salonow-w-wiedzy-agenta-sobota-9-15-w-obu",
+   "utworzono": "2026-10-15T09:13:10.316Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:10.316Z"
+  },
+  "RIN-86": {
+   "etykiety": [
+    "Dla agenta",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "21d669a7-211b-4b16-8bcf-d4648db8b353",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-06",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Skrócić godziny dzwonienia agenta: pn–pt 9–19, sobota 9–15",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-86/auto-tama-skrocic-godziny-dzwonienia-agenta-pn-pt-9-19-sobota-9-15",
+   "utworzono": "2026-10-15T09:13:10.819Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:10.819Z"
+  },
+  "RIN-87": {
+   "etykiety": [
+    "Błąd",
+    "Dla agenta",
+    "repo: rinvo"
+   ],
+   "id": "2cd6e575-2701-4ac1-9342-727cd7c7d6c2",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-06",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Błąd: agent dzwoni drugi raz po rozłączeniu w ciągu 3 sekund",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-87/auto-tama-blad-agent-dzwoni-drugi-raz-po-rozlaczeniu-w-ciagu-3-sekund",
+   "utworzono": "2026-10-15T09:13:11.140Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:11.140Z"
+  },
+  "RIN-88": {
+   "etykiety": [
+    "Błąd",
+    "Dla agenta",
+    "repo: rinvo"
+   ],
+   "id": "0d686972-b6a1-49a9-bf8e-170098e429c2",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-06",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Błąd: filtr statusu „zainteresowany” nie zawęża listy kontaktów",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-88/auto-tama-blad-filtr-statusu-zainteresowany-nie-zaweza-listy-kontaktow",
+   "utworzono": "2026-10-15T09:13:11.424Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:11.424Z"
+  },
+  "RIN-89": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Finanse"
+   ],
+   "id": "6ef53ed8-e464-406b-b94f-5467f3c6764b",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Zdecyduj: Sprawdzić naliczanie minut przy krótkich rozłączeniach i…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-89/auto-tama-zdecyduj-sprawdzic-naliczanie-minut-przy-krotkich",
+   "utworzono": "2026-10-15T09:13:11.895Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:11.895Z"
+  },
+  "RIN-90": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Finanse"
+   ],
+   "id": "6a617336-250e-4f1a-9a39-b43b5752c084",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-16",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Zdecyduj: Przekazać Michałowi korektę faktury za wrzesień na Auto…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-90/auto-tama-zdecyduj-przekazac-michalowi-korekte-faktury-za-wrzesien-na",
+   "utworzono": "2026-10-15T09:13:12.755Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:12.755Z"
+  },
+  "RIN-91": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Finanse"
+   ],
+   "id": "967538d3-7c0c-49cf-b0e3-c803e80264b0",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-11",
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Zdecyduj: Ustalić cenę SMS-ów po dwóch nieudanych próbach i podać ją…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-91/auto-tama-zdecyduj-ustalic-cene-sms-ow-po-dwoch-nieudanych-probach-i",
+   "utworzono": "2026-10-15T09:13:13.440Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:13.440Z"
+  },
+  "RIN-92": {
+   "etykiety": [
+    "Dla agenta",
+    "Zadanie",
+    "repo: rinvo-ops"
+   ],
+   "id": "1d8b31de-bd00-485d-a56d-56b609cc1c38",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[auto-tama] Przygotować jednostronicową ściągę ze znaczeniem statusów dla handlowców",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-92/auto-tama-przygotowac-jednostronicowa-sciage-ze-znaczeniem-statusow",
+   "utworzono": "2026-10-15T09:13:14.107Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:14.107Z"
+  },
+  "RIN-93": {
+   "etykiety": [
+    "Czeka na klienta",
+    "repo: rinvo-app"
+   ],
+   "id": "fa0a69c7-7228-4866-a30b-4a660ab61217",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": "2026-10-08",
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Dwie wersje wstępu rozmowy od Kasi (wybór wygra Kasia po teście Toruń/Włocławek)",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-93/auto-tama-dwie-wersje-wstepu-rozmowy-od-kasi-wybor-wygra-kasia-po",
+   "utworzono": "2026-10-15T09:13:14.408Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:14.408Z"
+  },
+  "RIN-94": {
+   "etykiety": [
+    "Czeka na klienta"
+   ],
+   "id": "3327f734-0436-4ae9-9cee-7ac68b10ab8e",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": "2026-10-12",
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Plik ze świeżymi leadami (ostatni miesiąc, strona i Facebook) od Kasi",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-94/auto-tama-plik-ze-swiezymi-leadami-ostatni-miesiac-strona-i-facebook",
+   "utworzono": "2026-10-15T09:13:14.830Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:14.830Z"
+  },
+  "RIN-95": {
+   "etykiety": [
+    "Czeka na klienta"
+   ],
+   "id": "1b69a3cc-7e6e-4718-832d-17ff9526a3b3",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Numer lub nagranie rozmowy, w której agent drugi raz zapytał o model",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-95/auto-tama-numer-lub-nagranie-rozmowy-w-ktorej-agent-drugi-raz-zapytal",
+   "utworzono": "2026-10-15T09:13:15.549Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:15.549Z"
+  },
+  "RIN-96": {
+   "etykiety": [
+    "Czeka na klienta"
+   ],
+   "id": "efe2d891-ee00-46dd-8be2-18306c34bcbd",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Numer sprawy przeglądu, który trafił do Oli jako lead sprzedażowy",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-96/auto-tama-numer-sprawy-przegladu-ktory-trafil-do-oli-jako-lead",
+   "utworzono": "2026-10-15T09:13:16.060Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:16.060Z"
+  },
+  "RIN-97": {
+   "etykiety": [
+    "Czeka na klienta",
+    "repo: rinvo-ops"
+   ],
+   "id": "17c7d13f-7cdd-40ed-a78b-409a95b6831e",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": "2026-10-15",
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Potwierdzenie od Kasi: spotkanie z Pawłem w czwartek 15 października o 10:00",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-97/auto-tama-potwierdzenie-od-kasi-spotkanie-z-pawlem-w-czwartek-15",
+   "utworzono": "2026-10-15T09:13:16.383Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:16.383Z"
+  },
+  "RIN-98": {
+   "etykiety": [
+    "Czeka na klienta"
+   ],
+   "id": "a8aca97b-6d2f-43e9-ab57-b8d35d40d34f",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Termin szkolenia dla handlowców (kwadrans, online) ustala Kasia",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-98/auto-tama-termin-szkolenia-dla-handlowcow-kwadrans-online-ustala-kasia",
+   "utworzono": "2026-10-15T09:13:16.664Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:16.664Z"
+  },
+  "RIN-99": {
+   "etykiety": [
+    "Czeka na klienta",
+    "repo: rinvo-ops"
+   ],
+   "id": "b4a5f6f3-0819-4fac-84da-132792bb6929",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Numery assistance i lista pól do agenta po godzinach (tylko do odłożenia)",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-99/auto-tama-numery-assistance-i-lista-pol-do-agenta-po-godzinach-tylko",
+   "utworzono": "2026-10-15T09:13:16.974Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T09:13:16.974Z"
+  }
+ }
+}
