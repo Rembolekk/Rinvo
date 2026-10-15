@@ -1,0 +1,106 @@
+=== przetworz.py ===
+Transkrypcja: ops/transkrypcje/motor-lux/2026-10-15-call-statusowy-motorlux.md
+Klient: motor-lux
+Start: 2026-10-15T17:17:03.520698
+
+============================================================
+=== claude --print ===
+============================================================
+
+Przeanalizowałem rozmowę z Motor-Lux. `render.py` i `daty.py` przeszły bez błędów, a wszystkie cytaty zgadzają się z transkrypcją. Karty klienta Motor-Lux jeszcze nie ma, więc zakazy numeruję od Z1, a `aktualizacje_spraw` jest puste. Niczego nie wysłałem; szkic maila czeka na zatwierdzenie.
+
+Wyniki są w `wyniki/motor-lux/2026-10-15-call-statusowy-motorlux/` (`wynik.json` i `raport.html`).
+
+- **Do zrobienia teraz (3):**
+  - Poprawka godzin jazd próbnych: w tygodniu 9–18, w sobotę 9–14, w niedzielę nigdy. Termin dziś, 15.10.
+  - Instrukcja agenta bez podawania cen i rabatów, z odesłaniem do handlowca.
+  - Korekta faktury z błędnym NIP-em, właściciel Michał.
+- **Czeka na klienta (4):**
+  - Numer rozmowy, w której agent rozłączył się w pół zdania (pewność niska).
+  - Lista modeli na jazdy próbne w Łodzi do piątku 16.10, z przypomnieniem raz; ma usunąć Ioniq 6 z oferty agenta.
+  - Spotkanie z panem Adamem, które Agnieszka umówi po miesięcznych wynikach.
+  - Piotrków, wstrzymany do decyzji pana Adama i nie wcześniej niż od listopada. Zapisałem tu zmianę zdania Agnieszki: najpierw "od razu", potem "nie podpinajcie bez niego".
+- **Backlog (1):** SMS do handlowca po potwierdzeniu jazdy próbnej, bez obiecanego terminu.
+- **Zakazy (4):**
+  - Piotrków nie jest podpinany bez pana Adama.
+  - Żadnych nowych kampanii 2–6.11.
+  - Agent nie podaje cen ani rabatów.
+  - Nie pisać bezpośrednio do Darka.
+- **Ryzyka (2):** oferta konkurenta AutoVoice (tańsza i od razu z obu salonów) oraz jakość bota.
+
+Przypomnienie o liście modeli ustawiłem na 19.10 (poniedziałek po terminie). To moje przeliczenie, opisane we wnioskach. "Od listopada" dla Piotrkowa `daty.py` oznaczył jako wniosek, bo nie umiał policzyć tej daty sam.
+Slack: wysłano (HTTP 200)
+
+Utwardzanie: {"nowy_klient": true, "maskowanie": {"liczba": 0, "rodzaje": {}}}
+
+============================================================
+=== render.py ===
+============================================================
+Komenda: python3 -I render.py wyniki/motor-lux/2026-10-15-call-statusowy-motorlux/wynik.json --transkrypcja ops/transkrypcje/motor-lux/2026-10-15-call-statusowy-motorlux.md
+
+OK: /home/runner/work/Rinvo/Rinvo/wyniki/motor-lux/2026-10-15-call-statusowy-motorlux/raport.html
+Cytaty sprawdzone z transkrypcją: tak
+  Do zrobienia teraz: 3
+  Czeka na klienta: 4
+  Backlog produktowy: 1
+  Zakazy i ograniczenia: 4
+  Ryzyka handlowe: 2
+
+============================================================
+=== daty.py ===
+============================================================
+Komenda: python3 -I daty.py wyniki/motor-lux/2026-10-15-call-statusowy-motorlux/wynik.json
+
+OK: okna_czasowe dla 7 spraw → wyniki/motor-lux/2026-10-15-call-statusowy-motorlux/wynik.json
+  agent-bez-cen-i-rabatow: 2026-10-16 – 2026-10-30; 2026-11-09 – →
+  korekta-faktury-nip: 2026-10-16 – 2026-10-30; 2026-11-09 – →
+  lista-modeli-lodz: 2026-10-16 – 2026-10-16
+  piotrkow-hyundai: 2026-11-09 – →
+  rozlaczenie-w-pol-zdania: 2026-10-16 – 2026-10-30; 2026-11-09 – →
+  spotkanie-z-panem-adamem: 2026-10-16 – 2026-10-30; 2026-11-09 – →
+  zakaz-podpiecia-piotrkowa: 2026-11-09 – →
+
+============================================================
+=== linear_sync.py ===
+============================================================
+
+============================================================
+SYNCHRONIZACJA: wyniki/motor-lux/2026-10-15-call-statusowy-motorlux/wynik.json  →  Linear [RIN]  (klient: motor-lux)
+============================================================
+
+Zespół: Rinvo demo (RIN)
+
+Etykiety:
+
+Stany: Todo / Backlog / Done / Cancelled gotowe
+
+
+  ✓ RIN-164 (godziny-jazd-probnych): [motor-lux] Uzupełnij: Błąd: agent proponuje jazdy
+  ✓ RIN-165 (agent-bez-cen-i-rabatow): [motor-lux] Zdecyduj: Instrukcja agenta: nie podaw
+  ✓ RIN-166 (korekta-faktury-nip): [motor-lux] Zdecyduj: Faktura z błędnym NIP-em: Mi
+  ✓ RIN-167 (rozlaczenie-w-pol-zdania): [motor-lux] Uzupełnij: Czekamy na numer rozmowy, w
+  ✓ RIN-168 (lista-modeli-lodz): [motor-lux] Uzupełnij: Czekamy na listę modeli na 
+  ✓ RIN-169 (spotkanie-z-panem-adamem): [motor-lux] Uzupełnij: Spotkanie Marka z panem Ada
+  ✓ RIN-170 (piotrkow-hyundai): [motor-lux] Uzupełnij: Podpięcie Piotrkowa (Hyunda
+  ✓ RIN-171 (sms-do-handlowca): [motor-lux] Zdecyduj: SMS do handlowca od razu po 
+  ✓ RIN-172 (ryzyko-autovoice): [motor-lux] Uzupełnij: Konkurent AutoVoice: tańsza
+  ✓ RIN-173 (ryzyko-jakosc-bota): [motor-lux] Uzupełnij: Jakość bota: niedziela, sta
+  + nowe zadanie notatka-motor-lux
+  ✓ RIN-174 (notatka-motor-lux): Notatka o kliencie: ryzyka i otwarte tematy
+  ✓ karta.md: ops/klienci/motor-lux/karta.md
+
+────────────────────────────────────────────────────────────
+Podsumowanie:
+  Utworzono zgłoszeń:            10
+  Zaktualizowano (komentarz):    0
+  Pominięto (ta sama rozmowa):   0
+  Zakazy → karta.json:           4
+  Aktualizacje otwartych spraw:  0
+────────────────────────────────────────────────────────────
+
+Stan Lineara zapisany do ops/.stan_linear.json (61 zgłoszeń).
+
+============================================================
+=== Slack ===
+============================================================
+Slack: wysłano (HTTP 200)

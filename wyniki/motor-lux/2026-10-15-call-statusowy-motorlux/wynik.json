@@ -1,0 +1,643 @@
+{
+  "zrodlo": "ops/transkrypcje/motor-lux/2026-10-15-call-statusowy-motorlux.md",
+  "wygenerowano": "2026-10-15",
+  "spotkanie": {
+    "tytul": "Motor-Lux × Rinvo: call po pierwszym tygodniu",
+    "data": "2026-10-15",
+    "godziny": "15:00–15:24",
+    "uczestnicy": [
+      "Agnieszka Wróbel",
+      "Marek Rewoliński"
+    ],
+    "wspominani": [
+      "pan Adam",
+      "Darek",
+      "Michał"
+    ]
+  },
+  "pozycje": [
+    {
+      "id": "T1",
+      "sekcja": 1,
+      "typ": "poprawka_bazy_wiedzy",
+      "rodzaj": "błąd",
+      "tytul": "Błąd: agent proponuje jazdy próbne w niedzielę; poprawić godziny jazd próbnych w Łodzi",
+      "opis": "Agent proponuje jazdy próbne w niedzielę, a salon w niedzielę jest zamknięty; trzy osoby przyjechały pod zamknięty salon. Poprawne godziny jazd próbnych: w tygodniu 9:00–18:00, w sobotę 9:00–14:00, niedziela nigdy. Marek uznał to za błąd w bazie wiedzy i zapowiedział poprawkę dzisiaj.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "termin_wyrazenie": "dzisiaj",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "agent proponuje jazdy próbne w niedzielę. A my w niedzielę mamy zamknięte. Trzy osoby przyjechały pod zamknięty salon.",
+        "W tygodniu dziewiąta–osiemnasta, w sobotę dziewiąta–czternasta. Niedziela nigdy.",
+        "To nasz błąd w bazie wiedzy.",
+        "Poprawię dzisiaj."
+      ],
+      "wnioski": [
+        "„W tygodniu” rozumiemy jako poniedziałek–piątek (Marek zapytał o poniedziałek–sobotę, Agnieszka podała godziny dla tygodnia i soboty).",
+        "Agent działa tylko w Łodzi, więc zmiana dotyczy salonu w Łodzi (Kia i Hyundai); Piotrków nie jest podpięty."
+      ],
+      "klucz_sprawy": "godziny-jazd-probnych",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Agent proponuje jazdy próbne w Łodzi tylko w godzinach: poniedziałek–piątek 9:00–18:00, sobota 9:00–14:00, i nigdy w niedzielę.",
+      "kryteria_akceptacji": [
+        "W bazie wiedzy godziny jazd próbnych w tygodniu to 9:00–18:00",
+        "W bazie wiedzy godziny jazd próbnych w sobotę to 9:00–14:00",
+        "W bazie wiedzy i konfiguracji nie ma jazd próbnych w niedzielę",
+        "W rozmowie testowej agent na prośbę o niedzielę nie proponuje terminu i podaje dozwolony dzień"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa: poprosić agenta o jazdę próbną w niedzielę i usłyszeć odmowę z innym terminem; zapytać o godziny w sobotę i usłyszeć „do czternastej”.",
+      "repo": "rinvo-app",
+      "termin_zrodlo": "kod",
+      "sprawdz_z_nagraniem": [
+        "9:00",
+        "18:00",
+        "14:00"
+      ],
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "T2",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Instrukcja agenta: nie podawać cen aut ani rabatów, odsyłać do handlowca",
+      "opis": "Agent podał klientowi kwotę Sportage z cennika sprzed miesiąca. Agnieszka żąda, żeby agent w ogóle nie podawał cen aut ani nie mówił o rabatach; ceny podaje tylko handlowiec. Marek zapowiedział poprawkę instrukcji (odsyłanie do handlowca).",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Wczoraj ktoś zapytał o cenę Sportage, a agent podał kwotę z cennika sprzed miesiąca.",
+        "Ceny podaje tylko handlowiec.",
+        "Agent nie podaje cen ani rabatów, odsyła do handlowca. Poprawię instrukcję."
+      ],
+      "wnioski": [
+        "Marek nie podał terminu poprawki instrukcji.",
+        "Z rozmowy nie wynika, skąd agent wziął stary cennik; jeśli jest w wiedzy agenta, trzeba go znaleźć."
+      ],
+      "klucz_sprawy": "agent-bez-cen-i-rabatow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Agent nigdy nie podaje cen aut ani nie mówi o rabatach, a na takie pytania odsyła do handlowca.",
+      "kryteria_akceptacji": [
+        "Instrukcja agenta wprost zakazuje podawania cen aut i mówienia o rabatach",
+        "Instrukcja każe odesłać pytającego do handlowca",
+        "W rozmowie testowej na pytanie o cenę Sportage agent nie podaje kwoty i odsyła do handlowca",
+        "W rozmowie testowej na pytanie o rabat agent nie podaje rabatu i odsyła do handlowca"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa: zapytać agenta o cenę Sportage i o rabat; w obu przypadkach nie pada kwota, a agent odsyła do handlowca.",
+      "repo": "rinvo-app",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "T3",
+      "sekcja": 1,
+      "typ": "finanse",
+      "rodzaj": "błąd",
+      "tytul": "Faktura z błędnym NIP-em: Michał wystawia korektę",
+      "opis": "Faktura dla Motor-Lux przyszła z błędnym NIP-em i księgowość klienta nie może jej zaksięgować. Marek przeprosił i przekaże sprawę Michałowi, który ma ją poprawić.",
+      "wlasciciel": "Michał",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Przyszła z błędnym NIP-em. Księgowość nie zaksięguje.",
+        "Przepraszam, przekażę Michałowi, poprawi."
+      ],
+      "wnioski": [
+        "W rozmowie nie padło, której faktury dotyczy błąd ani jaki jest poprawny NIP; dane trzeba wziąć z umowy i faktury.",
+        "Nie padł termin korekty ani obietnica jej wysłania, więc szkic maila jest tylko do zatwierdzenia przez człowieka."
+      ],
+      "klucz_sprawy": "korekta-faktury-nip",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Motor-Lux dostaje fakturę z poprawnym NIP-em, którą księgowość może zaksięgować.",
+      "kryteria_akceptacji": [
+        "Wystawiona jest korekta faktury z poprawnym NIP-em Motor-Lux",
+        "NIP na korekcie zgadza się z NIP-em firmy w umowie",
+        "Korekta jest gotowa do przekazania Agnieszce Wróbel (szkic maila w zgłoszeniu)"
+      ],
+      "jak_sprawdzic": "Porównać NIP na korekcie z umową Motor-Lux i potwierdzić, że Agnieszka dostała korektę.",
+      "repo": "brak",
+      "szkic_klienta": "Cześć Agnieszko,\n\nprzepraszamy za błędny NIP na fakturze. W załączeniu korekta z poprawnym NIP-em; powinna już dać się zaksięgować. Jeśli księgowość nadal zgłosi problem, daj znać.\n\nPozdrawiam\nMarek",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "rodzaj": "błąd",
+      "tytul": "Czekamy na numer rozmowy, w której agent przerwał klientowi w pół zdania i się rozłączył",
+      "opis": "Darek (handlowiec Kia) zgłosił, że w jednej rozmowie agent przerwał klientowi w pół zdania i się rozłączył, ale nie zapisał, która to była. Bez numeru rozmowy Marek jej nie znajdzie. Agnieszka da znać, jak Darek ją znajdzie.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "brak",
+      "warunek": "Darek znajdzie rozmowę, a Agnieszka przekaże numer lub nagranie",
+      "status": "czeka",
+      "cytat": [
+        "Ale nie zapisał, która to była. Jak znajdzie, dam znać.",
+        "Bez numeru nie znajdę, poczekam na ciebie."
+      ],
+      "wnioski": [
+        "Zgłoszenie jest z drugiej ręki (Darek przez Agnieszkę) i bez wskazania rozmowy, więc nie wiadomo, czego dokładnie dotyczy.",
+        "Kontakt w tej sprawie tylko przez Agnieszkę (zakaz Z4)."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "klient nie ustalił terminu ani liczby przypomnień; Agnieszka sama da znać"
+      },
+      "klucz_sprawy": "rozlaczenie-w-pol-zdania",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null,
+      "cel": "Znaleźć rozmowę, w której agent przerwał rozmówcy w pół zdania i się rozłączył, i ustalić, co poszło nie tak.",
+      "kryteria_akceptacji": [
+        "Agnieszka przekazuje numer albo nagranie tej rozmowy",
+        "Rozmowa jest odsłuchana i potwierdzone, w którym momencie agent przerwał rozmówcy i rozłączył się",
+        "Ustalenia wracają do klienta przez Agnieszkę, nie bezpośrednio do Darka"
+      ],
+      "jak_sprawdzic": "Odsłuchać wskazaną rozmowę i opisać moment przerwania oraz rozłączenia.",
+      "repo": "brak",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K2",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "rodzaj": "błąd",
+      "tytul": "Czekamy na listę modeli na jazdy próbne w Łodzi (agent proponuje Hyundaia Ioniq 6, którego salon nie ma)",
+      "opis": "Agnieszka wyśle listę modeli dostępnych na jazdy próbne w Łodzi do piątku. Agent proponuje też Hyundaia Ioniq 6, którego salon nie ma. Marek obiecał jedno przypomnienie, jeśli lista nie dotrze.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "2026-10-16",
+      "termin_wyrazenie": "Do piątku",
+      "warunek": "Agnieszka przysyła listę modeli",
+      "status": "czeka",
+      "cytat": [
+        "Wyślę ci jeszcze listę modeli, które mamy na jazdy próbne w Łodzi, bo agent proponuje też Hyundaia Ioniq 6, a my go nie mamy. Do piątku. Jak nie wyślę, przypomnij mi raz.",
+        "Dobra, do piątku, raz przypomnę."
+      ],
+      "wnioski": [
+        "„Do piątku” to 16.10 (przeliczone od daty rozmowy 15.10).",
+        "Data przypomnienia 19.10 (poniedziałek) to nasze przeliczenie: pierwszy dzień roboczy po terminie 16.10.",
+        "Usunięcie Ioniq 6 z oferty agenta czeka na listę; Marek nie zobowiązał się usunąć go wcześniej."
+      ],
+      "przypomnienie": {
+        "data": "2026-10-19",
+        "limit": "1 raz",
+        "uwagi": "Agnieszka: „przypomnij mi raz”. Przypomnienie tylko wtedy, gdy lista nie przyjdzie do piątku."
+      },
+      "klucz_sprawy": "lista-modeli-lodz",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Po otrzymaniu listy modeli agent proponuje na jazdy próbne w Łodzi tylko modele, które salon faktycznie ma, bez Hyundaia Ioniq 6.",
+      "kryteria_akceptacji": [
+        "Agnieszka przysyła listę modeli na jazdy próbne w Łodzi do piątku 16.10",
+        "Baza wiedzy agenta zawiera tylko modele z tej listy",
+        "W rozmowie testowej agent nie proponuje Hyundaia Ioniq 6"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa: zapytać agenta o dostępne modele na jazdę próbną w Łodzi i potwierdzić, że lista zgadza się z listą klienta, bez Ioniq 6.",
+      "repo": "rinvo-app",
+      "szkic_klienta": "Cześć Agnieszko,\n\nprzypominam o liście modeli, które macie na jazdy próbne w Łodzi. Uzgodniliśmy piątek; po otrzymaniu listy usuniemy z oferty agenta modele, których salon nie ma (np. Hyundaia Ioniq 6). Czy możesz ją przesłać?\n\nDziękuję\nMarek",
+      "termin_zrodlo": "kod",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K3",
+      "sekcja": 2,
+      "typ": "spotkanie",
+      "tytul": "Spotkanie Marka z panem Adamem: Agnieszka umówi po wynikach z Łodzi za miesiąc",
+      "opis": "Marek poprosił o rozmowę z panem Adamem (dyrektor salonów). Agnieszka odmówiła na teraz; umówi spotkanie, gdy będą wyniki za miesiąc. Do tego czasu Marek czeka na jej sygnał.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "brak",
+      "warunek": "Są wyniki agenta z Łodzi za miesiąc, a Agnieszka umawia spotkanie",
+      "status": "czeka",
+      "cytat": [
+        "Nie teraz. Jak będą wyniki za miesiąc, umówię was.",
+        "Dobrze, czekam na ciebie."
+      ],
+      "wnioski": [
+        "Spotkanie jest naturalną okazją do odpowiedzi na ofertę AutoVoice (R1).",
+        "„Za miesiąc” nie ma konkretnej daty; agent działa od tygodnia, więc wyniki miesięczne to ok. połowa listopada."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "klient nie ustalił terminu; Agnieszka sama umówi spotkanie po wynikach"
+      },
+      "klucz_sprawy": "spotkanie-z-panem-adamem",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Marek rozmawia z panem Adamem po miesięcznych wynikach agenta w Łodzi, z umówieniem przez Agnieszkę.",
+      "kryteria_akceptacji": [
+        "Agnieszka umawia spotkanie Marka z panem Adamem po wynikach z Łodzi za miesiąc",
+        "Marek nie kontaktuje się z panem Adamem w międzyczasie z pominięciem Agnieszki"
+      ],
+      "jak_sprawdzic": "Sprawdzić, czy jest zaproszenie na spotkanie z panem Adamem po wynikach miesięcznych.",
+      "repo": "rinvo-ops",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K4",
+      "sekcja": 2,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Podpięcie Piotrkowa (Hyundai) czeka na decyzję pana Adama, nie wcześniej niż od listopada",
+      "opis": "Agnieszka najpierw poprosiła o podpięcie Piotrkowa od razu, ale zaraz się wycofała: pan Adam chce najpierw zobaczyć wyniki z Łodzi za cały miesiąc. Piotrków najwcześniej od listopada, i tylko jeśli pan Adam zdecyduje. Do tego czasu Piotrków stoi.",
+      "wlasciciel": "pan Adam",
+      "termin": "brak",
+      "warunek": "Pan Adam zobaczył wyniki z Łodzi za cały miesiąc i zdecydował; nie wcześniej niż listopad",
+      "status": "czeka",
+      "cytat": [
+        "Albo czekaj. Nie. Pan Adam chciał najpierw zobaczyć wyniki z Łodzi za cały miesiąc. Piotrków dopiero od listopada, i to jak on powie. Nie podpinajcie bez niego.",
+        "Czyli Piotrków stoi, aż pan Adam zdecyduje."
+      ],
+      "wnioski": [
+        "„Od listopada” rozumiemy jako 1.11; blokada nowych kampanii 2–6.11 (premiera modelu) może przesunąć realne uruchomienie, jeśli podpięcie Piotrkowa uznać za nową kampanię."
+      ],
+      "zmiana_zdania": "Najpierw prośba o podpięcie Piotrkowa od razu, potem wycofanie: czekamy na decyzję pana Adama, nie wcześniej niż od listopada.",
+      "klucz_sprawy": "piotrkow-hyundai",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Piotrków (Hyundai) zostaje podpięty do agenta dopiero po decyzji pana Adama, nie wcześniej niż w listopadzie.",
+      "kryteria_akceptacji": [
+        "Piotrków nie jest podpięty przed decyzją pana Adama",
+        "Podpięcie nie następuje przed listopadem",
+        "Decyzja pana Adama jest przekazana przez Agnieszkę po wynikach z Łodzi za cały miesiąc"
+      ],
+      "jak_sprawdzic": "Sprawdzić, że w konfiguracji nie ma Piotrkowa i że jest potwierdzenie decyzji pana Adama przed podpięciem.",
+      "repo": "rinvo-app",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "B1",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "SMS do handlowca od razu po potwierdzeniu jazdy próbnej przez agenta",
+      "opis": "Handlowiec dostaje dziś maila po potwierdzeniu jazdy próbnej i czyta go wieczorem. Agnieszka chce SMS-a od razu po potwierdzeniu. Takiej funkcji nie ma; Marek zapisał prośbę (inni dealerzy też pytają o szybsze powiadomienia) i nie podał terminu.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "Chciałabym, żeby handlowiec dostawał SMS, jak tylko agent potwierdzi jazdę próbną. Teraz dostaje maila i czyta go wieczorem.",
+        "Takiej funkcji nie ma. Zapisuję, inni dealerzy też pytają o szybsze powiadomienia. Terminu nie podam."
+      ],
+      "wnioski": [
+        "SMS wysyłałby system do handlowca; zakaz Z4 dotyczy naszej korespondencji z Darkiem, nie automatycznych powiadomień, ale warto to potwierdzić z Agnieszką przy planowaniu."
+      ],
+      "klucz_sprawy": "sms-do-handlowca",
+      "klucz_funkcji": "sms-do-handlowca-po-potwierdzeniu",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Handlowiec dostaje SMS od razu po tym, jak agent potwierdzi jazdę próbną, zamiast maila czytanego wieczorem.",
+      "kryteria_akceptacji": [
+        "Po potwierdzeniu jazdy próbnej przez agenta handlowiec dostaje SMS",
+        "SMS dociera od razu, a nie dopiero wieczorem jak dotychczasowy mail"
+      ],
+      "jak_sprawdzic": "Potwierdzić jazdę próbną w rozmowie testowej i sprawdzić, że handlowiec dostaje SMS zaraz po potwierdzeniu.",
+      "repo": "rinvo",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z1",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie podpinać Piotrkowa bez pana Adama; nie wcześniej niż od listopada",
+      "opis": "Piotrków (Hyundai) nie jest podpinany, dopóki pan Adam nie zobaczy wyników z Łodzi za cały miesiąc i nie zdecyduje. Najwcześniej od listopada. Decyzję przekazuje Agnieszka.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "brak",
+      "warunek": "decyzja pana Adama po wynikach z Łodzi za cały miesiąc; nie wcześniej niż od listopada",
+      "status": "nigdy",
+      "cytat": [
+        "Piotrków dopiero od listopada, i to jak on powie. Nie podpinajcie bez niego."
+      ],
+      "klucz_sprawy": "zakaz-podpiecia-piotrkowa",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z2",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Żadnych nowych kampanii od 2 do 6 listopada (premiera nowego modelu)",
+      "opis": "W dniach premiery nowego modelu handlowcy będą zajęci na sali, więc w tym czasie nie uruchamiamy nowych kampanii.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "2026-11-06",
+      "termin_wyrazenie": "od drugiego do szóstego listopada",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "od drugiego do szóstego listopada mamy premierę nowego modelu. Handlowcy będą zajęci na sali. W tym tygodniu nie puszczajcie nowych kampanii.",
+        "Od drugiego do szóstego listopada żadnych nowych kampanii."
+      ],
+      "wnioski": [
+        "„W tym tygodniu” odnosi się do tygodnia premiery, czyli 2–6.11, a nie do bieżącego tygodnia rozmowy."
+      ],
+      "klucz_sprawy": "zakaz-nowych-kampanii-premiera",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "termin_zrodlo": "kod",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z3",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Agent nie podaje cen aut ani nie mówi o rabatach; ceny podaje tylko handlowiec",
+      "opis": "Agent nie podaje cen ani rabatów. Na takie pytania odsyła do handlowca.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "agent nie może podawać cen aut ani mówić o rabatach."
+      ],
+      "klucz_sprawy": "zakaz-cen-i-rabatow",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null,
+      "niepewnosc_slowa": [
+        "może"
+      ],
+      "flagi": [
+        "nowy_klient",
+        "niepewne"
+      ]
+    },
+    {
+      "id": "Z4",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie pisać bezpośrednio do Darka; cała komunikacja przez Agnieszkę",
+      "opis": "Darek (handlowiec Kia) jest na sali i nie czyta maili. Wszystko w jego sprawach idzie przez Agnieszkę.",
+      "wlasciciel": "Agnieszka Wróbel",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "I do Darka nie piszcie bezpośrednio, wszystko przeze mnie."
+      ],
+      "klucz_sprawy": "zakaz-pisania-do-darka",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "R1",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Konkurent AutoVoice: tańsza oferta od razu z obu salonów; pan Adam pyta",
+      "opis": "Pan Adam (decyduje o kosztach i o Piotrkowie) dostał ofertę od AutoVoice: tańszą i od razu z obu salonów. Nie mówi, że zmienia dostawcę, ale pyta. Rinvo działa dziś tylko w Łodzi, a Piotrków jest wstrzymany do decyzji pana Adama. Marek nie ma jeszcze dostępu do pana Adama.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "pan Adam dostał ofertę od AutoVoice. Tańsza i od razu z obu salonów. Nie mówi, że zmienia, ale pyta."
+      ],
+      "wnioski": [
+        "Ofertę widziała tylko Agnieszka z relacji pana Adama; nie znamy ceny ani zakresu AutoVoice.",
+        "Argument na rozmowę z Adamem: w pierwszym tygodniu agent potwierdził 38 terminów na 60 zgłoszeń (relacja Agnieszki); spotkanie z panem Adamem po miesięcznych wynikach to K3."
+      ],
+      "klucz_sprawy": "ryzyko-autovoice",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "temat_ryzyka": "konkurencja",
+      "zadanie_przygotowawcze": {
+        "cel": "Przygotować notatkę na spotkanie z panem Adamem o ofercie konkurenta AutoVoice: tańsza i od razu z obu salonów.",
+        "kryteria_akceptacji": [
+          "Notatka streszcza ryzyko własnymi słowami i zawiera dosłowny cytat z rozmowy 15.10 o AutoVoice",
+          "Notatka wymienia niewiadome: cena i zakres oferty AutoVoice oraz czy pan Adam rozważa zmianę",
+          "Notatka zawiera nasze argumenty z faktów z rozmowy: 38 potwierdzonych terminów na 60 zgłoszeń w pierwszym tygodniu w Łodzi",
+          "Notatka uwzględnia, że Piotrków czeka na decyzję pana Adama i nie obiecujemy terminu podpięcia",
+          "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+        ],
+        "jak_sprawdzic": "Przeczytać notatkę przed spotkaniem: kryteria są spełnione, a cytaty zgadzają się ze źródłem.",
+        "repo": "rinvo-ops"
+      },
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "R2",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Jakość bota: niedziela, stara cena, rozłączenie w pół zdania",
+      "opis": "W pierwszym tygodniu agent proponował jazdy w niedzielę (trzy osoby pod zamkniętym salonem), podał kwotę z cennika sprzed miesiąca i według Darka rozłączył się w trakcie zdania rozmówcy. To słaby moment przy pytaniach pana Adama o ofertę konkurenta.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Trzy osoby przyjechały pod zamknięty salon.",
+        "agent podał kwotę z cennika sprzed miesiąca."
+      ],
+      "wnioski": [
+        "Powiązane z T1, T2 i K1. Agnieszka ogólnie oceniła pierwszy tydzień jako dobry („Dobrze”)."
+      ],
+      "klucz_sprawy": "ryzyko-jakosc-bota",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "temat_ryzyka": "jakosc_bota",
+      "flagi": [
+        "nowy_klient"
+      ]
+    }
+  ],
+  "aktualizacje_spraw": [],
+  "zmiany_zdania": [
+    {
+      "temat": "Podpięcie Piotrkowa (Hyundai)",
+      "przed": "Podpiąć Piotrków od razu, tak samo jak Łódź.",
+      "po": "Piotrków czeka na decyzję pana Adama, najwcześniej od listopada; bez niego nie podpinać.",
+      "pozycja": "K4",
+      "cytat": "Albo czekaj. Nie. Pan Adam chciał najpierw zobaczyć wyniki z Łodzi za cały miesiąc."
+    }
+  ],
+  "konflikty_dat": [],
+  "fakty_czasowe": [
+    {
+      "typ": "blokada",
+      "od": "2026-11-02",
+      "do": "2026-11-06",
+      "dotyczy": "wszystko_nowe",
+      "cytat": "od drugiego do szóstego listopada mamy premierę nowego modelu. Handlowcy będą zajęci na sali. W tym tygodniu nie puszczajcie nowych kampanii.",
+      "wyrazenie": "od drugiego do szóstego listopada",
+      "zrodlo_daty": "kod"
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": "2026-10-15",
+      "dotyczy": "godziny-jazd-probnych",
+      "cytat": "Poprawię dzisiaj.",
+      "wyrazenie": "dzisiaj",
+      "zrodlo_daty": "kod"
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-16",
+      "do": "2026-10-16",
+      "dotyczy": "lista-modeli-lodz",
+      "cytat": "Do piątku. Jak nie wyślę, przypomnij mi raz.",
+      "wyrazenie": "Do piątku",
+      "zrodlo_daty": "kod"
+    },
+    {
+      "typ": "start_nie_wczesniej",
+      "od": "2026-11-01",
+      "do": null,
+      "dotyczy": "piotrkow-hyundai",
+      "cytat": "Piotrków dopiero od listopada, i to jak on powie.",
+      "wyrazenie": "od listopada",
+      "zrodlo_daty": "wniosek"
+    },
+    {
+      "typ": "start_nie_wczesniej",
+      "od": "2026-11-01",
+      "do": null,
+      "dotyczy": "zakaz-podpiecia-piotrkowa",
+      "cytat": "Piotrków dopiero od listopada, i to jak on powie.",
+      "wyrazenie": "od listopada",
+      "zrodlo_daty": "wniosek"
+    }
+  ],
+  "okna_czasowe": [
+    {
+      "klucz_sprawy": "agent-bez-cen-i-rabatow",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-30"
+        },
+        {
+          "od": "2026-11-09",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "korekta-faktury-nip",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-30"
+        },
+        {
+          "od": "2026-11-09",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "lista-modeli-lodz",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-16"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "piotrkow-hyundai",
+      "okna": [
+        {
+          "od": "2026-11-09",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "rozlaczenie-w-pol-zdania",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-30"
+        },
+        {
+          "od": "2026-11-09",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "spotkanie-z-panem-adamem",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-30"
+        },
+        {
+          "od": "2026-11-09",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "zakaz-podpiecia-piotrkowa",
+      "okna": [
+        {
+          "od": "2026-11-09",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    }
+  ],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [
+      "Prośba „Podepnijcie od razu Piotrków” i odpowiedź Marka „Dobra, przygotuję” zastąpione ostatnią wersją (Piotrków czeka na pana Adama, od listopada): zapisane w zmianach zdania i w K4.",
+      "Przekazanie faktury Michałowi i sama korekta scalone w jedną pozycję T3.",
+      "Sprawa Ioniq 6 scalona z listą modeli (K2): usunięcie modelu zależy od listy."
+    ],
+    "pominiete": [
+      "Pytanie Marka o jazdy próbne od poniedziałku do soboty to doprecyzowanie, nie zmiana zdania.",
+      "Wynik pierwszego tygodnia (38 potwierdzonych terminów na 60 zgłoszeń) to liczba kontekstowa, użyta tylko w R1.",
+      "„Przypomnij mi raz” zapisane w przypomnieniu.limit (K2), a nie jako osobny zakaz.",
+      "Karta klienta Motor-Lux nie istnieje, więc brak zakazów i otwartych spraw; aktualizacje_spraw jest puste, a numeracja zakazów zaczyna się od Z1.",
+      "W prosby.json nie ma pasującej funkcji (SMS do klienta po nieudanych próbach to inna rzecz); klucz funkcji w B1 jest nowy."
+    ]
+  },
+  "szkic_maila": "Cześć Agnieszko,\n\ndziękuję za dzisiejszą rozmowę. Podsumowuję, co ustaliliśmy:\n\n- Godziny jazd próbnych w Łodzi poprawiamy dzisiaj: w tygodniu 9:00–18:00, w sobotę 9:00–14:00, w niedzielę nigdy.\n- Agent nie będzie podawał cen aut ani rabatów; będzie odsyłał do handlowca. Poprawiamy instrukcję.\n- Piotrków (Hyundai) zostaje niepodpięty, dopóki pan Adam nie zobaczy wyników z Łodzi za cały miesiąc i nie zdecyduje; nie wcześniej niż od listopada.\n- Od 2 do 6 listopada nie uruchamiamy żadnych nowych kampanii (premiera nowego modelu).\n- Do Darka nie piszemy bezpośrednio, wszystko idzie przez Ciebie.\n- Czekamy na Twoją listę modeli na jazdy próbne w Łodzi do piątku (agent proponuje Hyundaia Ioniq 6, którego nie macie). Jeśli lista nie dotrze, przypomnimy raz.\n- Czekamy na numer rozmowy, w której agent przerwał klientowi w pół zdania i się rozłączył, jak Darek ją znajdzie.\n- SMS do handlowca po potwierdzeniu jazdy próbnej: takiej funkcji dziś nie ma. Zapisaliśmy prośbę, ale nie podajemy terminu.\n- Fakturę z błędnym NIP-em przekazałem Michałowi do poprawy.\n- Spotkanie z panem Adamem: czekam na Twój sygnał, gdy będą wyniki za miesiąc.\n\nPozdrawiam\nMarek",
+  "ostrzezenia_dat": [],
+  "kontrola": {
+    "nowy_klient": true,
+    "maskowanie": {
+      "liczba": 0,
+      "rodzaje": {}
+    }
+  }
+}

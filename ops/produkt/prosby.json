@@ -119,5 +119,16 @@
         "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
       }
     ]
+  },
+  "sms-do-handlowca-po-potwierdzeniu": {
+    "tytul": "SMS do handlowca od razu po potwierdzeniu jazdy próbnej przez agenta",
+    "prosby": [
+      {
+        "klient": "motor-lux",
+        "cytat": "Chciałabym, żeby handlowiec dostawał SMS, jak tylko agent potwierdzi jazdę próbną. Teraz dostaje maila i czyta go wieczorem.",
+        "data": "2026-10-15",
+        "zrodlo": "ops/transkrypcje/motor-lux/2026-10-15-call-statusowy-motorlux.md"
+      }
+    ]
   }
 }

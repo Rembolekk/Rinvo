@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T17:05:56+00:00",
+ "zapisano": "2026-10-15T17:20:59+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -830,6 +830,191 @@
    "utworzono": "2026-10-15T14:48:27.932Z",
    "zamknieto": null,
    "zmieniono": "2026-10-15T14:48:27.932Z"
+  },
+  "RIN-164": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "bc013298-4b35-492c-943f-1b0baacda880",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-15",
+   "typ_stanu": "unstarted",
+   "tytul": "[motor-lux] Uzupełnij: Błąd: agent proponuje jazdy próbne w niedzielę; poprawić…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-164/motor-lux-uzupelnij-blad-agent-proponuje-jazdy-probne-w-niedziele",
+   "utworzono": "2026-10-15T17:20:54.407Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:54.407Z"
+  },
+  "RIN-165": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "2f8e2ef4-944d-4c97-b00f-46e63ffecf91",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[motor-lux] Zdecyduj: Instrukcja agenta: nie podawać cen aut ani rabatów…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-165/motor-lux-zdecyduj-instrukcja-agenta-nie-podawac-cen-aut-ani-rabatow",
+   "utworzono": "2026-10-15T17:20:55.107Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:55.107Z"
+  },
+  "RIN-166": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Finanse"
+   ],
+   "id": "ae1aa1cb-1550-48e5-8a8a-a642c10fd2a5",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[motor-lux] Zdecyduj: Faktura z błędnym NIP-em: Michał wystawia korektę",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-166/motor-lux-zdecyduj-faktura-z-blednym-nip-em-michal-wystawia-korekte",
+   "utworzono": "2026-10-15T17:20:55.646Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:55.646Z"
+  },
+  "RIN-167": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji"
+   ],
+   "id": "2198b517-22e1-4d62-a222-92987a638e2d",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[motor-lux] Uzupełnij: Czekamy na numer rozmowy, w której agent przerwał…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-167/motor-lux-uzupelnij-czekamy-na-numer-rozmowy-w-ktorej-agent-przerwal",
+   "utworzono": "2026-10-15T17:20:56.262Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:56.262Z"
+  },
+  "RIN-168": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji",
+    "repo: rinvo-app"
+   ],
+   "id": "3d6e291a-51e5-4c16-bca8-c0c576e0f670",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": "2026-10-16",
+   "typ_stanu": "backlog",
+   "tytul": "[motor-lux] Uzupełnij: Czekamy na listę modeli na jazdy próbne w Łodzi (agent…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-168/motor-lux-uzupelnij-czekamy-na-liste-modeli-na-jazdy-probne-w-lodzi",
+   "utworzono": "2026-10-15T17:20:56.573Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:56.573Z"
+  },
+  "RIN-169": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji",
+    "repo: rinvo-ops"
+   ],
+   "id": "0b328bc1-5d5b-4b9c-a37c-ddb23cb079f9",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[motor-lux] Uzupełnij: Spotkanie Marka z panem Adamem: Agnieszka umówi po…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-169/motor-lux-uzupelnij-spotkanie-marka-z-panem-adamem-agnieszka-umowi-po",
+   "utworzono": "2026-10-15T17:20:56.921Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:56.921Z"
+  },
+  "RIN-170": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji",
+    "repo: rinvo-app"
+   ],
+   "id": "831595ba-9d97-4353-9e9c-a829e05f51b5",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[motor-lux] Uzupełnij: Podpięcie Piotrkowa (Hyundai) czeka na decyzję pana Adama…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-170/motor-lux-uzupelnij-podpiecie-piotrkowa-hyundai-czeka-na-decyzje-pana",
+   "utworzono": "2026-10-15T17:20:57.260Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:57.260Z"
+  },
+  "RIN-171": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Produkt",
+    "repo: rinvo"
+   ],
+   "id": "fd83a1fe-f0fe-4061-9899-82c6f979a28d",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[motor-lux] Zdecyduj: SMS do handlowca od razu po potwierdzeniu jazdy próbnej…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-171/motor-lux-zdecyduj-sms-do-handlowca-od-razu-po-potwierdzeniu-jazdy",
+   "utworzono": "2026-10-15T17:20:57.594Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:57.594Z"
+  },
+  "RIN-172": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Ryzyko"
+   ],
+   "id": "8c984922-3ebb-4fce-87d8-ef4b641e40ce",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[motor-lux] Uzupełnij: Konkurent AutoVoice: tańsza oferta od razu z obu salonów…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-172/motor-lux-uzupelnij-konkurent-autovoice-tansza-oferta-od-razu-z-obu",
+   "utworzono": "2026-10-15T17:20:58.088Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:58.088Z"
+  },
+  "RIN-173": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Ryzyko"
+   ],
+   "id": "7ca5d1b9-e87f-45ee-983a-87f6fc747d53",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[motor-lux] Uzupełnij: Jakość bota: niedziela, stara cena, rozłączenie w pół zdania",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-173/motor-lux-uzupelnij-jakosc-bota-niedziela-stara-cena-rozlaczenie-w-pol",
+   "utworzono": "2026-10-15T17:20:58.379Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:58.379Z"
+  },
+  "RIN-174": {
+   "etykiety": [
+    "Dla agenta",
+    "Zadanie"
+   ],
+   "id": "fb62f2c4-1f55-4677-9547-d7071171c7f9",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[motor-lux] Notatka o kliencie: ryzyka i otwarte tematy",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-174/motor-lux-notatka-o-kliencie-ryzyka-i-otwarte-tematy",
+   "utworzono": "2026-10-15T17:20:58.761Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T17:20:58.761Z"
   }
  }
 }
