@@ -51,7 +51,7 @@ def zgloszenie(numer=41, tytul="Toruń podaje sobotę do 14:00 zamiast do 15:00"
 
 class AtrapaLinear:
     def __init__(self, zgloszenia=()):
-        self.zgloszenia, self.zdarzenia = list(zgloszenia), []
+        self.zgloszenia, self.zdarzenia, self.utworzone = list(zgloszenia), [], []
 
     def kandydaci(self):
         return copy.deepcopy(self.zgloszenia)
@@ -78,6 +78,12 @@ class AtrapaLinear:
 
     def zgloszenie_po_numerze(self, numer):
         return next((copy.deepcopy(z) for z in self.zgloszenia if z["identifier"] == f"RIN-{numer}"), None)
+
+    def utworz(self, tytul, opis, etykiety, stan="Todo", priorytet=None):
+        z = {"id": f"nowe-{len(self.utworzone)}", "identifier": f"RIN-{900 + len(self.utworzone)}", "url": f"https://linear.app/ws/issue/RIN-{900 + len(self.utworzone)}/x",
+             "title": tytul, "description": opis, "labels": list(etykiety), "state": stan}
+        self.utworzone.append(z)
+        return dict(z)
 
     def typy(self, rodzaj):
         return [z[1:] for z in self.zdarzenia if z[0] == rodzaj]
@@ -158,6 +164,17 @@ class AtrapaGitHub:
 
     def pr(self, numer):
         return next(p for p in self.prs if p["number"] == numer)
+
+    def zaktualizuj_pr(self, numer, opis=None, tytul=None):
+        self.opisy = getattr(self, "opisy", [])
+        self.opisy.append((numer, opis))
+        for p in self.prs:
+            if p["number"] == numer and opis is not None:
+                p["body"] = opis
+
+    def odpowiedz_inline(self, numer, komentarz_id, tekst):
+        self.odpowiedzi = getattr(self, "odpowiedzi", [])
+        self.odpowiedzi.append((numer, komentarz_id, tekst))
 
     def aktualizuj_galaz(self, numer):
         if self.blad_aktualizacji:

@@ -84,6 +84,15 @@ class GitHub:
     def utworz_pr(self, tytul, galaz, opis, baza="main"):
         return self._zapytaj("POST", "/pulls", {"title": tytul, "head": galaz, "base": baza, "body": opis})
 
+    def zaktualizuj_pr(self, numer, opis=None, tytul=None):
+        """Zmienia opis (i/lub tytuł) PR."""
+        dane = {k: v for k, v in (("body", opis), ("title", tytul)) if v is not None}
+        return self._zapytaj("PATCH", f"/pulls/{numer}", dane)
+
+    def odpowiedz_inline(self, numer, komentarz_id, tekst):
+        """Odpowiedź w wątku komentarza inline (np. recenzji CodeRabbit)."""
+        return self._zapytaj("POST", f"/pulls/{numer}/comments/{komentarz_id}/replies", {"body": podpisz_agenta(tekst)})
+
     def aktualizuj_galaz(self, numer):
         """Wciela main do gałęzi PR (GitHub: update-branch). Nowy commit uruchamia testy i CodeRabbit od nowa."""
         return self._zapytaj("PUT", f"/pulls/{numer}/update-branch", {})
@@ -163,7 +172,7 @@ def ostatnia_recenzja_coderabbit(recenzje, komentarze_inline):
     if r.get("state") == "APPROVED":
         uwagi = 0
     return {"commit": r.get("commit_id"), "uwagi": uwagi,
-            "komentarze": [{"sciezka": c.get("path"), "linia": c.get("line"), "tresc": c.get("body", "")} for c in inline]}
+            "komentarze": [{"id": c.get("id"), "sciezka": c.get("path"), "linia": c.get("line"), "tresc": c.get("body", "")} for c in inline]}
 
 
 POMINIECIE_CODERABBIT = ("review skipped", "review failed", "rate limit", "review paused", "reviews paused")

@@ -264,7 +264,28 @@
       "config/{klient}.yaml",
       "wiedza/{klient}.md"
     ],
-    "_pliki_klienta": "Pliki, które agent może zmienić dla klienta: zadanie nie rusza, gdy któryś z nich ma otwarty PR innego zadania (czeka na scalenie)."
+    "_pliki_klienta": "Pliki, które agent może zmienić dla klienta: zadanie nie rusza, gdy któryś z nich ma otwarty PR innego zadania (czeka na scalenie).",
+    "kryteria_poza_plikami": [
+      "rozmowie testowej",
+      "rozmowa testowa",
+      "rozmowy testowej",
+      "testowej rozmowie",
+      "wiadomość do klient",
+      "wiadomość, że",
+      "dostaje wiadomość",
+      "dostaje maila",
+      "dostaje mail",
+      "wysłan",
+      "kontakt z klient",
+      "klient dostaje",
+      "klientka dostaje",
+      "po wdrożeniu",
+      "nagrani",
+      "ręcznie",
+      "zatwierdz",
+      "potwierdz"
+    ],
+    "_kryteria_poza_plikami": "Kryterium zawierające któryś z tych fragmentów wymaga działania poza plikami (rozmowa testowa, kontakt z klientem…): w opisie PR trafia do sekcji „Sprawdzenie po wdrożeniu” bez pola do odhaczenia, a po scaleniu agent zakłada z niego krótkie zgłoszenie. Pozostałe kryteria agent odhacza dopiero po sprawdzeniu w plikach (dosłowny dowód)."
   },
   "tematy_konfiguracji": {
     "_opis": "Zakazy dotyczące tej samej części konfiguracji co zgłoszenie idą na górę sekcji „Czego nie ruszać”. Temat jest aktywny, gdy w tytule, celu, opisie lub kryteriach zgłoszenia występuje któreś ze słów z „zgloszenie”; zakaz jest powiązany, gdy w jego tytule występuje słowo z „zakaz”.",

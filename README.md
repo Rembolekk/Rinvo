@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_kryteria_pr.py` | kryteria w opisie PR (odhaczone z dowodem / sekcja po wdrożeniu), prawdziwy komentarz po uwagach CodeRabbit, poprawa opisu istniejącego PR, zgłoszenie po scaleniu: 18 testów |
 | `testy/test_potwierdzenie_pora.py` | potwierdzenie karty i zwolnienie spraw o każdej porze i w każdy dzień (po 18:00, niedziela, święto); okno 8–18 blokuje tylko maile: 7 testów |
 | `testy/test_nowy_klient.py` | nowy klient (jedno zgłoszenie do potwierdzenia karty, wstrzymanie, zwolnienie), „dziś” bez produktu i wstrzymanych, zgodność strony z widokiem: 21 testów |
 | `testy/test_strona_glowna.py` | układ index.html i Głosu klientów, liczba zgodna z widokiem „Dla mnie dziś”, czas od wpłynięcia, nazwy klientów z karty: 21 testów |
@@ -330,6 +331,14 @@ Agent sam wykonuje zgłoszenia z Lineara w osobnym repozytorium [Rinvo-app](http
 
 **Workflow** `Agent wykonawczy` (`agent.yml`): ręcznie (zawsze), co 15 minut i po każdym udanym przetworzeniu rozmowy lub maila (te dwa dopiero po ustawieniu zmiennej repozytorium `AGENT_WLACZONY=true`). Sekret `AGENT_GITHUB_TOKEN` (dostęp tylko do Rinvo-app) istnieje wyłącznie w sekretach GitHuba; agent nie działa lokalnie. Testy logiki bez sieci: `python3 testy/test_agent.py`.
 
+
+**Kryteria w opisie PR (`kryteria_pr.py`):** kryteria sprawdzalne w plikach agent odhacza dopiero po sprawdzeniu (model ocenia, ale kod wymaga dosłownego dowodu, który stoi w pliku;
+bez dowodu kryterium zostaje nieodhaczone). Kryteria wymagające działania poza plikami (rozmowa testowa, kontakt z klientem; lista fragmentów w
+`ops/zasady.json` → `agent_wykonawczy.kryteria_poza_plikami`) trafiają do osobnej sekcji **„Sprawdzenie po wdrożeniu”** bez pól do odhaczenia. Po scaleniu agent zakłada z tej sekcji
+krótkie zgłoszenie „Po wdrożeniu: …” (Do weryfikacji). Komentarz po uwagach CodeRabbit mówi prawdę: które pliki zmienił (z gita) albo że nie zmienił żadnych, oraz decyzję o każdej
+uwadze (uwzględniona, dotyczy sprawdzenia po wdrożeniu i została przeniesiona do tej sekcji, nietrafna: z powodem); bez nowego commita agent odpowiada w wątku CodeRabbit i prosi o ponowną
+recenzję (`@coderabbitai review`). PR ze starym opisem (pola do odhaczenia, brak sekcji), na który CodeRabbit zgłosił uwagi, agent poprawia raz, bez dotykania plików.
+Testy: `python3 testy/test_kryteria_pr.py`.
 
 **Stan już zgodny:** gdy agent nie wprowadza zmian, kod sprawdza kryteria akceptacji na obecnym `config/` i `wiedza/` (model ocenia, ale musi podać dosłowne cytaty z plików, weryfikowane kodem; kryteria spoza plików, np. wiadomość do klienta, są pomijane i wymienione w komentarzu). Gdy są spełnione: komentarz „Agent: stan już zgodny z oczekiwaniem” z cytatami, Done, bez PR. Oddanie człowiekowi tylko przy niespełnionych kryteriach albo gdy nie da się ich sprawdzić.
 

@@ -220,13 +220,17 @@ def cytaty_klienta(sekcje, limit=3):
     return [l[2:].strip() for l in sekcje.get("Kontekst", "").splitlines() if l.startswith("> ")][:limit]
 
 
-def buduj_opis_pr(zg, sekcje):
-    kryteria = [l for l in sekcje.get("Kryteria akceptacji", "").splitlines() if l.strip().startswith("- [")]
+def buduj_opis_pr(zg, sekcje, klasyfikacja=None):
+    """Opis PR. klasyfikacja (kryteria_pr.klasyfikuj): kryteria sprawdzone w plikach są odhaczone z dowodem, kryteria wymagające działania poza
+    plikami (rozmowa testowa, kontakt z klientem) są w sekcji „Sprawdzenie po wdrożeniu” bez pól do odhaczenia. Bez klasyfikacji: lista bez odhaczeń."""
+    import kryteria_pr
+    if klasyfikacja is None:
+        klasyfikacja = [{"tekst": k, "rodzaj": "plik", "dowod": None} for k in kryteria_pr.kryteria_z_tekstu(sekcje.get("Kryteria akceptacji", ""))]
     cytaty = cytaty_klienta(sekcje)
     return "\n\n".join([
         f"Fixes {zg['identifier']}",
         f"## Cel\n\n{sekcje.get('Cel', tytul_bez_prefiksu(zg.get('title')))}",
-        "## Kryteria akceptacji\n\n" + ("\n".join(kryteria) or "_brak_"),
+        kryteria_pr.sekcje_opisu(klasyfikacja) if klasyfikacja else "## Kryteria akceptacji\n\n_brak_",
         "## Cytat klienta\n\n" + ("\n".join(f"> {c}" for c in cytaty) or "_brak_"),
         "## Czego nie ruszać\n\n" + (sekcje.get("Czego nie ruszać") or "_brak_"),
         f"Zgłoszenie: {zg.get('url', zg['identifier'])}\n\n_Zmianę przygotował agent wykonawczy; scala ją agent_scal.py "
@@ -390,7 +394,14 @@ def obsluz_zgloszenie(s, zg):
         # 4) PR
         s.git.commit_push(katalog, f"{tytul_bez_prefiksu(zg.get('title'))} ({zg['identifier']})\n\nFixes {zg['identifier']}",
                           galaz, do_commita)
-        pr = s.github.utworz_pr(zg["title"], galaz, buduj_opis_pr(zg, sekcje))
+        import kryteria_pr
+        pliki_opisu = {}
+        for sc in dict.fromkeys(list(do_commita) + [w.format(klient=klient) for w in A["pliki_klienta"]]):
+            tekst_pliku = s.git.czytaj(katalog, sc)
+            if tekst_pliku:
+                pliki_opisu[sc] = tekst_pliku
+        klasyfikacja = kryteria_pr.klasyfikuj(s, kryteria_pr.kryteria_z_tekstu(sekcje.get("Kryteria akceptacji", "")), pliki_opisu, zg)
+        pr = s.github.utworz_pr(zg["title"], galaz, buduj_opis_pr(zg, sekcje, klasyfikacja))
         uwaga = f"\n\nCofnięto zmiany poza dozwolonymi ścieżkami: {', '.join(cofniete)}." if cofniete else ""
         s.linear.komentarz(zg, f"**Agent otworzył PR:** {pr['html_url']}{uwaga}")
         zdarzenia.zapisz_zdarzenie(s, "pr_otwarty", klient, zg["identifier"], tytul_bez_prefiksu(zg.get("title")), pr["html_url"])
