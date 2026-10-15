@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T14:41:31+00:00",
+ "zapisano": "2026-10-15T14:48:28+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -594,6 +594,242 @@
    "utworzono": "2026-10-15T14:40:39.527Z",
    "zamknieto": null,
    "zmieniono": "2026-10-15T14:40:40.695Z"
+  },
+  "RIN-150": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "2cc978bb-82ae-4461-a92e-63bcba5b2acb",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-15",
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Zdecyduj: Poprawić w bazie wiedzy informację o śniadaniu: wliczone…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-150/hotele-baltyk-zdecyduj-poprawic-w-bazie-wiedzy-informacje-o-sniadaniu",
+   "utworzono": "2026-10-15T14:48:22.343Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:22.343Z"
+  },
+  "RIN-151": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "1069514f-85a9-4cfa-952a-56f32e4cf520",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Uzupełnij: Ustawić godziny dzwonienia: od 9:00, ale nie wcześniej niż…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-151/hotele-baltyk-uzupelnij-ustawic-godziny-dzwonienia-od-900-ale-nie",
+   "utworzono": "2026-10-15T14:48:22.795Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:22.795Z"
+  },
+  "RIN-152": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "6f47632d-0a46-4b2c-8fec-e03c1895ac5f",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Zdecyduj: Poprawić instrukcję agenta: nie proponuje zniżek, ceny są…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-152/hotele-baltyk-zdecyduj-poprawic-instrukcje-agenta-nie-proponuje-znizek",
+   "utworzono": "2026-10-15T14:48:23.281Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:23.281Z"
+  },
+  "RIN-153": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Zadanie"
+   ],
+   "id": "9769d7be-64f0-47f6-ac89-8c8ffd1809bd",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Zdecyduj: Sprawdzić nagranie rozmowy z wczoraj, w której agent…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-153/hotele-baltyk-zdecyduj-sprawdzic-nagranie-rozmowy-z-wczoraj-w-ktorej",
+   "utworzono": "2026-10-15T14:48:23.901Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:23.901Z"
+  },
+  "RIN-154": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Konfiguracja",
+    "repo: rinvo-app"
+   ],
+   "id": "33c90c81-cdaa-4e80-869b-7965dd4af6a3",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-26",
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Uzupełnij: Wstrzymać dzwonienie do porzuconych rezerwacji w Sopocie w…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-154/hotele-baltyk-uzupelnij-wstrzymac-dzwonienie-do-porzuconych-rezerwacji",
+   "utworzono": "2026-10-15T14:48:24.340Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:24.340Z"
+  },
+  "RIN-155": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Finanse",
+    "repo: rinvo-ops"
+   ],
+   "id": "d7c25ee3-9189-41d0-b9d4-d338dad97c3f",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": "2026-10-23",
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Zdecyduj: Przygotować wycenę podpięcia Kołobrzegu i przekazać ją…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-155/hotele-baltyk-zdecyduj-przygotowac-wycene-podpiecia-kolobrzegu-i",
+   "utworzono": "2026-10-15T14:48:24.763Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:24.763Z"
+  },
+  "RIN-156": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Finanse"
+   ],
+   "id": "9c170c43-61a5-4abd-8d73-5ad06bf85e58",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Zdecyduj: Poprawić adres na fakturze: ma być Sopot (tam jest umowa)…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-156/hotele-baltyk-zdecyduj-poprawic-adres-na-fakturze-ma-byc-sopot-tam",
+   "utworzono": "2026-10-15T14:48:25.355Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:25.355Z"
+  },
+  "RIN-157": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji"
+   ],
+   "id": "12f5a6a2-82b7-4fc3-96b4-bdc5b2431998",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[hotele-baltyk] Uzupełnij: Numer rezerwacji, w której agent dwa razy zapytał gościa o…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-157/hotele-baltyk-uzupelnij-numer-rezerwacji-w-ktorej-agent-dwa-razy",
+   "utworzono": "2026-10-15T14:48:25.832Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:25.832Z"
+  },
+  "RIN-158": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji"
+   ],
+   "id": "78c55db5-45a0-4e1b-9576-20434355e379",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[hotele-baltyk] Uzupełnij: Rozmowa z panem [nazwisko] o ofercie ReceptAI: dopiero po…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-uzupelnij-rozmowa-z-panem-nazwisko-o-ofercie-receptai",
+   "utworzono": "2026-10-15T14:48:26.299Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:26.299Z"
+  },
+  "RIN-159": {
+   "etykiety": [
+    "Czeka na klienta",
+    "Do weryfikacji"
+   ],
+   "id": "06cd267d-6dd0-4683-a0f7-1302e39051e9",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[hotele-baltyk] Uzupełnij: Decyzja pana [nazwisko] o podpięciu Kołobrzegu: czekamy…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-uzupelnij-decyzja-pana-nazwisko-o-podpieciu-kolobrzegu",
+   "utworzono": "2026-10-15T14:48:26.592Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:26.592Z"
+  },
+  "RIN-160": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Do weryfikacji",
+    "Produkt",
+    "repo: rinvo"
+   ],
+   "id": "5fc9817c-69e8-4967-ab8c-1be68b5871aa",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[hotele-baltyk] Zdecyduj: Panel: oznaczenie, które rezerwacje dokończono dzięki…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-160/hotele-baltyk-zdecyduj-panel-oznaczenie-ktore-rezerwacje-dokonczono",
+   "utworzono": "2026-10-15T14:48:26.939Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:26.939Z"
+  },
+  "RIN-161": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Ryzyko"
+   ],
+   "id": "53d63300-e269-47d5-8f50-9fea4b43c9a2",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Uzupełnij: Konkurent ReceptAI: według Joanny robi to samo taniej i od…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-161/hotele-baltyk-uzupelnij-konkurent-receptai-wedlug-joanny-robi-to-samo",
+   "utworzono": "2026-10-15T14:48:27.413Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:27.413Z"
+  },
+  "RIN-162": {
+   "etykiety": [
+    "Do weryfikacji",
+    "Ryzyko"
+   ],
+   "id": "ea828ea8-3f8a-435c-8cea-8ccf25ffd145",
+   "priorytet": 2,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Uzupełnij: Jakość agenta w pierwszym tygodniu: błędna informacja o…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-162/hotele-baltyk-uzupelnij-jakosc-agenta-w-pierwszym-tygodniu-bledna",
+   "utworzono": "2026-10-15T14:48:27.666Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:27.666Z"
+  },
+  "RIN-163": {
+   "etykiety": [
+    "Dla agenta",
+    "Zadanie"
+   ],
+   "id": "457d3965-6b92-470e-a9fc-a3c1c30f70e8",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[hotele-baltyk] Notatka o kliencie: ryzyka i otwarte tematy",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-163/hotele-baltyk-notatka-o-kliencie-ryzyka-i-otwarte-tematy",
+   "utworzono": "2026-10-15T14:48:27.932Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:48:27.932Z"
   }
  }
 }

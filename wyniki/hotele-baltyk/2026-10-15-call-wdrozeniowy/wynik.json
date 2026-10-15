@@ -1,0 +1,735 @@
+{
+  "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md",
+  "wygenerowano": "2026-10-15",
+  "spotkanie": {
+    "tytul": "Hotele Bałtyk × Rinvo: call po pierwszym tygodniu",
+    "data": "2026-10-15",
+    "godziny": "13:00–13:27",
+    "uczestnicy": [
+      "Joanna Wiśniewska",
+      "Marek Rewoliński"
+    ],
+    "wspominani": [
+      "pan [nazwisko]",
+      "Tomek",
+      "Michał"
+    ]
+  },
+  "pozycje": [
+    {
+      "id": "T1",
+      "sekcja": 1,
+      "typ": "poprawka_bazy_wiedzy",
+      "rodzaj": "błąd",
+      "tytul": "Poprawić w bazie wiedzy informację o śniadaniu: wliczone tylko w premium i apartamentach, w standardzie dopłata 50 zł od osoby",
+      "opis": "Agent mówi gościom, że śniadanie jest wliczone w cenę, a w pakiecie standard nie jest. Dwie osoby kłóciły się o to przy zameldowaniu. Śniadanie jest wliczone w pakiecie premium i w apartamentach; w standardzie jest dopłata 50 zł od osoby. Marek poprawia dziś.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-15",
+      "termin_wyrazenie": "dzisiaj",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "agent mówi gościom, że śniadanie jest wliczone w cenę. A w pakiecie standard nie jest. Dwie osoby już się o to kłóciły przy zameldowaniu.",
+        "W premium i w apartamentach. W standardzie dopłata pięćdziesiąt złotych od osoby.",
+        "Poprawię dzisiaj."
+      ],
+      "wnioski": [
+        "Marek sam nazwał to „naszym błędem w bazie wiedzy”, więc to błąd, a nie nowa funkcja.",
+        "„Dzisiaj” to 15.10 (data rozmowy)."
+      ],
+      "klucz_sprawy": "sniadanie-w-bazie-wiedzy",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Agent głosowy Hotelu Sopot przestaje mówić, że śniadanie jest wliczone w każdy pakiet, i podaje właściwe zasady dla standardu, premium i apartamentów.",
+      "kryteria_akceptacji": [
+        "Baza wiedzy mówi, że śniadanie jest wliczone w pakiecie premium",
+        "Baza wiedzy mówi, że śniadanie jest wliczone w apartamentach",
+        "Baza wiedzy mówi, że w pakiecie standard śniadanie jest za dopłatą 50 zł od osoby",
+        "W bazie wiedzy nie ma już zdania, że śniadanie jest wliczone w każdy pakiet"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa: zapytać agenta o śniadanie w pakiecie standard, premium i w apartamencie; sprawdzić odpowiedzi względem czterech kryteriów.",
+      "repo": "rinvo-app",
+      "termin_zrodlo": "kod",
+      "sprawdz_z_nagraniem": [
+        "50 zł"
+      ],
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "T2",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Ustawić godziny dzwonienia: od 9:00, ale nie wcześniej niż 8 godzin po przerwaniu rezerwacji",
+      "opis": "Agent oddzwaniał o 9 rano do osób, które przerwały rezerwację o 2 w nocy, i część gości była zaskoczona. Ustalenie końcowe: godzina startu zostaje 9:00, a agent nie dzwoni do nikogo wcześniej niż 8 godzin po przerwaniu rezerwacji.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Agent dzwoni też do ludzi, którzy przerwali rezerwację o drugiej w nocy, i oddzwania od razu o dziewiątej rano. Niektórzy byli zaskoczeni.",
+        "Albo nie, wiesz co, zostaw dziewiątą, ale nie dzwoń do nikogo wcześniej niż osiem godzin po przerwaniu rezerwacji.",
+        "Czyli dziewiąta zostaje, ale minimum osiem godzin od przerwania."
+      ],
+      "wnioski": [
+        "Dotyczy Sopotu, bo agent działa tylko tam; w rozmowie nie padło to wprost.",
+        "Pierwsza wersja (od 10:00) została odwołana przez Joannę, zob. zmiany_zdania."
+      ],
+      "zmiana_zdania": "Najpierw: „Niech dzwoni najwcześniej po dziesiątej.” Potem: godzina 9:00 zostaje, a dodatkowo minimum 8 godzin od przerwania rezerwacji.",
+      "klucz_sprawy": "godziny-dzwonienia-sopot",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Agent dzwoni do porzuconych rezerwacji od 9:00 i zawsze minimum 8 godzin po przerwaniu rezerwacji przez gościa.",
+      "kryteria_akceptacji": [
+        "Najwcześniejsza godzina dzwonienia w konfiguracji to 9:00 (nie 10:00)",
+        "Konfiguracja wymaga minimum 8 godzin od przerwania rezerwacji do pierwszego telefonu",
+        "Rezerwacja przerwana o 2:00 w nocy nie dostaje telefonu o 9:00 tego samego dnia, tylko od 10:00 (2:00 + 8 godzin)"
+      ],
+      "jak_sprawdzic": "Test na konfiguracji: rezerwacja przerwana o 2:00 dostaje telefon dopiero od 10:00; rezerwacja przerwana o 22:00 dopiero od 9:00 następnego dnia.",
+      "repo": "rinvo-app",
+      "sprawdz_z_nagraniem": [
+        "9:00",
+        "10:00",
+        "2:00",
+        "od 9:00",
+        "od 10:00"
+      ],
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "T3",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Poprawić instrukcję agenta: nie proponuje zniżek, ceny są stałe",
+      "opis": "Agent powiedział gościowi „może uda się coś utargować”. Joanna: agent nie może proponować zniżek, ceny są stałe. Marek poprawia instrukcję agenta.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "agent nie może proponować zniżek. Wczoraj powiedział komuś „może uda się coś utargować”. Nie. Ceny są stałe.",
+        "Zniżek agent nie proponuje, poprawię instrukcję."
+      ],
+      "wnioski": [
+        "Nie wiadomo, czy poprzednia instrukcja wprost zakazywała zniżek; zapisane jako zmiana instrukcji, nie jako błąd w kodzie."
+      ],
+      "klucz_sprawy": "agent-bez-znizek",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null,
+      "cel": "Agent nie proponuje zniżek ani negocjacji ceny i mówi gościom, że ceny są stałe.",
+      "kryteria_akceptacji": [
+        "Instrukcja agenta zabrania proponowania zniżek i targowania się",
+        "Instrukcja mówi, że ceny są stałe",
+        "Gość pytający „czy da się taniej” słyszy od agenta, że ceny są stałe, bez żadnej propozycji zniżki"
+      ],
+      "jak_sprawdzic": "Rozmowa testowa: zapytać agenta, czy da się taniej albo coś utargować; agent ma odpowiedzieć, że ceny są stałe, i niczego nie proponować.",
+      "repo": "rinvo-app",
+      "niepewnosc_slowa": [
+        "może"
+      ],
+      "flagi": [
+        "nowy_klient",
+        "niepewne"
+      ]
+    },
+    {
+      "id": "T4",
+      "sekcja": 1,
+      "typ": "zobowiazanie_nasze",
+      "tytul": "Sprawdzić nagranie rozmowy z wczoraj, w której agent powiedział „może uda się coś utargować”",
+      "opis": "Marek zobowiązał się odsłuchać nagranie rozmowy z 14.10, w której agent zasugerował możliwość utargowania ceny, żeby ustalić, co dokładnie padło.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Wczoraj powiedział komuś „może uda się coś utargować”.",
+        "To poważne, sprawdzę to nagranie."
+      ],
+      "wnioski": [
+        "„Wczoraj” to 14.10; numer rezerwacji ani nazwisko gościa nie padły, nagranie trzeba znaleźć po dacie i frazie."
+      ],
+      "klucz_sprawy": "nagranie-znizka-utargowac",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null,
+      "cel": "Ustalić na nagraniu z 14.10, co dokładnie agent powiedział gościowi o możliwości utargowania ceny.",
+      "kryteria_akceptacji": [
+        "Nagranie z 14.10 z frazą „może uda się coś utargować” zostało odnalezione i odsłuchane",
+        "Zapisano dosłowny fragment rozmowy, w którym agent mówi o utargowaniu",
+        "Zapisano, czy agent złożył gościowi jakąkolwiek obietnicę zniżki"
+      ],
+      "jak_sprawdzic": "Notatka Marka z cytatem z nagrania i informacją, czy padła obietnica zniżki.",
+      "repo": "brak",
+      "niepewnosc_slowa": [
+        "może"
+      ],
+      "sprawdz_z_nagraniem": [
+        "14.10"
+      ],
+      "flagi": [
+        "nowy_klient",
+        "niepewne"
+      ]
+    },
+    {
+      "id": "T5",
+      "sekcja": 1,
+      "typ": "zmiana_konfiguracji",
+      "rodzaj": "zmiana",
+      "tytul": "Wstrzymać dzwonienie do porzuconych rezerwacji w Sopocie w dniach 26–31.10 (zjazd firmowy, hotel pełny)",
+      "opis": "W dniach 26–31.10 w Sopocie jest zjazd firmowy i hotel jest pełny, więc agent nie dzwoni do nikogo z porzuconych rezerwacji, bo i tak nie ma wolnych pokoi. Marek wstrzymuje dzwonienie dla Sopotu na ten okres. Pauzę trzeba ustawić przed 26.10.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-26",
+      "termin_wyrazenie": "dwudziestego szóstego",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "od dwudziestego szóstego do trzydziestego pierwszego mamy w Sopocie zjazd firmowy, hotel pełny. W tym czasie nie dzwońcie do nikogo z porzuconych rezerwacji, bo i tak nie ma wolnych pokoi.",
+        "Od dwudziestego szóstego do trzydziestego pierwszego wstrzymuję dzwonienie dla Sopotu."
+      ],
+      "wnioski": [
+        "Przeliczone od daty rozmowy (15.10): 26.10 to poniedziałek, 31.10 to sobota.",
+        "Termin 26.10 to początek pauzy; ustawić ją trzeba przed tą datą.",
+        "Nie wiadomo, od kiedy agent wznawia dzwonienie po 31.10 (zakładamy, że po zjeździe, czyli od 1.11), czy rezerwacje porzucone w czasie pauzy mają dostać telefon po jej końcu; do doprecyzowania z Joanną."
+      ],
+      "klucz_sprawy": "pauza-dzwonienia-zjazd-sopot",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Agent nie wykonuje żadnych telefonów do porzuconych rezerwacji Sopotu od 26.10 do 31.10 włącznie.",
+      "kryteria_akceptacji": [
+        "Konfiguracja Sopotu wstrzymuje dzwonienie od 26.10 do 31.10 włącznie",
+        "Przed 26.10 i po 31.10 harmonogram dzwonienia działa jak dotychczas (godziny z T2)",
+        "Pauza dotyczy tylko Sopotu"
+      ],
+      "jak_sprawdzic": "Test na konfiguracji: dla dat 26.10–31.10 harmonogram nie wyznacza żadnych połączeń do Sopotu, a dla 25.10 i 1.11 wyznacza.",
+      "repo": "rinvo-app",
+      "termin_zrodlo": "kod",
+      "sprawdz_z_nagraniem": [
+        "31.10",
+        "26.10",
+        "Przed 26",
+        "od 26",
+        "do 31"
+      ],
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "T6",
+      "sekcja": 1,
+      "typ": "finanse",
+      "tytul": "Przygotować wycenę podpięcia Kołobrzegu i przekazać ją Joannie (nie panu [nazwisko]) do końca przyszłego tygodnia",
+      "opis": "Pan [nazwisko] pytał o cenę podpięcia Kołobrzegu. Marek przygotowuje wycenę dla Kołobrzegu i wysyła ją do Joanny, która sama przekaże ją panu [nazwisko]. Do [nazwisko] nie piszemy bezpośrednio. Wycena nie oznacza podpięcia: o nim decyduje pan [nazwisko].",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "2026-10-23",
+      "termin_wyrazenie": "do końca przyszłego tygodnia",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Przygotuję wycenę dla Kołobrzegu i wyślę [nazwisko]?",
+        "Wyślij mnie, ja mu przekażę. Do [nazwisko] nie piszcie bezpośrednio, on nie lubi maili od dostawców.",
+        "Wycenę Kołobrzegu poproszę do końca przyszłego tygodnia.",
+        "Będzie. Do usłyszenia."
+      ],
+      "wnioski": [
+        "„Do końca przyszłego tygodnia” liczy kod względem daty rozmowy (15.10); przy piątku jest to 23.10.",
+        "Rinvo rozlicza się za minuty rozmów, fakturą miesięczną (kontekst w nagłówku transkrypcji); zakres wyceny (model rozliczenia, liczba minut) nie padł w rozmowie i wymaga decyzji człowieka."
+      ],
+      "klucz_sprawy": "wycena-kolobrzeg",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Joanna dostaje do końca przyszłego tygodnia wycenę podpięcia Kołobrzegu, którą sama przekaże panu [nazwisko].",
+      "kryteria_akceptacji": [
+        "Wycena dotyczy Kołobrzegu (Bałtyk Resort)",
+        "Mail z wyceną jest adresowany do Joanny Wiśniewskiej, a nie do pana [nazwisko]",
+        "Wycena jest gotowa najpóźniej w ostatnim dniu przyszłego tygodnia (23.10)",
+        "Wycena nie zawiera obietnicy podpięcia przed decyzją pana [nazwisko]"
+      ],
+      "jak_sprawdzic": "Sprawdzić adresata maila (Joanna), zakres wyceny (Kołobrzeg) i datę wysłania (najpóźniej 23.10).",
+      "repo": "rinvo-ops",
+      "szkic_klienta": "Cześć Joanno,\n\nzgodnie z rozmową: wycena podpięcia Kołobrzegu, o którą prosiłaś, jest razem z tą wiadomością, do przekazania panu [nazwisko]. Piszę do Ciebie, tak jak ustaliliśmy, bez maila bezpośrednio do pana [nazwisko].\n\nKołobrzeg podepniemy dopiero po tym, jak pan [nazwisko] da nam znać, że tego chce.\n\nPozdrawiam\nMarek Rewoliński",
+      "termin_zrodlo": "kod",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "T7",
+      "sekcja": 1,
+      "typ": "finanse",
+      "rodzaj": "błąd",
+      "tytul": "Poprawić adres na fakturze: ma być Sopot (tam jest umowa), faktura przyszła na adres w Kołobrzegu",
+      "opis": "Faktura przyszła na adres w Kołobrzegu, a powinna na Sopot, bo tam jest umowa. Marek przekazuje sprawę Michałowi (Rinvo), który ma poprawić.",
+      "wlasciciel": "Michał",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "zrob_teraz",
+      "cytat": [
+        "Przyszła na adres w Kołobrzegu, a powinna na Sopot, bo tam jest umowa.",
+        "Przekażę Michałowi, poprawi."
+      ],
+      "wnioski": [
+        "Michał to pracownik Rinvo (w nagłówku transkrypcji wymieniony jako „Michał (Rinvo)”).",
+        "Nie padło, czy chodzi o korektę już wystawionej faktury, czy tylko o adres na kolejnych; zakładamy: popraw adres na bieżącej fakturze i w danych rozliczeniowych."
+      ],
+      "klucz_sprawy": "adres-faktury-sopot",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Faktura dla Hoteli Bałtyk ma adres w Sopocie, gdzie jest umowa, a nie w Kołobrzegu.",
+      "kryteria_akceptacji": [
+        "Adres nabywcy w danych rozliczeniowych klienta to adres w Sopocie",
+        "Poprawiona faktura ma adres w Sopocie",
+        "Michał potwierdza Markowi, że poprawka została wprowadzona"
+      ],
+      "jak_sprawdzic": "Otworzyć poprawioną fakturę i dane rozliczeniowe klienta; adres ma być sopocki.",
+      "repo": "brak",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Numer rezerwacji, w której agent dwa razy zapytał gościa o liczbę osób: czekamy na Joannę (Tomek ma poszukać)",
+      "opis": "Tomek z recepcji Sopot mówi, że agent zapytał jednego pana dwa razy o liczbę osób. Nie ma numeru rezerwacji, więc Marek nie może sprawdzić nagrania. Joanna da znać, gdy Tomek znajdzie numer.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "Joanna przekaże numer rezerwacji, gdy Tomek go znajdzie",
+      "status": "czeka",
+      "cytat": [
+        "Tomek mówi, że agent zapytał jednego pana dwa razy o liczbę osób. Ale nie mam numeru tej rezerwacji, Tomek nie zapisał. Jak znajdzie, dam znać.",
+        "Bez numeru nie znajdę, poczekam na panią."
+      ],
+      "wnioski": [
+        "Nie wiadomo, czy to jednorazowy przypadek, czy błąd w logice agenta; po numerze trzeba odsłuchać nagranie. Do tego czasu pozycja nie jest ani błędem, ani prośbą.",
+        "Klient nie ustalił, ile razy wolno przypominać; obowiązuje domyślny limit z zasad."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "klient nie określił liczby przypomnień; Joanna sama da znać po znalezieniu numeru"
+      },
+      "klucz_sprawy": "rezerwacja-podwojne-pytanie",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null,
+      "cel": "Po otrzymaniu numeru rezerwacji ustalić na nagraniu, czy agent faktycznie dwa razy zapytał gościa o liczbę osób, i znaleźć przyczynę.",
+      "kryteria_akceptacji": [
+        "Joanna przekazała numer rezerwacji",
+        "Nagranie tej rezerwacji zostało odsłuchane",
+        "Zapisano dosłowny fragment, w którym agent pyta o liczbę osób, i informację, czy pytanie padło dwa razy"
+      ],
+      "jak_sprawdzic": "Notatka z odsłuchu nagrania po numerze rezerwacji, z cytatem obu pytań, jeśli padły.",
+      "repo": "brak",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K2",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Rozmowa z panem [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "opis": "Marek zaproponował rozmowę z panem [nazwisko] po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać. Marek czeka.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "Gotowe wyniki z całego miesiąca i sygnał od Joanny",
+      "status": "czeka",
+      "cytat": [
+        "Może pogadam z panem [nazwisko]?",
+        "Nie teraz. Jak będą wyniki z całego miesiąca, wtedy. Ja dam znać.",
+        "Dobrze, czekam."
+      ],
+      "wnioski": [
+        "Propozycja Marka została odłożona, a nie odwołana: to nie jest zmiana zdania, tylko odrzucona na teraz propozycja.",
+        "Okres „całego miesiąca” nie ma w rozmowie dat; start pilota to około tydzień przed 15.10, więc miesiąc wypada na początek listopada (wniosek, nie ustalenie)."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "klient sam da znać; liczba przypomnień nie ustalona"
+      },
+      "klucz_sprawy": "rozmowa-z-robertem-po-wynikach",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Po sygnale od Joanny i wynikach z całego miesiąca umówić rozmowę z panem [nazwisko] o ofercie ReceptAI i wynikach agenta.",
+      "kryteria_akceptacji": [
+        "Joanna dała znać, że można rozmawiać z panem [nazwisko]",
+        "Wyniki z całego miesiąca są dostępne przed rozmową",
+        "Rozmowa jest umówiona przez Joannę, bez maila bezpośrednio do pana [nazwisko]"
+      ],
+      "jak_sprawdzic": "Potwierdzenie od Joanny i data rozmowy z panem [nazwisko] w kalendarzu.",
+      "repo": "brak",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "K3",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Decyzja pana [nazwisko] o podpięciu Kołobrzegu: czekamy, aż napisze",
+      "opis": "Pan [nazwisko] pytał, czy można od razu podpiąć Kołobrzeg, ale jeszcze nic nie zdecydował, tylko pytał o cenę. Decyzja i budżet są jego. Kołobrzegu nie podpinamy, dopóki on nie napisze.",
+      "wlasciciel": "pan [nazwisko]",
+      "termin": "brak",
+      "warunek": "Pan [nazwisko] napisze, że chce podpiąć Kołobrzeg",
+      "status": "czeka",
+      "cytat": [
+        "[nazwisko] pytał, czy możecie od razu podpiąć Kołobrzeg. Ja bym chciała, ale to jego decyzja i jego budżet. On jeszcze nic nie zdecydował, tylko pytał o cenę. Nie podpinajcie, dopóki on nie napisze."
+      ],
+      "wnioski": [
+        "Z cytatu nie wynika, do kogo pan [nazwisko] ma napisać (do nas czy do Joanny).",
+        "Wycena (T6) idzie przez Joannę; przypominać o decyzji można tylko przez nią."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "brak",
+        "uwagi": "klient nie określił; nie pisać do pana [nazwisko] bezpośrednio (zakaz)"
+      },
+      "klucz_sprawy": "decyzja-roberta-kolobrzeg",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Po decyzji pana [nazwisko] o podpięciu Kołobrzegu rozpocząć wdrożenie dla Bałtyk Resort.",
+      "kryteria_akceptacji": [
+        "Pan [nazwisko] napisał, że chce podpiąć Kołobrzeg",
+        "Decyzja jest potwierdzona na piśmie (mail od niego albo od Joanny z jego decyzją)",
+        "Wdrożenie nie ruszyło przed tą decyzją"
+      ],
+      "jak_sprawdzic": "Mail z decyzją w historii korespondencji z klientem; data tego maila jest wcześniejsza niż data konfiguracji Kołobrzegu.",
+      "repo": "brak",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "B1",
+      "sekcja": 3,
+      "typ": "pomysl_produktowy",
+      "rodzaj": "nowa_funkcja",
+      "tytul": "Panel: oznaczenie, które rezerwacje dokończono dzięki agentowi, a które samodzielnie",
+      "opis": "Joanna nie wie, co jest zasługą agenta, bo w panelu nie ma rozróżnienia między rezerwacjami dokończonymi po rozmowie z agentem i samodzielnie przez gościa. Marek: takiego rozróżnienia w panelu nie ma, prośba zapisana, terminu nie podaje.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "backlog",
+      "cytat": [
+        "chciałabym widzieć w panelu, które rezerwacje dokończyli dzięki agentowi, a które sami. Teraz nie wiem, co jest waszą zasługą.",
+        "Takiego rozróżnienia w panelu nie ma. Zapisuję, inni klienci też pytają o raporty skuteczności. Terminu nie podam."
+      ],
+      "wnioski": [
+        "Marek mówi, że inni klienci pytają o raporty skuteczności; w prosby.json nie ma jeszcze tej konkretnej funkcji (jest tylko raport mailowy dla innego klienta), więc nie liczymy jej jako prośby wielu klientów.",
+        "Z rozmowy wynika, że wyniki z całego miesiąca mają być argumentem przed panem [nazwisko] (K2), więc dla klienta to ważna prośba; to wniosek, nie ustalenie."
+      ],
+      "klucz_sprawy": "rozroznienie-rezerwacji-agent-vs-samodzielne",
+      "klucz_funkcji": "atrybucja-rezerwacji-w-panelu",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "cel": "Klient widzi w panelu, które porzucone rezerwacje zostały dokończone po rozmowie agenta, a które samodzielnie przez gościa.",
+      "kryteria_akceptacji": [
+        "W panelu przy każdej dokończonej rezerwacji widać, czy dokończono ją po rozmowie z agentem, czy samodzielnie",
+        "Joanna widzi to rozróżnienie w panelu Hoteli Bałtyk dla Sopotu"
+      ],
+      "jak_sprawdzic": "Otworzyć panel klienta i potwierdzić, że dokończone rezerwacje mają oznaczenie źródła.",
+      "repo": "rinvo",
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z1",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie dzwonić do nikogo wcześniej niż 8 godzin po przerwaniu rezerwacji",
+      "opis": "Joanna: agent nie dzwoni do nikogo wcześniej niż 8 godzin po przerwaniu rezerwacji (obok stałej godziny startu 9:00). Zakaz obowiązuje do odwołania przez klienta.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "nie dzwoń do nikogo wcześniej niż osiem godzin po przerwaniu rezerwacji."
+      ],
+      "wnioski": [
+        "Dotyczy Sopotu (jedyny hotel z agentem); w karcie brak decydentów, nie wiadomo formalnie, kto zatwierdza zmiany tej zasady."
+      ],
+      "klucz_sprawy": "zakaz-dzwonienia-przed-8h",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z2",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie dzwonić do nikogo z porzuconych rezerwacji w Sopocie 26–31.10 (zjazd firmowy, hotel pełny)",
+      "opis": "W dniach 26–31.10 w Sopocie jest zjazd firmowy, hotel jest pełny, więc nie ma sensu dzwonić do gości z porzuconych rezerwacji.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "W tym czasie nie dzwońcie do nikogo z porzuconych rezerwacji, bo i tak nie ma wolnych pokoi."
+      ],
+      "wnioski": [
+        "Okres 26–31.10 pochodzi z poprzedniego zdania Joanny (fakty_czasowe).",
+        "Zakaz wygasa po 31.10 i wtedy przechodzi do wygasłych."
+      ],
+      "klucz_sprawy": "zakaz-dzwonienia-zjazd-sopot",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z3",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie podpinać Kołobrzegu, dopóki pan [nazwisko] nie napisze, że chce",
+      "opis": "Podpięcie Kołobrzegu to decyzja i budżet pana [nazwisko] (dyrektora). Do jego pisemnej decyzji nic nie robimy w Kołobrzegu.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "Pan [nazwisko] napisze, że chce podpiąć Kołobrzeg",
+      "status": "nigdy",
+      "cytat": [
+        "Nie podpinajcie, dopóki on nie napisze."
+      ],
+      "wnioski": [
+        "Zakaz uchyla pan [nazwisko] (wg Joanny to jego decyzja i budżet), nie Joanna; wycena (T6) nie narusza tego zakazu."
+      ],
+      "klucz_sprawy": "zakaz-podpinania-kolobrzegu",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z4",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie pisać do [nazwisko] bezpośrednio: kontakt tylko przez Joannę",
+      "opis": "Pan [nazwisko] (dyrektor) nie lubi maili od dostawców. Wycena i inne sprawy idą do Joanny, która przekazuje je dalej.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "Do [nazwisko] nie piszcie bezpośrednio, on nie lubi maili od dostawców."
+      ],
+      "klucz_sprawy": "zakaz-pisania-do-roberta",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "Z5",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Agent nie proponuje zniżek: ceny są stałe",
+      "opis": "Agent nie może proponować zniżek ani sugerować targowania się. Ceny w hotelach są stałe.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "nigdy",
+      "cytat": [
+        "agent nie może proponować zniżek.",
+        "Ceny są stałe."
+      ],
+      "klucz_sprawy": "zakaz-znizek",
+      "pewnosc": "niska",
+      "konflikt_z_zakazem": null,
+      "niepewnosc_slowa": [
+        "może"
+      ],
+      "flagi": [
+        "nowy_klient",
+        "niepewne"
+      ]
+    },
+    {
+      "id": "Z6",
+      "sekcja": 4,
+      "typ": "zakaz",
+      "tytul": "Nie rozmawiać teraz z [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "opis": "Marek zaproponował rozmowę z panem [nazwisko] po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać.",
+      "wlasciciel": "Joanna Wiśniewska",
+      "termin": "brak",
+      "warunek": "Wyniki z całego miesiąca i sygnał od Joanny",
+      "status": "nigdy",
+      "cytat": [
+        "Nie teraz. Jak będą wyniki z całego miesiąca, wtedy. Ja dam znać."
+      ],
+      "klucz_sprawy": "zakaz-rozmowy-z-robertem-teraz",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "R1",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan [nazwisko] dostał od nich maila",
+      "opis": "Joanna słyszała, że firma ReceptAI oferuje to samo taniej i od razu dla obu hoteli. Pan [nazwisko] dostał od nich maila. Joanna zaznacza, że nie mówi o zmianie dostawcy, ale chce, żebyśmy wiedzieli. Marek zaproponował rozmowę z panem [nazwisko]; Joanna odłożyła ją do wyników z całego miesiąca.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Słyszałam też, że firma ReceptAI robi to samo taniej i od razu z obu hoteli. [nazwisko] dostał od nich maila. Nie mówię, że zmieniamy, ale wiedz."
+      ],
+      "wnioski": [
+        "Informacja o niższej cenie ReceptAI to relacja z drugiej ręki („słyszałam”); ceny ReceptAI nie są znane.",
+        "Pan [nazwisko] decyduje o kosztach i o Kołobrzegu, więc oferta ReceptAI dla obu hoteli trafia wprost w jego decyzję o rozszerzeniu (K3)."
+      ],
+      "klucz_sprawy": "ryzyko-receptai",
+      "temat_ryzyka": "konkurencja",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "zadanie_przygotowawcze": {
+        "cel": "Przygotować notatkę o ryzyku ReceptAI przed rozmową z panem [nazwisko] po wynikach z całego miesiąca (rozmowa dopiero na sygnał od Joanny).",
+        "kryteria_akceptacji": [
+          "Notatka cytuje słowa Joanny o ReceptAI (taniej, obie lokalizacje, mail do pana [nazwisko]) i zaznacza, że to relacja z drugiej ręki",
+          "Notatka zawiera nasze argumenty z wyników pierwszego miesiąca (dokończone rezerwacje, np. 12 z 40 w pierwszym tygodniu) oraz listę znanych problemów i ich napraw",
+          "Notatka zawiera pytania do Joanny, m.in. o to, co dokładnie było w mailu od ReceptAI",
+          "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
+        ],
+        "jak_sprawdzic": "Marek czyta notatkę przed rozmową: cztery punkty są spełnione, a cytaty zgadzają się z transkrypcją.",
+        "repo": "rinvo-ops"
+      },
+      "flagi": [
+        "nowy_klient"
+      ]
+    },
+    {
+      "id": "R2",
+      "sekcja": 5,
+      "typ": "ryzyko_handlowe",
+      "tytul": "Jakość agenta w pierwszym tygodniu: błędna informacja o śniadaniu, telefon rano po nocnej rezerwacji, propozycja utargowania ceny",
+      "opis": "Pierwszy tydzień Joanna ocenia ogólnie dobrze (z 40 porzuconych rezerwacji 12 dokończyło), ale zgłosiła błędy widoczne dla gości: śniadanie wliczone w standardzie (dwie kłótnie przy zameldowaniu), zaskoczeni goście po telefonie o 9 rano, agent sugerujący utargowanie ceny i możliwe podwójne pytanie o liczbę osób. Przed oceną całego miesiąca przez pana [nazwisko] warto pokazać, że te błędy są naprawione.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "brak",
+      "status": "czeka",
+      "cytat": [
+        "Ogólnie dobrze. Z czterdziestu porzuconych rezerwacji dwanaście dokończyło. Ale jest problem: agent mówi gościom, że śniadanie jest wliczone w cenę.",
+        "Niektórzy byli zaskoczeni."
+      ],
+      "wnioski": [
+        "To nie jest groźba rezygnacji; Joanna ocenia start pozytywnie. Ryzyko wynika z kojarzenia powtarzających się błędów z oceną pana [nazwisko] po miesiącu (wniosek, nie cytat).",
+        "Naprawy: T1, T2, T3; sprawy do wyjaśnienia: T4, K1."
+      ],
+      "klucz_sprawy": "ryzyko-jakosc-agenta-pierwszy-tydzien",
+      "temat_ryzyka": "jakosc_bota",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": null,
+      "flagi": [
+        "nowy_klient"
+      ]
+    }
+  ],
+  "aktualizacje_spraw": [],
+  "zmiany_zdania": [
+    {
+      "temat": "Najwcześniejsza godzina dzwonienia do porzuconych rezerwacji",
+      "przed": "Niech dzwoni najwcześniej po dziesiątej.",
+      "po": "Godzina 9:00 zostaje, ale agent nie dzwoni wcześniej niż 8 godzin po przerwaniu rezerwacji.",
+      "pozycja": "T2",
+      "cytat": "Albo nie, wiesz co, zostaw dziewiątą, ale nie dzwoń do nikogo wcześniej niż osiem godzin po przerwaniu rezerwacji."
+    }
+  ],
+  "konflikty_dat": [],
+  "fakty_czasowe": [
+    {
+      "typ": "blokada",
+      "od": "2026-10-26",
+      "do": "2026-10-31",
+      "dotyczy": "pauza-dzwonienia-zjazd-sopot",
+      "cytat": "od dwudziestego szóstego do trzydziestego pierwszego mamy w Sopocie zjazd firmowy, hotel pełny.",
+      "wyrazenie": "od dwudziestego szóstego do trzydziestego pierwszego",
+      "zrodlo_daty": "kod"
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-15",
+      "do": "2026-10-15",
+      "dotyczy": "sniadanie-w-bazie-wiedzy",
+      "cytat": "Poprawię dzisiaj.",
+      "wyrazenie": "dzisiaj",
+      "zrodlo_daty": "kod"
+    },
+    {
+      "typ": "termin",
+      "od": "2026-10-23",
+      "do": "2026-10-23",
+      "dotyczy": "wycena-kolobrzeg",
+      "cytat": "Wycenę Kołobrzegu poproszę do końca przyszłego tygodnia.",
+      "wyrazenie": "do końca przyszłego tygodnia",
+      "zrodlo_daty": "kod"
+    }
+  ],
+  "okna_czasowe": [
+    {
+      "klucz_sprawy": "pauza-dzwonienia-zjazd-sopot",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-23"
+        },
+        {
+          "od": "2026-11-02",
+          "do": null
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    },
+    {
+      "klucz_sprawy": "wycena-kolobrzeg",
+      "okna": [
+        {
+          "od": "2026-10-16",
+          "do": "2026-10-23"
+        }
+      ],
+      "adnotacja": "policzone przez kod"
+    }
+  ],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [
+      "Godzina dzwonienia: „Od dziesiątej, zapisane.” (Marek) zastąpione późniejszym ustaleniem 9:00 + minimum 8 godzin od przerwania (T2, zmiana zdania Joanny).",
+      "„Przekażę Michałowi, poprawi.” scalone z T7 (właściciel: Michał).",
+      "„Bez numeru nie znajdę, poczekam na panią.” scalone z K1.",
+      "„Dobrze, czekam.” (Marek, rozmowa z panem [nazwisko]) scalone z K2.",
+      "„Od dwudziestego szóstego do trzydziestego pierwszego wstrzymuję dzwonienie dla Sopotu.” scalone z T5 (zobowiązanie Marka) i Z2 (zakaz Joanny)."
+    ],
+    "pominiete": [
+      "Statystyka „z czterdziestu porzuconych rezerwacji dwanaście dokończyło” to informacja, nie pozycja; użyta we wnioskach R1/R2.",
+      "„Mam tylko dwadzieścia minut, potem przyjeżdża grupa” to tło rozmowy, bez zobowiązania.",
+      "Propozycja Marka „Może pogadam z panem [nazwisko]?” została odłożona przez Joannę („Nie teraz”), nie odwołana: to nie zmiana zdania (K2, Z6).",
+      "Nowy klient: karta klienta (ops/klienci/hotele-baltyk/karta.json) nie istnieje, więc zakazy numerowane od Z1, brak decydentów i otwartych spraw; brak aktualizacji spraw."
+    ]
+  },
+  "szkic_maila": "Dzień dobry Joanno,\n\ndziękuję za dzisiejszą rozmowę. Podsumowanie ustaleń:\n\n1. Śniadanie: poprawiam dziś informację w bazie wiedzy agenta. Śniadanie jest wliczone w pakiecie premium i w apartamentach, a w pakiecie standard jest dopłata 50 zł od osoby.\n2. Godziny dzwonienia: agent dzwoni od 9:00, ale nie wcześniej niż 8 godzin po przerwaniu rezerwacji.\n3. Zniżki: agent nie proponuje zniżek, ceny są stałe. Sprawdzę nagranie z wczoraj i poprawię instrukcję agenta.\n4. Zjazd firmowy w Sopocie: od 26 do 31 października wstrzymuję dzwonienie do osób z porzuconych rezerwacji w Sopocie.\n5. Kołobrzeg: niczego nie podpinamy, dopóki pan [nazwisko] nie napisze, że chce. Wycenę dla Kołobrzegu przygotuję do końca przyszłego tygodnia i przekażę Tobie, nie bezpośrednio panu [nazwisko].\n6. Faktura: sprawę adresu (ma być Sopot, bo tam jest umowa) przekazuję Michałowi, który ją poprawi.\n7. Podwójne pytanie o liczbę osób: gdy Tomek znajdzie numer rezerwacji, daj mi proszę znać, wtedy to sprawdzę.\n8. Panel: rozróżnienia rezerwacji dokończonych dzięki agentowi i samodzielnie w panelu na razie nie ma. Zapisałem Twoją prośbę, bez podawania terminu.\n\nPozdrawiam\nMarek Rewoliński",
+  "ostrzezenia_dat": [],
+  "kontrola": {
+    "nowy_klient": true,
+    "maskowanie": {
+      "liczba": 53,
+      "rodzaje": {
+        "nazwisko": 53
+      }
+    }
+  }
+}

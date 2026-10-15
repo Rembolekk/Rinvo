@@ -1,0 +1,411 @@
+{
+  "klient": "hotele-baltyk",
+  "nazwa": "Hotele Baltyk",
+  "nowy_klient": true,
+  "decydenci": [],
+  "decydenci_wniosek": [
+    {
+      "imie": "Joanna Wiśniewska",
+      "rola": "wniosek z rozmowy, do potwierdzenia"
+    }
+  ],
+  "kontakty": [
+    {
+      "imie": "Joanna Wiśniewska",
+      "email": "",
+      "rola": "joanna.wisniewska@hotelebaltyk.pl",
+      "zakres_decyzji": "brak",
+      "potwierdzony": false,
+      "status": "z rozmowy, do potwierdzenia"
+    }
+  ],
+  "domeny": [],
+  "zakazy": [
+    {
+      "id": "Z1",
+      "klucz_sprawy": "zakaz-dzwonienia-przed-8h",
+      "tytul": "Nie dzwonić do nikogo wcześniej niż 8 godzin po przerwaniu rezerwacji",
+      "opis": "Joanna: agent nie dzwoni do nikogo wcześniej niż 8 godzin po przerwaniu rezerwacji (obok stałej godziny startu 9:00). Zakaz obowiązuje do odwołania przez klienta.",
+      "cytat": [
+        "nie dzwoń do nikogo wcześniej niż osiem godzin po przerwaniu rezerwacji."
+      ],
+      "wlasciciel": "Joanna Wiśniewska",
+      "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+    },
+    {
+      "id": "Z2",
+      "klucz_sprawy": "zakaz-dzwonienia-zjazd-sopot",
+      "tytul": "Nie dzwonić do nikogo z porzuconych rezerwacji w Sopocie 26–31.10 (zjazd firmowy, hotel pełny)",
+      "opis": "W dniach 26–31.10 w Sopocie jest zjazd firmowy, hotel jest pełny, więc nie ma sensu dzwonić do gości z porzuconych rezerwacji.",
+      "cytat": [
+        "W tym czasie nie dzwońcie do nikogo z porzuconych rezerwacji, bo i tak nie ma wolnych pokoi."
+      ],
+      "wlasciciel": "Joanna Wiśniewska",
+      "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+    },
+    {
+      "id": "Z3",
+      "klucz_sprawy": "zakaz-podpinania-kolobrzegu",
+      "tytul": "Nie podpinać Kołobrzegu, dopóki pan [nazwisko] nie napisze, że chce",
+      "opis": "Podpięcie Kołobrzegu to decyzja i budżet pana [nazwisko] (dyrektora). Do jego pisemnej decyzji nic nie robimy w Kołobrzegu.",
+      "cytat": [
+        "Nie podpinajcie, dopóki on nie napisze."
+      ],
+      "wlasciciel": "Joanna Wiśniewska",
+      "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+    },
+    {
+      "id": "Z4",
+      "klucz_sprawy": "zakaz-pisania-do-roberta",
+      "tytul": "Nie pisać do [nazwisko] bezpośrednio: kontakt tylko przez Joannę",
+      "opis": "Pan [nazwisko] (dyrektor) nie lubi maili od dostawców. Wycena i inne sprawy idą do Joanny, która przekazuje je dalej.",
+      "cytat": [
+        "Do [nazwisko] nie piszcie bezpośrednio, on nie lubi maili od dostawców."
+      ],
+      "wlasciciel": "Joanna Wiśniewska",
+      "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+    },
+    {
+      "id": "Z5",
+      "klucz_sprawy": "zakaz-znizek",
+      "tytul": "Agent nie proponuje zniżek: ceny są stałe",
+      "opis": "Agent nie może proponować zniżek ani sugerować targowania się. Ceny w hotelach są stałe.",
+      "cytat": [
+        "agent nie może proponować zniżek.",
+        "Ceny są stałe."
+      ],
+      "wlasciciel": "Joanna Wiśniewska",
+      "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+    },
+    {
+      "id": "Z6",
+      "klucz_sprawy": "zakaz-rozmowy-z-robertem-teraz",
+      "tytul": "Nie rozmawiać teraz z [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "opis": "Marek zaproponował rozmowę z panem [nazwisko] po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać.",
+      "cytat": [
+        "Nie teraz. Jak będą wyniki z całego miesiąca, wtedy. Ja dam znać."
+      ],
+      "wlasciciel": "Joanna Wiśniewska",
+      "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+    }
+  ],
+  "otwarte_sprawy": {
+    "sniadanie-w-bazie-wiedzy": {
+      "linear_id": "2cc978bb-82ae-4461-a92e-63bcba5b2acb",
+      "identifier": "RIN-150",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-150/hotele-baltyk-zdecyduj-poprawic-w-bazie-wiedzy-informacje-o-sniadaniu",
+      "tytul": "Poprawić w bazie wiedzy informację o śniadaniu: wliczone tylko w premium i apartamentach, w standardzie dopłata 50 zł od osoby",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „cenę”)",
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "reguly": [
+          "pieniadze",
+          "flaga_nowy_klient"
+        ]
+      }
+    },
+    "godziny-dzwonienia-sopot": {
+      "linear_id": "1069514f-85a9-4cfa-952a-56f32e4cf520",
+      "identifier": "RIN-151",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-151/hotele-baltyk-uzupelnij-ustawic-godziny-dzwonienia-od-900-ale-nie",
+      "tytul": "Ustawić godziny dzwonienia: od 9:00, ale nie wcześniej niż 8 godzin po przerwaniu rezerwacji",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "weryfikacja",
+        "powody": [
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "reguly": [
+          "flaga_nowy_klient"
+        ]
+      }
+    },
+    "agent-bez-znizek": {
+      "linear_id": "6f47632d-0a46-4b2c-8fec-e03c1895ac5f",
+      "identifier": "RIN-152",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-152/hotele-baltyk-zdecyduj-poprawic-instrukcje-agenta-nie-proponuje-znizek",
+      "tytul": "Poprawić instrukcję agenta: nie proponuje zniżek, ceny są stałe",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "pewność niska: nie wiadomo na pewno, czego dotyczy",
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „ceny”)",
+          "nowy klient: karta do potwierdzenia",
+          "niepewne lub żartobliwe sformułowanie, to nie zobowiązanie ani decyzja"
+        ],
+        "reguly": [
+          "pewnosc_niska",
+          "pieniadze",
+          "flaga_nowy_klient",
+          "flaga_niepewne"
+        ]
+      }
+    },
+    "nagranie-znizka-utargowac": {
+      "linear_id": "9769d7be-64f0-47f6-ac89-8c8ffd1809bd",
+      "identifier": "RIN-153",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-153/hotele-baltyk-zdecyduj-sprawdzic-nagranie-rozmowy-z-wczoraj-w-ktorej",
+      "tytul": "Sprawdzić nagranie rozmowy z wczoraj, w której agent powiedział „może uda się coś utargować”",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "pewność niska: nie wiadomo na pewno, czego dotyczy",
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „ceny”)",
+          "nowy klient: karta do potwierdzenia",
+          "niepewne lub żartobliwe sformułowanie, to nie zobowiązanie ani decyzja"
+        ],
+        "reguly": [
+          "pewnosc_niska",
+          "pieniadze",
+          "flaga_nowy_klient",
+          "flaga_niepewne"
+        ]
+      }
+    },
+    "pauza-dzwonienia-zjazd-sopot": {
+      "linear_id": "33c90c81-cdaa-4e80-869b-7965dd4af6a3",
+      "identifier": "RIN-154",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-154/hotele-baltyk-uzupelnij-wstrzymac-dzwonienie-do-porzuconych-rezerwacji",
+      "tytul": "Wstrzymać dzwonienie do porzuconych rezerwacji w Sopocie w dniach 26–31.10 (zjazd firmowy, hotel pełny)",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "weryfikacja",
+        "powody": [
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "reguly": [
+          "flaga_nowy_klient"
+        ]
+      }
+    },
+    "wycena-kolobrzeg": {
+      "linear_id": "d7c25ee3-9189-41d0-b9d4-d338dad97c3f",
+      "identifier": "RIN-155",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-155/hotele-baltyk-zdecyduj-przygotowac-wycene-podpiecia-kolobrzegu-i",
+      "tytul": "Przygotować wycenę podpięcia Kołobrzegu i przekazać ją Joannie (nie panu [nazwisko]) do końca przyszłego tygodnia",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)",
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "reguly": [
+          "pieniadze",
+          "flaga_nowy_klient"
+        ]
+      }
+    },
+    "adres-faktury-sopot": {
+      "linear_id": "9c170c43-61a5-4abd-8d73-5ad06bf85e58",
+      "identifier": "RIN-156",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-156/hotele-baltyk-zdecyduj-poprawic-adres-na-fakturze-ma-byc-sopot-tam",
+      "tytul": "Poprawić adres na fakturze: ma być Sopot (tam jest umowa), faktura przyszła na adres w Kołobrzegu",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)",
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "reguly": [
+          "pieniadze",
+          "flaga_nowy_klient"
+        ]
+      }
+    },
+    "rezerwacja-podwojne-pytanie": {
+      "linear_id": "12f5a6a2-82b7-4fc3-96b4-bdc5b2431998",
+      "identifier": "RIN-157",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-157/hotele-baltyk-uzupelnij-numer-rezerwacji-w-ktorej-agent-dwa-razy",
+      "tytul": "Numer rezerwacji, w której agent dwa razy zapytał gościa o liczbę osób: czekamy na Joannę (Tomek ma poszukać)",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": [],
+        "reguly": []
+      },
+      "po_wznowieniu": {
+        "komu": "czlowiek",
+        "powody": [
+          "pewność niska: nie wiadomo na pewno, czego dotyczy",
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
+    },
+    "rozmowa-z-robertem-po-wynikach": {
+      "linear_id": "78c55db5-45a0-4e1b-9576-20434355e379",
+      "identifier": "RIN-158",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-uzupelnij-rozmowa-z-panem-nazwisko-o-ofercie-receptai",
+      "tytul": "Rozmowa z panem [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": [],
+        "reguly": []
+      },
+      "po_wznowieniu": {
+        "komu": "weryfikacja",
+        "powody": [
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
+    },
+    "decyzja-roberta-kolobrzeg": {
+      "linear_id": "06cd267d-6dd0-4683-a0f7-1302e39051e9",
+      "identifier": "RIN-159",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-uzupelnij-decyzja-pana-nazwisko-o-podpieciu-kolobrzegu",
+      "tytul": "Decyzja pana [nazwisko] o podpięciu Kołobrzegu: czekamy, aż napisze",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": [],
+        "reguly": []
+      },
+      "po_wznowieniu": {
+        "komu": "czlowiek",
+        "powody": [
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „cenę”)",
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 1,
+        "wykorzystane": 0,
+        "nie_przypominac": false
+      }
+    },
+    "rozroznienie-rezerwacji-agent-vs-samodzielne": {
+      "linear_id": "5fc9817c-69e8-4967-ab8c-1be68b5871aa",
+      "identifier": "RIN-160",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-160/hotele-baltyk-zdecyduj-panel-oznaczenie-ktore-rezerwacje-dokonczono",
+      "tytul": "Panel: oznaczenie, które rezerwacje dokończono dzięki agentowi, a które samodzielnie",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czlowiek",
+        "powody": [
+          "priorytet produktowy",
+          "nowy klient: karta do potwierdzenia"
+        ],
+        "reguly": [
+          "produkt",
+          "flaga_nowy_klient"
+        ]
+      }
+    },
+    "ryzyko-receptai": {
+      "linear_id": "53d63300-e269-47d5-8f50-9fea4b43c9a2",
+      "identifier": "RIN-161",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-161/hotele-baltyk-uzupelnij-konkurent-receptai-wedlug-joanny-robi-to-samo",
+      "tytul": "Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan [nazwisko] dostał od nich maila",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "ryzyko",
+        "powody": [],
+        "reguly": []
+      }
+    },
+    "ryzyko-jakosc-agenta-pierwszy-tydzien": {
+      "linear_id": "ea828ea8-3f8a-435c-8cea-8ccf25ffd145",
+      "identifier": "RIN-162",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-162/hotele-baltyk-uzupelnij-jakosc-agenta-w-pierwszym-tygodniu-bledna",
+      "tytul": "Jakość agenta w pierwszym tygodniu: błędna informacja o śniadaniu, telefon rano po nocnej rezerwacji, propozycja utargowania ceny",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "ryzyko",
+        "powody": [],
+        "reguly": []
+      }
+    },
+    "notatka-hotele-baltyk": {
+      "linear_id": "457d3965-6b92-470e-a9fc-a3c1c30f70e8",
+      "identifier": "RIN-163",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-163/hotele-baltyk-notatka-o-kliencie-ryzyka-i-otwarte-tematy",
+      "tytul": "Notatka o kliencie: ryzyka i otwarte tematy",
+      "zrodla": [
+        "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "opis_hash": "014507f036ad42de",
+      "przypisanie": {
+        "komu": "agent",
+        "powody": [],
+        "reguly": []
+      }
+    }
+  },
+  "ryzyka": {
+    "konkurencja": [
+      {
+        "data": "2026-10-15",
+        "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md",
+        "cytat": "Słyszałam też, że firma ReceptAI robi to samo taniej i od razu z obu hoteli. [nazwisko] dostał od nich maila. Nie mówię, że zmieniamy, ale wiedz."
+      }
+    ],
+    "jakosc_bota": [
+      {
+        "data": "2026-10-15",
+        "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md",
+        "cytat": "Ogólnie dobrze. Z czterdziestu porzuconych rezerwacji dwanaście dokończyło. Ale jest problem: agent mówi gościom, że śniadanie jest wliczone w cenę."
+      }
+    ]
+  }
+}

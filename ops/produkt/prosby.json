@@ -108,5 +108,16 @@
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
       }
     ]
+  },
+  "atrybucja-rezerwacji-w-panelu": {
+    "tytul": "Panel: oznaczenie, które rezerwacje dokończono dzięki agentowi, a które samodzielnie",
+    "prosby": [
+      {
+        "klient": "hotele-baltyk",
+        "cytat": "chciałabym widzieć w panelu, które rezerwacje dokończyli dzięki agentowi, a które sami. Teraz nie wiem, co jest waszą zasługą.",
+        "data": "2026-10-15",
+        "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
+      }
+    ]
   }
 }

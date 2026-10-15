@@ -1,0 +1,112 @@
+=== przetworz.py ===
+Transkrypcja: ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md
+Klient: hotele-baltyk
+Start: 2026-10-15T14:44:18.871911
+
+============================================================
+=== claude --print ===
+============================================================
+
+Analiza gotowa: `wynik.json` i `raport.html` leżą w `wyniki/hotele-baltyk/2026-10-15-call-wdrozeniowy/`. `render.py` potwierdził, że wszystkie cytaty są dosłowne, a `daty.py` policzył okna robocze bez błędów.
+
+Hotele Bałtyk nie mają jeszcze karty klienta. Zakazy numerowałem od Z1, a aktualizacji otwartych spraw nie ma.
+
+- **Do zrobienia teraz (7):**
+  - poprawka śniadania w bazie wiedzy (dziś, 15.10);
+  - godziny dzwonienia;
+  - zakaz zniżek w instrukcji agenta;
+  - odsłuch nagrania „może uda się coś utargować”;
+  - pauza dzwonienia w Sopocie 26–31.10;
+  - wycena Kołobrzegu dla Joanny do 23.10 (ze szkicem maila);
+  - adres faktury (Michał).
+- **Zmiana zdania:** Joanna najpierw chciała dzwonienia od 10:00, potem ustaliła 9:00 plus minimum 8 godzin od przerwania rezerwacji.
+- **Czeka na klienta (3):**
+  - numer rezerwacji z podwójnym pytaniem o liczbę osób (pewność niska);
+  - rozmowa z panem Robertem, dopiero gdy Joanna da znać po wynikach z miesiąca;
+  - decyzja pana Roberta o Kołobrzegu.
+- **Backlog (1):** panel z rozróżnieniem rezerwacji „dzięki agentowi” i „samodzielnie”.
+- **Zakazy (6):**
+  - nie dzwonić wcześniej niż 8 godzin po przerwaniu rezerwacji;
+  - nie dzwonić do porzuconych rezerwacji w Sopocie 26–31.10;
+  - nie podpinać Kołobrzegu bez pisemnej decyzji Roberta;
+  - nie pisać do Roberta bezpośrednio;
+  - agent nie proponuje zniżek;
+  - nie rozmawiać z Robertem o ofercie ReceptAI przed sygnałem od Joanny.
+- **Ryzyka (2):** konkurent ReceptAI (to relacja z drugiej ręki, bez znanych cen) i jakość agenta w pierwszym tygodniu.
+
+Daty policzył kod. Pauzę w Sopocie ustawiam na 26.10, wycenę na 23.10 (czyli piątek „przyszłego tygodnia”). Jeśli Joanna miała na myśli niedzielę, termin trzeba poprawić ręcznie. Po 31.10 nie wiadomo, czy rezerwacje porzucone w czasie zjazdu mają dostać telefon, więc to warto doprecyzować z Joanną.
+
+Niczego nie wysłałem. Szkic maila podsumowującego i szkic maila z wyceną czekają na zatwierdzenie.
+Slack: wysłano (HTTP 200)
+
+Utwardzanie: {"nowy_klient": true, "maskowanie": {"liczba": 53, "rodzaje": {"nazwisko": 53}}}
+
+============================================================
+=== render.py ===
+============================================================
+Komenda: python3 -I render.py wyniki/hotele-baltyk/2026-10-15-call-wdrozeniowy/wynik.json --transkrypcja ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md
+
+OK: /home/runner/work/Rinvo/Rinvo/wyniki/hotele-baltyk/2026-10-15-call-wdrozeniowy/raport.html
+Cytaty sprawdzone z transkrypcją: tak
+  Do zrobienia teraz: 7
+  Czeka na klienta: 3
+  Backlog produktowy: 1
+  Zakazy i ograniczenia: 6
+  Ryzyka handlowe: 2
+
+============================================================
+=== daty.py ===
+============================================================
+Komenda: python3 -I daty.py wyniki/hotele-baltyk/2026-10-15-call-wdrozeniowy/wynik.json
+
+OK: okna_czasowe dla 2 spraw → wyniki/hotele-baltyk/2026-10-15-call-wdrozeniowy/wynik.json
+  pauza-dzwonienia-zjazd-sopot: 2026-10-16 – 2026-10-23; 2026-11-02 – →
+  wycena-kolobrzeg: 2026-10-16 – 2026-10-23
+
+============================================================
+=== linear_sync.py ===
+============================================================
+
+============================================================
+SYNCHRONIZACJA: wyniki/hotele-baltyk/2026-10-15-call-wdrozeniowy/wynik.json  →  Linear [RIN]  (klient: hotele-baltyk)
+============================================================
+
+Zespół: Rinvo demo (RIN)
+
+Etykiety:
+
+Stany: Todo / Backlog / Done / Cancelled gotowe
+
+
+  ✓ RIN-150 (sniadanie-w-bazie-wiedzy): [hotele-baltyk] Zdecyduj: Poprawić w bazie wiedzy 
+  ✓ RIN-151 (godziny-dzwonienia-sopot): [hotele-baltyk] Uzupełnij: Ustawić godziny dzwonie
+  ✓ RIN-152 (agent-bez-znizek): [hotele-baltyk] Zdecyduj: Poprawić instrukcję agen
+  ✓ RIN-153 (nagranie-znizka-utargowac): [hotele-baltyk] Zdecyduj: Sprawdzić nagranie rozmo
+  ✓ RIN-154 (pauza-dzwonienia-zjazd-sopot): [hotele-baltyk] Uzupełnij: Wstrzymać dzwonienie do
+  ✓ RIN-155 (wycena-kolobrzeg): [hotele-baltyk] Zdecyduj: Przygotować wycenę podpi
+  ✓ RIN-156 (adres-faktury-sopot): [hotele-baltyk] Zdecyduj: Poprawić adres na faktur
+  ✓ RIN-157 (rezerwacja-podwojne-pytanie): [hotele-baltyk] Uzupełnij: Numer rezerwacji, w któ
+  ✓ RIN-158 (rozmowa-z-robertem-po-wynikach): [hotele-baltyk] Uzupełnij: Rozmowa z panem [nazwis
+  ✓ RIN-159 (decyzja-roberta-kolobrzeg): [hotele-baltyk] Uzupełnij: Decyzja pana [nazwisko]
+  ✓ RIN-160 (rozroznienie-rezerwacji-agent-vs-samodzielne): [hotele-baltyk] Zdecyduj: Panel: oznaczenie, które
+  ✓ RIN-161 (ryzyko-receptai): [hotele-baltyk] Uzupełnij: Konkurent ReceptAI: wed
+  ✓ RIN-162 (ryzyko-jakosc-agenta-pierwszy-tydzien): [hotele-baltyk] Uzupełnij: Jakość agenta w pierwsz
+  + nowe zadanie notatka-hotele-baltyk
+  ✓ RIN-163 (notatka-hotele-baltyk): Notatka o kliencie: ryzyka i otwarte tematy
+  ✓ karta.md: ops/klienci/hotele-baltyk/karta.md
+
+────────────────────────────────────────────────────────────
+Podsumowanie:
+  Utworzono zgłoszeń:            13
+  Zaktualizowano (komentarz):    0
+  Pominięto (ta sama rozmowa):   0
+  Zakazy → karta.json:           6
+  Aktualizacje otwartych spraw:  0
+────────────────────────────────────────────────────────────
+
+Stan Lineara zapisany do ops/.stan_linear.json (50 zgłoszeń).
+
+============================================================
+=== Slack ===
+============================================================
+Slack: wysłano (HTTP 200)
