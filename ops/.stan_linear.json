@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T09:43:09+00:00",
+ "zapisano": "2026-10-15T10:30:26+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -248,7 +248,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-128/auto-tama-spotkanie-z-pawlem-pol-godziny-czwartek-1510-o-1000-czekamy",
    "utworzono": "2026-10-15T09:40:56.540Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:41:04.590Z"
+   "zmieniono": "2026-10-15T09:55:14.794Z"
   },
   "RIN-129": {
    "etykiety": [
@@ -510,7 +510,23 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-144/auto-tama-notatka-przed-spotkaniem-spotkanie-z-pawlem-pol-godziny",
    "utworzono": "2026-10-15T09:41:04.138Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:41:04.138Z"
+   "zmieniono": "2026-10-15T10:30:12.472Z"
+  },
+  "RIN-145": {
+   "etykiety": [
+    "Decyzja człowieka",
+    "Produkt"
+   ],
+   "id": "8b8b67c2-fdc7-43a3-a86a-216e15589d38",
+   "priorytet": 0,
+   "stan": "Todo",
+   "termin": null,
+   "typ_stanu": "unstarted",
+   "tytul": "[produkt] Zdecyduj: propozycja – Integracja z systemem (CRM) dealera…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-145/produkt-zdecyduj-propozycja-integracja-z-systemem-crm-dealera",
+   "utworzono": "2026-10-15T10:30:25.833Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T10:30:25.833Z"
   }
  }
 }

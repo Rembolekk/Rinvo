@@ -1,0 +1,34 @@
+{
+  "integracja-z-systemem-dealera": {
+    "historia": [
+      {
+        "data": "2026-10-15",
+        "zmiana": "pierwsza wersja propozycji"
+      }
+    ],
+    "material": {
+      "md": "ops/materialy/produkt/integracja-z-systemem-dealera.md",
+      "pdf": "ops/materialy/produkt/integracja-z-systemem-dealera.pdf"
+    },
+    "status": "do_decyzji",
+    "sygnal": {
+      "klienci": [
+        "auto-tama"
+      ],
+      "prosb": 1,
+      "typy": [
+        "uratuje"
+      ],
+      "zrodel": 1
+    },
+    "tytul": "Integracja z systemem (CRM) dealera, żeby leady same trafiały do handlowców",
+    "utworzono": "2026-10-15",
+    "wersja": 1,
+    "zaktualizowano": "2026-10-15",
+    "zgloszenie": {
+      "id": "8b8b67c2-fdc7-43a3-a86a-216e15589d38",
+      "identifier": "RIN-145",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-145/produkt-zdecyduj-propozycja-integracja-z-systemem-crm-dealera"
+    }
+  }
+}
