@@ -52,6 +52,8 @@ class LinearAgent:
             "Todo": linear_sync.find_state(stany, "Todo", "unstarted"),
             "In Progress": linear_sync.find_state(stany, "In Progress", "started"),
             "Done": linear_sync.find_state(stany, "Done", "completed"),
+            "Backlog": linear_sync.find_state(stany, "Backlog", "backlog"),
+            "Canceled": linear_sync.find_state(stany, "Cancelled", "cancelled"),
         }
 
     _POLA = "id identifier title description priority createdAt url state { name } labels { nodes { name } }"
@@ -81,6 +83,20 @@ class LinearAgent:
         linear_sync.gql(self.api_key, linear_sync.M_UPDATE_ISSUE,
                         {"id": zg["id"], "input": {"stateId": self._stany[nazwa]}})
         zg["state"] = nazwa
+
+    def ustaw_uklad(self, zg, tytul, opis):
+        """Tytuł i opis zgłoszenia w układzie dla człowieka (dla_czlowieka.py)."""
+        linear_sync.gql(self.api_key, linear_sync.M_UPDATE_ISSUE, {"id": zg["id"], "input": {"title": tytul, "description": opis}})
+        zg["title"], zg["description"] = tytul, opis
+
+    def utworz(self, tytul, opis, etykiety, stan="Todo", priorytet=None):
+        """Nowe zgłoszenie w zespole; zwraca słownik jak z listy zgłoszeń (id, identifier, url, title, labels, state)."""
+        wejscie = {"teamId": self.team["id"], "title": tytul, "description": opis, "stateId": self._stany[stan],
+                   "labelIds": [self.etykiety[n] for n in etykiety if n in self.etykiety]}
+        if priorytet is not None:
+            wejscie["priority"] = priorytet
+        w = linear_sync.gql(self.api_key, linear_sync.M_CREATE_ISSUE, {"input": wejscie})["issueCreate"]["issue"]
+        return {**w, "title": tytul, "description": opis, "labels": list(etykiety), "state": stan}
 
     def dodaj_etykiete(self, zg, nazwa):
         linear_sync.dodaj_etykiete(self.api_key, zg["id"], self.etykiety, nazwa)

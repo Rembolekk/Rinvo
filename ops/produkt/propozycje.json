@@ -1,0 +1,67 @@
+{
+  "eksport-excel-potwierdzenia": {
+    "historia": [
+      {
+        "data": "2026-10-15",
+        "zmiana": "pierwsza wersja propozycji"
+      }
+    ],
+    "material": {
+      "md": "ops/materialy/produkt/eksport-excel-potwierdzenia.md",
+      "pdf": "ops/materialy/produkt/eksport-excel-potwierdzenia.pdf"
+    },
+    "status": "do_decyzji",
+    "sygnal": {
+      "klienci": [
+        "auto-tama",
+        "klinika-usmiech"
+      ],
+      "prosb": 2,
+      "typy": [
+        "wielu"
+      ],
+      "zrodel": 2
+    },
+    "tytul": "Eksport listy potwierdzeń do Excela",
+    "utworzono": "2026-10-15",
+    "wersja": 1,
+    "zaktualizowano": "2026-10-15",
+    "zgloszenie": {
+      "id": "c8578b29-1ae3-4461-8b07-d89288e17d63",
+      "identifier": "RIN-83",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-83/produkt-zdecyduj-propozycja-eksport-listy-potwierdzen-do-excela"
+    }
+  },
+  "integracja-crm": {
+    "historia": [
+      {
+        "data": "2026-10-15",
+        "zmiana": "pierwsza wersja propozycji"
+      }
+    ],
+    "material": {
+      "md": "ops/materialy/produkt/integracja-crm.md",
+      "pdf": "ops/materialy/produkt/integracja-crm.pdf"
+    },
+    "status": "do_decyzji",
+    "sygnal": {
+      "klienci": [
+        "auto-tama"
+      ],
+      "prosb": 1,
+      "typy": [
+        "uratuje"
+      ],
+      "zrodel": 1
+    },
+    "tytul": "Integracja Rinvo z CRM dealera",
+    "utworzono": "2026-10-15",
+    "wersja": 1,
+    "zaktualizowano": "2026-10-15",
+    "zgloszenie": {
+      "id": "ef80a041-890c-42fb-afe9-7fd8ad7ce8ab",
+      "identifier": "RIN-82",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-82/produkt-zdecyduj-propozycja-integracja-rinvo-z-crm-dealera"
+    }
+  }
+}

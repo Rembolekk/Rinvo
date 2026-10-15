@@ -185,6 +185,9 @@ def markdown_do_pdf(tytul, tresc, sciezka, skala=1.0):
 def sciezki_materialu(klient, zg, katalog=None):
     katalog = Path(katalog) if katalog else KATALOG_MATERIALOW
     baza = f"{zg['identifier'].lower()}-{ag.slug(ag.tytul_bez_prefiksu(zg.get('title')), 40)}"
+    istniejacy = sorted((katalog / klient).glob(f"{zg['identifier'].lower()}-*.md"))       # tytuł mógł się zmienić (układ dla człowieka): zostaje stara nazwa
+    if istniejacy:
+        baza = istniejacy[0].stem
     return katalog / klient / f"{baza}.md", katalog / klient / f"{baza}.pdf", katalog / klient / f"{baza}.meta.json"
 
 
@@ -202,12 +205,17 @@ def utworz_material(s, zg, klient, karta, rodzaj):
     md, pdf, meta = sciezki_materialu(klient, zg, getattr(s, "katalog_materialow", None))
     fakty = fakty_materialu(zg, klient, karta, zrodla, klucz)
     skrot = hashlib.sha256(fakty.encode("utf-8")).hexdigest()[:20]
+    # skrót v2 nie zależy od tytułu: układ dla człowieka skraca tytuł i dopisuje czynność, a materiał nie ma się przez to pisać od nowa
+    skrot2 = hashlib.sha256(fakty.split("\n\n", 1)[1].encode("utf-8")).hexdigest()[:20]
     if md.exists() and pdf.exists() and meta.exists():
         m = json.loads(meta.read_text(encoding="utf-8"))
         if m.get("reczny"):                           # człowiek poprawił .md i ustawił "reczny": true w .meta.json: PDF z jego wersji
             markdown_do_pdf(m.get("tytul", ""), md.read_text(encoding="utf-8"), pdf)
             return _wynik(m, md, pdf, W, s, klient, karta)
-        if m.get("skrot") == skrot:
+        if m.get("skrot") == skrot or m.get("skrot_v2") == skrot2:
+            if m.get("skrot_v2") != skrot2:
+                m["skrot_v2"] = skrot2
+                meta.write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
             return _wynik(m, md, pdf, W, s, klient, karta)
     try:
         tytul, tresc, luki = parsuj(s.claude.zapytaj(buduj_prompt(rodzaj, fakty, Z)))
@@ -223,7 +231,7 @@ def utworz_material(s, zg, klient, karta, rodzaj):
         tekst_md += "\n## Założenia demo\n\n" + "\n".join(f"- {z['temat']}: {z['tresc']} (założenie demo)" for z in zal) + "\n"
     md.write_text(tekst_md, encoding="utf-8")
     markdown_do_pdf(tytul, md.read_text(encoding="utf-8"), pdf)
-    m = {"skrot": skrot, "identyfikator": zg["identifier"], "rodzaj": rodzaj, "tytul": tytul, "luki": luki}
+    m = {"skrot": skrot, "skrot_v2": skrot2, "identyfikator": zg["identifier"], "rodzaj": rodzaj, "tytul": tytul, "luki": luki}
     meta.write_text(json.dumps(m, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
     zdarzenia.zapisz_zdarzenie(s, "material", klient, zg["identifier"], tytul, str(pdf))
     return _wynik(m, md, pdf, W, s, klient, karta)

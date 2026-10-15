@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_porzadek_produkt.py` | porządek w zgłoszeniach dla człowieka (tytuł od czynności, blok, wysyłka z bloku, Odrzuć, widok, przeliczenie) i agent produktowy (propozycje, aktualizacja bez duplikatu, ruchy Buduj/Później/Odrzuć, Głos klientów, limit): 60 testów |
 | `testy/test_utwardzanie2.py` | utwardzanie cz. 2 (regresje, pierwszeństwo człowieka, rozmiar zmiany i konflikty agenta, blokady a naprawy, klucze, limity i kredyty, bezpiecznik kosztów, eskalacja): 74 testy |
 | `testy/test_utwardzanie.py` | 17 przypadków brzegowych rozmów i maili (duplikat, starsza rozmowa, niepełna, pomyłka mówcy, maskowanie, polecenia, uwierzytelnienie, autoodpowiedzi, załączniki, Fwd, odpowiedzi): 88 testów |
 | `testy/uruchom.py` | runner testów oczekiwań (X/Y, exit 0/1) |
@@ -378,6 +379,31 @@ Agent działa na tokenach właściciela (Linear, GitHub), więc jego wpisy wygl�
 ## Notatka przed spotkaniem
 
 Notatka przed spotkaniem to materiał WEWNĘTRZNY (dla Marka), nigdy mail do klienta: zadanie „Notatka przed spotkaniem…” nie dostaje szkicu ani wysyłki. `notatka_spotkania.py` (krok w workflow „Codzienne podsumowanie”, po porannym podsumowaniu) znajduje spotkania z karty klienta, które są dziś albo jutro (dzień przed), i tworzy `ops/materialy/<klient>/notatka-<data spotkania>.md` oraz `.pdf`: maksymalnie jedna strona, 3 ryzyka (każde z naszym argumentem z faktów z rozmów i kart oraz rekomendowanym stanowiskiem), 3–5 pytań do klienta i najwyżej 5 tematów ważnych dla tego spotkania. **Statusy bierze z Lineara w chwili pisania**, nie z opisu zgłoszenia (In Progress to „w toku”, nie „zrobione”). Kod odrzuca notatkę z obietnicą ceny, terminu albo integracji, z kwotą spoza faktów, z wzmianką o integracji bez uczciwego „nie mamy”, z miejscem do uzupełnienia albo z innym klientem, i prosi model o poprawę (do 3 prób; za długą najpierw zmniejsza czcionkę, potem skraca). Link do PDF trafia do komentarza zadania notatki i na Slacka („Notatka przed spotkaniem gotowa: <link>”). Idempotentne: istniejącej notatki nie nadpisuje bez `--odswiez` (odświeżenie nie powtarza powiadomień). Ręcznie: `python3 notatka_spotkania.py --dzien 2026-10-14 --klient auto-tama`; podgląd: `--sucho`. Testy: `python3 testy/test_notatka_spotkania.py`.
+
+## Porządek w zgłoszeniach dla człowieka (`dla_czlowieka.py`, `widok.py`)
+
+Zgłoszenia, które czekają na człowieka (**Decyzja człowieka**, **Do weryfikacji**, **Szkic gotowy**), mają stały układ:
+
+- **Tytuł** zaczyna się od czynności: `Wyślij:`, `Zdecyduj:`, `Sprawdź:` albo `Uzupełnij:`, potem krótki opis (do 60 znaków), np. `[auto-tama] Wyślij: Wysłanie Kasi wyceny SMS-ów po nieodebranych`.
+- **Na górze opisu stały blok**: `Co masz zrobić` (jedno zdanie), `Dlaczego Ty` (jedno słowo powodu), gdy jest szkic `Gotowy mail` (Do, Temat, treść, Załączniki, Kiedy wyjdzie, czyli najbliższe okno wysyłki) i `Twoje ruchy` (etykieta „Wyślij” | etykieta „Odrzuć” | popraw treść w tym bloku i daj „Wyślij”). Pod linią `---` zostaje kontekst, cytaty i zakazy.
+- **Wysyłka bierze treść z bloku** w opisie: wersja poprawiona przez człowieka wygrywa, a przechodzi przez te same bezpieczniki co szkic z komentarza (duplikat, odbiorca z karty, zakazy, filtr treści, okno 8–18, limit dzienny, urlop). Komentarze ze szkicami zostają jako historia.
+- **Etykieta „Odrzuć”**: zgłoszenie Canceled, wpis „odrzucone przez człowieka” w karcie klienta (`odrzucone`), brak ponownego tworzenia z tego samego źródła (nowe źródło o tym samym może zgłosić sprawę od nowa). Odrzuć jest obsługiwane przed wysyłką, więc anulowane zgłoszenie nic nie wyśle.
+- **Widok w Linearze „Dla mnie dziś”** (`python3 widok.py`, link w `ops/widok_dla_mnie.json`): tylko sprawy dla człowieka, zgrupowane po terminie i posortowane po priorytecie. Dokładną kolejność „po terminie, termin dziś, reszta według priorytetu” liczy kod (`dla_czlowieka.klucz_dla_mnie`) w porannym podsumowaniu, które linkuje do widoku.
+- **Przeliczenie istniejących zgłoszeń**: `python3 dla_czlowieka.py --przelicz` (raport) i `--zastosuj`; mail z komentarza trafia do bloku, poprawki człowieka w bloku przeżywają przeliczenie. Nowe zgłoszenia z `linear_sync.py` powstają od razu w tym układzie.
+
+Testy: `python3 testy/test_porzadek_produkt.py` (testy `test_a01_…` … `test_a06_…`).
+
+## Agent produktowy: propozycje z sygnałów (`propozycje.py`)
+
+Gdy sygnał z **Głosu klientów** pojawia się pierwszy raz albo się wzmacnia (nowy klient prosi, prośba wraca w nowym źródle, klient z tą prośbą ma ryzyko utraty), agent pisze propozycję jako materiał `ops/materialy/produkt/<klucz_funkcji>.md` i `.pdf`: **Problem** (własnymi słowami), **Kto prosi** (klienci, liczba, daty, dosłowne cytaty), **Wpływ** (ryzyko utraty klienta i co oferuje konkurencja, tylko fakty ze źródeł), **Najmniejsza wersja rozwiązania**, **Pytania otwarte do klientów**, **Ryzyka**, **Proponowany następny krok**.
+
+- Sekcje „Kto prosi” i „Wpływ” składa **kod** z cytatów i kart klientów (bez wymyślonych kwot). Model pisze resztę, a jego tekst przechodzi kontrolę: bez kwot, cen, terminów, obietnic, identyfikatorów i adresów (`ops/zasady.json` → `propozycje`). Wywołania modelu liczą się do dziennego limitu (`limity.Budzet`).
+- W Linearze powstaje zgłoszenie dla człowieka `[produkt] Zdecyduj: propozycja – <funkcja>` w układzie z poprzedniej sekcji, powód „priorytet produktowy”, link do materiału. Ruchy: etykieta **Buduj** (powstaje zgłoszenie dla agenta z celem i kryteriami z propozycji, Slack), **Później** (wraca do decyzji, gdy sygnał się wzmocni), **Odrzuć**.
+- Wzmocnienie sygnału **aktualizuje tę samą propozycję** (nowa wersja, sekcja „Co się zmieniło”, komentarz w zgłoszeniu), nigdy nie tworzy duplikatu. Stan: `ops/produkt/propozycje.json`.
+- Głos klientów linkuje do propozycji przy każdym sygnale. Slack: jedna linijka „Nowa propozycja produktowa: <funkcja>, prosi N klientów”.
+- Uruchamia ją codzienne podsumowanie (`podsumowanie.yml`); ruchy Buduj/Później obsługuje job wysyłki (`wyslij.py`).
+
+Testy: `python3 testy/test_porzadek_produkt.py` (testy `test_b01_…` … `test_b05_…`).
 
 ## Przypadki brzegowe (utwardzanie)
 

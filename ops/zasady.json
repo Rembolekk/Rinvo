@@ -13,7 +13,10 @@
     "szkic": "Szkic gotowy",
     "wyslij": "Wyślij",
     "wyslano": "Wysłano",
-    "regresja": "Regresja"
+    "regresja": "Regresja",
+    "odrzuc": "Odrzuć",
+    "buduj": "Buduj",
+    "pozniej": "Później"
   },
   "czlowiek_gdy": {
     "pieniadze": {
@@ -736,5 +739,61 @@
     "_opis": "„Decyzja człowieka” bez reakcji (brak zmiany w zgłoszeniu) ponad dni_do_gory dni roboczych idzie na górę porannego podsumowania z liczbą dni; ponad dni_osobna_wiadomosc: osobna wiadomość raz.",
     "dni_do_gory": 2,
     "dni_osobna_wiadomosc": 5
+  },
+  "dla_czlowieka": {
+    "_opis": "Zgłoszenia dla człowieka (Decyzja człowieka, Do weryfikacji, Szkic gotowy) mają stały układ: tytuł zaczyna się od czynności, na górze opisu blok „Co masz zrobić”, pod linią kontekst. Wysyłka bierze treść maila z tego bloku (wersja poprawiona przez człowieka wygrywa).",
+    "czynnosci": [
+      "Wyślij",
+      "Zdecyduj",
+      "Sprawdź",
+      "Uzupełnij"
+    ],
+    "max_znakow_opisu_tytulu": 60,
+    "odrzucone_powod": "odrzucone przez człowieka",
+    "widok": {
+      "nazwa": "Dla mnie dziś",
+      "etykiety": [
+        "Decyzja człowieka",
+        "Do weryfikacji",
+        "Szkic gotowy"
+      ],
+      "plik": "ops/widok_dla_mnie.json"
+    },
+    "slowa_uzupelnij": [
+      "uzupełni",
+      "brak kontaktu",
+      "brak kryteri",
+      "brak danych",
+      "luki",
+      "do potwierdzenia"
+    ]
+  },
+  "propozycje": {
+    "_opis": "Agent produktowy: gdy sygnał z Głosu klientów pojawia się pierwszy raz albo się wzmacnia, pisze propozycję jako materiał ops/materialy/produkt/<klucz_funkcji>.md i .pdf oraz zgłoszenie „Zdecyduj: propozycja – <funkcja>” dla człowieka. Ruchy: etykieta Buduj, Później albo Odrzuć. Bez obietnic terminów i cen, bez kwot spoza źródeł.",
+    "katalog": "ops/materialy/produkt",
+    "stan": "ops/produkt/propozycje.json",
+    "tytul_zgloszenia": "[produkt] Zdecyduj: propozycja – {funkcja}",
+    "powod": "priorytet produktowy",
+    "sekcje": [
+      "Problem",
+      "Kto prosi",
+      "Wpływ",
+      "Najmniejsza wersja rozwiązania",
+      "Pytania otwarte do klientów",
+      "Ryzyka",
+      "Proponowany następny krok"
+    ],
+    "max_kryteriow": 6,
+    "zabronione_wzorce": [
+      "\\d[\\d\\s.,]*\\s?(zł|pln|eur|usd|€|\\$|tys\\.|mln)",
+      "\\b(Q[1-4]|kwartał\\w*)\\b",
+      "\\b(w ciągu|za)\\s+\\d+\\s+(dni|dnia|tygodni|tygodnie|miesi)",
+      "\\bdo (końca )?(stycznia|lutego|marca|kwietnia|maja|czerwca|lipca|sierpnia|września|października|listopada|grudnia)\\b",
+      "\\b(obiecuj|gwarantuj|dostarczymy do|będzie gotowe)\\w*"
+    ],
+    "agent_etykiety": [
+      "Dla agenta",
+      "Produkt"
+    ]
   }
 }

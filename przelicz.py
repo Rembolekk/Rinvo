@@ -24,6 +24,7 @@ from pathlib import Path
 import copy
 
 import czlowiek
+import dla_czlowieka
 import linear_sync
 import notatki
 import zasady
@@ -106,6 +107,11 @@ def zastosuj(api_key, klient, karta, Z, wiersze, team, label_map, todo_id, najno
         ids = [l["id"] for l in st["labels"] if l["name"] not in w["usun"]]
         ids += [label_map[n] for n in w["dodaj"] if n in label_map and label_map[n] not in ids]
         opis = linear_sync.build_description(item, w["zrodlo"], karta, przyp, Z)
+        # blok „Co masz zrobić” (w tym mail poprawiony przez człowieka) przeliczenie zachowuje; nowy układ dopisuje dla_czlowieka.przelicz
+        stary = (linear_sync.gql(api_key, 'query { issue(id: "%s") { description } }' % linear_id).get("issue") or {}).get("description") or ""
+        blok_zgloszenia = dla_czlowieka.rozdziel(stary)[0]
+        if blok_zgloszenia:
+            opis = dla_czlowieka.zloz_opis(blok_zgloszenia, opis)
         wejscie = {"labelIds": ids, "description": opis}
         if item.get("termin_modelu"):                 # kod poprawił termin: tytuł z błędną datą też
             wejscie["title"] = f"[{klient}] {item.get('tytul', '')}"
@@ -200,6 +206,10 @@ def main():
             zastosuj(api_key, klient, karta, Z, wiersze, team, label_map, todo_id, najnowsze)
             linear_sync.save_karta(klient, karta)
             linear_sync.write_karta_md(klient, karta)
+    if args.zastosuj:                                  # zgłoszenia dla człowieka: tytuł od czynności i blok na górze opisu
+        import wyslij
+        zmiany_ukladu = dla_czlowieka.przelicz(wyslij.zbuduj_srodowisko(), zastosuj=True)
+        print(f"\nZgłoszenia dla człowieka przeliczone do nowego układu: {len(zmiany_ukladu)}")
     print(f"\nRAZEM zmieniło przypisanie: {len(wszystkie)}" + ("" if args.zastosuj else "  (raport; nic nie zmieniono)"))
 
 

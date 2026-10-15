@@ -94,7 +94,8 @@ def wczytaj_dane(root=".", dzis=None):
     return {"Z": Z, "klienci": klienci, "stan": stan_linear.wczytaj(root / "ops/.stan_linear.json"),
             "zdarzenia": zdarzenia.wczytaj(root / "ops/.zdarzenia.json"), "prosby": _json(root / "ops/produkt/prosby.json", {}),
             "dzis": dzis or datetime.now(ZoneInfo("Europe/Warsaw")).date(), "root": root,
-            "sygnaly_stan": _json(root / "ops/.sygnaly.json", None)}
+            "sygnaly_stan": _json(root / "ops/.sygnaly.json", None),
+            "propozycje": _json(root / "ops/produkt/propozycje.json", {})}
 
 
 def nazwa_klienta(klient):
@@ -450,7 +451,16 @@ def strona_glos(dane):
     karty = []
     for g in sygn:
         c = g["cytat"] or {}
-        karty.append(f"""<div class="panel"><h3>{e(g['tytul'])} <span class="tag {kolory[g['status']]}">{e(g['status'])}</span></h3>
+        prop = (dane.get("propozycje") or {}).get(g["klucz"])
+        if prop:                                                  # każdy sygnał linkuje do propozycji produktowej (propozycje.py)
+            pdf = f'{dane["Z"]["propozycje"]["katalog"]}/{g["klucz"]}.pdf'          # względem katalogu głównego stron
+            zgl_p = prop.get("zgloszenie") or {}
+            propozycja = (f'<p class="sub" style="margin:4px 0"><b>Propozycja:</b> <a href="{e(pdf)}">PDF</a> · '
+                          f'<a href="{e(zgl_p.get("url", "#"))}">zgłoszenie {e(zgl_p.get("identifier", ""))}</a> · wersja {e(prop.get("wersja", 1))} '
+                          f'<span class="tag">{e(str(prop.get("status", "")).replace("_", " "))}</span></p>')
+        else:
+            propozycja = '<p class="sub" style="margin:4px 0"><b>Propozycja:</b> w przygotowaniu</p>'
+        karty.append(f"""<div class="panel"><h3>{e(g['tytul'])} <span class="tag {kolory[g['status']]}">{e(g['status'])}</span></h3>{propozycja}
 <p class="sub" style="margin:4px 0"><b>Dlaczego:</b> {e(g['powod'])}</p>
 <p class="sub" style="margin:4px 0">Klienci: {e(', '.join(nazwa_klienta(dane['klienci'][k]) if k in dane['klienci'] else k for k in g['klienci']))}
 · pierwsza prośba {e(g['pierwsza'])}, ostatnia {e(g['ostatnia'])} {zgl_html(g)}</p>

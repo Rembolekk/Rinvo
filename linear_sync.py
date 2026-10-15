@@ -26,6 +26,7 @@ import zasady
 from sekrety import czysc
 from podpis import podpisz_agenta
 import czlowiek
+import dla_czlowieka
 import higiena
 import zakazy_czas
 
@@ -52,6 +53,7 @@ REQUIRED_LABELS = [
     "Decyzja człowieka",
     "repo: rinvo-app", "repo: rinvo", "repo: rinvo-ops",
     "Szkic gotowy", "Wyślij", "Wysłano", "Regresja",
+    "Odrzuć", "Buduj", "Później",
 ]
 
 LABEL_COLORS = {
@@ -68,6 +70,9 @@ LABEL_COLORS = {
     "Powtarzające się ryzyko": "#991b1b",
     "Wielu klientów": "#0891b2",
     "Decyzja człowieka": "#2563eb",
+    "Odrzuć": "#64748b",
+    "Buduj": "#16a34a",
+    "Później": "#a3a3a3",
     "Regresja": "#dc2626",
     "Szkic gotowy": "#eab308",
     "Wyślij": "#16a34a",
@@ -1190,7 +1195,7 @@ def main():
         otwarte = karta.get("otwarte_sprawy", {})
 
         # ── zgłoszenie usunięte albo zarchiwizowane przez człowieka: odrzucone, nie tworzymy go ponownie ──
-        if klucz in karta.get("odrzucone", {}):
+        if klucz in karta.get("odrzucone", {}) and dla_czlowieka.czy_blokuje_odrzucenie(karta["odrzucone"][klucz], source):
             print(f"  [odrzucone przez człowieka] {klucz} ({karta['odrzucone'][klucz].get('identifier', '?')}): nie tworzę ponownie")
             stats["pominieto"] += 1
             continue
@@ -1245,6 +1250,13 @@ def main():
             product_escalate, _ = update_prosby(prosby, item, klient, source, today)
 
         desc = build_description(item, source, karta, przyp, Z)
+        reguly = [x["regula"] for x in przyp.get("powody", [])]
+        czynnosc = dla_czlowieka.czynnosc_dla(label_names, desc, Z, reguly)
+        if czynnosc:                                  # zgłoszenie dla człowieka: tytuł od czynności i blok „Co masz zrobić” na górze opisu
+            tytul = dla_czlowieka.tytul_zgloszenia(tytul, czynnosc, Z)
+            desc = dla_czlowieka.zloz_opis(dla_czlowieka.zloz_blok(
+                dla_czlowieka.co_masz_zrobic(czynnosc, tytul, None, "; ".join(zasady.powody_tekst(przyp)) or None),
+                dla_czlowieka.dlaczego_ty({"reguly": reguly}, label_names, Z, czynnosc)), desc)
 
         # ── dry-run ───────────────────────────────────────────────────────────
         if args.dry_run:

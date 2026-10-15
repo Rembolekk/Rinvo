@@ -78,6 +78,11 @@ class AtrapaLinear:
                     k["body"] = tresc
         self.zdarzenia.append(("edycja", komentarz_id, tresc))
 
+    def ustaw_uklad(self, z, tytul, opis):
+        for t in (z, self.zgloszenia.get(z["identifier"], z)):
+            t["title"], t["description"] = tytul, opis
+        self.zdarzenia.append(("uklad", z["identifier"], tytul))
+
     def ustaw_stan(self, z, nazwa):
         for t in (z, self.zgloszenia.get(z["identifier"], z)):
             t["state"] = nazwa
@@ -1373,7 +1378,7 @@ class TestWorkflow(unittest.TestCase):
         t = (Path(__file__).parent.parent / ".github/workflows/agent.yml").read_text(encoding="utf-8")
         self.assertIn("fpdf2", t)
         self.assertIn("fonts-dejavu-core", t)
-        self.assertRegex(t, r"for sciezka in [^\n]*ops/materialy; do")      # po dodaniu stron: pętla po ścieżkach zamiast osobnego git add
+        self.assertRegex(t, r"for sciezka in [^\n]*ops/materialy( ops/produkt)?; do")      # po dodaniu stron: pętla po ścieżkach zamiast osobnego git add
         self.assertIn("contents: write", t)
 
     def test_agent_nie_dostaje_hasla_do_poczty(self):

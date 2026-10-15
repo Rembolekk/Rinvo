@@ -22,6 +22,7 @@ import sys
 from datetime import timedelta
 
 import agent as ag
+import dla_czlowieka
 import materialy as mat
 import stan_linear
 import wyslij as wy
@@ -330,6 +331,10 @@ def _wpis_szkicu(s, odbiorca, zgloszenia, temat, tresc, spotkanie, zalaczniki=()
         if z is not glowny:
             s.linear.komentarz(z, wy.format_komentarza_zbiorczego(glowny["identifier"]))
         s.linear.dodaj_etykiete(z, E["szkic"])
+    # układ dla człowieka: blok z gotowym mailem na górze opisu (źródło wysyłki), komentarze zostają jako historia
+    mail = {"do": odbiorca["imie"], "temat": temat, "tresc": tresc, "zgloszenia": ident, "spotkanie": spotkanie, "zalaczniki": list(zalaczniki)}
+    for z in zgloszenia:
+        dla_czlowieka.zastosuj_uklad(s, z, komentarze=[], mail=mail if z is glowny else {"zbiorczy": glowny["identifier"]})
     return {"status": "szkic", "zgloszenia": ident, "do": odbiorca["imie"], "temat": temat, "zaproszenie": bool(spotkanie), "zalaczniki": list(zalaczniki)}
 
 
@@ -342,6 +347,7 @@ def _do_weryfikacji(s, zg, powody, czesc=None):
     if czesc and czesc.get("tresc"):
         tekst += f"\n\nRobocza wersja (nie zostanie wysłana):\n\n---\n{czesc['tresc']}\n---"
     s.linear.komentarz(zg, tekst + "\n\nPopraw zgłoszenie albo napisz mail ręcznie.")
+    dla_czlowieka.zastosuj_uklad(s, zg, komentarze=[], powod="; ".join(powody))
     return {"status": "do_weryfikacji", "zgloszenia": [zg["identifier"]], "powod": "; ".join(powody)}
 
 
@@ -356,6 +362,8 @@ def obsluz_grupe(s, klient, grupa):
             if E["szkic"] not in z.get("labels", []):
                 s.linear.dodaj_etykiete(z, E["weryfikacja"])
         s.linear.komentarz(grupa[0], BRAK_KONTAKTU)
+        for z in grupa:
+            dla_czlowieka.zastosuj_uklad(s, z, komentarze=[], powod="uzupełnij potwierdzony kontakt z adresem e-mail w karcie klienta")
         return [{"status": "brak_kontaktu", "powod": "brak kontaktu w karcie", "zgloszenia": [z["identifier"] for z in grupa]}]
 
     czesci, wyniki_materialow = [], []

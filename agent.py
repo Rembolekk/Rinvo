@@ -53,7 +53,9 @@ def klient_z_tytulu(tytul):
 
 
 def tytul_bez_prefiksu(tytul):
-    return re.sub(r"^\[[^\]]+\]\s*", "", tytul or "").strip()
+    """Tytuł bez „[klient] ” i bez czynności układu dla człowieka („Wyślij: …”, „Zdecyduj: …”)."""
+    t = re.sub(r"^\[[^\]]+\]\s*", "", tytul or "").strip()
+    return re.sub(r"^(?:Wyślij|Zdecyduj|Sprawdź|Uzupełnij):\s*", "", t)
 
 
 def slug(tekst, limit=40):

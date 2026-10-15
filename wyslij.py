@@ -26,6 +26,7 @@ import sys
 from datetime import date, datetime, timedelta
 from zoneinfo import ZoneInfo
 
+import dla_czlowieka
 import slack_widok as sw
 import stan_linear
 import zakazy_czas
@@ -40,20 +41,52 @@ EMAIL_RE = re.compile(r"[\w.+-]+@[\w-]+(?:\.[\w-]+)+")
 
 # ── szkic w komentarzu ────────────────────────────────────────────────────────
 
-def format_komentarza_szkicu(odbiorca, temat, tresc, identyfikatory, spotkanie=None, zalaczniki=()):
-    sp = ""
+def czesc_maila(odbiorca, temat, tresc, identyfikatory, spotkanie=None, zalaczniki=(), kiedy=None):
+    """Linie szkicu maila: Do, Temat, Zgłoszenia, [Załączniki], [Spotkanie], [Kiedy wyjdzie], potem treść między liniami „---”.
+    Ten sam układ jest w komentarzu ze szkicem (historia) i w bloku „Co masz zrobić” w opisie zgłoszenia (źródło wysyłki)."""
+    linie = [f"**Do:** {odbiorca}", f"**Temat:** {temat}", f"**Zgłoszenia:** {', '.join(identyfikatory)}"]
     if zalaczniki:
-        sp += f"**Załączniki:** {', '.join(zalaczniki)}\n"
+        linie.append(f"**Załączniki:** {', '.join(zalaczniki)}")
     if spotkanie:
-        sp = (f"**Spotkanie:** {spotkanie['data']} {spotkanie['godzina']} | {spotkanie.get('czas_min', 60)} | "
-              f"{spotkanie.get('miejsce', '')} | {spotkanie.get('tytul', '')}  _(zaproszenie .ics zostanie dołączone)_\n")
-    return (f"{NAGLOWEK_SZKICU}\n\n**Do:** {odbiorca}\n**Temat:** {temat}\n**Zgłoszenia:** {', '.join(identyfikatory)}\n{sp}\n"
-            f"---\n{tresc.strip()}\n---\n\n_Aby wysłać: dodaj etykietę „Wyślij”. Szkic możesz poprawić, dodając nowy komentarz "
-            f"w tym samym układzie; wysłany zostanie najnowszy._")
+        linie.append(f"**Spotkanie:** {spotkanie['data']} {spotkanie['godzina']} | {spotkanie.get('czas_min', 60)} | "
+                     f"{spotkanie.get('miejsce', '')} | {spotkanie.get('tytul', '')}  _(zaproszenie .ics zostanie dołączone)_")
+    if kiedy:
+        linie.append(f"**Kiedy wyjdzie:** {kiedy}")
+    # puste linie wokół „---”: bez nich Markdown (Linear) zamienia linię przed „---” w nagłówek i gubi ogranicznik
+    return linie + ["", "---", "", tresc.strip(), "", "---", ""]
+
+
+def format_komentarza_szkicu(odbiorca, temat, tresc, identyfikatory, spotkanie=None, zalaczniki=()):
+    return (f"{NAGLOWEK_SZKICU}\n\n" + "\n".join(czesc_maila(odbiorca, temat, tresc, identyfikatory, spotkanie, zalaczniki))
+            + "\n\n_Aby wysłać: dodaj etykietę „Wyślij”. Szkic możesz poprawić, dodając nowy komentarz "
+              "w tym samym układzie albo poprawiając blok na górze opisu zgłoszenia; wysłana zostanie najnowsza wersja z opisu._")
 
 
 def format_komentarza_zbiorczego(glowny):
     return f"{NAGLOWEK_ZBIORCZEGO} treść maila jest w zgłoszeniu {glowny}. Etykietę „Wyślij” dodaj tam."
+
+
+def parsuj_czesc_maila(body):
+    """Tekst z liniami Do/Temat/Zgłoszenia/…/--- treść --- → {"do","temat","zgloszenia","tresc","zalaczniki","spotkanie"} albo None.
+    Treść to tekst między PIERWSZĄ a OSTATNIĄ linią „---” (treść może zawierać własne linie „---”)."""
+    do = re.search(r"^\*\*Do:\*\*\s*(.+)$", body, re.M)
+    temat = re.search(r"^\*\*Temat:\*\*\s*(.+)$", body, re.M)
+    zgl = re.search(r"^\*\*Zgłoszenia:\*\*\s*(.+)$", body, re.M)
+    linie = body.split("\n")
+    kreski = [i for i, l in enumerate(linie) if l.strip() == "---"]
+    zal = re.search(r"^\*\*Załączniki:\*\*\s*(.+)$", body, re.M)
+    sp = re.search(r"^\*\*Spotkanie:\*\*\s*(\d{4}-\d{2}-\d{2}) (\d{1,2}:\d{2}) \| (\d+) \| ([^|\n]*) \| ([^\n]*?)(?:\s+_\(.*)?$", body, re.M)
+    if not (do and temat and len(kreski) >= 2):
+        return None
+    tresc = "\n".join(linie[kreski[0] + 1: kreski[-1]]).strip()
+    if not tresc:
+        return None
+    return {"do": do.group(1).strip(), "temat": temat.group(1).strip(),
+            "zgloszenia": re.findall(r"RIN-\d+", zgl.group(1)) if zgl else [],
+            "tresc": tresc,
+            "zalaczniki": [x.strip() for x in zal.group(1).split(",") if x.strip()] if zal else [],
+            "spotkanie": ({"data": sp.group(1), "godzina": sp.group(2), "czas_min": int(sp.group(3)),
+                           "miejsce": sp.group(4).strip(), "tytul": sp.group(5).strip()} if sp else None)}
 
 
 def parsuj_szkic(komentarze):
@@ -66,21 +99,19 @@ def parsuj_szkic(komentarze):
             return {"zbiorczy": m.group(1) if m else "?"}
         if not body.startswith(NAGLOWEK_SZKICU):
             continue
-        do = re.search(r"^\*\*Do:\*\*\s*(.+)$", body, re.M)
-        temat = re.search(r"^\*\*Temat:\*\*\s*(.+)$", body, re.M)
-        zgl = re.search(r"^\*\*Zgłoszenia:\*\*\s*(.+)$", body, re.M)
-        tresc = re.search(r"^---\n(.*?)\n---\s*$", body, re.M | re.S)
-        zal = re.search(r"^\*\*Załączniki:\*\*\s*(.+)$", body, re.M)
-        sp = re.search(r"^\*\*Spotkanie:\*\*\s*(\d{4}-\d{2}-\d{2}) (\d{1,2}:\d{2}) \| (\d+) \| ([^|\n]*) \| ([^\n]*?)(?:\s+_\(.*)?$", body, re.M)
-        if not (do and temat and tresc):
+        # stopka „_Aby wysłać…_” nie należy do treści
+        szkic = parsuj_czesc_maila(body)
+        if szkic is None:
             continue
-        return {"do": do.group(1).strip(), "temat": temat.group(1).strip(),
-                "zgloszenia": re.findall(r"RIN-\d+", zgl.group(1)) if zgl else [],
-                "tresc": tresc.group(1).strip(),
-                "zalaczniki": [x.strip() for x in zal.group(1).split(",") if x.strip()] if zal else [],
-                "spotkanie": ({"data": sp.group(1), "godzina": sp.group(2), "czas_min": int(sp.group(3)),
-                               "miejsce": sp.group(4).strip(), "tytul": sp.group(5).strip()} if sp else None)}
+        return szkic
     return None
+
+
+def szkic_zgloszenia(s, zg):
+    """Szkic do wysłania dla zgłoszenia: blok „Co masz zrobić” w opisie (wersja poprawiona przez człowieka wygrywa),
+    inaczej najnowszy komentarz ze szkicem. Wskazanie zbiorcze zwraca {"zbiorczy": "RIN-x"}."""
+    szkic = dla_czlowieka.parsuj_blok(zg.get("description"))
+    return szkic or parsuj_szkic(s.linear.komentarze(zg))
 
 
 def znajdz_placeholder(temat, tresc, W):
@@ -356,14 +387,18 @@ def obsluz_zgloszenie(s, zg):
         s.linear.usun_etykiete(zg, E["wyslij"])
         return {"status": "pominiete", "powod": "już wysłano", "zgloszenie": zg["identifier"]}
 
+    if zg.get("state") in ("Canceled", "Cancelled"):                 # odrzucone przez człowieka: nic nie wychodzi
+        s.linear.usun_etykiete(zg, E["wyslij"])
+        return {"status": "pominiete", "powod": "zgłoszenie anulowane", "zgloszenie": zg["identifier"]}
+
     klient = klient_z_tytulu(zg.get("title")) or ""
     karta = s.wczytaj_karte(klient)
-    szkic = parsuj_szkic(s.linear.komentarze(zg))
+    szkic = szkic_zgloszenia(s, zg)
     if szkic is None:
-        return wstrzymaj(s, zg, ["brak szkicu maila w komentarzach zgłoszenia"])
+        return wstrzymaj(s, zg, ["brak szkicu maila w opisie ani w komentarzach zgłoszenia"])
     if "zbiorczy" in szkic:                      # etykieta na dowolnym zgłoszeniu grupy wysyła mail całej grupy
         glowny = s.linear.zgloszenie_po_numerze(int(szkic["zbiorczy"].split("-")[1])) if szkic["zbiorczy"].startswith("RIN-") else None
-        szkic = parsuj_szkic(s.linear.komentarze(glowny)) if glowny else None
+        szkic = szkic_zgloszenia(s, glowny) if glowny else None
         if szkic is None or "zbiorczy" in szkic:
             return wstrzymaj(s, zg, ["nie znaleziono szkicu zbiorczego w zgłoszeniu głównym"])
 
@@ -452,6 +487,7 @@ def obsluz_zgloszenie(s, zg):
 
 def uruchom(s):
     wyniki, wyslane = [], set()
+    wyniki += dla_czlowieka.obsluz_odrzucenia(s)                      # „Odrzuć” przed wysyłką: odrzucone zgłoszenie nic nie wyśle
     for zg in s.linear.z_etykieta(s.Z["etykiety"]["wyslij"]):
         if zg["identifier"] in wyslane:               # to samo zgłoszenie grupy już poszło w tym przebiegu
             continue
@@ -488,6 +524,7 @@ def zbuduj_srodowisko(sucho=False):
 
     s = Srodowisko()
     s.Z, s.sucho = Z, sucho
+    s.plik_stanu = Z["propozycje"]["stan"]
     s.linear = LinearAgent(linear_sync.load_api_key(), Z)
     s.slack = SlackAgent()
     s.poczta = Poczta(Z["wysylka"])
@@ -531,6 +568,10 @@ def main():
     args = ap.parse_args()
     s = zbuduj_srodowisko(args.sucho)
     wyniki = uruchom(s)
+    if not args.sucho:
+        import propozycje
+        for w in propozycje.uruchom_ruchy(s):                       # ruchy człowieka na propozycjach produktowych: Buduj, Później
+            print(f"{w['klucz']}: {w['status']}")
     for w in wyniki:
         print(f"{w['zgloszenie']}: {w['status']}" + (f" ({w['powod']})" if w.get("powod") else ""))
     if not wyniki:

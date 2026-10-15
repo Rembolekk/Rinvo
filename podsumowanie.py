@@ -28,7 +28,9 @@ import sys
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 
+import dla_czlowieka
 import slack_widok as sw
+import widok
 import zasady
 from maile import slack_bezpiecznie
 from sekrety import wyczysc_srodowisko
@@ -76,7 +78,7 @@ def czy_pora(teraz_utc, stan, Z, wymus=False):
 
 # ── dane z Lineara ────────────────────────────────────────────────────────────
 
-_POLA = "id identifier url title createdAt updatedAt dueDate state { name type } labels { nodes { name } }"
+_POLA = "id identifier url title createdAt updatedAt dueDate priority state { name type } labels { nodes { name } }"
 
 
 def _pobierz(api_key, filtr):
@@ -305,9 +307,8 @@ def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
     eskal = eskalacje(otwarte, karty, Z, dzis)
     eskal_ids = {e["z"]["identifier"] for e in eskal}
     grupy["czlowiek"] = [h for h in grupy["czlowiek"] if h["z"]["identifier"] not in eskal_ids]     # na górze z liczbą dni, bez powtórki
-    human = sorted(grupy["czlowiek"] + grupy["weryfikacja"],
-                   key=lambda h: (KOLEJNOSC_POWODOW.index(h["powod"]) if h["powod"] in KOLEJNOSC_POWODOW else 9,
-                                  h["z"]["identifier"]))
+    # kolejność jak w widoku „Dla mnie dziś”: po terminie, termin dziś, reszta według priorytetu
+    human = sorted(grupy["czlowiek"] + grupy["weryfikacja"], key=lambda h: dla_czlowieka.klucz_dla_mnie(h["z"], dzis))
     uwaga = grupy["ryzyko"] + sorted(grupy["po_terminie"], key=lambda u: (u["termin"], u["z"]["identifier"]))
     przyszle = sorted(((_data(w["z"].get("dueDate")), w["klient"], w["z"]) for w in grupy["czeka"]
                        if _data(w["z"].get("dueDate")) and _data(w["z"]["dueDate"]) >= dzis),
@@ -318,6 +319,7 @@ def przygotuj(otwarte, skonczone, karty, Z, dzis, nowe=()):
         "czeka_n": len(grupy["czeka"]), "czeka_najblizsze": przyszle[0] if przyszle else None,
         "nowe_n": len(grupy["nowe"]),
         "widok": sw.widok_linear_url([z.get("url") for z in otwarte]),
+        "widok_dla_mnie": None,
         "strony_url": Z.get("strony", {}).get("url_bazowy", "").rstrip("/") + "/index.html" if Z.get("strony") else None,
         "strony_tekst": Z.get("strony", {}).get("tekst_linku", "Wszystko o klientach i prośbach: strony"),
     }
@@ -337,6 +339,8 @@ def buduj_wiadomosc(dane, dzis):
         sekcje.append(f"*Dziś potrzebujemy Cię w {n} {'sprawie' if n == 1 else 'sprawach'}*")
         linie = [sw.linia_pozycji(h["z"].get("url"), h["z"].get("title"), h["klient"], h["powod"])
                  for h in dane["human"]]
+        if dane.get("widok_dla_mnie"):
+            linie.append(f"<{dane['widok_dla_mnie']}|Dla mnie dziś w Linearze>")
         sekcje.append("*Wymaga człowieka*\n" + "\n".join(sw.ogranicz(linie)))
     if dane["uwaga"] or dane.get("klucze_uwaga"):
         linie = []
@@ -428,6 +432,7 @@ def main():
 
     api_key = linear_sync.load_api_key()
     karty = wczytaj_karty()
+    karty.setdefault("produkt", {"klient": "Produkt", "otwarte_sprawy": {}, "zakazy": []})      # propozycje produktowe: zgłoszenia „[produkt] …”
     dzis = czas_polski(teraz).date()
     otwarte, skonczone = pobierz_zgloszenia(api_key, teraz, Z["podsumowanie"].get("okno_nowych_godzin", 26))
     klienci = zbierz(otwarte, [], karty, Z, dzis)
@@ -436,6 +441,7 @@ def main():
     import klucze
     naglowek = klucze.pobierz_naglowek_github(os.environ.get("AGENT_GITHUB_TOKEN", ""), Z["agent_wykonawczy"]["repo_github"],
                                              Z["klucze"]["naglowek_github"])
+    dane["widok_dla_mnie"] = widok.wczytaj_url(Z)             # widok „Dla mnie dziś” (widok.py)
     dane["klucze_uwaga"] = klucze.linie_uwagi(klucze.wygasajace(Z, naglowek, dzis))
     tekst, bloki = buduj_wiadomosc(dane, dzis)
     print(tekst)
