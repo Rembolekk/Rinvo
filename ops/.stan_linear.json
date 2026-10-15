@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T18:21:54+00:00",
+ "zapisano": "2026-10-15T18:29:32+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -839,6 +839,7 @@
   },
   "RIN-164": {
    "etykiety": [
+    "Decyzja człowieka",
     "Dla agenta",
     "Konfiguracja",
     "repo: rinvo-app"
@@ -852,7 +853,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-164/motor-lux-blad-agent-proponuje-jazdy-probne-w-niedziele-poprawic",
    "utworzono": "2026-10-15T17:20:54.407Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:59:43.315Z"
+   "zmieniono": "2026-10-15T18:29:15.635Z"
   },
   "RIN-165": {
    "etykiety": [
