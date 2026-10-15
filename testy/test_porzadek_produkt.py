@@ -773,7 +773,7 @@ class B5Integracje(BBaza):
         pr.uruchom(s, self.dane())
         self.repo.zapisz("ops/produkt/propozycje.json", pr.wczytaj_stan(s.plik_stanu))
         h = self.repo.strony()["glos-klientow.html"]
-        self.assertEqual(h.count("<b>Propozycja:</b> <a href="), 2)
+        self.assertEqual(h.count('>Propozycja</a>'), 2)
         self.assertIn('href="ops/materialy/produkt/integracja-crm.pdf"', h)
         self.assertIn('href="ops/materialy/produkt/eksport-excel.pdf"', h)
 

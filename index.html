@@ -1,47 +1,45 @@
 <!doctype html>
 <html lang="pl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Klienci</title><meta name="robots" content="noindex"><style>
-:root{--bg:#f6f5f2;--card:#fff;--ink:#1d1d1b;--mut:#62615c;--line:#e3e1db;--acc:#2f5bd3;--accbg:#e8eefc;
---ok:#0f7a43;--okbg:#e2f4ea;--warn:#9a5b00;--warnbg:#fdf0d9;--bad:#b42318;--badbg:#fde7e5;--back:#5b4bb7;--backbg:#ece9fb;color-scheme:light}
-@media (prefers-color-scheme:dark){:root{--bg:#151514;--card:#1f1f1d;--ink:#ecebe6;--mut:#a3a29b;--line:#34332f;--acc:#8aa8ff;--accbg:#232c45;
---ok:#6fd39c;--okbg:#173326;--warn:#f3b75a;--warnbg:#382a12;--bad:#ff8a80;--badbg:#3d1d1a;--back:#b3a8ff;--backbg:#2a2545;color-scheme:dark}}
+:root{--bg:#fff;--ink:#202124;--mut:#70757a;--line:#eceef0;--acc:#2b59c3;--ok:#2e8b57;--warn:#d99a00;--bad:#c2410c;color-scheme:light}
+@media (prefers-color-scheme:dark){:root{--bg:#141516;--ink:#e8eaed;--mut:#9aa0a6;--line:#2a2c2e;--acc:#8ab4f8;--ok:#6fcf97;--warn:#f2c14e;--bad:#f28b6a;color-scheme:dark}}
 *{box-sizing:border-box}
-body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.55 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif}
-.wrap{max-width:1000px;margin:0 auto;padding:24px 16px 56px}
-h1{font-size:1.55rem;margin:0 0 4px;letter-spacing:-.01em} h2{font-size:1.2rem;margin:30px 0 10px} h3{font-size:1rem;margin:0}
-.meta,.sub{color:var(--mut);margin:0 0 18px} nav{margin:0 0 18px;font-size:.9rem} nav a{margin-right:14px}
-a{color:var(--acc)} .demo{display:inline-block;font-size:.78rem;font-weight:600;color:var(--warn);background:var(--warnbg);padding:2px 10px;border-radius:99px;margin-bottom:10px}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:12px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
-a.card{text-decoration:none;color:inherit;display:block} a.card:hover{border-color:var(--acc)}
-.card header{display:flex;gap:10px;align-items:center;margin-bottom:8px}
-.dot{width:14px;height:14px;border-radius:50%;flex:none} .dot.czerwone{background:var(--bad)} .dot.zolte{background:#e0a100} .dot.zielone{background:var(--ok)}
-.nums{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px} .num{background:var(--bg);border:1px solid var(--line);border-radius:8px;padding:4px 10px;font-size:.82rem;color:var(--mut)}
-.num b{font-size:1.1rem;color:var(--ink);margin-right:4px}
-.why{font-size:.83rem;color:var(--mut);margin:6px 0 0}
-.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:12px}
-.panel h3{margin-bottom:8px} ul{margin:0;padding-left:20px} li{margin:0 0 8px}
-.now3{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
-.tag{display:inline-block;font-size:.72rem;padding:1px 8px;border-radius:99px;background:var(--bg);border:1px solid var(--line);color:var(--mut);margin-left:4px}
-.tag.bad{background:var(--badbg);color:var(--bad);border-color:transparent} .tag.ok{background:var(--okbg);color:var(--ok);border-color:transparent}
-.tag.warn{background:var(--warnbg);color:var(--warn);border-color:transparent} .tag.back{background:var(--backbg);color:var(--back);border-color:transparent}
-blockquote{margin:6px 0 0;padding:4px 10px;border-left:3px solid var(--line);color:var(--mut);font-style:italic;font-size:.88rem}
-.tl{list-style:none;padding:0;margin:0} .tl li{display:grid;grid-template-columns:92px 1fr;gap:4px 12px;padding:10px 0;border-bottom:1px solid var(--line);margin:0}
-.tl time{color:var(--mut);font-size:.85rem} @media (max-width:520px){.tl li{grid-template-columns:1fr}}
-.kind{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;color:var(--back);margin-right:6px}
-.empty{color:var(--mut)} footer{margin-top:36px;color:var(--mut);font-size:.85rem}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif}
+.wrap{max-width:880px;margin:0 auto;padding:40px 20px 56px}
+nav{font-size:.85rem;margin:0 0 36px} nav a{color:var(--mut);text-decoration:none;margin-right:18px} nav a:hover{color:var(--ink)}
+h1{font-size:1.5rem;font-weight:600;margin:0 0 6px;letter-spacing:-.01em}
+h2{font-size:.78rem;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--mut);margin:44px 0 12px}
+h3{font-size:1rem;font-weight:600;margin:0 0 6px}
+a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
+.meta,.sub{color:var(--mut);margin:0 0 14px}
+.gora{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 32px;margin:0 0 8px}
+.glowne{font-size:2rem;line-height:1.25;font-weight:600;margin:0;letter-spacing:-.015em}
+.agenci{color:var(--mut);font-size:.95rem;margin:0}
+.podpis{color:var(--mut);font-size:.78rem;margin:2px 0 0;text-align:right}
+table{width:100%;border-collapse:collapse}
+.klienci{margin-top:36px}
+th{font-weight:500;font-size:.78rem;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+td{padding:14px 10px;border-bottom:1px solid var(--line);vertical-align:baseline}
+th.n,td.n{text-align:right;font-variant-numeric:tabular-nums}
+td.n.zero{color:var(--mut)} td.uwaga{color:var(--mut);font-size:.92rem}
+.tabela{overflow-x:auto}
+.dot{display:inline-block;width:11px;height:11px;border-radius:50%;vertical-align:baseline;margin-right:10px;cursor:help}
+.dot.czerwone{background:var(--bad)} .dot.zolte{background:var(--warn)} .dot.zielone{background:var(--ok)}
+.now3{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:28px}
+.panel{padding:0 0 18px;margin:0 0 18px;border-bottom:1px solid var(--line)}
+ul{margin:0;padding-left:18px} li{margin:0 0 8px}
+.tag{font-size:.74rem;color:var(--mut);border:1px solid var(--line);border-radius:99px;padding:0 8px;margin-left:6px;white-space:nowrap}
+.tag.bad{color:var(--bad);border-color:currentColor} .tag.ok{color:var(--ok);border-color:currentColor} .tag.warn{color:var(--warn);border-color:currentColor}
+blockquote{margin:6px 0 0;padding:2px 12px;border-left:2px solid var(--line);color:var(--mut);font-size:.92rem}
+.tl{list-style:none;padding:0;margin:0} .tl li{display:grid;grid-template-columns:92px 1fr;gap:4px 14px;padding:12px 0;border-bottom:1px solid var(--line);margin:0}
+.tl time{color:var(--mut);font-size:.85rem} @media (max-width:560px){.tl li{grid-template-columns:1fr}.glowne{font-size:1.6rem}.podpis{text-align:left}}
+.kind{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-right:8px}
+.empty{color:var(--mut)} details summary{cursor:pointer;color:var(--mut);font-size:.9rem}
+summary.jedna{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+footer{margin-top:56px;color:var(--mut);font-size:.78rem}
 </style></head><body><div class="wrap">
-<span class="demo">dane fikcyjne, demo</span>
 <nav><a href="index.html">Klienci</a><a href="glos-klientow.html">Głos klientów</a></nav>
-<h1>Klienci</h1><p class="meta">Jedno miejsce na wszystko o kliencie: sprawy, rozmowy, zakazy, ryzyka i kontakty.</p>
-<div class="grid"><a class="card" href="klienci/auto-tama.html"><header><span class="dot czerwone" title="Czerwone"></span>
-<h3>Grupa Auto Tama</h3><span class="tag">Czerwone</span></header>
-<div class="nums"><span class="num"><b>5</b>u agentów</span><span class="num"><b>6</b>u człowieka</span>
-<span class="num"><b>5</b>czeka na klienta</span></div>
-<p class="why">ryzyko „Konkurencja” pojawiło się już 2 razy; po terminie: 3</p></a><a class="card" href="klienci/hotele-baltyk.html"><header><span class="dot zolte" title="Żółte"></span>
-<h3>Hotele Baltyk</h3><span class="tag">Żółte</span></header>
-<div class="nums"><span class="num"><b>1</b>u agentów</span><span class="num"><b>9</b>u człowieka</span>
-<span class="num"><b>3</b>czeka na klienta</span></div>
-<p class="why">wymaga człowieka: 9</p></a></div><p class="sub" style="margin-top:18px"><span class="dot czerwone" style="display:inline-block;vertical-align:middle"></span> Czerwone: Powtarzające się ryzyko albo sprawa po terminie · <span class="dot zolte" style="display:inline-block;vertical-align:middle"></span> Żółte: Coś wymaga człowieka · <span class="dot zielone" style="display:inline-block;vertical-align:middle"></span> Zielone: Reszta: bez ryzyk i spraw po terminie</p><h2>Agenci w tym tygodniu</h2><div class="panel"><div class="nums"><span class="num"><b>5</b>zamkniętych spraw (7 dni)</span></div><div class="nums"><span class="num"><b>2</b>poprawek scalonych</span><span class="num"><b>9 d 2 h</b>średnio od źródła do scalenia</span><span class="num"><b>9 d 2 h</b>najkrócej</span></div><p class="sub" style="margin:8px 0 0">Najszybsza: <a href="https://github.com/Rembolekk/rinvo-app/pull/5">Zmienić godziny salonów podawane klientom: sobota do 15:00</a> <span class="tag">RIN-116</span></p><p class="why">Czas liczony od najwcześniejszego źródła sprawy (rozmowa lub mail, z kart klientów) do scalenia poprawki (dziennik zdarzeń). Zamknięte sprawy z Lineara.</p></div>
-<footer>Dane fikcyjne, demo. Strona wygenerowana automatycznie; stan Lineara z 2026-10-15T17:05:56+00:00. Adresy e-mail kontaktów celowo nie są publikowane.</footer>
+
+<div class="gora"><p class="glowne">Dziś potrzebujemy Cię w <a href="https://linear.app/rinvo-demo/view/dbaddc1c00a1">32 sprawach</a></p><div><p class="agenci">Agenci w tym tygodniu: 5 spraw zamkniętych, poprawka średnio w 2 h 15 min od wpłynięcia rozmowy</p><p class="podpis">od wpłynięcia rozmowy do wdrożonej poprawki</p></div></div><div class="tabela"><table class="klienci"><thead><tr><th>Klient</th><th class="n">Wymaga Ciebie</th><th class="n">U agentów</th><th class="n">Czeka na klienta</th><th>Uwaga</th></tr></thead><tbody><tr><td><span class="dot czerwone" title="Czerwone: ryzyko „Konkurencja” pojawiło się już 2 razy; po terminie: 3"></span><a href="klienci/auto-tama.html">Grupa Auto Tama</a></td><td class="n">18</td><td class="n">4</td><td class="n">3</td><td class="uwaga">konkurencja wraca drugi raz</td></tr><tr><td><span class="dot zolte" title="Żółte: wymaga człowieka: 13"></span><a href="klienci/hotele-baltyk.html">Hotele Bałtyk</a></td><td class="n">13</td><td class="n">1</td><td class="n zero">0</td><td class="uwaga">—</td></tr><tr><td><span class="dot zolte" title="Żółte: Coś wymaga człowieka"></span><a href="glos-klientow.html">Produkt</a></td><td class="n">1</td><td class="n zero">0</td><td class="n zero">0</td><td class="uwaga">—</td></tr></tbody></table></div><details style="margin-top:28px"><summary>Poprawki scalone w tym tygodniu</summary><div class="tabela"><table><thead><tr><th>Poprawka</th><th class="n">Od wpłynięcia rozmowy</th></tr></thead><tbody><tr><td><a href="https://github.com/Rembolekk/rinvo-app/pull/5">Zmienić godziny salonów podawane klientom: sobota do 15:00</a> <span class="tag">RIN-116</span></td><td class="n">1 h 45 min</td></tr><tr><td><a href="https://github.com/Rembolekk/rinvo-app/pull/6">Skrócić godziny dzwonienia agenta: tydzień 9–19, sobota 9–15</a> <span class="tag">RIN-117</span></td><td class="n">2 h 45 min</td></tr></tbody></table></div></details>
+<footer>Dane fikcyjne, demo · zaktualizowano 15 października 2026, 19:05</footer>
 </div></body></html>

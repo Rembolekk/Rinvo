@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_strona_glowna.py` | układ index.html i Głosu klientów, liczba zgodna z widokiem „Dla mnie dziś”, czas od wpłynięcia, nazwy klientów z karty: 21 testów |
 | `testy/test_poprawki_proby.py` | poprawki po próbie generalnej (maskowanie, kotwice, kolejność agenta, minione spotkania, limit sesji): 39 testów |
 | `testy/test_reset_demo.py` | reset do próby generalnej (plan bez flagi, archiwizacja Lineara, karty, transkrypcje poza wyzwalaczem workflow, stan, Rinvo-app na tymczasowym repo git, PR-y): 13 testów |
 | `testy/test_porzadek_produkt.py` | porządek w zgłoszeniach dla człowieka (tytuł od czynności, blok, wysyłka z bloku, Odrzuć, widok, przeliczenie) i agent produktowy (propozycje, aktualizacja bez duplikatu, ruchy Buduj/Później/Odrzuć, Głos klientów, limit): 60 testów |
@@ -409,6 +410,18 @@ Gdy sygnał z **Głosu klientów** pojawia się pierwszy raz albo się wzmacnia 
 - Uruchamia ją codzienne podsumowanie (`podsumowanie.yml`); ruchy Buduj/Później obsługuje job wysyłki (`wyslij.py`).
 
 Testy: `python3 testy/test_porzadek_produkt.py` (testy `test_b01_…` … `test_b05_…`).
+
+## Strony: układ i liczby
+
+- **index.html:** na górze jedno duże zdanie „Dziś potrzebujemy Cię w N sprawach” (link do widoku „Dla mnie dziś” w Linearze) i obok linijka o agentach
+  (zamknięte sprawy z 7 dni, średni czas poprawki). Niżej prosta tabela: kropka statusu (kolor wyjaśnia dymek), nazwa klienta z karty (link do jego strony),
+  Wymaga Ciebie, U agentów, Czeka na klienta, Uwaga (jedno zdanie, np. „konkurencja wraca drugi raz”). Stopka jedną linijką: „Dane fikcyjne, demo · zaktualizowano …”.
+- **Liczba spraw dla człowieka** to dokładnie to, co pokazuje widok „Dla mnie dziś”: otwarte zgłoszenia z etykietą Decyzja człowieka, Do weryfikacji albo Szkic gotowy
+  (`widok.filtr` i `generuj_strony.wymaga_ciebie_etykiety` czytają te same etykiety z `ops/zasady.json`), również w backlogu.
+- **Czas poprawki** liczymy od WPŁYNIĘCIA rozmowy albo maila do systemu (czas commita pliku, zapisany w `ops/.przetworzone.json` jako `wplynelo`; `wplyniecia.py`),
+  do scalenia poprawki, a nie od daty rozmowy z nazwy pliku. Podpis: „od wpłynięcia rozmowy do wdrożonej poprawki”.
+- **Głos klientów:** zdanie „N sygnałów wartych decyzji”, potem po jednym wierszu na sygnał (funkcja, dlaczego, ilu klientów, link do propozycji), cytat zwinięty pod
+  wierszem, pojedyncze prośby w jednej zwiniętej linijce na dole. Strony klientów mają ten sam spokojny układ. Testy: `python3 testy/test_strona_glowna.py`.
 
 ## Poprawki po próbie generalnej
 

@@ -3,24 +3,28 @@
     "klient": "auto-tama",
     "transkrypcja": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
     "przetworzone": "2026-10-15 09:41:05",
-    "odcisk": "2026-10-06|11:02|kasia malinowska;marek rewoliński"
+    "odcisk": "2026-10-06|11:02|kasia malinowska;marek rewoliński",
+    "wplynelo": "2026-10-15T11:29:54+02:00"
   },
   "f49e7776e103a51ab617acdf0ed8b6524bbca5c752ba2f60fcc6d5e354e6091b": {
     "klient": "auto-tama",
     "transkrypcja": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
     "przetworzone": "2026-10-15 14:35:54",
-    "odcisk": "2026-10-13|11:00|kasia malinowska;marek rewoliński"
+    "odcisk": "2026-10-13|11:00|kasia malinowska;marek rewoliński",
+    "wplynelo": "2026-10-15T14:16:12+02:00"
   },
   "8ab534f7dd61fb5d3c9ed0dff9b7c358d89974dcf1623a9bd6a0e2a1d1e29af6": {
     "klient": "auto-tama",
     "transkrypcja": "ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md",
     "przetworzone": "2026-10-15 14:40:41",
-    "odcisk": null
+    "odcisk": null,
+    "wplynelo": "2026-10-15T14:39:07+00:00"
   },
   "a522302716ce4cf0bde98fc7705b11a8792c1affdc885337e5215fb6443d597a": {
     "klient": "hotele-baltyk",
     "transkrypcja": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md",
     "przetworzone": "2026-10-15 14:48:28",
-    "odcisk": "2026-10-15|13:00|joanna wiśniewska;marek rewoliński"
+    "odcisk": "2026-10-15|13:00|joanna wiśniewska;marek rewoliński",
+    "wplynelo": "2026-10-15T16:43:56+02:00"
   }
 }

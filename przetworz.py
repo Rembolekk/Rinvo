@@ -21,6 +21,7 @@ Klucze API czytane z .env — nigdy nie są logowane ani drukowane.
 
 import argparse
 import hashlib
+import wplyniecia
 import json
 import os
 import re
@@ -471,7 +472,8 @@ def main():
                     print(wiad.replace("*", ""))
                     send_slack(wiad, log_path=log_path)
                     registry[h] = {"klient": klient, "transkrypcja": transkrypcja,
-                                   "przetworzone": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "odcisk": None}
+                                   "przetworzone": datetime.now().strftime("%Y-%m-%d %H:%M:%S"), "odcisk": None,
+                                   "wplynelo": wplyniecia.czas_wplyniecia(transkrypcja)}
                     save_registry(registry)
                     oznacz_przetworzony(transkrypcja)
                     return
@@ -679,6 +681,7 @@ def main():
             "transkrypcja": transkrypcja,
             "przetworzone": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "odcisk": wejscie["odcisk"],
+            "wplynelo": wplyniecia.czas_wplyniecia(transkrypcja),       # commit pliku: od tego liczymy czas do wdrożonej poprawki
         }
         save_registry(registry)
         # mail: Message-ID trafia do ops/.maile.json (przetworzone) dopiero po udanym przetworzeniu

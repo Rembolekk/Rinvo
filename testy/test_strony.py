@@ -121,19 +121,21 @@ class TestSprawy(unittest.TestCase):
         d = Repo(stan=stan).dane()
         s = gs.sprawy_klienta(d, "alfa")
         self.assertEqual([z["id"] for z in s["agent"]], ["RIN-1"])
-        self.assertEqual([z["id"] for z in s["czlowiek"]], ["RIN-2"])
+        # ZMIANA ŚWIADOMA: „wymaga Ciebie” to te same sprawy, które pokazuje widok „Dla mnie dziś” w Linearze (etykiety Decyzja człowieka,
+        # Do weryfikacji, Szkic gotowy, także w backlogu), więc RIN-4 (prośba produktowa z Decyzją człowieka) nie ginie w „backlogu”
+        self.assertEqual([z["id"] for z in s["czlowiek"]], ["RIN-2", "RIN-4"])
         self.assertEqual([z["id"] for z in s["czeka"]], ["RIN-3", "RIN-7"], "czekanie na klienta liczy się także w backlogu")
-        self.assertEqual([z["id"] for z in s["backlog"]], ["RIN-4"])
+        self.assertEqual(s["backlog"], [])
         self.assertEqual([z["id"] for z in s["zamkniete"]], ["RIN-5"])
 
     def test_liczby_na_stronie_glownej(self):
         stan = {"RIN-1": zg("[alfa] A", etykiety=["Dla agenta"]), "RIN-2": zg("[alfa] A2", etykiety=["Dla agenta"]),
                 "RIN-3": zg("[alfa] B", etykiety=["Decyzja człowieka"]), "RIN-4": zg("[alfa] C", etykiety=["Czeka na klienta"])}
         h = Repo(stan=stan).strony()["index.html"]
-        karta_alfa = re.search(r'href="klienci/alfa\.html">.*?</a>', h, re.S).group(0)
-        self.assertRegex(karta_alfa, r"<b>2</b>u agentów")
-        self.assertRegex(karta_alfa, r"<b>1</b>u człowieka")
-        self.assertRegex(karta_alfa, r"<b>1</b>czeka na klienta")
+        wiersz = re.search(r'<tr><td><span class="dot[^"]*"[^>]*></span><a href="klienci/alfa\.html">Alfa</a></td>(.*?)</tr>', h, re.S).group(1)
+        liczby = re.findall(r'<td class="n[^"]*">(\d+)</td>', wiersz)
+        self.assertEqual(liczby, ["1", "2", "1"], "Wymaga Ciebie, U agentów, Czeka na klienta")
+        self.assertIn("Dziś potrzebujemy Cię w 1 sprawie", tekst(h))
 
 
 class TestStrony(unittest.TestCase):
@@ -203,9 +205,9 @@ class TestStronaKlienta(unittest.TestCase):
         h = self._repo().strony()["klienci/alfa.html"]
         t = tekst(h)
         self.assertLess(t.index("Teraz"), t.index("Oś czasu"))
-        self.assertRegex(t, r"Wymaga człowieka \(1\).*Decyzja o Oplu")
-        self.assertRegex(t, r"U agentów \(1\).*Poprawka godzin")
-        self.assertRegex(t, r"Czeka na klienta \(1\).*Plik od klienta")
+        self.assertRegex(t, r"Wymaga Ciebie 1.*Decyzja o Oplu")
+        self.assertRegex(t, r"U agentów 1.*Poprawka godzin")
+        self.assertRegex(t, r"Czeka na klienta 1.*Plik od klienta")
         self.assertIn('href="https://linear.app/ws/issue/RIN-2/opel"', h)
 
     def test_os_czasu_od_najnowszych_ze_wszystkimi_rodzajami(self):
@@ -303,9 +305,10 @@ class TestGlosKlientow(unittest.TestCase):
         sygn, reszta = gs.sygnaly(d)
         self.assertEqual((sygn, [x["klucz"] for x in reszta]), ([], ["jedna"]))
         h = gs.strona_glos(d)
-        self.assertIn("Pozostałe (1)", h)
-        self.assertIn("<details>", h)
-        self.assertIn("Sygnały (0)", h)
+        self.assertIn("Pozostałe pojedyncze prośby (1)", h)
+        self.assertIn("<details", h)
+        self.assertIn("Brak sygnałów wartych decyzji", h)
+        self.assertIn("Jedna prośba", tekst(h).split("Pozostałe pojedyncze prośby")[1][:60], "jedna linijka z tytułami")
 
     def test_maksymalnie_piec_sygnalow_najsilniejsze_pierwsze_reszta_do_pozostalych(self):
         prosby = {}
@@ -328,10 +331,12 @@ class TestGlosKlientow(unittest.TestCase):
         r.wynik("alfa", "x", {"pozycje": [{"klucz_funkcji": "xls", "klucz_sprawy": "s"}]})
         h = gs.strona_glos(r.dane())
         t = tekst(h)
-        self.assertIn("Dlaczego: prosi 2 klientów: Alfa, Beta", t)
+        self.assertIn("1 sygnał wart decyzji", t)
+        self.assertRegex(t, r"Eksport do Excela\s+prosi 2 klientów\s+2\s+")
+        self.assertIn("Cytat klienta", t)
         self.assertIn("Też Excel.", t)
-        self.assertIn("zrobione", t)
-        self.assertIn("pierwsza prośba 2026-10-13, ostatnia 2026-10-14", t)
+        self.assertIn("<details>", h, "cytat zwinięty pod wierszem")
+        self.assertIn("Propozycja", t)
 
     def test_nowe_sygnaly_pierwsze_uruchomienie_to_tylko_baza(self):
         d = self._repo({"xls": {"tytul": "Excel", "prosby": [prosba("alfa", "c", "2026-10-13", "a.md"), prosba("beta", "c", "2026-10-14", "b.md")]}})
@@ -507,6 +512,8 @@ class TestDatyZrodlaRyzyk(unittest.TestCase):
 
 
 class TestAgenciTydzien(unittest.TestCase):
+    """ZMIANA ŚWIADOMA: czas liczymy od WPŁYNIĘCIA rozmowy albo maila do systemu (pole „wplynelo” w ops/.przetworzone.json, czyli czas commita),
+    a nie od daty rozmowy z nazwy pliku."""
 
     def _repo(self):
         stan = {"RIN-1": {**zg("[alfa] Szybka", stan="Done"), "zamknieto": "2026-10-14T10:00:00Z"},
@@ -520,7 +527,11 @@ class TestAgenciTydzien(unittest.TestCase):
                                             "b": {"identifier": "RIN-2", "zrodla": ["ops/transkrypcje/alfa/2026-10-06-call.md", "ops/transkrypcje/alfa/2026-10-13-call.md"]},
                                             "c": {"identifier": "RIN-3", "zrodla": ["ops/transkrypcje/alfa/2026-08-30-call.md"]}})
         r = Repo(stan=stan, zdarz=zd, karta_a=ka)
-        r.wynik("alfa", "2026-10-13-call", {"zrodlo": "ops/transkrypcje/alfa/2026-10-13-call.md", "spotkanie": {"data": "2026-10-13", "godziny": "11:00–11:24"}})
+        # wpłynęły w innych momentach niż sugerują daty w nazwach plików
+        r.zapisz("ops/.przetworzone.json", {
+            "h1": {"klient": "alfa", "transkrypcja": "ops/transkrypcje/alfa/2026-10-13-call.md", "wplynelo": "2026-10-14T09:00:00+02:00"},
+            "h2": {"klient": "alfa", "transkrypcja": "ops/transkrypcje/alfa/2026-10-06-call.md", "wplynelo": "2026-10-13T08:00:00+00:00"},
+            "h3": {"klient": "alfa", "transkrypcja": "ops/transkrypcje/alfa/2026-08-30-call.md", "wplynelo": "2026-09-01T08:00:00+00:00"}})
         return r
 
     def test_zamkniete_scalone_srednia_i_najkrotszy_czas(self):
@@ -528,31 +539,41 @@ class TestAgenciTydzien(unittest.TestCase):
         self.assertEqual(st["zamkniete"], 2, "tylko ostatnie 7 dni")
         self.assertEqual(st["scalone"], 2)
         czasy = {p["zgloszenie"]: p["czas"] for p in st["pomiary"]}
-        # RIN-1: 13.10 11:00 → 14.10 12:00 (10:00 UTC) = 1 d 1 h; RIN-2: najwcześniejsze źródło 6.10 00:00 → 8 d 12 h
-        self.assertEqual(gs.formatuj_czas(czasy["RIN-1"]), "1 d 1 h")
-        self.assertEqual(gs.formatuj_czas(czasy["RIN-2"]), "8 d 12 h")
+        # RIN-1: wpłynęło 14.10 09:00 PL (07:00 UTC) → scalone 10:00 UTC = 3 h; RIN-2: najwcześniejsze wpłynięcie 13.10 08:00 UTC → 26 h
+        self.assertEqual(gs.formatuj_czas(czasy["RIN-1"]), "3 h 0 min")
+        self.assertEqual(gs.formatuj_czas(czasy["RIN-2"]), "1 d 2 h")
 
-    def test_sekcja_na_stronie_glownej_z_przykladem_najszybszej(self):
+    def test_czas_nie_zalezy_od_daty_rozmowy_z_nazwy_pliku(self):
+        r = self._repo()
+        r.zapisz("ops/.przetworzone.json", {"h1": {"klient": "alfa", "transkrypcja": "ops/transkrypcje/alfa/2026-10-13-call.md", "wplynelo": "2026-10-14T09:30:00+00:00"}})
+        czasy = {p["zgloszenie"]: p["czas"] for p in gs.statystyki_agentow(r.dane())["pomiary"]}
+        self.assertEqual(gs.formatuj_czas(czasy["RIN-1"]), "30 min", "od wpłynięcia, nie od 13.10")
+
+    def test_zrodlo_bez_zapisanego_wplyniecia_nie_jest_mierzone_po_dacie_z_nazwy(self):
+        r = self._repo()
+        r.zapisz("ops/.przetworzone.json", {})
+        self.assertEqual(gs.statystyki_agentow(r.dane())["scalone"], 0)
+
+    def test_zdanie_o_agentach_na_stronie_glownej(self):
         r = self._repo()
         h = gs.strona_index(r.dane())
         t = tekst(h)
-        self.assertIn("Agenci w tym tygodniu", t)
-        self.assertIn("2 zamkniętych spraw (7 dni)", t)
-        self.assertIn("2 poprawek scalonych", t)
-        self.assertIn("średnio od źródła do scalenia", t)
-        self.assertIn("4 d 18 h", t, "średnia z 1 d 1 h i 8 d 12 h")
-        self.assertIn("najkrócej", t)
-        self.assertRegex(t, r"Najszybsza: Szybka RIN-1")
-        self.assertIn('href="https://github.com/x/y/pull/1"', h)
+        self.assertIn("Agenci w tym tygodniu: 2 sprawy zamknięte, poprawka średnio w 14 h 30 min od wpłynięcia rozmowy", t, "średnia z 3 h i 26 h")
+        self.assertIn("od wpłynięcia rozmowy do wdrożonej poprawki", t, "podpis")
+        self.assertIn('href="https://github.com/x/y/pull/1"', h, "szczegóły w zwiniętej liście poprawek")
 
-    def test_brak_scalonych_poprawek_to_czytelny_komunikat(self):
-        h = gs.strona_index(Repo().dane())
-        self.assertIn("nie scalili jeszcze żadnej poprawki", tekst(h))
+    def test_brak_scalonych_poprawek_to_czytelne_zdanie(self):
+        t = tekst(gs.strona_index(Repo().dane()))
+        self.assertIn("Agenci w tym tygodniu: 0 spraw zamkniętych, jeszcze bez scalonej poprawki", t)
 
     def test_poprawka_bez_znanego_zrodla_nie_psuje_statystyk(self):
         r = self._repo()
         r.zapisz("ops/.zdarzenia.json", [{"data": "2026-10-14T10:00:00+00:00", "typ": "pr_scalony", "klient": "alfa", "zgloszenie": "RIN-99", "tytul": "?", "url": "u"}])
         self.assertEqual(gs.statystyki_agentow(r.dane())["scalone"], 0)
+
+    def test_przetworz_zapisuje_wplyniecie_w_rejestrze(self):
+        kod = (ROOT / "przetworz.py").read_text(encoding="utf-8")
+        self.assertEqual(kod.count("wplyniecia.czas_wplyniecia(transkrypcja)"), 2)
 
 
 class TestStanIDziennik(unittest.TestCase):

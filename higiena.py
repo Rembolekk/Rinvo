@@ -130,12 +130,24 @@ def rozmowa_wewnetrzna(tekst):
 
 # ── nowy klient ───────────────────────────────────────────────────────────────
 
+def nazwa_z_naglowka(tekst):
+    """Nazwa klienta z tytułu rozmowy („# Hotele Bałtyk × Rinvo: call…” → „Hotele Bałtyk”) z polskimi znakami; None, gdy się nie da."""
+    m = re.match(r"\s*#\s*(.+)", tekst or "")
+    if not m:
+        return None
+    for czesc in re.split(r"\s+[×x]\s+", m.group(1).split(":", 1)[0]):
+        czesc = czesc.strip()
+        if czesc and "rinvo" not in czesc.casefold():
+            return czesc
+    return None
+
+
 def karta_nowego_klienta(klient, tekst, nazwa=None):
     """Karta założona z rozmowy: kontakty NIEPOTWIERDZONE, decydenci jako wniosek (nic do wysyłki, nic dla agenta)."""
     h = parsuj_naglowek_rozmowy(tekst)
     kontakty = [{"imie": u["imie"], "email": "", "rola": u["firma"] or "uczestnik rozmowy", "zakres_decyzji": "brak",
                  "potwierdzony": False, "status": "z rozmowy, do potwierdzenia"} for u in h["uczestnicy"] if not u["zespol"]]
-    return {"klient": klient, "nazwa": nazwa or klient.replace("-", " ").title(), "nowy_klient": True,
+    return {"klient": klient, "nazwa": nazwa or nazwa_z_naglowka(tekst) or klient.replace("-", " ").title(), "nowy_klient": True,
             "decydenci": [], "decydenci_wniosek": [{"imie": k["imie"], "rola": "wniosek z rozmowy, do potwierdzenia"} for k in kontakty],
             "kontakty": kontakty, "domeny": [], "zakazy": [], "otwarte_sprawy": {}, "ryzyka": {}}
 
