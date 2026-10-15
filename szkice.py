@@ -251,9 +251,11 @@ def napisz_czesc(s, zg, odbiorca, karta, klient, material=None):
         powody = sprawdz_czesc(s, temat, tresc, odbiorca, karta, klient)
         # zaproszenie kalendarzowe: poprawne dane albo treść bez obietnicy zaproszenia
         if spotkanie:
-            ok, powod_sp = wy.waliduj_spotkanie(spotkanie, fakty_zgloszenia(zg), wy.lokalnie(s.teraz(), W).date(), W)
+            ok, powod_sp = wy.waliduj_spotkanie(spotkanie, fakty_zgloszenia(zg), wy.lokalnie(s.teraz(), W).date(), W, s.teraz())
             wynik["spotkanie"] = ok
-            if ok is None:
+            if ok is None and powod_sp == wy.POWOD_MINELO:
+                wynik["minelo"] = spotkanie                  # spotkanie już minęło: szkic wycofuje się sam (komentarz), nie idzie do weryfikacji
+            elif ok is None:
                 powody.append(f"zaproszenie kalendarzowe: {powod_sp}")
         if wynik["spotkanie"] is None and not material:
             obietnica = wy.obiecuje_zalacznik(tresc, W)
@@ -266,7 +268,7 @@ def napisz_czesc(s, zg, odbiorca, karta, klient, material=None):
     brak = wy.znajdz_placeholder(wynik["temat"] or "", wynik["tresc"] or "", W) if wynik["tresc"] else None
     if brak:                                           # placeholder: bez ponawiania, szkic zostaje do uzupełnienia
         powody = [f"szkic wymaga uzupełnienia: {brak}"] + powody
-    return {**wynik, "powody": powody, "brak_uzupelnienia": brak, "zalaczniki": [material["pdf"]] if material else []}
+    return {**wynik, "minelo": wynik.get("minelo"), "powody": powody, "brak_uzupelnienia": brak, "zalaczniki": [material["pdf"]] if material else []}
 
 
 def polacz_czesci(s, czesci, odbiorca, karta, klient):
@@ -294,6 +296,15 @@ def polacz_czesci(s, czesci, odbiorca, karta, klient):
             return {"temat": temat, "tresc": tresc, "spotkanie": spotkanie, "zalaczniki": zalaczniki}
         prompt += "\n\nPOPRZEDNIA WERSJA ODRZUCONA. Unikaj: " + "; ".join(powody)
     return None
+
+
+ZNACZNIK_MINELO = "Szkic zaproszenia wycofany: spotkanie"
+
+
+def juz_wycofany_przeterminowany(s, zg):
+    """Najnowszy komentarz zgłoszenia to wycofanie szkicu przeterminowanego zaproszenia: nie piszemy go od nowa przy każdym przebiegu."""
+    kom = sorted(s.linear.komentarze(zg), key=lambda k: k.get("createdAt", ""))
+    return bool(kom) and bez_podpisu((kom[-1].get("body") or "").lstrip()).lstrip().startswith(ZNACZNIK_MINELO)
 
 
 BRAK_KONTAKTU = ("**Brak szkicu maila: brak kontaktu w karcie klienta.** Karta nie ma potwierdzonego kontaktu z adresem e-mail, "
@@ -383,6 +394,13 @@ def obsluz_grupe(s, klient, grupa):
             material = {"tytul": m["tytul"], "tekst": Path(m["md"]).read_text(encoding="utf-8"), "pdf": m["pdf"]}
         czesci.append((zg, napisz_czesc(s, zg, odbiorca, karta, klient, material)))
     wyniki = list(wyniki_materialow)
+    for z, c in czesci:                                # spotkanie z zaproszenia już minęło: komentarz zamiast szkicu, bez etykiety i bez wysyłki
+        if c.get("minelo"):
+            sp = c["minelo"]
+            opis = f"{sp.get('data', '?')} {sp.get('godzina', '')}".strip()
+            s.linear.komentarz(z, f"{ZNACZNIK_MINELO} ({opis}) już minęło. Nic nie zostało wysłane.")
+            wyniki.append({"status": "wycofane", "zgloszenia": [z["identifier"]], "powod": f"spotkanie {opis} już minęło"})
+    czesci = [(z, c) for z, c in czesci if not c.get("minelo")]
     gotowe = [(z, c) for z, c in czesci if c["tresc"] and not c["powody"] and not wymaga_decyzji(z, s.Z)]
     decyzje = [(z, c) for z, c in czesci if c["tresc"] and not c["powody"] and wymaga_decyzji(z, s.Z)]
     odrzucone = [(z, c) for z, c in czesci if c["powody"] or not c["tresc"]]
@@ -439,14 +457,33 @@ def odfiltruj(s, zgloszenia, wyniki):
             _, pdf, _ = mat.sciezki_materialu(klient, zg, getattr(s, "katalog_materialow", None))
             if not pdf.exists():                       # szkic powstał, zanim istniał materiał (stara wersja): piszemy od nowa
                 usun_szkic(s, zg, "materiał nie istniał w chwili pisania szkicu")
+        if E["szkic"] not in zg.get("labels", []) and juz_wycofany_przeterminowany(s, zg):
+            continue
         dalej.append(zg)
     return dalej
+
+
+def wycofaj_przeterminowane(s):
+    """Szkice z zaproszeniem na spotkanie, które już minęło (czekają na „Wyślij” albo na zbiorczy mail), wycofują się same."""
+    E = s.Z["etykiety"]
+    wyniki, widziane = [], set()
+    for zg in s.linear.z_etykieta(E["szkic"]):
+        if zg["identifier"] in widziane:
+            continue
+        szkic = wy.szkic_zgloszenia(s, zg)
+        if not szkic or "zbiorczy" in szkic or not szkic.get("spotkanie") or not wy.spotkanie_minelo(szkic["spotkanie"], s.teraz(), s.Z["wysylka"]):
+            continue
+        grupa = [zg] + [g for g in (s.linear.zgloszenie_po_numerze(int(i.split("-")[1])) for i in szkic.get("zgloszenia", []) if i != zg["identifier"]) if g]
+        widziane.update(g["identifier"] for g in grupa)
+        w = wy.wycofaj_przeterminowany(s, zg, grupa, szkic)
+        wyniki.append({**w, "klient": ag.klient_z_tytulu(zg.get("title")) or "", "zgloszenia": [g["identifier"] for g in grupa]})
+    return wyniki
 
 
 def uruchom(s):
     S = s.Z["szkice"]
     od = (s.teraz() - timedelta(days=S["max_dni_od_zamkniecia"])).isoformat()
-    wyniki = []
+    wyniki = wycofaj_przeterminowane(s)
     zrodlowe = getattr(s, "cytaty_zrodlowe", None)
     kandydaci = odfiltruj(s, s.linear.ukonczone(od) + s.linear.otwarte(S["stany_otwarte"]), wyniki)
     for (klient, _dzien), grupa in sorted(grupuj(kandydaci, s.Z, zrodlowe).items(), key=lambda kv: (kv[0][0], str(kv[0][1]))):

@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_poprawki_proby.py` | poprawki po próbie generalnej (maskowanie, kotwice, kolejność agenta, minione spotkania, limit sesji): 39 testów |
 | `testy/test_reset_demo.py` | reset do próby generalnej (plan bez flagi, archiwizacja Lineara, karty, transkrypcje poza wyzwalaczem workflow, stan, Rinvo-app na tymczasowym repo git, PR-y): 13 testów |
 | `testy/test_porzadek_produkt.py` | porządek w zgłoszeniach dla człowieka (tytuł od czynności, blok, wysyłka z bloku, Odrzuć, widok, przeliczenie) i agent produktowy (propozycje, aktualizacja bez duplikatu, ruchy Buduj/Później/Odrzuć, Głos klientów, limit): 60 testów |
 | `testy/test_utwardzanie2.py` | utwardzanie cz. 2 (regresje, pierwszeństwo człowieka, rozmiar zmiany i konflikty agenta, blokady a naprawy, klucze, limity i kredyty, bezpiecznik kosztów, eskalacja): 74 testy |
@@ -408,6 +409,24 @@ Gdy sygnał z **Głosu klientów** pojawia się pierwszy raz albo się wzmacnia 
 - Uruchamia ją codzienne podsumowanie (`podsumowanie.yml`); ruchy Buduj/Później obsługuje job wysyłki (`wyslij.py`).
 
 Testy: `python3 testy/test_porzadek_produkt.py` (testy `test_b01_…` … `test_b05_…`).
+
+## Poprawki po próbie generalnej
+
+- **Maskowanie (`higiena.py`, `odmaskuj.py`):** maskujemy tylko osoby TRZECIE (klienci końcowi, goście, leady po „pan/pani …”). Osoby z nagłówka rozmowy
+  (uczestnicy, wspominani, wszystko pogrubione przed „## Transkrypcja”), kontakty i decydenci z karty nie są maskowane w żadnej odmianie
+  (Robert = Roberta, Robertowi, Robertem, Robercie). `python3 odmaskuj.py <klient> <transkrypcja> [--zastosuj]` przywraca omyłkowo zamaskowane
+  osoby bez modelu: cytaty dosłownie z transkrypcji, reszta wg poprzedzającego słowa, potem maskowanie od nowa poprawną regułą, `raport.html`,
+  karta i tytuły/opisy/komentarze w Linearze.
+- **Testy oczekiwań (`testy/uruchom.py`):** zamiast nazw kluczy spraw (model nazywa je za każdym razem inaczej) oczekiwania mają `kotwica_cytatu`
+  (fragment cytatu albo lista alternatyw; klucz bierze się z wyniku), `fragment_cytatu` może być listą alternatyw, a `wymaga_klienta` (np. `klinika-usmiech`)
+  pomija test, gdy tego klienta nie ma w tej próbie. Wyniki próby leżą w `testy/migawka_demo/wyniki_proba/`.
+- **Agent w workflow:** najpierw scalanie PR (`agent_scal.py`), potem branie nowych zadań (`agent.py`), więc scalony PR zwalnia pliki w tym samym przebiegu.
+- **Minione spotkanie:** szkic zaproszenia na spotkanie, które już się zaczęło, wycofuje się sam (komentarz „Szkic zaproszenia wycofany…”, zdjęte
+  etykiety, blok zniknął z opisu, bez wysyłki); dotyczy wysyłki, sprzątania szkiców i generowania. Notatka przed spotkaniem nie powstaje po godzinie spotkania.
+- **Limit sesji:** komunikaty typu „You've hit your session limit · resets …” (także z kodem wyjścia 0 i bez wyniku) oraz diagnostyka Claude w workflow
+  kończą się zielono: rozmowy trafiają do kolejki „oczekuje na limit” (`limity.py --kolejkuj`), maile oddają zużytą próbę (`--kolejkuj-maile`),
+  Slack dostaje jedną informację na epizod (`--powiadom`), a ponowienie następuje przy następnym przebiegu.
+Testy: `python3 testy/test_poprawki_proby.py` (testy `test_p1_…` … `test_p5_…`).
 
 ## Próba generalna od czystego stanu (`reset_demo.py`, `proba/`)
 

@@ -164,13 +164,40 @@ def _tokeny_znane(znane):
     return t
 
 
+_TYTULY = {"pan", "pani", "panem", "panią", "panu", "pana", "państwo", "państwa"}
+_KONCOWKI_ZNANE = ("", "a", "owi", "em", "iem", "u", "ie", "y", "ą", "ę", "e", "i", "ego", "emu", "ym")
+
+
+def jest_znany(tok, znane_t):
+    """Czy token (w dowolnej odmianie) należy do znanej osoby: Robert = Roberta, Robertem, Robertowi, Robercie; Tomek = Tomka."""
+    t = tok.casefold()
+    for k in znane_t:
+        if k in _TYTULY or len(k) < 3:
+            continue
+        if t == k or (t.startswith(k) and t[len(k):] in _KONCOWKI_ZNANE):
+            return True
+        if k.endswith("ek") and t.startswith(k[:-2] + "k") and t[len(k) - 1:] in _KONCOWKI_ZNANE:
+            return True
+        if len(k) >= 5 and t.startswith(k[:-1]) and len(t) - len(k) <= 4:        # Robert → Robercie, Joanna → Joannie
+            return True
+    return False
+
+
+def osoby_z_naglowka(tekst):
+    """Osoby wymienione w nagłówku rozmowy (przed „## Transkrypcja”): wszystko, co pogrubione, czyli uczestnicy, wspominani
+    i osoby z rolą w kontekście. Takie osoby nie są maskowane: to ludzie ze strony klienta i naszej."""
+    gora = tekst.split("## Transkrypcja", 1)[0]
+    return [_imie_pelne(x) for x in re.findall(r"\*\*(.+?)\*\*", gora)]
+
+
 def nazwiska_koncowe(tekst, znane=()):
-    """Nazwiska klientów końcowych po zwrotach „pan/pani/państwo …”, bez osób znanych (uczestnicy, wspominani, kontakty)."""
-    znane_t = _tokeny_znane(znane)
+    """Nazwiska osób TRZECICH (klienci końcowi, goście, leady) po zwrotach „pan/pani/państwo …”. Bez osób znanych w dowolnej
+    odmianie: uczestnicy, wspominani, osoby z nagłówka, kontakty i decydenci z karty."""
+    znane_t = _tokeny_znane(list(znane) + osoby_z_naglowka(tekst))
     wynik = set()
     for m in _PAN.finditer(tekst):
         for tok in re.split(r"[ -]", m.group(1)):
-            if tok.casefold() not in znane_t:
+            if not jest_znany(tok, znane_t):
                 wynik.add(tok)
     return wynik
 

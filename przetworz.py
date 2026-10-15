@@ -574,7 +574,8 @@ def main():
             except subprocess.TimeoutExpired:
                 fail("claude", "Przekroczono limit 30 minut.")
 
-            if r.returncode != 0 and limity.czy_limit(tail_log(log_path, 40), Zl):
+            # limit sesji bywa zgłaszany kodem wyjścia 0 i samym komunikatem w wyjściu (bez wyniku): też traktujemy go jako limit
+            if limity.czy_limit(tail_log(log_path, 40), Zl) and (r.returncode != 0 or not wynik_path.exists()):
                 kolejka_ = limity.Kolejka()
                 tekst_oczek = limity.tekst_oczekiwania_na_limit(kolejka_.lista() + [transkrypcja]) if kolejka_.powiadom_raz() else None
                 odloz_na_limit(tekst_oczek)

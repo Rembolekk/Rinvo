@@ -720,7 +720,13 @@
       "\\b429\\b",
       "overloaded",
       "reached your .{0,30}limit",
-      "limit will reset"
+      "limit will reset",
+      "hit your .{0,40}limit",
+      "(session|weekly|5-hour|five-hour|daily|monthly) limit",
+      "limit\\s*(reached|resets)",
+      "resets\\s+\\d{1,2}(:\\d{2})?\\s*(am|pm)",
+      "out of (extra )?usage",
+      "upgrade to .{0,30}(plan|max)"
     ],
     "kod_wyjscia": 75
   },

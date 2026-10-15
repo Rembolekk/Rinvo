@@ -137,7 +137,37 @@ def tekst_oczekiwania_na_limit(klucze):
 def main():
     ap = argparse.ArgumentParser(description="Kolejka zadań czekających na limit modelu.")
     ap.add_argument("--dopisz-kolejke", metavar="PLIK", help="dopisz do pliku z listą ścieżek zadania czekające na limit (istniejące pliki)")
+    ap.add_argument("--czy-limit", metavar="TEKST", help="kod wyjścia 0, gdy TEKST (wyjście claude) wygląda na błąd limitu/kredytów, inaczej 1")
+    ap.add_argument("--kolejkuj", metavar="PLIK", help="dodaj do kolejki „oczekuje na limit” zadania z pliku z listą ścieżek (po jednej w linii)")
+    ap.add_argument("--kolejkuj-maile", metavar="PLIK", help="maile z listy (po jednej ścieżce w linii): oddaj zużytą próbę (ops/.maile.json) i dodaj do kolejki limitu")
+    ap.add_argument("--powiadom", action="store_true", help="jedna informacja na Slacku na epizod limitu (kolejka „oczekuje na limit”)")
     args = ap.parse_args()
+    if args.czy_limit is not None:
+        import zasady
+        sys.exit(0 if czy_limit(args.czy_limit, zasady.wczytaj_zasady()) else 1)
+    if args.kolejkuj:
+        k = Kolejka()
+        zadania = [l.strip() for l in Path(args.kolejkuj).read_text(encoding="utf-8").splitlines() if l.strip()]
+        for z in zadania:
+            k.dodaj(z)
+        print(f"Kolejka limitu: dodano {len(zadania)}")
+    if args.kolejkuj_maile:
+        import maile
+        k = Kolejka()
+        sciezki = [l.strip() for l in Path(args.kolejkuj_maile).read_text(encoding="utf-8").splitlines() if l.strip()]
+        for sc in sciezki:
+            maile.cofnij_probe(sc)
+            k.dodaj(sc)
+        print(f"Kolejka limitu: maili {len(sciezki)} (próby cofnięte)")
+    if args.powiadom:
+        k = Kolejka()
+        if k.powiadom_raz():
+            from przetworz import load_env, send_slack
+            load_env()
+            ok, blad = send_slack(tekst_oczekiwania_na_limit(k.lista() or ["zadania w tym przebiegu"]))
+            print("Slack: " + ("wysłano informację o limicie" if ok else f"błąd ({str(blad)[:80]})"))
+        else:
+            print("Slack: informacja o limicie już wysłana w tym epizodzie")
     if args.dopisz_kolejke:
         p = Path(args.dopisz_kolejke)
         obecne = {l.strip() for l in p.read_text(encoding="utf-8").splitlines() if l.strip()} if p.exists() else set()

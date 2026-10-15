@@ -54,6 +54,7 @@ jobs:
         run: npm install -g @anthropic-ai/claude-code
 
       - name: Diagnostyka Claude
+        id: diag
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           RINVO_MODEL: ${{ vars.RINVO_MODEL }}
@@ -71,21 +72,38 @@ jobs:
           RC=$?
           set -e
           echo "Model: $MODEL, kod wyjścia: $RC, odpowiedź: $ODP"
-          [ "$RC" -eq 0 ] || { echo "::error::claude -p nie działa na serwerze (kod $RC)"; exit 1; }
+          if [ "$RC" -ne 0 ]; then
+            if python3 limity.py --czy-limit "$ODP"; then
+              echo "limit=true" >> "$GITHUB_OUTPUT"
+              echo "::warning::Limit sesji albo kredytów modelu: agent poczeka do następnego przebiegu"
+              exit 0
+            fi
+            echo "::error::claude -p nie działa na serwerze (kod $RC)"
+            exit 1
+          fi
 
-      # Agent nie zapisuje nic w tym repo (czyta karty klientów); pracuje w klonie Rinvo-app w katalogu tymczasowym.
-      # AGENT_GITHUB_TOKEN ma dostęp tylko do Rinvo-app. Proces claude dostaje środowisko bez żadnych kluczy poza logowaniem.
-      - name: Agent wykonuje zgłoszenia
+      - name: Limit modelu – informacja
+        if: steps.diag.outputs.limit == 'true'
         env:
-          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
-          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          AGENT_GITHUB_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
-          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
-        run: python3 agent.py
+        run: |
+          set -uo pipefail
+          python3 limity.py --powiadom
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ops/.kolejka_limit.json ops/.maile.json 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "[automat] limit modelu: kolejka [skip ci]"
+          for proba in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 1; }
+          done
+          exit 1
 
-      # Scalanie PR agenta (testy zielone + CodeRabbit bez uwag + tylko config/ i wiedza/ + typ konfiguracja).
+      # NAJPIERW scalanie PR agenta (testy zielone + CodeRabbit bez uwag + tylko config/ i wiedza/ + typ konfiguracja): scalony PR zwalnia pliki,
+      # więc zadania czekające na scalenie mogą ruszyć w tym samym przebiegu, zamiast czekać na następny.
       - name: Agent scala gotowe PR
+        if: steps.diag.outputs.limit != 'true'
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
@@ -94,9 +112,22 @@ jobs:
           RINVO_MODEL: ${{ vars.RINVO_MODEL }}
         run: python3 agent_scal.py
 
+      # POTEM branie nowych zadań. Agent nie zapisuje nic w tym repo (czyta karty klientów); pracuje w klonie Rinvo-app w katalogu tymczasowym.
+      # AGENT_GITHUB_TOKEN ma dostęp tylko do Rinvo-app. Proces claude dostaje środowisko bez żadnych kluczy poza logowaniem.
+      - name: Agent wykonuje zgłoszenia
+        if: steps.diag.outputs.limit != 'true'
+        env:
+          CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          AGENT_GITHUB_TOKEN: ${{ secrets.AGENT_GITHUB_TOKEN }}
+          RINVO_MODEL: ${{ vars.RINVO_MODEL }}
+        run: python3 agent.py
+
       # Szkice maili do klienta po zamknięciu zgłoszeń (komentarz + etykieta Szkic gotowy). Niczego nie wysyła:
       # wysyła dopiero wyslij.py po etykiecie Wyślij dodanej przez człowieka. Tu nie ma hasła do poczty.
       - name: Szkice maili do klientów
+        if: steps.diag.outputs.limit != 'true'
         env:
           CLAUDE_CODE_OAUTH_TOKEN: ${{ secrets.CLAUDE_CODE_OAUTH_TOKEN }}
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}

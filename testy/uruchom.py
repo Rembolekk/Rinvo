@@ -22,6 +22,12 @@ Rodzaje testów (pole typ_sprawdzania, domyślnie "pozycje"):
   mail_nie_zawiera  szkic maila nie zawiera podanych fraz
   linear         (tylko --online) stan, etykiety, priorytet i termin zgłoszenia w Linearze
 
+KOTWICE (odporne na to, że model za każdym razem nazywa sprawy trochę inaczej):
+  kotwica_cytatu  zamiast klucz_sprawy: fragment cytatu (tekst albo lista alternatyw) znajdujący się w pozycji albo aktualizacji sprawy
+                  w wynik.json; klucz sprawy jest brany z tego wyniku. Brak dopasowania = FAIL, wiele różnych kluczy = FAIL.
+  fragment_cytatu może być listą alternatyw (wystarczy, że pasuje którakolwiek).
+  wymaga_klienta  test zależy od innego klienta (np. "klinika-usmiech"): pomijany (SKIP), gdy jego karty nie ma w ops/klienci/.
+
 Wyjście: ostatnia linia "PASS X/Y" albo "FAIL X/Y" (kod 0 tylko gdy wszystkie wykonane
 testy przeszły). Y nie obejmuje testów pominiętych (offline).
 """
@@ -354,15 +360,56 @@ SPRAWDZENIA = {
 }
 
 
+def _norm(t):
+    return re.sub(r"\s+", " ", str(t or "")).strip()
+
+
+def klucze_z_kotwicy(wynik, fragment):
+    """Klucze spraw, których pozycja (cytaty) albo aktualizacja (cytat) zawiera fragment."""
+    f = _norm(fragment)
+    klucze = set()
+    for p in wynik.get("pozycje", []):
+        if p.get("klucz_sprawy") and any(f in _norm(c) for c in p.get("cytat", []) if isinstance(c, str)):
+            klucze.add(p["klucz_sprawy"])
+    for a in wynik.get("aktualizacje_spraw", []):
+        if a.get("klucz_sprawy") and f in _norm(a.get("cytat")):
+            klucze.add(a["klucz_sprawy"])
+    return klucze
+
+
+def _alternatywy(wartosc):
+    return list(wartosc) if isinstance(wartosc, (list, tuple)) else [wartosc]
+
+
 def check(ctx, exp):
     rodzaj = exp.get("typ_sprawdzania", "pozycje")
     fn = SPRAWDZENIA.get(rodzaj)
     if not fn:
         return "fail", f"nieznany typ_sprawdzania: {rodzaj!r}"
-    try:
-        return fn(ctx, exp)
-    except KeyError as exc:
-        return "fail", f"w oczekiwaniu brakuje pola {exc}"
+    wymaga = exp.get("wymaga_klienta")
+    if wymaga and not (ROOT / "ops" / "klienci" / wymaga / "karta.json").exists():
+        return "skip", f"wymaga klienta {wymaga}, którego nie ma w tej próbie"
+    # alternatywy fragmentów i kotwic: wystarczy jedna, która się rozwiąże i przejdzie
+    wariant = [("fragment_cytatu", a) for a in _alternatywy(exp["fragment_cytatu"])] if isinstance(exp.get("fragment_cytatu"), (list, tuple)) else \
+              [("kotwica_cytatu", a) for a in _alternatywy(exp["kotwica_cytatu"])] if "kotwica_cytatu" in exp else [(None, None)]
+    ostatni = ("fail", "brak dopasowania")
+    for pole, alt in wariant:
+        e = dict(exp)
+        if pole == "fragment_cytatu":
+            e["fragment_cytatu"] = alt
+        elif pole == "kotwica_cytatu":
+            klucze = klucze_z_kotwicy(ctx.wynik, alt)
+            if len(klucze) != 1:
+                ostatni = ("fail", f"kotwica {alt!r}: " + ("nie znaleziono sprawy z takim cytatem" if not klucze else f"niejednoznaczna, sprawy: {sorted(klucze)}"))
+                continue
+            e["klucz_sprawy"] = next(iter(klucze))
+        try:
+            ostatni = fn(ctx, e)
+        except KeyError as exc:
+            ostatni = ("fail", f"w oczekiwaniu brakuje pola {exc}")
+        if ostatni[0] != "fail":
+            return ostatni
+    return ostatni
 
 
 # ── main ──────────────────────────────────────────────────────────────────────
@@ -414,7 +461,7 @@ def main():
     total = passed + failed
     wynik_linia = f"{'PASS' if failed == 0 else 'FAIL'} {passed}/{total}"
     if skipped:
-        wynik_linia += f" (pominięto offline: {skipped})"
+        wynik_linia += f" (pominięto: {skipped})"
 
     if failures:
         print(f"\nNiepowodzenia ({len(failures)}):")

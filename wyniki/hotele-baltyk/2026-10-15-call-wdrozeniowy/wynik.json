@@ -10,7 +10,7 @@
       "Marek Rewoliński"
     ],
     "wspominani": [
-      "pan [nazwisko]",
+      "pan Robert",
       "Tomek",
       "Michał"
     ]
@@ -224,16 +224,16 @@
       "id": "T6",
       "sekcja": 1,
       "typ": "finanse",
-      "tytul": "Przygotować wycenę podpięcia Kołobrzegu i przekazać ją Joannie (nie panu [nazwisko]) do końca przyszłego tygodnia",
-      "opis": "Pan [nazwisko] pytał o cenę podpięcia Kołobrzegu. Marek przygotowuje wycenę dla Kołobrzegu i wysyła ją do Joanny, która sama przekaże ją panu [nazwisko]. Do [nazwisko] nie piszemy bezpośrednio. Wycena nie oznacza podpięcia: o nim decyduje pan [nazwisko].",
+      "tytul": "Przygotować wycenę podpięcia Kołobrzegu i przekazać ją Joannie (nie panu Robertowi) do końca przyszłego tygodnia",
+      "opis": "Pan Robert pytał o cenę podpięcia Kołobrzegu. Marek przygotowuje wycenę dla Kołobrzegu i wysyła ją do Joanny, która sama przekaże ją panu Robertowi. Do Roberta nie piszemy bezpośrednio. Wycena nie oznacza podpięcia: o nim decyduje pan Robert.",
       "wlasciciel": "Marek Rewoliński",
       "termin": "2026-10-23",
       "termin_wyrazenie": "do końca przyszłego tygodnia",
       "warunek": "brak",
       "status": "zrob_teraz",
       "cytat": [
-        "Przygotuję wycenę dla Kołobrzegu i wyślę [nazwisko]?",
-        "Wyślij mnie, ja mu przekażę. Do [nazwisko] nie piszcie bezpośrednio, on nie lubi maili od dostawców.",
+        "Przygotuję wycenę dla Kołobrzegu i wyślę Robertowi?",
+        "Wyślij mnie, ja mu przekażę. Do Roberta nie piszcie bezpośrednio, on nie lubi maili od dostawców.",
         "Wycenę Kołobrzegu poproszę do końca przyszłego tygodnia.",
         "Będzie. Do usłyszenia."
       ],
@@ -244,16 +244,16 @@
       "klucz_sprawy": "wycena-kolobrzeg",
       "pewnosc": "wysoka",
       "konflikt_z_zakazem": null,
-      "cel": "Joanna dostaje do końca przyszłego tygodnia wycenę podpięcia Kołobrzegu, którą sama przekaże panu [nazwisko].",
+      "cel": "Joanna dostaje do końca przyszłego tygodnia wycenę podpięcia Kołobrzegu, którą sama przekaże panu Robertowi.",
       "kryteria_akceptacji": [
         "Wycena dotyczy Kołobrzegu (Bałtyk Resort)",
-        "Mail z wyceną jest adresowany do Joanny Wiśniewskiej, a nie do pana [nazwisko]",
+        "Mail z wyceną jest adresowany do Joanny Wiśniewskiej, a nie do pana Roberta",
         "Wycena jest gotowa najpóźniej w ostatnim dniu przyszłego tygodnia (23.10)",
-        "Wycena nie zawiera obietnicy podpięcia przed decyzją pana [nazwisko]"
+        "Wycena nie zawiera obietnicy podpięcia przed decyzją pana Roberta"
       ],
       "jak_sprawdzic": "Sprawdzić adresata maila (Joanna), zakres wyceny (Kołobrzeg) i datę wysłania (najpóźniej 23.10).",
       "repo": "rinvo-ops",
-      "szkic_klienta": "Cześć Joanno,\n\nzgodnie z rozmową: wycena podpięcia Kołobrzegu, o którą prosiłaś, jest razem z tą wiadomością, do przekazania panu [nazwisko]. Piszę do Ciebie, tak jak ustaliliśmy, bez maila bezpośrednio do pana [nazwisko].\n\nKołobrzeg podepniemy dopiero po tym, jak pan [nazwisko] da nam znać, że tego chce.\n\nPozdrawiam\nMarek Rewoliński",
+      "szkic_klienta": "Cześć Joanno,\n\nzgodnie z rozmową: wycena podpięcia Kołobrzegu, o którą prosiłaś, jest razem z tą wiadomością, do przekazania panu Robertowi. Piszę do Ciebie, tak jak ustaliliśmy, bez maila bezpośrednio do pana Roberta.\n\nKołobrzeg podepniemy dopiero po tym, jak pan Robert da nam znać, że tego chce.\n\nPozdrawiam\nMarek Rewoliński",
       "termin_zrodlo": "kod",
       "flagi": [
         "nowy_klient"
@@ -335,14 +335,14 @@
       "id": "K2",
       "sekcja": 2,
       "typ": "czeka_na_klienta",
-      "tytul": "Rozmowa z panem [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
-      "opis": "Marek zaproponował rozmowę z panem [nazwisko] po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać. Marek czeka.",
+      "tytul": "Rozmowa z panem Robertem o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "opis": "Marek zaproponował rozmowę z panem Robertem po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać. Marek czeka.",
       "wlasciciel": "Joanna Wiśniewska",
       "termin": "brak",
       "warunek": "Gotowe wyniki z całego miesiąca i sygnał od Joanny",
       "status": "czeka",
       "cytat": [
-        "Może pogadam z panem [nazwisko]?",
+        "Może pogadam z panem Robertem?",
         "Nie teraz. Jak będą wyniki z całego miesiąca, wtedy. Ja dam znać.",
         "Dobrze, czekam."
       ],
@@ -358,13 +358,13 @@
       "klucz_sprawy": "rozmowa-z-robertem-po-wynikach",
       "pewnosc": "wysoka",
       "konflikt_z_zakazem": null,
-      "cel": "Po sygnale od Joanny i wynikach z całego miesiąca umówić rozmowę z panem [nazwisko] o ofercie ReceptAI i wynikach agenta.",
+      "cel": "Po sygnale od Joanny i wynikach z całego miesiąca umówić rozmowę z panem Robertem o ofercie ReceptAI i wynikach agenta.",
       "kryteria_akceptacji": [
-        "Joanna dała znać, że można rozmawiać z panem [nazwisko]",
+        "Joanna dała znać, że można rozmawiać z panem Robertem",
         "Wyniki z całego miesiąca są dostępne przed rozmową",
-        "Rozmowa jest umówiona przez Joannę, bez maila bezpośrednio do pana [nazwisko]"
+        "Rozmowa jest umówiona przez Joannę, bez maila bezpośrednio do pana Roberta"
       ],
-      "jak_sprawdzic": "Potwierdzenie od Joanny i data rozmowy z panem [nazwisko] w kalendarzu.",
+      "jak_sprawdzic": "Potwierdzenie od Joanny i data rozmowy z panem Robertem w kalendarzu.",
       "repo": "brak",
       "flagi": [
         "nowy_klient"
@@ -374,30 +374,30 @@
       "id": "K3",
       "sekcja": 2,
       "typ": "czeka_na_klienta",
-      "tytul": "Decyzja pana [nazwisko] o podpięciu Kołobrzegu: czekamy, aż napisze",
-      "opis": "Pan [nazwisko] pytał, czy można od razu podpiąć Kołobrzeg, ale jeszcze nic nie zdecydował, tylko pytał o cenę. Decyzja i budżet są jego. Kołobrzegu nie podpinamy, dopóki on nie napisze.",
-      "wlasciciel": "pan [nazwisko]",
+      "tytul": "Decyzja pana Roberta o podpięciu Kołobrzegu: czekamy, aż napisze",
+      "opis": "Pan Robert pytał, czy można od razu podpiąć Kołobrzeg, ale jeszcze nic nie zdecydował, tylko pytał o cenę. Decyzja i budżet są jego. Kołobrzegu nie podpinamy, dopóki on nie napisze.",
+      "wlasciciel": "pan Robert",
       "termin": "brak",
-      "warunek": "Pan [nazwisko] napisze, że chce podpiąć Kołobrzeg",
+      "warunek": "Pan Robert napisze, że chce podpiąć Kołobrzeg",
       "status": "czeka",
       "cytat": [
-        "[nazwisko] pytał, czy możecie od razu podpiąć Kołobrzeg. Ja bym chciała, ale to jego decyzja i jego budżet. On jeszcze nic nie zdecydował, tylko pytał o cenę. Nie podpinajcie, dopóki on nie napisze."
+        "Robert pytał, czy możecie od razu podpiąć Kołobrzeg. Ja bym chciała, ale to jego decyzja i jego budżet. On jeszcze nic nie zdecydował, tylko pytał o cenę. Nie podpinajcie, dopóki on nie napisze."
       ],
       "wnioski": [
-        "Z cytatu nie wynika, do kogo pan [nazwisko] ma napisać (do nas czy do Joanny).",
+        "Z cytatu nie wynika, do kogo pan Robert ma napisać (do nas czy do Joanny).",
         "Wycena (T6) idzie przez Joannę; przypominać o decyzji można tylko przez nią."
       ],
       "przypomnienie": {
         "data": "brak",
         "limit": "brak",
-        "uwagi": "klient nie określił; nie pisać do pana [nazwisko] bezpośrednio (zakaz)"
+        "uwagi": "klient nie określił; nie pisać do pana Roberta bezpośrednio (zakaz)"
       },
       "klucz_sprawy": "decyzja-roberta-kolobrzeg",
       "pewnosc": "wysoka",
       "konflikt_z_zakazem": null,
-      "cel": "Po decyzji pana [nazwisko] o podpięciu Kołobrzegu rozpocząć wdrożenie dla Bałtyk Resort.",
+      "cel": "Po decyzji pana Roberta o podpięciu Kołobrzegu rozpocząć wdrożenie dla Bałtyk Resort.",
       "kryteria_akceptacji": [
-        "Pan [nazwisko] napisał, że chce podpiąć Kołobrzeg",
+        "Pan Robert napisał, że chce podpiąć Kołobrzeg",
         "Decyzja jest potwierdzona na piśmie (mail od niego albo od Joanny z jego decyzją)",
         "Wdrożenie nie ruszyło przed tą decyzją"
       ],
@@ -424,7 +424,7 @@
       ],
       "wnioski": [
         "Marek mówi, że inni klienci pytają o raporty skuteczności; w prosby.json nie ma jeszcze tej konkretnej funkcji (jest tylko raport mailowy dla innego klienta), więc nie liczymy jej jako prośby wielu klientów.",
-        "Z rozmowy wynika, że wyniki z całego miesiąca mają być argumentem przed panem [nazwisko] (K2), więc dla klienta to ważna prośba; to wniosek, nie ustalenie."
+        "Z rozmowy wynika, że wyniki z całego miesiąca mają być argumentem przed panem Robertem (K2), więc dla klienta to ważna prośba; to wniosek, nie ustalenie."
       ],
       "klucz_sprawy": "rozroznienie-rezerwacji-agent-vs-samodzielne",
       "klucz_funkcji": "atrybucja-rezerwacji-w-panelu",
@@ -492,17 +492,17 @@
       "id": "Z3",
       "sekcja": 4,
       "typ": "zakaz",
-      "tytul": "Nie podpinać Kołobrzegu, dopóki pan [nazwisko] nie napisze, że chce",
-      "opis": "Podpięcie Kołobrzegu to decyzja i budżet pana [nazwisko] (dyrektora). Do jego pisemnej decyzji nic nie robimy w Kołobrzegu.",
+      "tytul": "Nie podpinać Kołobrzegu, dopóki pan Robert nie napisze, że chce",
+      "opis": "Podpięcie Kołobrzegu to decyzja i budżet pana Roberta (dyrektora). Do jego pisemnej decyzji nic nie robimy w Kołobrzegu.",
       "wlasciciel": "Joanna Wiśniewska",
       "termin": "brak",
-      "warunek": "Pan [nazwisko] napisze, że chce podpiąć Kołobrzeg",
+      "warunek": "Pan Robert napisze, że chce podpiąć Kołobrzeg",
       "status": "nigdy",
       "cytat": [
         "Nie podpinajcie, dopóki on nie napisze."
       ],
       "wnioski": [
-        "Zakaz uchyla pan [nazwisko] (wg Joanny to jego decyzja i budżet), nie Joanna; wycena (T6) nie narusza tego zakazu."
+        "Zakaz uchyla pan Robert (wg Joanny to jego decyzja i budżet), nie Joanna; wycena (T6) nie narusza tego zakazu."
       ],
       "klucz_sprawy": "zakaz-podpinania-kolobrzegu",
       "pewnosc": "wysoka",
@@ -515,14 +515,14 @@
       "id": "Z4",
       "sekcja": 4,
       "typ": "zakaz",
-      "tytul": "Nie pisać do [nazwisko] bezpośrednio: kontakt tylko przez Joannę",
-      "opis": "Pan [nazwisko] (dyrektor) nie lubi maili od dostawców. Wycena i inne sprawy idą do Joanny, która przekazuje je dalej.",
+      "tytul": "Nie pisać do Roberta bezpośrednio: kontakt tylko przez Joannę",
+      "opis": "Pan Robert (dyrektor) nie lubi maili od dostawców. Wycena i inne sprawy idą do Joanny, która przekazuje je dalej.",
       "wlasciciel": "Joanna Wiśniewska",
       "termin": "brak",
       "warunek": "brak",
       "status": "nigdy",
       "cytat": [
-        "Do [nazwisko] nie piszcie bezpośrednio, on nie lubi maili od dostawców."
+        "Do Roberta nie piszcie bezpośrednio, on nie lubi maili od dostawców."
       ],
       "klucz_sprawy": "zakaz-pisania-do-roberta",
       "pewnosc": "wysoka",
@@ -560,8 +560,8 @@
       "id": "Z6",
       "sekcja": 4,
       "typ": "zakaz",
-      "tytul": "Nie rozmawiać teraz z [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
-      "opis": "Marek zaproponował rozmowę z panem [nazwisko] po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać.",
+      "tytul": "Nie rozmawiać teraz z Robertem o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "opis": "Marek zaproponował rozmowę z panem Robertem po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać.",
       "wlasciciel": "Joanna Wiśniewska",
       "termin": "brak",
       "warunek": "Wyniki z całego miesiąca i sygnał od Joanny",
@@ -580,27 +580,27 @@
       "id": "R1",
       "sekcja": 5,
       "typ": "ryzyko_handlowe",
-      "tytul": "Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan [nazwisko] dostał od nich maila",
-      "opis": "Joanna słyszała, że firma ReceptAI oferuje to samo taniej i od razu dla obu hoteli. Pan [nazwisko] dostał od nich maila. Joanna zaznacza, że nie mówi o zmianie dostawcy, ale chce, żebyśmy wiedzieli. Marek zaproponował rozmowę z panem [nazwisko]; Joanna odłożyła ją do wyników z całego miesiąca.",
+      "tytul": "Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan Robert dostał od nich maila",
+      "opis": "Joanna słyszała, że firma ReceptAI oferuje to samo taniej i od razu dla obu hoteli. Pan Robert dostał od nich maila. Joanna zaznacza, że nie mówi o zmianie dostawcy, ale chce, żebyśmy wiedzieli. Marek zaproponował rozmowę z panem Robertem; Joanna odłożyła ją do wyników z całego miesiąca.",
       "wlasciciel": "Marek Rewoliński",
       "termin": "brak",
       "warunek": "brak",
       "status": "czeka",
       "cytat": [
-        "Słyszałam też, że firma ReceptAI robi to samo taniej i od razu z obu hoteli. [nazwisko] dostał od nich maila. Nie mówię, że zmieniamy, ale wiedz."
+        "Słyszałam też, że firma ReceptAI robi to samo taniej i od razu z obu hoteli. Robert dostał od nich maila. Nie mówię, że zmieniamy, ale wiedz."
       ],
       "wnioski": [
         "Informacja o niższej cenie ReceptAI to relacja z drugiej ręki („słyszałam”); ceny ReceptAI nie są znane.",
-        "Pan [nazwisko] decyduje o kosztach i o Kołobrzegu, więc oferta ReceptAI dla obu hoteli trafia wprost w jego decyzję o rozszerzeniu (K3)."
+        "Pan Robert decyduje o kosztach i o Kołobrzegu, więc oferta ReceptAI dla obu hoteli trafia wprost w jego decyzję o rozszerzeniu (K3)."
       ],
       "klucz_sprawy": "ryzyko-receptai",
       "temat_ryzyka": "konkurencja",
       "pewnosc": "wysoka",
       "konflikt_z_zakazem": null,
       "zadanie_przygotowawcze": {
-        "cel": "Przygotować notatkę o ryzyku ReceptAI przed rozmową z panem [nazwisko] po wynikach z całego miesiąca (rozmowa dopiero na sygnał od Joanny).",
+        "cel": "Przygotować notatkę o ryzyku ReceptAI przed rozmową z panem Robertem po wynikach z całego miesiąca (rozmowa dopiero na sygnał od Joanny).",
         "kryteria_akceptacji": [
-          "Notatka cytuje słowa Joanny o ReceptAI (taniej, obie lokalizacje, mail do pana [nazwisko]) i zaznacza, że to relacja z drugiej ręki",
+          "Notatka cytuje słowa Joanny o ReceptAI (taniej, obie lokalizacje, mail do pana Roberta) i zaznacza, że to relacja z drugiej ręki",
           "Notatka zawiera nasze argumenty z wyników pierwszego miesiąca (dokończone rezerwacje, np. 12 z 40 w pierwszym tygodniu) oraz listę znanych problemów i ich napraw",
           "Notatka zawiera pytania do Joanny, m.in. o to, co dokładnie było w mailu od ReceptAI",
           "Notatka nie zawiera obietnic cen, terminów ani zmian umowy"
@@ -617,7 +617,7 @@
       "sekcja": 5,
       "typ": "ryzyko_handlowe",
       "tytul": "Jakość agenta w pierwszym tygodniu: błędna informacja o śniadaniu, telefon rano po nocnej rezerwacji, propozycja utargowania ceny",
-      "opis": "Pierwszy tydzień Joanna ocenia ogólnie dobrze (z 40 porzuconych rezerwacji 12 dokończyło), ale zgłosiła błędy widoczne dla gości: śniadanie wliczone w standardzie (dwie kłótnie przy zameldowaniu), zaskoczeni goście po telefonie o 9 rano, agent sugerujący utargowanie ceny i możliwe podwójne pytanie o liczbę osób. Przed oceną całego miesiąca przez pana [nazwisko] warto pokazać, że te błędy są naprawione.",
+      "opis": "Pierwszy tydzień Joanna ocenia ogólnie dobrze (z 40 porzuconych rezerwacji 12 dokończyło), ale zgłosiła błędy widoczne dla gości: śniadanie wliczone w standardzie (dwie kłótnie przy zameldowaniu), zaskoczeni goście po telefonie o 9 rano, agent sugerujący utargowanie ceny i możliwe podwójne pytanie o liczbę osób. Przed oceną całego miesiąca przez pana Roberta warto pokazać, że te błędy są naprawione.",
       "wlasciciel": "Marek Rewoliński",
       "termin": "brak",
       "warunek": "brak",
@@ -627,7 +627,7 @@
         "Niektórzy byli zaskoczeni."
       ],
       "wnioski": [
-        "To nie jest groźba rezygnacji; Joanna ocenia start pozytywnie. Ryzyko wynika z kojarzenia powtarzających się błędów z oceną pana [nazwisko] po miesiącu (wniosek, nie cytat).",
+        "To nie jest groźba rezygnacji; Joanna ocenia start pozytywnie. Ryzyko wynika z kojarzenia powtarzających się błędów z oceną pana Roberta po miesiącu (wniosek, nie cytat).",
         "Naprawy: T1, T2, T3; sprawy do wyjaśnienia: T4, K1."
       ],
       "klucz_sprawy": "ryzyko-jakosc-agenta-pierwszy-tydzien",
@@ -711,25 +711,23 @@
       "Godzina dzwonienia: „Od dziesiątej, zapisane.” (Marek) zastąpione późniejszym ustaleniem 9:00 + minimum 8 godzin od przerwania (T2, zmiana zdania Joanny).",
       "„Przekażę Michałowi, poprawi.” scalone z T7 (właściciel: Michał).",
       "„Bez numeru nie znajdę, poczekam na panią.” scalone z K1.",
-      "„Dobrze, czekam.” (Marek, rozmowa z panem [nazwisko]) scalone z K2.",
+      "„Dobrze, czekam.” (Marek, rozmowa z panem Robertem) scalone z K2.",
       "„Od dwudziestego szóstego do trzydziestego pierwszego wstrzymuję dzwonienie dla Sopotu.” scalone z T5 (zobowiązanie Marka) i Z2 (zakaz Joanny)."
     ],
     "pominiete": [
       "Statystyka „z czterdziestu porzuconych rezerwacji dwanaście dokończyło” to informacja, nie pozycja; użyta we wnioskach R1/R2.",
       "„Mam tylko dwadzieścia minut, potem przyjeżdża grupa” to tło rozmowy, bez zobowiązania.",
-      "Propozycja Marka „Może pogadam z panem [nazwisko]?” została odłożona przez Joannę („Nie teraz”), nie odwołana: to nie zmiana zdania (K2, Z6).",
+      "Propozycja Marka „Może pogadam z panem Robertem?” została odłożona przez Joannę („Nie teraz”), nie odwołana: to nie zmiana zdania (K2, Z6).",
       "Nowy klient: karta klienta (ops/klienci/hotele-baltyk/karta.json) nie istnieje, więc zakazy numerowane od Z1, brak decydentów i otwartych spraw; brak aktualizacji spraw."
     ]
   },
-  "szkic_maila": "Dzień dobry Joanno,\n\ndziękuję za dzisiejszą rozmowę. Podsumowanie ustaleń:\n\n1. Śniadanie: poprawiam dziś informację w bazie wiedzy agenta. Śniadanie jest wliczone w pakiecie premium i w apartamentach, a w pakiecie standard jest dopłata 50 zł od osoby.\n2. Godziny dzwonienia: agent dzwoni od 9:00, ale nie wcześniej niż 8 godzin po przerwaniu rezerwacji.\n3. Zniżki: agent nie proponuje zniżek, ceny są stałe. Sprawdzę nagranie z wczoraj i poprawię instrukcję agenta.\n4. Zjazd firmowy w Sopocie: od 26 do 31 października wstrzymuję dzwonienie do osób z porzuconych rezerwacji w Sopocie.\n5. Kołobrzeg: niczego nie podpinamy, dopóki pan [nazwisko] nie napisze, że chce. Wycenę dla Kołobrzegu przygotuję do końca przyszłego tygodnia i przekażę Tobie, nie bezpośrednio panu [nazwisko].\n6. Faktura: sprawę adresu (ma być Sopot, bo tam jest umowa) przekazuję Michałowi, który ją poprawi.\n7. Podwójne pytanie o liczbę osób: gdy Tomek znajdzie numer rezerwacji, daj mi proszę znać, wtedy to sprawdzę.\n8. Panel: rozróżnienia rezerwacji dokończonych dzięki agentowi i samodzielnie w panelu na razie nie ma. Zapisałem Twoją prośbę, bez podawania terminu.\n\nPozdrawiam\nMarek Rewoliński",
+  "szkic_maila": "Dzień dobry Joanno,\n\ndziękuję za dzisiejszą rozmowę. Podsumowanie ustaleń:\n\n1. Śniadanie: poprawiam dziś informację w bazie wiedzy agenta. Śniadanie jest wliczone w pakiecie premium i w apartamentach, a w pakiecie standard jest dopłata 50 zł od osoby.\n2. Godziny dzwonienia: agent dzwoni od 9:00, ale nie wcześniej niż 8 godzin po przerwaniu rezerwacji.\n3. Zniżki: agent nie proponuje zniżek, ceny są stałe. Sprawdzę nagranie z wczoraj i poprawię instrukcję agenta.\n4. Zjazd firmowy w Sopocie: od 26 do 31 października wstrzymuję dzwonienie do osób z porzuconych rezerwacji w Sopocie.\n5. Kołobrzeg: niczego nie podpinamy, dopóki pan Robert nie napisze, że chce. Wycenę dla Kołobrzegu przygotuję do końca przyszłego tygodnia i przekażę Tobie, nie bezpośrednio panu Robertowi.\n6. Faktura: sprawę adresu (ma być Sopot, bo tam jest umowa) przekazuję Michałowi, który ją poprawi.\n7. Podwójne pytanie o liczbę osób: gdy Tomek znajdzie numer rezerwacji, daj mi proszę znać, wtedy to sprawdzę.\n8. Panel: rozróżnienia rezerwacji dokończonych dzięki agentowi i samodzielnie w panelu na razie nie ma. Zapisałem Twoją prośbę, bez podawania terminu.\n\nPozdrawiam\nMarek Rewoliński",
   "ostrzezenia_dat": [],
   "kontrola": {
     "nowy_klient": true,
     "maskowanie": {
-      "liczba": 53,
-      "rodzaje": {
-        "nazwisko": 53
-      }
+      "liczba": 0,
+      "rodzaje": {}
     }
   }
 }

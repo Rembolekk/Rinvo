@@ -46,8 +46,8 @@
     {
       "id": "Z3",
       "klucz_sprawy": "zakaz-podpinania-kolobrzegu",
-      "tytul": "Nie podpinać Kołobrzegu, dopóki pan [nazwisko] nie napisze, że chce",
-      "opis": "Podpięcie Kołobrzegu to decyzja i budżet pana [nazwisko] (dyrektora). Do jego pisemnej decyzji nic nie robimy w Kołobrzegu.",
+      "tytul": "Nie podpinać Kołobrzegu, dopóki pan Robert nie napisze, że chce",
+      "opis": "Podpięcie Kołobrzegu to decyzja i budżet pana Roberta (dyrektora). Do jego pisemnej decyzji nic nie robimy w Kołobrzegu.",
       "cytat": [
         "Nie podpinajcie, dopóki on nie napisze."
       ],
@@ -57,10 +57,10 @@
     {
       "id": "Z4",
       "klucz_sprawy": "zakaz-pisania-do-roberta",
-      "tytul": "Nie pisać do [nazwisko] bezpośrednio: kontakt tylko przez Joannę",
-      "opis": "Pan [nazwisko] (dyrektor) nie lubi maili od dostawców. Wycena i inne sprawy idą do Joanny, która przekazuje je dalej.",
+      "tytul": "Nie pisać do Roberta bezpośrednio: kontakt tylko przez Joannę",
+      "opis": "Pan Robert (dyrektor) nie lubi maili od dostawców. Wycena i inne sprawy idą do Joanny, która przekazuje je dalej.",
       "cytat": [
-        "Do [nazwisko] nie piszcie bezpośrednio, on nie lubi maili od dostawców."
+        "Do Roberta nie piszcie bezpośrednio, on nie lubi maili od dostawców."
       ],
       "wlasciciel": "Joanna Wiśniewska",
       "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
@@ -80,8 +80,8 @@
     {
       "id": "Z6",
       "klucz_sprawy": "zakaz-rozmowy-z-robertem-teraz",
-      "tytul": "Nie rozmawiać teraz z [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
-      "opis": "Marek zaproponował rozmowę z panem [nazwisko] po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać.",
+      "tytul": "Nie rozmawiać teraz z Robertem o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "opis": "Marek zaproponował rozmowę z panem Robertem po informacji o ReceptAI. Joanna: nie teraz, dopiero gdy będą wyniki z całego miesiąca; sama da znać.",
       "cytat": [
         "Nie teraz. Jak będą wyniki z całego miesiąca, wtedy. Ja dam znać."
       ],
@@ -203,7 +203,7 @@
       "linear_id": "d7c25ee3-9189-41d0-b9d4-d338dad97c3f",
       "identifier": "RIN-155",
       "url": "https://linear.app/rinvo-demo/issue/RIN-155/hotele-baltyk-zdecyduj-przygotowac-wycene-podpiecia-kolobrzegu-i",
-      "tytul": "Przygotować wycenę podpięcia Kołobrzegu i przekazać ją Joannie (nie panu [nazwisko]) do końca przyszłego tygodnia",
+      "tytul": "Przygotować wycenę podpięcia Kołobrzegu i przekazać ją Joannie (nie panu Robertowi) do końca przyszłego tygodnia",
       "zrodla": [
         "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
       ],
@@ -273,7 +273,7 @@
       "linear_id": "78c55db5-45a0-4e1b-9576-20434355e379",
       "identifier": "RIN-158",
       "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-uzupelnij-rozmowa-z-panem-nazwisko-o-ofercie-receptai",
-      "tytul": "Rozmowa z panem [nazwisko] o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+      "tytul": "Rozmowa z panem Robertem o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
       "zrodla": [
         "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
       ],
@@ -300,7 +300,7 @@
       "linear_id": "06cd267d-6dd0-4683-a0f7-1302e39051e9",
       "identifier": "RIN-159",
       "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-uzupelnij-decyzja-pana-nazwisko-o-podpieciu-kolobrzegu",
-      "tytul": "Decyzja pana [nazwisko] o podpięciu Kołobrzegu: czekamy, aż napisze",
+      "tytul": "Decyzja pana Roberta o podpięciu Kołobrzegu: czekamy, aż napisze",
       "zrodla": [
         "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
       ],
@@ -349,7 +349,7 @@
       "linear_id": "53d63300-e269-47d5-8f50-9fea4b43c9a2",
       "identifier": "RIN-161",
       "url": "https://linear.app/rinvo-demo/issue/RIN-161/hotele-baltyk-uzupelnij-konkurent-receptai-wedlug-joanny-robi-to-samo",
-      "tytul": "Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan [nazwisko] dostał od nich maila",
+      "tytul": "Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan Robert dostał od nich maila",
       "zrodla": [
         "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md"
       ],
@@ -397,7 +397,7 @@
       {
         "data": "2026-10-15",
         "zrodlo": "ops/transkrypcje/hotele-baltyk/2026-10-15-call-wdrozeniowy.md",
-        "cytat": "Słyszałam też, że firma ReceptAI robi to samo taniej i od razu z obu hoteli. [nazwisko] dostał od nich maila. Nie mówię, że zmieniamy, ale wiedz."
+        "cytat": "Słyszałam też, że firma ReceptAI robi to samo taniej i od razu z obu hoteli. Robert dostał od nich maila. Nie mówię, że zmieniamy, ale wiedz."
       }
     ],
     "jakosc_bota": [

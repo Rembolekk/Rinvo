@@ -54,47 +54,6 @@ jobs:
           pip install certifi
           npm install -g @anthropic-ai/claude-code
 
-      # Diagnostyka logowania: te same flagi i model co w przetworz.py.
-      # Pokazuje, czy CLAUDE_CODE_OAUTH_TOKEN działa na serwerze, zanim ruszy analiza.
-      - name: Diagnostyka Claude
-        run: |
-          set -uo pipefail
-          MODEL="${RINVO_MODEL:-}"
-          MODEL="${MODEL:-claude-sonnet-5-5}"
-          echo "Model: $MODEL"
-          echo "Wersja: $(claude --version 2>&1)"
-          # Sekrety wklejone z Notatek mogą mieć enter, \u2028 itp. — czyścimy jak przetworz.py.
-          for NAZWA in CLAUDE_CODE_OAUTH_TOKEN LINEAR_API_KEY SLACK_WEBHOOK_URL; do
-            PRZED="${!NAZWA:-}"
-            export "$NAZWA=$(python3 sekrety.py "$NAZWA")"
-            PO="${!NAZWA:-}"
-            if [ "${#PRZED}" -ne "${#PO}" ]; then
-              echo "::warning::$NAZWA zawierał białe/niewidoczne znaki ($(( ${#PRZED} - ${#PO} )) usunięto) — popraw sekret w GitHubie"
-            fi
-          done
-          if [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
-            echo "CLAUDE_CODE_OAUTH_TOKEN: ustawiony (długość ${#CLAUDE_CODE_OAUTH_TOKEN})"
-          else
-            echo "::error::CLAUDE_CODE_OAUTH_TOKEN jest pusty lub nieustawiony (Settings → Secrets → Actions)"
-            exit 1
-          fi
-          [ -n "${LINEAR_API_KEY:-}" ] && echo "LINEAR_API_KEY: ustawiony" || echo "::warning::LINEAR_API_KEY pusty"
-          [ -n "${SLACK_WEBHOOK_URL:-}" ] && echo "SLACK_WEBHOOK_URL: ustawiony" || echo "::warning::SLACK_WEBHOOK_URL pusty"
-
-          set +e
-          ODP=$(claude -p "Odpowiedz jednym słowem: OK" \
-                  --model "$MODEL" \
-                  --allowedTools "Read,Write,Edit,Bash" \
-                  --dangerously-skip-permissions < /dev/null 2>&1)
-          RC=$?
-          set -e
-          echo "Kod wyjścia: $RC"
-          echo "Odpowiedź: $ODP"
-          if [ "$RC" -ne 0 ]; then
-            echo "::error::claude -p nie działa na serwerze (kod $RC): $ODP"
-            exit 1
-          fi
-
       - name: Wykryj transkrypcje
         id: wykryj
         env:
@@ -141,8 +100,76 @@ jobs:
           echo "Transkrypcje do przetworzenia: $N"
           cat /tmp/transkrypcje.txt
 
-      - name: Przetwórz
+      # Diagnostyka logowania: te same flagi i model co w przetworz.py.
+      # Pokazuje, czy CLAUDE_CODE_OAUTH_TOKEN działa na serwerze, zanim ruszy analiza.
+      - name: Diagnostyka Claude
+        id: diag
         if: steps.wykryj.outputs.liczba != '0'
+        run: |
+          set -uo pipefail
+          MODEL="${RINVO_MODEL:-}"
+          MODEL="${MODEL:-claude-sonnet-5-5}"
+          echo "Model: $MODEL"
+          echo "Wersja: $(claude --version 2>&1)"
+          # Sekrety wklejone z Notatek mogą mieć enter, \u2028 itp. — czyścimy jak przetworz.py.
+          for NAZWA in CLAUDE_CODE_OAUTH_TOKEN LINEAR_API_KEY SLACK_WEBHOOK_URL; do
+            PRZED="${!NAZWA:-}"
+            export "$NAZWA=$(python3 sekrety.py "$NAZWA")"
+            PO="${!NAZWA:-}"
+            if [ "${#PRZED}" -ne "${#PO}" ]; then
+              echo "::warning::$NAZWA zawierał białe/niewidoczne znaki ($(( ${#PRZED} - ${#PO} )) usunięto) — popraw sekret w GitHubie"
+            fi
+          done
+          if [ -n "${CLAUDE_CODE_OAUTH_TOKEN:-}" ]; then
+            echo "CLAUDE_CODE_OAUTH_TOKEN: ustawiony (długość ${#CLAUDE_CODE_OAUTH_TOKEN})"
+          else
+            echo "::error::CLAUDE_CODE_OAUTH_TOKEN jest pusty lub nieustawiony (Settings → Secrets → Actions)"
+            exit 1
+          fi
+          [ -n "${LINEAR_API_KEY:-}" ] && echo "LINEAR_API_KEY: ustawiony" || echo "::warning::LINEAR_API_KEY pusty"
+          [ -n "${SLACK_WEBHOOK_URL:-}" ] && echo "SLACK_WEBHOOK_URL: ustawiony" || echo "::warning::SLACK_WEBHOOK_URL pusty"
+
+          set +e
+          ODP=$(claude -p "Odpowiedz jednym słowem: OK" \
+                  --model "$MODEL" \
+                  --allowedTools "Read,Write,Edit,Bash" \
+                  --dangerously-skip-permissions < /dev/null 2>&1)
+          RC=$?
+          set -e
+          echo "Kod wyjścia: $RC"
+          echo "Odpowiedź: $ODP"
+          if [ "$RC" -ne 0 ]; then
+            if python3 limity.py --czy-limit "$ODP"; then
+              # limit sesji / kredytów: to nie awaria. Zadania czekają w kolejce „oczekuje na limit”, jedna informacja na Slacku,
+              # przebieg kończy się na zielono i ponawia się przy następnym uruchomieniu.
+              echo "limit=true" >> "$GITHUB_OUTPUT"
+              echo "::warning::Limit sesji albo kredytów modelu: zadania czekają w kolejce, ponowienie przy następnym przebiegu"
+              exit 0
+            fi
+            echo "::error::claude -p nie działa na serwerze (kod $RC): $ODP"
+            exit 1
+          fi
+
+      - name: Limit modelu – kolejka i informacja
+        if: steps.diag.outputs.limit == 'true'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          set -uo pipefail
+          python3 limity.py --kolejkuj /tmp/transkrypcje.txt --powiadom
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A -- ops/.kolejka_limit.json ops/.maile.json 2>/dev/null || true
+          if git diff --cached --quiet; then exit 0; fi
+          git commit -q -m "[automat] limit modelu: kolejka [skip ci]"
+          for proba in 1 2 3; do
+            git push origin HEAD:main && exit 0
+            git pull --rebase origin main || { git rebase --abort 2>/dev/null; exit 1; }
+          done
+          exit 1
+
+      - name: Przetwórz
+        if: steps.wykryj.outputs.liczba != '0' && steps.diag.outputs.limit != 'true'
         run: |
           set -uo pipefail
           touch /tmp/start_przetwarzania

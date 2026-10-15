@@ -41,8 +41,20 @@ OBIETNICE = [r"(?:zrobimy|wdrożymy|dostarczymy|zapewnimy|zintegrujemy|podłącz
 
 # ── wybór spotkań ─────────────────────────────────────────────────────────────
 
-def spotkania_do_notatki(klient, karta, najnowsze, Z, dzis):
-    """Spotkania z karty klienta, dla których czas na notatkę: dziś albo jutro (dzień przed spotkaniem)."""
+def godzina_spotkania(tytul, najnowsza_pozycja):
+    """Godzina spotkania (HH, MM) z tytułu sprawy albo z tytułu i opisu najnowszej pozycji („10:00”); None, gdy jej nie ma."""
+    teksty = [tytul or ""] + ([najnowsza_pozycja.get("tytul", ""), najnowsza_pozycja.get("opis", "")] if najnowsza_pozycja else [])
+    for tekst in teksty:
+        m = re.search(r"(?<!\d)([01]?\d|2[0-3]):([0-5]\d)(?!\d)", tekst)
+        if m:
+            return int(m.group(1)), int(m.group(2))
+    return None
+
+
+def spotkania_do_notatki(klient, karta, najnowsze, Z, dzis, teraz=None):
+    """Spotkania z karty klienta, dla których czas na notatkę: dziś albo jutro (dzień przed spotkaniem).
+    Notatka nie powstaje po godzinie spotkania: gdy znamy godzinę, a (lokalne) teraz jest jej równe lub późniejsze, spotkanie pomijamy.
+    teraz: aware datetime; sprawdzane tylko, gdy dzis to dzisiejszy dzień lokalny."""
     wynik = []
     for z in notatki.zbierz_zadania(klient, karta, najnowsze, Z, dzis):
         if not z["klucz"].startswith(notatki.PREFIKS) or z.get("termin") is None:
@@ -53,6 +65,11 @@ def spotkania_do_notatki(klient, karta, najnowsze, Z, dzis):
         otwarte = karta.get("otwarte_sprawy", {})
         spotkanie = otwarte.get(z["klucz"][len(notatki.PREFIKS):], {})
         zadanie = otwarte.get(z["klucz"], {})
+        if teraz is not None:
+            lokalne = wy.lokalnie(teraz, Z["wysylka"])
+            godz = godzina_spotkania(spotkanie.get("tytul") or z["tytul"], (najnowsze.get(z["klucz"][len(notatki.PREFIKS):]) or (None,))[0])
+            if godz and data == lokalne.date() == dzis and (lokalne.hour, lokalne.minute) >= godz:
+                continue                                  # po godzinie spotkania notatka nie ma sensu
         wynik.append({"data": data, "tytul": spotkanie.get("tytul") or z["tytul"], "zadanie": zadanie.get("identifier"),
                       "spotkanie": spotkanie.get("identifier")})
     return wynik
@@ -256,7 +273,7 @@ def uruchom(s, dzis, klienci):
     for klient in klienci:
         karta = s.wczytaj_karte(klient)
         najnowsze = notatki.najnowsze_pozycje(klient, getattr(s, "katalog_wynikow", Path("wyniki")))
-        for sp in spotkania_do_notatki(klient, karta, najnowsze, s.Z, dzis):
+        for sp in spotkania_do_notatki(klient, karta, najnowsze, s.Z, dzis, s.teraz()):
             if getattr(s, "sucho", False):
                 wyniki.append({"klient": klient, "status": "powstalaby", "spotkanie": sp["tytul"], "data": sp["data"].isoformat()})
                 continue

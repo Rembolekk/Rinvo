@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T14:48:58+00:00",
+ "zapisano": "2026-10-15T14:58:50+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -168,7 +168,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-123/auto-tama-wstep-rozmowy-w-dwoch-wersjach-czekamy-na-teksty-od-kasi",
    "utworzono": "2026-10-15T09:40:54.928Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:43.117Z"
+   "zmieniono": "2026-10-15T14:55:04.279Z"
   },
   "RIN-124": {
    "etykiety": [
@@ -185,7 +185,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-124/auto-tama-sprawdz-plik-ze-swiezymi-leadami-ostatni-miesiac-strona-i",
    "utworzono": "2026-10-15T09:40:55.302Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:40:39.133Z"
+   "zmieniono": "2026-10-15T14:55:04.554Z"
   },
   "RIN-125": {
    "etykiety": [
@@ -249,7 +249,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-128/auto-tama-wyslij-spotkanie-z-pawlem-pol-godziny-czwartek-1510-o-1000",
    "utworzono": "2026-10-15T09:40:56.540Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:37:18.052Z"
+   "zmieniono": "2026-10-15T14:55:09.281Z"
   },
   "RIN-129": {
    "etykiety": [
@@ -451,7 +451,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-140/auto-tama-konkurent-voicedesk-tanszy-i-z-integracja-z-systemem-dealera",
    "utworzono": "2026-10-15T09:41:02.406Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:52.922Z"
+   "zmieniono": "2026-10-15T14:55:03.988Z"
   },
   "RIN-141": {
    "etykiety": [
@@ -512,7 +512,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-144/auto-tama-notatka-przed-spotkaniem-spotkanie-z-pawlem-pol-godziny",
    "utworzono": "2026-10-15T09:41:04.138Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:40:40.497Z"
+   "zmieniono": "2026-10-15T14:55:06.405Z"
   },
   "RIN-145": {
    "etykiety": [
@@ -578,7 +578,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-148/auto-tama-sprawdz-pawel-chce-puscic-opla-na-starej-bazie-wbrew",
    "utworzono": "2026-10-15T14:35:53.164Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:54.131Z"
+   "zmieniono": "2026-10-15T14:55:04.780Z"
   },
   "RIN-149": {
    "etykiety": [
@@ -611,7 +611,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-150/hotele-baltyk-zdecyduj-poprawic-w-bazie-wiedzy-informacje-o-sniadaniu",
    "utworzono": "2026-10-15T14:48:22.343Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:48:28.592Z"
+   "zmieniono": "2026-10-15T14:55:02.434Z"
   },
   "RIN-151": {
    "etykiety": [
@@ -743,11 +743,11 @@
    "stan": "Backlog",
    "termin": null,
    "typ_stanu": "backlog",
-   "tytul": "[hotele-baltyk] Uzupełnij: Rozmowa z panem [nazwisko] o ofercie ReceptAI: dopiero po…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-uzupelnij-rozmowa-z-panem-nazwisko-o-ofercie-receptai",
+   "tytul": "[hotele-baltyk] Uzupełnij: Rozmowa z panem Robertem o ofercie ReceptAI: dopiero po…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-uzupelnij-rozmowa-z-panem-robertem-o-ofercie-receptai",
    "utworzono": "2026-10-15T14:48:26.299Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:48:28.592Z"
+   "zmieniono": "2026-10-15T14:58:50.213Z"
   },
   "RIN-159": {
    "etykiety": [
@@ -759,11 +759,11 @@
    "stan": "Backlog",
    "termin": null,
    "typ_stanu": "backlog",
-   "tytul": "[hotele-baltyk] Uzupełnij: Decyzja pana [nazwisko] o podpięciu Kołobrzegu: czekamy…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-uzupelnij-decyzja-pana-nazwisko-o-podpieciu-kolobrzegu",
+   "tytul": "[hotele-baltyk] Uzupełnij: Decyzja pana Roberta o podpięciu Kołobrzegu: czekamy…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-uzupelnij-decyzja-pana-roberta-o-podpieciu-kolobrzegu",
    "utworzono": "2026-10-15T14:48:26.592Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:48:28.592Z"
+   "zmieniono": "2026-10-15T14:58:50.085Z"
   },
   "RIN-160": {
    "etykiety": [

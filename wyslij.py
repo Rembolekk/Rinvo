@@ -164,7 +164,19 @@ def obiecuje_zalacznik(tresc, W):
     return None
 
 
-def waliduj_spotkanie(sp, fakty, dzis, W):
+POWOD_MINELO = "termin spotkania już minął"
+
+
+def spotkanie_minelo(sp, teraz, W):
+    """Czy spotkanie już się zaczęło (data i godzina czasu polskiego <= teraz). Brak poprawnych danych = False."""
+    try:
+        start = datetime.fromisoformat(f"{sp['data']}T{sp['godzina']}:00").replace(tzinfo=ZoneInfo(W["strefa"]))
+    except (KeyError, TypeError, ValueError):
+        return False
+    return start <= teraz
+
+
+def waliduj_spotkanie(sp, fakty, dzis, W, teraz=None):
     """Spotkanie z szkicu → (poprawne słowniki albo None, powód). Data i godzina muszą być poprawne, nie z przeszłości
     i widoczne w faktach zgłoszenia (np. „15.10”, „10:00”): model niczego nie wymyśla."""
     try:
@@ -176,8 +188,8 @@ def waliduj_spotkanie(sp, fakty, dzis, W):
         assert 5 <= czas <= 600
     except Exception:  # noqa: BLE001
         return None, "niepoprawna data albo godzina spotkania"
-    if d < dzis:
-        return None, "termin spotkania jest w przeszłości"
+    if d < dzis or (teraz is not None and spotkanie_minelo({"data": d.isoformat(), "godzina": f"{godz:02d}:{min_:02d}"}, teraz, W)):
+        return None, POWOD_MINELO
     f = fakty.lower()
     dm = {f"{d.day}.{d.month}", f"{d.day:02d}.{d.month:02d}", f"{d.day}.{d.month:02d}", f"{d.day:02d}.{d.month}"}
     hm = {f"{godz}:{min_:02d}", f"{godz:02d}:{min_:02d}"}
@@ -353,6 +365,26 @@ def wstrzymaj(s, zg, powody, grupa=None):
     return {"status": "wstrzymane", "powod": powod, "zgloszenie": zg["identifier"]}
 
 
+def wycofaj_przeterminowany(s, zg, grupa, szkic, teraz_zrodlo="wysyłką"):
+    """Szkic zaproszenia na spotkanie, które już minęło, wycofuje się sam: komentarz zamiast wysyłki, zdjęte etykiety Wyślij i Szkic gotowy,
+    blok z gotowym mailem znika z opisu, komentarze ze szkicem dostają adnotację. Nic nie jest wysyłane."""
+    import szkice
+    E = s.Z["etykiety"]
+    sp = szkic.get("spotkanie") or {}
+    opis = f"{sp.get('data', '?')} {sp.get('godzina', '')}".strip()
+    if getattr(s, "sucho", False):
+        return {"status": "wycofane", "powod": f"spotkanie {opis} już minęło", "zgloszenie": zg["identifier"]}
+    for g in grupa:
+        szkice.wycofaj_szkice(s, g, "spotkanie już minęło")
+        s.linear.usun_etykiete(g, E["wyslij"])
+        s.linear.usun_etykiete(g, E["szkic"])
+        tytul, nowy_opis = dla_czlowieka.zdejmij_uklad(g)
+        if (tytul, nowy_opis) != (g.get("title"), g.get("description")):
+            s.linear.ustaw_uklad(g, tytul, nowy_opis)
+    s.linear.komentarz(zg, f"Szkic zaproszenia wycofany: spotkanie ({opis}) już minęło. Nic nie zostało wysłane.")
+    return {"status": "wycofane", "powod": f"spotkanie {opis} już minęło", "zgloszenie": zg["identifier"]}
+
+
 def czekaj(s, zg, karta, klient, powod):
     """Oczekiwanie (okno, limit, urlop, błąd poczty): bez zmian w Linearze; Slack raz na powód."""
     if getattr(s, "sucho", False):
@@ -408,6 +440,10 @@ def obsluz_zgloszenie(s, zg):
     grupa = [zg] + [g for g in (s.linear.zgloszenie_po_numerze(int(i.split("-")[1])) for i in identyfikatory
                                 if i != zg["identifier"]) if g]
 
+    # spotkanie z szkicu już minęło: szkic wycofuje się sam (komentarz, bez wysyłki)
+    if szkic.get("spotkanie") and spotkanie_minelo(szkic["spotkanie"], s.teraz(), W):
+        return wycofaj_przeterminowany(s, zg, grupa, szkic)
+
     # 1) duplikaty (historia w karcie, etykieta Wysłano na zgłoszeniach grupy)
     odbiorca = znajdz_odbiorce(karta, szkic["do"])
     # 2) odbiorca tylko z karty
@@ -427,7 +463,7 @@ def obsluz_zgloszenie(s, zg):
     # zaproszenie .ics: tylko z poprawnych danych; bez niego treść nie może obiecywać zaproszenia ani załącznika
     spotkanie, ics = szkic.get("spotkanie"), None
     if spotkanie:
-        sp_ok, powod_sp = waliduj_spotkanie(spotkanie, s.fakty_zgloszen(grupa), lokalnie(s.teraz(), W).date(), W)
+        sp_ok, powod_sp = waliduj_spotkanie(spotkanie, s.fakty_zgloszen(grupa), lokalnie(s.teraz(), W).date(), W, s.teraz())
         if sp_ok is None:
             powody.append(f"zaproszenie kalendarzowe: {powod_sp}")
         spotkanie = sp_ok

@@ -243,6 +243,14 @@ def zastosuj_uklad(s, zg, komentarze=None, przypisanie=None, mail=None, powod=No
     return czynnosc
 
 
+def zdejmij_uklad(zg):
+    """(tytuł bez czynności, opis bez bloku): zgłoszenie przestaje być zgłoszeniem dla człowieka (np. wycofany szkic)."""
+    pref = prefiks_klienta(zg.get("title"))
+    tytul = f"{pref} {tytul_merytoryczny(zg.get('title'))}".strip()
+    blok, kontekst = rozdziel(zg.get("description"))
+    return tytul, (kontekst.strip() + "\n") if blok else (zg.get("description") or "")
+
+
 # ── kolejność „Dla mnie dziś” ─────────────────────────────────────────────────
 
 def klucz_dla_mnie(z, dzis):
