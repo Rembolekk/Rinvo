@@ -1,0 +1,19 @@
+{
+ "RIN-146": {
+  "etykiety_dodane": [
+   "Wyślij"
+  ],
+  "etykiety_usuniete": [],
+  "kiedy": "2026-10-15T18:44:11.395Z",
+  "poprzedni_stan": "Todo",
+  "stan": "Todo",
+  "typ_stanu": "unstarted",
+  "zamkniete": false
+ },
+ "RIN-175": {
+  "etykiety_dodane": [],
+  "etykiety_usuniete": [],
+  "kiedy": "2026-10-15T19:26:54+00:00",
+  "usuniete": true
+ }
+}
