@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T14:35:54+00:00",
+ "zapisano": "2026-10-15T14:37:19+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -22,7 +22,6 @@
    "etykiety": [
     "Dla agenta",
     "Konfiguracja",
-    "Szkic gotowy",
     "repo: rinvo-app"
    ],
    "id": "19864b3a-b074-464b-b01b-21e821f143f6",
@@ -34,7 +33,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-115/auto-tama-wyslij-poprawic-adres-salonu-we-wloclawku-na-torunska-120",
    "utworzono": "2026-10-15T09:40:51.506Z",
    "zamknieto": "2026-10-15T09:41:57.982Z",
-   "zmieniono": "2026-10-15T14:35:33.871Z"
+   "zmieniono": "2026-10-15T14:36:59.342Z"
   },
   "RIN-116": {
    "etykiety": [
@@ -45,14 +44,14 @@
    ],
    "id": "55f82942-481e-4818-bb3b-830df2f89084",
    "priorytet": 0,
-   "stan": "Todo",
+   "stan": "Done",
    "termin": "2026-10-06",
-   "typ_stanu": "unstarted",
+   "typ_stanu": "completed",
    "tytul": "[auto-tama] Zmienić godziny salonów podawane klientom: sobota do 15:00",
    "url": "https://linear.app/rinvo-demo/issue/RIN-116/auto-tama-zmienic-godziny-salonow-podawane-klientom-sobota-do-1500",
    "utworzono": "2026-10-15T09:40:51.769Z",
-   "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:45.539Z"
+   "zamknieto": "2026-10-15T14:36:54.200Z",
+   "zmieniono": "2026-10-15T14:36:54.210Z"
   },
   "RIN-117": {
    "etykiety": [
@@ -135,7 +134,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-121/auto-tama-wyslij-przeslac-kasi-cene-sms-ow-wysylanych-po-dwoch",
    "utworzono": "2026-10-15T09:40:53.744Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:43:08.625Z"
+   "zmieniono": "2026-10-15T14:37:19.403Z"
   },
   "RIN-122": {
    "etykiety": [
@@ -238,18 +237,19 @@
   },
   "RIN-128": {
    "etykiety": [
-    "Dla agenta"
+    "Dla agenta",
+    "Szkic gotowy"
    ],
    "id": "fd1bbcb4-0b15-4846-a8b4-dd767d9f2b90",
    "priorytet": 0,
    "stan": "Todo",
    "termin": "2026-10-15",
    "typ_stanu": "unstarted",
-   "tytul": "[auto-tama] Spotkanie z Pawłem (pół godziny, czwartek 15.10 o 10:00): czekamy na potwierdzenie Kasi",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-128/auto-tama-spotkanie-z-pawlem-pol-godziny-czwartek-1510-o-1000-czekamy",
+   "tytul": "[auto-tama] Wyślij: Spotkanie z Pawłem (pół godziny, czwartek 15.10 o 10:00)…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-128/auto-tama-wyslij-spotkanie-z-pawlem-pol-godziny-czwartek-1510-o-1000",
    "utworzono": "2026-10-15T09:40:56.540Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:41.686Z"
+   "zmieniono": "2026-10-15T14:37:18.052Z"
   },
   "RIN-129": {
    "etykiety": [
@@ -545,7 +545,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-146/auto-tama-wyslij-kasi-zestawienie-wynikow-testu-wstepu-ilu-rozmow",
    "utworzono": "2026-10-15T14:35:43.365Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:43.365Z"
+   "zmieniono": "2026-10-15T14:35:54.131Z"
   },
   "RIN-147": {
    "etykiety": [
@@ -562,7 +562,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-147/auto-tama-zdecyduj-eksport-listy-kontaktow-do-excela-np-samych",
    "utworzono": "2026-10-15T14:35:48.164Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:48.164Z"
+   "zmieniono": "2026-10-15T14:35:54.131Z"
   },
   "RIN-148": {
    "etykiety": [
@@ -578,7 +578,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-148/auto-tama-sprawdz-pawel-chce-puscic-opla-na-starej-bazie-wbrew",
    "utworzono": "2026-10-15T14:35:53.164Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:53.164Z"
+   "zmieniono": "2026-10-15T14:35:54.131Z"
   }
  }
 }
