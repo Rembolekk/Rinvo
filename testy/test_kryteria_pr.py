@@ -269,7 +269,7 @@ class K5ZgloszeniePoScaleniu(unittest.TestCase):
 class K6Dokumentacja(unittest.TestCase):
 
     def test_readme_opisuje_zasady(self):
-        r = (ROOT / "README.md").read_text(encoding="utf-8")
+        r = "".join((ROOT / d).read_text(encoding="utf-8") for d in ("README.md", "docs/SZCZEGOLY.md", "docs/PRZYPADKI-BRZEGOWE.md"))
         for fraza in ("Sprawdzenie po wdrożeniu", "kryteria_pr.py", "@coderabbitai review"):
             self.assertIn(fraza, r, fraza)
 

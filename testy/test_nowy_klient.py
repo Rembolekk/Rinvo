@@ -247,7 +247,7 @@ class N4Wykluczenia(unittest.TestCase):
 class N5Dokumentacja(unittest.TestCase):
 
     def test_readme_opisuje_nowego_klienta_i_dzis(self):
-        r = (ROOT / "README.md").read_text(encoding="utf-8")
+        r = "".join((ROOT / d).read_text(encoding="utf-8") for d in ("README.md", "docs/SZCZEGOLY.md", "docs/PRZYPADKI-BRZEGOWE.md"))
         for fraza in ("Potwierdź kartę klienta", "Wstrzymane do potwierdzenia karty", "raz w tygodniu", "karta_klienta.py"):
             self.assertIn(fraza, r, fraza)
 

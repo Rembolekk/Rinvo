@@ -889,7 +889,7 @@ class Test17Odpowiedz(Tmp):
 class TestSpojnosc(unittest.TestCase):
 
     def test_readme_ma_tabele_przypadkow_brzegowych_z_plikami_i_testami(self):
-        r = (ROOT / "README.md").read_text(encoding="utf-8")
+        r = "".join((ROOT / d).read_text(encoding="utf-8") for d in ("README.md", "docs/SZCZEGOLY.md", "docs/PRZYPADKI-BRZEGOWE.md"))
         self.assertIn("Przypadki brzegowe", r)
         self.assertIn("| Sytuacja | Co robi system | Plik | Test |", r)
         for nr in range(1, 18):

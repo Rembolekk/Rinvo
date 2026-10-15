@@ -517,7 +517,7 @@ class TestSpojnosc(unittest.TestCase):
 
     def test_kazdy_punkt_ma_test_i_wpis_w_readme(self):
         kod = Path(__file__).read_text(encoding="utf-8")
-        r = (ROOT / "README.md").read_text(encoding="utf-8")
+        r = "".join((ROOT / d).read_text(encoding="utf-8") for d in ("README.md", "docs/SZCZEGOLY.md", "docs/PRZYPADKI-BRZEGOWE.md"))
         for p in ("p1", "p2", "p3", "p4", "p5"):
             self.assertIn(f"def test_{p}_", kod)
         for fraza in ("odmaskuj.py", "kotwica_cytatu", "najpierw scalanie", "wycofuje się sam", "oczekuje na limit"):

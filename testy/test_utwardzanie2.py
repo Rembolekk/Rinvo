@@ -817,7 +817,7 @@ class C09Eskalacja(unittest.TestCase):
 class TestSpojnosc(unittest.TestCase):
 
     def test_readme_ma_przypadki_c01_c09_w_tabeli(self):
-        r = (ROOT / "README.md").read_text(encoding="utf-8")
+        r = "".join((ROOT / d).read_text(encoding="utf-8") for d in ("README.md", "docs/SZCZEGOLY.md", "docs/PRZYPADKI-BRZEGOWE.md"))
         for nr in range(1, 10):
             self.assertIn(f"c{nr:02d}_", r, f"test punktu {nr} wymieniony w README")
 

@@ -849,7 +849,7 @@ class TestSpojnosc(unittest.TestCase):
             self.assertIn(f"def test_{p}_", kod)
 
     def test_readme_opisuje_obie_funkcje(self):
-        r = (ROOT / "README.md").read_text(encoding="utf-8")
+        r = "".join((ROOT / d).read_text(encoding="utf-8") for d in ("README.md", "docs/SZCZEGOLY.md", "docs/PRZYPADKI-BRZEGOWE.md"))
         self.assertIn("dla_czlowieka.py", r)
         self.assertIn("propozycje.py", r)
         self.assertIn("Dla mnie dziś", r)
