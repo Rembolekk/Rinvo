@@ -1,1 +1,101 @@
-{}
+{
+  "klik-w-kafelek-do-listy": {
+    "tytul": "Klikanie w kafelek „zainteresowani” przenosi do listy tych kontaktów",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Klikam w tę dziewiątkę. Nic. Zostaję na kafelku. A ja chcę zobaczyć tych dziewięciu ludzi, a nie siedemdziesiąt wierszy.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "testy-ab-w-panelu": {
+    "tytul": "Testy A/B wbudowane w panel: klient sam ustawia wersje i czyta wyniki",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Chciałabym mieć w panelu coś takiego, że wrzucam dwie albo trzy wersje początku rozmowy, system sam dzieli połowę telefonów na jedną, połowę na drugą, a po tygodniu widzę, przy której ludzie rzadziej się rozłączają i częściej dochodzą do końca.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "raport-mailowy-tygodniowy": {
+    "tytul": "Tygodniowy raport mailowy z liczbami dla Pawła (poniedziałek rano)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Paweł pyta mnie co tydzień o te same liczby: ile zadzwoniliśmy, ile odebrało, ilu zainteresowanych. Ja to przepisuję ręcznie do maila. Da się, żeby to samo do niego przychodziło? W poniedziałek rano, na przykład.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "sms-po-nieudanych-probach": {
+    "tytul": "SMS do osoby, do której agent dwa razy się nie dodzwonił",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Jak bot dwa razy nie dodzwoni się do kogoś, to czy nie mógłby wysłać SMS-a? Coś w stylu „dzwoniliśmy w sprawie Twojego zapytania o Peugeota, oddzwoń albo kliknij tutaj”. Ludzie nie odbierają nieznanych numerów, a SMS przeczytają.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "agent-po-godzinach": {
+    "tytul": "Jeden agent odbierający po godzinach wszystkie numery salonu",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Jak salon jest zamknięty, ma odbierać jeden agent, na wszystkie numery.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "mail-handlowca-model-salon-na-gorze": {
+    "tytul": "Mail do handlowca po walidacji: model i salon na górze",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Mail, który dostaje po walidacji, to ściana tekstu z transkrypcją.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "kolejnosc-kolumn-lista-kontaktow": {
+    "tytul": "Lista kontaktów: nazwisko zaraz po statusie",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "I kolumny. Na liście kontaktów chcę mieć nazwisko zaraz po statusie.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "integracja-z-systemem-dealera": {
+    "tytul": "Integracja z systemem (CRM) dealera, żeby leady same trafiały do handlowców",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Bardziej go kręci to łączenie z systemem, bo dziewczyny teraz przepisują wszystko z maili.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  },
+  "proby-w-przerwie-obiadowej": {
+    "tytul": "Pierwsza próba dzwonienia w przerwie obiadowej (po wynikach na świeżych leadach)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Najwięcej ludzi odbierało w okolicach dwunastej, trzynastej i po siedemnastej. Rano, przed dziesiątą, prawie nikt.",
+        "data": "2026-10-06",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      }
+    ]
+  }
+}

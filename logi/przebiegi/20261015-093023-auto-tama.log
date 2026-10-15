@@ -1,0 +1,171 @@
+=== przetworz.py ===
+Transkrypcja: ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
+Klient: auto-tama
+Start: 2026-10-15T09:30:23.189580
+
+============================================================
+=== claude --print ===
+============================================================
+
+Analiza rozmowy z 6.10 jest gotowa. `render.py` potwierdził, że wszystkie cytaty występują w transkrypcji dosłownie, a `daty.py` policzył okna robocze i zapisał je do `wynik.json`.
+
+Pliki są w `wyniki/auto-tama/2026-10-06-call-statusowy/`: `wynik.json` i `raport.html`. Niczego nie wysłałem do klienta, a szkic maila czeka na zatwierdzenie.
+
+Pozycji jest 53:
+- **Do zrobienia teraz (9):**
+  - błąd drugiego telefonu po rozłączeniu w 3 sekundy i błąd filtra statusu,
+  - adres salonu we Włocławku (Toruńska 120),
+  - godziny salonów i godziny dzwonienia agenta (9–19, sobota do 15:00),
+  - korekta faktury,
+  - sprawdzenie naliczania krótkich połączeń,
+  - cena SMS-ów,
+  - ściąga ze statusami.
+- **Czeka na klienta (8):** dwie wersje wstępu do czwartku, plik ze świeżymi leadami w poniedziałek, potwierdzenie spotkania z Pawłem na 15.10 o 10:00, szkolenie handlowców i kilka mniejszych spraw.
+- **Backlog (9):** testy A/B w panelu, raport mailowy dla Pawła, klikanie w kafelek, SMS po nieudanych próbach, agent po godzinach, integracja z systemem dealera i kilka mniejszych próśb.
+- **Zakazy (23):** m.in. Opel, stara baza, brak testu wstępu w tym tygodniu, agent po godzinach, brak nowych rzeczy w czasie urlopu Kasi 19–23.10.
+- **Ryzyka (4):** konkurent VoiceDesk, Paweł chcący wszystko wyłączyć, jakość bota i rozliczenia.
+
+Zmiany zdania odnotowałem dwie: sobota do 14:00 zmieniła się na 15:00, osobno w godzinach salonów i w godzinach dzwonienia.
+
+- **Karta klienta:** karta auto-tama ma puste `zakazy` i `otwarte_sprawy`, a `prosby.json` jest pusty. Dlatego zakazy numerowałem od Z1, `aktualizacje_spraw` zostało puste, a klucze funkcji są nowe.
+- **Ostrzeżenie `daty.py`:** pozycja B8 (integracja z systemem dealera) ma w cytacie słowa czasowe bez wpisu w `fakty_czasowe`. Zostawiłem to celowo, bo Marek niczego tam nie obiecał.
+- **Niska pewność:** K2 (termin pliku „powiedzmy poniedziałek”), K3 i K4 (nie wiadomo, czy to błąd bota), B4, B8, B9 i Z22.
+
+Utwardzanie: {"maskowanie": {"liczba": 0, "rodzaje": {}}}
+
+============================================================
+=== render.py ===
+============================================================
+Komenda: python3 -I render.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json --transkrypcja ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md
+
+OK: /home/runner/work/Rinvo/Rinvo/wyniki/auto-tama/2026-10-06-call-statusowy/raport.html
+Cytaty sprawdzone z transkrypcją: tak
+  Do zrobienia teraz: 9
+  Czeka na klienta: 8
+  Backlog produktowy: 9
+  Zakazy i ograniczenia: 23
+  Ryzyka handlowe: 4
+
+============================================================
+=== daty.py ===
+============================================================
+Komenda: python3 -I daty.py wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json
+
+OK: okna_czasowe dla 15 spraw → wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json
+  agent-po-godzinach: 2026-11-02 – →
+  cena-sms: 2026-10-07 – 2026-10-09
+  kolejnosc-kolumn-lista-kontaktow: 2026-10-12 – 2026-10-16; 2026-10-26 – →
+  korekta-faktury: 2026-10-07 – 2026-10-16
+  mail-handlowca-model-salon-na-gorze: 2026-10-12 – 2026-10-16; 2026-10-26 – →
+  mail-przeglad-zle-zakwalifikowany: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+  nagranie-drugie-pytanie-o-model: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+  naliczanie-krotkich-polaczen: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+  numery-assistance-lista-pol: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+  sciaga-statusow: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+  spotkanie-z-pawlem: 2026-10-07 – 2026-10-15
+  swieze-leady-plik: 2026-10-07 – 2026-10-12
+  szkolenie-handlowcow: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+  wstep-dwie-wersje: 2026-10-12 – 2026-10-16; 2026-10-26 – →
+  zgoda-na-nazwe-firmy: 2026-10-07 – 2026-10-16; 2026-10-26 – →
+
+Ostrzeżenia (brak faktu czasowego): 1
+  B8 integracja-z-systemem-dealera
+
+============================================================
+=== linear_sync.py ===
+============================================================
+
+============================================================
+SYNCHRONIZACJA: wyniki/auto-tama/2026-10-06-call-statusowy/wynik.json  →  Linear [RIN]  (klient: auto-tama)
+============================================================
+
+Zespół: Rinvo demo (RIN)
+
+Etykiety:
+
+Stany: Todo / Backlog / Done / Cancelled gotowe
+
+
+  ✓ RIN-114 (podwojny-telefon-po-rozlaczeniu): [auto-tama] Błąd: agent dzwoni drugi raz po rozłąc
+  ✓ RIN-115 (adres-salonu-wloclawek): [auto-tama] Poprawić adres salonu we Włocławku na 
+  ✓ RIN-116 (godziny-salonow-w-bazie): [auto-tama] Zmienić godziny salonów podawane klien
+  ✓ RIN-117 (godziny-dzwonienia-agenta): [auto-tama] Skrócić godziny dzwonienia agenta: tyd
+  ✓ RIN-118 (filtr-statusow): [auto-tama] Błąd: filtr statusu „zainteresowany” n
+  ✓ RIN-119 (korekta-faktury): [auto-tama] Zdecyduj: Korekta faktury za wrzesień:
+  ✓ RIN-120 (naliczanie-krotkich-polaczen): [auto-tama] Zdecyduj: Sprawdzić, jak liczymy krótk
+  ✓ RIN-121 (cena-sms): [auto-tama] Zdecyduj: Przesłać Kasi cenę SMS-ów wy
+  ✓ RIN-122 (sciaga-statusow): [auto-tama] Wyślij: Przygotować jednostronicową śc
+  ✓ RIN-123 (wstep-dwie-wersje): [auto-tama] Wstęp rozmowy w dwóch wersjach: czekam
+  ✓ RIN-124 (swieze-leady-plik): [auto-tama] Sprawdź: Plik ze świeżymi leadami (ost
+  ✓ RIN-125 (mail-przeglad-zle-zakwalifikowany): [auto-tama] Sprawdź: Mail do handlowca po walidacj
+  ✓ RIN-126 (nagranie-drugie-pytanie-o-model): [auto-tama] Sprawdź: Nagranie rozmowy, w której as
+  ✓ RIN-127 (szkolenie-handlowcow): [auto-tama] Szkolenie dla handlowców (15 minut onl
+  ✓ RIN-128 (spotkanie-z-pawlem): [auto-tama] Spotkanie z Pawłem (pół godziny, czwar
+  ✓ RIN-129 (numery-assistance-lista-pol): [auto-tama] Numery assistance i lista pól do agent
+  ✓ RIN-130 (zgoda-na-nazwe-firmy): [auto-tama] Zgoda Pawła na nazwę firmy w przykładz
+  ✓ RIN-131 (klik-w-kafelek-do-listy): [auto-tama] Zdecyduj: Klikanie w kafelek „zaintere
+  ✓ RIN-132 (testy-ab-w-panelu): [auto-tama] Zdecyduj: Testy A/B wbudowane w panel:
+  ✓ RIN-133 (raport-mailowy-tygodniowy): [auto-tama] Zdecyduj: Tygodniowy raport mailowy z 
+  ✓ RIN-134 (sms-po-nieudanych-probach): [auto-tama] Zdecyduj: SMS do osoby, do której agen
+  ✓ RIN-135 (agent-po-godzinach): [auto-tama] Zdecyduj: Jeden agent odbierający po g
+  ✓ RIN-136 (mail-handlowca-model-salon-na-gorze): [auto-tama] Wyślij: Mail do handlowca po walidacji
+  ✓ RIN-137 (kolejnosc-kolumn-lista-kontaktow): [auto-tama] Lista kontaktów: nazwisko zaraz po sta
+  ✓ RIN-138 (integracja-z-systemem-dealera): [auto-tama] Zdecyduj: Integracja z systemem (CRM) 
+  ✓ RIN-139 (proby-w-przerwie-obiadowej): [auto-tama] Zdecyduj: Pierwsza próba dzwonienia w 
+  ✓ RIN-140 (ryzyko-voicedesk): [auto-tama] Konkurent VoiceDesk: tańszy i z integr
+  ✓ RIN-141 (ryzyko-wylaczenie-przez-pawla): [auto-tama] Paweł po wynikach na starej bazie chci
+  ✓ RIN-142 (ryzyko-jakosc-bota): [auto-tama] Jakość bota: rozmówcy orientują się, ż
+  ✓ RIN-143 (ryzyko-rozliczenia): [auto-tama] Rozliczenia: faktura na zły podmiot i 
+  + nowe zadanie notatka-spotkanie-z-pawlem
+  ✓ RIN-144 (notatka-spotkanie-z-pawlem): Notatka przed spotkaniem: Spotkanie z Pawłem (pół 
+  ✓ karta.md: ops/klienci/auto-tama/karta.md
+
+────────────────────────────────────────────────────────────
+Podsumowanie:
+  Utworzono zgłoszeń:            30
+  Zaktualizowano (komentarz):    0
+  Pominięto (ta sama rozmowa):   0
+  Zakazy → karta.json:           23
+  Aktualizacje otwartych spraw:  0
+────────────────────────────────────────────────────────────
+
+Stan Lineara zapisany do ops/.stan_linear.json (31 zgłoszeń).
+
+============================================================
+=== uruchom.py ===
+============================================================
+  FAIL  Zmiana zdania: sobota 9-15, nie 9-14 (ostateczna decyzja)
+        brak pozycji z cytatem: 'Sobotę jednak zostaw do piętnastej, nie do czternastej'
+  FAIL  Adres Włocławek: poprawka bazy wiedzy → etykiety Konfiguracja + Dla agenta
+        brak pozycji z cytatem: 'Toruńska 120. Godziny bez zmian'
+  PASS  Filtr statusu to błąd (nie nowa funkcja) → sekcja 1, etykieta Błąd + Dla agenta
+  PASS  Kliknięcie w kafelek to nowa_funkcja → sekcja 3, NIE dostaje Dla agenta
+  PASS  Opel zakaz – nawet na polecenie Pawła → sekcja 4
+  PASS  Zakaz: nie wierzyć fałszywemu akceptowi po godzinach
+  PASS  Tekst wstępu – jedno przypomnienie (raz, nie więcej) → sekcja 2
+  PASS  Plik leadów – jedno przypomnienie, jeden mail (nie trzy) → sekcja 2
+  PASS  Zakaz: nie wysyłać wzoru pliku
+  PASS  Zakaz: nie pisać do Oli bezpośrednio
+  PASS  Zakaz: urlop Kasi 19-23.10 – nic nowego nie startuje
+  PASS  Zakaz: agent nie sprzedaje, bez aut używanych
+  PASS  VoiceDesk jako ryzyko handlowe → sekcja 5
+  PASS  Korekta faktury – Michał dziś → sekcja 1, typ finanse
+  PASS  Zaproszenie dla Pawła tylko po potwierdzeniu Kasi → sekcja 2
+  FAIL  Kolumna z nazwiskiem tylko przy okazji naprawy filtra – warunek ustawiony
+        sekcja: oczekiwano 1, jest 4 (id=Z21)
+  PASS  Materiały po godzinach: przyjąć ale nie podpinać → zakaz sekcja 4
+  PASS  Sprawa przeglądu od Oli – bez numeru czeka, nie zgadywać → sekcja 2
+  PASS  Tekst wstępu – dwie wersje do napisania przez Kasię → sekcja 2
+  PASS  Okna czasowe dla tekst-wstepu-dwie-wersje: min 2 okna (blok + urlop)
+
+Niepowodzenia (3):
+  - Zmiana zdania: sobota 9-15, nie 9-14 (ostateczna decyzja): brak pozycji z cytatem: 'Sobotę jednak zostaw do piętnastej, nie do czternastej'
+  - Adres Włocławek: poprawka bazy wiedzy → etykiety Konfiguracja + Dla agenta: brak pozycji z cytatem: 'Toruńska 120. Godziny bez zmian'
+  - Kolumna z nazwiskiem tylko przy okazji naprawy filtra – warunek ustawiony: sekcja: oczekiwano 1, jest 4 (id=Z21)
+
+FAIL 17/20
+
+============================================================
+=== Slack ===
+============================================================
+Slack: wysłano (HTTP 200)
