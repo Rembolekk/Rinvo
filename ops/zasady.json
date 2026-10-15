@@ -16,7 +16,9 @@
     "regresja": "Regresja",
     "odrzuc": "Odrzuć",
     "buduj": "Buduj",
-    "pozniej": "Później"
+    "pozniej": "Później",
+    "wstrzymane": "Wstrzymane do potwierdzenia karty",
+    "karta": "Karta do potwierdzenia"
   },
   "czlowiek_gdy": {
     "pieniadze": {
@@ -752,7 +754,8 @@
       "Wyślij",
       "Zdecyduj",
       "Sprawdź",
-      "Uzupełnij"
+      "Uzupełnij",
+      "Potwierdź"
     ],
     "max_znakow_opisu_tytulu": 60,
     "odrzucone_powod": "odrzucone przez człowieka",
@@ -763,7 +766,11 @@
         "Do weryfikacji",
         "Szkic gotowy"
       ],
-      "plik": "ops/widok_dla_mnie.json"
+      "plik": "ops/widok_dla_mnie.json",
+      "wyklucz_etykiety": [
+        "Produkt",
+        "Wstrzymane do potwierdzenia karty"
+      ]
     },
     "slowa_uzupelnij": [
       "uzupełni",
@@ -772,7 +779,8 @@
       "brak danych",
       "luki",
       "do potwierdzenia"
-    ]
+    ],
+    "_opis_dzis": "„Dziś” to tylko sprawy na dziś: szkice do wysłania, decyzje (pieniądze, zakazy…), weryfikacje i potwierdzenia kart. Pomysły i propozycje produktowe (etykieta Produkt) oraz sprawy wstrzymane do potwierdzenia karty nowego klienta NIE wchodzą do „dziś”; produkt ma osobną linijkę „raz w tygodniu”."
   },
   "propozycje": {
     "_opis": "Agent produktowy: gdy sygnał z Głosu klientów pojawia się pierwszy raz albo się wzmacnia, pisze propozycję jako materiał ops/materialy/produkt/<klucz_funkcji>.md i .pdf oraz zgłoszenie „Zdecyduj: propozycja – <funkcja>” dla człowieka. Ruchy: etykieta Buduj, Później albo Odrzuć. Bez obietnic terminów i cen, bez kwot spoza źródeł.",
@@ -801,5 +809,10 @@
       "Dla agenta",
       "Produkt"
     ]
+  },
+  "nowy_klient": {
+    "_opis": "Nowy klient: JEDNO zgłoszenie dla człowieka „Potwierdź kartę klienta <nazwa>”; pozostałe sprawy zachowują normalny podział, ale mają etykietę „Wstrzymane do potwierdzenia karty” (agent ich nie bierze, nie liczą się jako „Wymaga Ciebie”). Po potwierdzeniu karty (zgłoszenie Done albo zdjęty znacznik nowy_klient w karcie) wracają do normalnego obiegu.",
+    "tytul_zgloszenia": "Potwierdź kartę klienta {nazwa}",
+    "priorytet": 2
   }
 }

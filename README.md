@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_nowy_klient.py` | nowy klient (jedno zgłoszenie do potwierdzenia karty, wstrzymanie, zwolnienie), „dziś” bez produktu i wstrzymanych, zgodność strony z widokiem: 21 testów |
 | `testy/test_strona_glowna.py` | układ index.html i Głosu klientów, liczba zgodna z widokiem „Dla mnie dziś”, czas od wpłynięcia, nazwy klientów z karty: 21 testów |
 | `testy/test_poprawki_proby.py` | poprawki po próbie generalnej (maskowanie, kotwice, kolejność agenta, minione spotkania, limit sesji): 39 testów |
 | `testy/test_reset_demo.py` | reset do próby generalnej (plan bez flagi, archiwizacja Lineara, karty, transkrypcje poza wyzwalaczem workflow, stan, Rinvo-app na tymczasowym repo git, PR-y): 13 testów |
@@ -411,13 +412,25 @@ Gdy sygnał z **Głosu klientów** pojawia się pierwszy raz albo się wzmacnia 
 
 Testy: `python3 testy/test_porzadek_produkt.py` (testy `test_b01_…` … `test_b05_…`).
 
+## Nowy klient: jedno zgłoszenie zamiast kilkudziesięciu (`karta_klienta.py`)
+
+Karta nowego klienta powstaje z rozmowy (kontakty i decydenci „do potwierdzenia”). Zamiast oznaczać wszystkie jego sprawy jako wymagające człowieka:
+- powstaje JEDNO zgłoszenie dla człowieka **„Potwierdź kartę klienta <nazwa>”** (etykiety Do weryfikacji + Karta do potwierdzenia) z krótką listą kontaktów i decydentów;
+- pozostałe sprawy mają normalny podział (agent, czeka na klienta, produkt, ryzyko, decyzja), ale też etykietę **Wstrzymane do potwierdzenia karty**: agent ich nie
+  bierze, nie liczą się jako „Wymaga Ciebie”, strona klienta pokazuje je w zwiniętej liście, a w tabeli klientów w „Uwadze” stoi „N spraw wstrzymanych do potwierdzenia karty”;
+- po potwierdzeniu karty (zamknij zgłoszenie jako Done albo zdejmij znacznik `nowy_klient` w `ops/klienci/<klient>/karta.json`) etykieta wstrzymania znika, decydenci z wniosku
+  stają się decydentami, kontakty z adresem są potwierdzone, a Slack dostaje jedną linijkę. Robi to `karta_klienta.zwolnij_potwierdzone` w jobie wysyłki (co kilka minut).
+Testy: `python3 testy/test_nowy_klient.py`.
+
 ## Strony: układ i liczby
 
 - **index.html:** na górze jedno duże zdanie „Dziś potrzebujemy Cię w N sprawach” (link do widoku „Dla mnie dziś” w Linearze) i obok linijka o agentach
   (zamknięte sprawy z 7 dni, średni czas poprawki). Niżej prosta tabela: kropka statusu (kolor wyjaśnia dymek), nazwa klienta z karty (link do jego strony),
   Wymaga Ciebie, U agentów, Czeka na klienta, Uwaga (jedno zdanie, np. „konkurencja wraca drugi raz”). Stopka jedną linijką: „Dane fikcyjne, demo · zaktualizowano …”.
-- **Liczba spraw dla człowieka** to dokładnie to, co pokazuje widok „Dla mnie dziś”: otwarte zgłoszenia z etykietą Decyzja człowieka, Do weryfikacji albo Szkic gotowy
-  (`widok.filtr` i `generuj_strony.wymaga_ciebie_etykiety` czytają te same etykiety z `ops/zasady.json`), również w backlogu.
+- **„Dziś” to tylko sprawy na dziś** (`dla_czlowieka.widok` w `ops/zasady.json`): szkice do wysłania, decyzje (pieniądze, zakazy…), weryfikacje i potwierdzenia kart
+  (etykiety Decyzja człowieka, Do weryfikacji, Szkic gotowy; tylko otwarte). Pomysły i propozycje produktowe (etykieta Produkt) oraz sprawy wstrzymane do
+  potwierdzenia karty NIE wchodzą do „dziś”. `widok.filtr` i `generuj_strony.sprawy_dla_czlowieka` czytają te same etykiety i wyłączenia, więc liczba na stronie
+  zgadza się z widokiem w Linearze. Produkt ma osobną linijkę „Produkt: N pomysłów do przeglądu (raz w tygodniu)” z linkiem do Głosu klientów.
 - **Czas poprawki** liczymy od WPŁYNIĘCIA rozmowy albo maila do systemu (czas commita pliku, zapisany w `ops/.przetworzone.json` jako `wplynelo`; `wplyniecia.py`),
   do scalenia poprawki, a nie od daty rozmowy z nazwy pliku. Podpis: „od wpłynięcia rozmowy do wdrożonej poprawki”.
 - **Głos klientów:** zdanie „N sygnałów wartych decyzji”, potem po jednym wierszu na sygnał (funkcja, dlaczego, ilu klientów, link do propozycji), cytat zwinięty pod

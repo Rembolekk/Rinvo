@@ -54,7 +54,7 @@ a{color:var(--acc);text-decoration:none} a:hover{text-decoration:underline}
 .gora{display:flex;flex-wrap:wrap;justify-content:space-between;align-items:baseline;gap:8px 32px;margin:0 0 8px}
 .glowne{font-size:2rem;line-height:1.25;font-weight:600;margin:0;letter-spacing:-.015em}
 .agenci{color:var(--mut);font-size:.95rem;margin:0}
-.podpis{color:var(--mut);font-size:.78rem;margin:2px 0 0;text-align:right}
+.produkt{color:var(--mut);margin:6px 0 0;font-size:.95rem}
 table{width:100%;border-collapse:collapse}
 .klienci{margin-top:36px}
 th{font-weight:500;font-size:.78rem;color:var(--mut);text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);white-space:nowrap}
@@ -71,7 +71,7 @@ ul{margin:0;padding-left:18px} li{margin:0 0 8px}
 .tag.bad{color:var(--bad);border-color:currentColor} .tag.ok{color:var(--ok);border-color:currentColor} .tag.warn{color:var(--warn);border-color:currentColor}
 blockquote{margin:6px 0 0;padding:2px 12px;border-left:2px solid var(--line);color:var(--mut);font-size:.92rem}
 .tl{list-style:none;padding:0;margin:0} .tl li{display:grid;grid-template-columns:92px 1fr;gap:4px 14px;padding:12px 0;border-bottom:1px solid var(--line);margin:0}
-.tl time{color:var(--mut);font-size:.85rem} @media (max-width:560px){.tl li{grid-template-columns:1fr}.glowne{font-size:1.6rem}.podpis{text-align:left}}
+.tl time{color:var(--mut);font-size:.85rem} @media (max-width:560px){.tl li{grid-template-columns:1fr}.glowne{font-size:1.6rem}}
 .kind{font-size:.72rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--mut);margin-right:8px}
 .empty{color:var(--mut)} details summary{cursor:pointer;color:var(--mut);font-size:.9rem}
 summary.jedna{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -127,7 +127,7 @@ def sprawy_klienta(dane, slug):
     """Zgłoszenia klienta z pliku stanu Lineara, podzielone na: czlowiek, agent, czeka (otwarte) oraz zamkniete."""
     E = dane["Z"]["etykiety"]
     czlowiek_et = wymaga_ciebie_etykiety(dane)
-    wynik = {"czlowiek": [], "agent": [], "czeka": [], "backlog": [], "inne": [], "zamkniete": []}
+    wynik = {"czlowiek": [], "agent": [], "czeka": [], "backlog": [], "inne": [], "zamkniete": [], "wstrzymane": [], "produkt": []}
     for ident, z in sorted(dane["stan"]["zgloszenia"].items(), key=lambda kv: int(kv[0].split("-")[1])):
         if not z["tytul"].startswith(f"[{slug}]"):
             continue
@@ -136,7 +136,11 @@ def sprawy_klienta(dane, slug):
             wynik["zamkniete"].append(z)
             continue
         et = set(z["etykiety"])
-        if et & czlowiek_et:                      # te same sprawy, które pokazuje widok „Dla mnie dziś” w Linearze
+        if E["wstrzymane"] in et:                 # nowy klient: sprawa czeka na potwierdzenie karty, nie liczy się nigdzie jako „na dziś”
+            wynik["wstrzymane"].append(z)
+        elif et & czlowiek_et and E["produkt"] in et:
+            wynik["produkt"].append(z)            # decyzje o priorytetach produktu: przegląd raz w tygodniu, nie „dziś”
+        elif et & czlowiek_et:                    # te same sprawy, które pokazuje widok „Dla mnie dziś” w Linearze
             wynik["czlowiek"].append(z)
         elif E["czeka"] in et:
             wynik["czeka"].append(z)
@@ -239,7 +243,11 @@ def forma_liczby(n, jeden, kilka, wiele):
 
 
 def uwaga_klienta(dane, klient):
-    """Jedno krótkie zdanie o tym, co pali: powtarzające się ryzyko („konkurencja wraca drugi raz”), a w razie braku sprawy po terminie. Puste, gdy nic."""
+    """Jedno krótkie zdanie o tym, co pali: karta nowego klienta czeka na potwierdzenie, powtarzające się ryzyko („konkurencja wraca drugi raz”),
+    a w razie braku sprawa po terminie. Puste, gdy nic."""
+    wstrz = sprawy_klienta(dane, klient["slug"])["wstrzymane"]
+    if wstrz:
+        return f"{len(wstrz)} {forma_liczby(len(wstrz), 'sprawa wstrzymana', 'sprawy wstrzymane', 'spraw wstrzymanych')} do potwierdzenia karty"
     for temat, wpisy in ryzyka_klienta(klient):
         n = wystapienia(wpisy)
         if n >= 2:
@@ -261,9 +269,18 @@ def wiersz_klienta(dane, slug, nazwa, href, kolor, tytul_kropki, s, uwaga):
 
 
 def sprawy_dla_czlowieka(dane):
-    """Wszystkie otwarte sprawy dla człowieka: tyle, ile pokazuje widok „Dla mnie dziś” (te same etykiety)."""
-    et = wymaga_ciebie_etykiety(dane)
-    return [i for i, z in dane["stan"]["zgloszenia"].items() if z["stan"] not in STANY_ZAMKNIETE and set(z["etykiety"]) & et]
+    """Otwarte sprawy NA DZIŚ dla człowieka: tyle, ile pokazuje widok „Dla mnie dziś” (te same etykiety, bez produktu i bez wstrzymanych)."""
+    et, E = wymaga_ciebie_etykiety(dane), dane["Z"]["etykiety"]
+    wyklucz = {E["produkt"], E["wstrzymane"]}
+    return [i for i, z in dane["stan"]["zgloszenia"].items()
+            if z["stan"] not in STANY_ZAMKNIETE and set(z["etykiety"]) & et and not set(z["etykiety"]) & wyklucz]
+
+
+def pomysly_produktowe(dane):
+    """Otwarte pomysły i propozycje produktowe czekające na przegląd (raz w tygodniu); wstrzymane do potwierdzenia karty się nie liczą."""
+    et, E = wymaga_ciebie_etykiety(dane), dane["Z"]["etykiety"]
+    return [i for i, z in dane["stan"]["zgloszenia"].items()
+            if z["stan"] not in STANY_ZAMKNIETE and E["produkt"] in z["etykiety"] and set(z["etykiety"]) & et and E["wstrzymane"] not in z["etykiety"]]
 
 
 def zdanie_agentow(st):
@@ -289,10 +306,6 @@ def strona_index(dane):
         kolor, powody = swiatlo(dane, k)
         opis_koloru = f"{SWIATLO[kolor][0]}: " + ("; ".join(powody) if powody else SWIATLO[kolor][1])
         wiersze.append(wiersz_klienta(dane, slug, nazwa_klienta(k), f"klienci/{slug}.html", kolor, opis_koloru, sprawy_klienta(dane, slug), uwaga_klienta(dane, k)))
-    sp = sprawy_klienta(dane, "produkt")
-    if any(sp[k] for k in ("czlowiek", "agent", "czeka")):                       # propozycje produktowe: zgłoszenia „[produkt] …”
-        kol = "zolte" if sp["czlowiek"] else "zielone"
-        wiersze.append(wiersz_klienta(dane, "produkt", "Produkt", "glos-klientow.html", kol, f"{SWIATLO[kol][0]}: {SWIATLO[kol][1]}", sp, ""))
     tabela = ('<div class="tabela"><table class="klienci"><thead><tr><th>Klient</th><th class="n">Wymaga Ciebie</th><th class="n">U agentów</th>'
               '<th class="n">Czeka na klienta</th><th>Uwaga</th></tr></thead><tbody>' + "".join(wiersze) + "</tbody></table></div>") if wiersze else \
         '<p class="empty">Brak klientów.</p>'
@@ -304,9 +317,11 @@ def strona_index(dane):
         szczegoly = ('<details style="margin-top:28px"><summary>Poprawki scalone w tym tygodniu</summary><div class="tabela"><table><thead><tr><th>Poprawka</th>'
                      '<th class="n">Od wpłynięcia rozmowy</th></tr></thead><tbody>' + "".join(poprawka(pm) for pm in sorted(st["pomiary"], key=lambda x: x["czas"]))
                      + "</tbody></table></div></details>")
-    gora = (f'<div class="gora"><p class="glowne">{glowne}</p><div><p class="agenci">{e(zdanie_agentow(st))}</p>'
-            f'<p class="podpis">od wpłynięcia rozmowy do wdrożonej poprawki</p></div></div>')
-    return strona("Klienci", gora + tabela + szczegoly, dane, 0, h1=False)
+    gora = f'<div class="gora"><p class="glowne">{glowne}</p><p class="agenci">{e(zdanie_agentow(st))}</p></div>'
+    np = len(pomysly_produktowe(dane))
+    produkt = (f'<p class="produkt">Produkt: <a href="glos-klientow.html">{np} {forma_liczby(np, "pomysł", "pomysły", "pomysłów")} do przeglądu</a> (raz w tygodniu)</p>'
+               if np else '<p class="produkt">Produkt: brak pomysłów do przeglądu (raz w tygodniu)</p>')
+    return strona("Klienci", gora + produkt + tabela + szczegoly, dane, 0, h1=False)
 
 
 # ── strona klienta ────────────────────────────────────────────────────────────
@@ -374,7 +389,11 @@ def strona_klienta(dane, klient):
                   f'<div><h3>Wymaga Ciebie <span class="tag">{len(s["czlowiek"])}</span></h3>{_lista_zgloszen(s["czlowiek"], dzis, "Nic nie czeka na człowieka.")}</div>'
                   f'<div><h3>U agentów <span class="tag">{len(s["agent"])}</span></h3>{_lista_zgloszen(s["agent"], dzis, "Agenci nie mają teraz zadań.")}</div>'
                   f'<div><h3>Czeka na klienta <span class="tag">{len(s["czeka"])}</span></h3>{_lista_zgloszen(s["czeka"], dzis, "Nie czekamy na klienta.")}</div></div>'
-                  + (f'<p class="sub">W backlogu: {len(s["backlog"])} (prośby produktowe i pomysły: <a href="../glos-klientow.html">Głos klientów</a>).</p>' if s["backlog"] else ""))
+                  + (f'<p class="sub">W backlogu: {len(s["backlog"])}.</p>' if s["backlog"] else "")
+                  + (f'<p class="sub">Produkt: {len(s["produkt"])} {forma_liczby(len(s["produkt"]), "pomysł", "pomysły", "pomysłów")} do przeglądu raz w tygodniu '
+                     f'(<a href="../glos-klientow.html">Głos klientów</a>).</p>' if s["produkt"] else "")
+                  + (f'<details><summary>Wstrzymane do potwierdzenia karty ({len(s["wstrzymane"])})</summary>'
+                     f'{_lista_zgloszen(s["wstrzymane"], dzis)}<p class="sub">Wracają do normalnego obiegu po potwierdzeniu karty klienta.</p></details>' if s["wstrzymane"] else ""))
 
     ot = os_czasu(dane, klient)
     czesci.append("<h2>Oś czasu</h2>" + ("<ul class=\"tl\">" + "".join(

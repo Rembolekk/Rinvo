@@ -605,6 +605,9 @@ def main():
     s = zbuduj_srodowisko(args.sucho)
     wyniki = uruchom(s)
     if not args.sucho:
+        import karta_klienta
+        for w in karta_klienta.zwolnij_potwierdzone(s):            # potwierdzona karta nowego klienta: wstrzymane sprawy wracają do obiegu
+            print(f"{w['klient']}: karta potwierdzona, wróciło {len(w['zwolnione'])} spraw")
         import propozycje
         for w in propozycje.uruchom_ruchy(s):                       # ruchy człowieka na propozycjach produktowych: Buduj, Później
             print(f"{w['klucz']}: {w['status']}")

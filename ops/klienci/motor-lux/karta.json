@@ -78,13 +78,9 @@
       ],
       "data_spotkania": "2026-10-15",
       "przypisanie": {
-        "komu": "weryfikacja",
-        "powody": [
-          "nowy klient: karta do potwierdzenia"
-        ],
-        "reguly": [
-          "flaga_nowy_klient"
-        ]
+        "komu": "agent",
+        "powody": [],
+        "reguly": []
       }
     },
     "agent-bez-cen-i-rabatow": {
@@ -99,12 +95,10 @@
       "przypisanie": {
         "komu": "czlowiek",
         "powody": [
-          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „ceny”)",
-          "nowy klient: karta do potwierdzenia"
+          "kosztuje pieniądze albo dotyczy cen i umów (słowo: „ceny”)"
         ],
         "reguly": [
-          "pieniadze",
-          "flaga_nowy_klient"
+          "pieniadze"
         ]
       }
     },
@@ -120,12 +114,10 @@
       "przypisanie": {
         "komu": "czlowiek",
         "powody": [
-          "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)",
-          "nowy klient: karta do potwierdzenia"
+          "kosztuje pieniądze albo dotyczy cen i umów (typ: finanse)"
         ],
         "reguly": [
-          "pieniadze",
-          "flaga_nowy_klient"
+          "pieniadze"
         ]
       }
     },
@@ -146,8 +138,7 @@
       "po_wznowieniu": {
         "komu": "czlowiek",
         "powody": [
-          "pewność niska: nie wiadomo na pewno, czego dotyczy",
-          "nowy klient: karta do potwierdzenia"
+          "pewność niska: nie wiadomo na pewno, czego dotyczy"
         ],
         "wymaga_szkicu": false
       },
@@ -172,10 +163,8 @@
         "reguly": []
       },
       "po_wznowieniu": {
-        "komu": "weryfikacja",
-        "powody": [
-          "nowy klient: karta do potwierdzenia"
-        ],
+        "komu": "agent",
+        "powody": [],
         "wymaga_szkicu": false
       },
       "przypomnienie": {
@@ -199,10 +188,8 @@
         "reguly": []
       },
       "po_wznowieniu": {
-        "komu": "weryfikacja",
-        "powody": [
-          "nowy klient: karta do potwierdzenia"
-        ],
+        "komu": "agent",
+        "powody": [],
         "wymaga_szkicu": false
       },
       "przypomnienie": {
@@ -226,10 +213,8 @@
         "reguly": []
       },
       "po_wznowieniu": {
-        "komu": "weryfikacja",
-        "powody": [
-          "nowy klient: karta do potwierdzenia"
-        ],
+        "komu": "agent",
+        "powody": [],
         "wymaga_szkicu": false
       },
       "przypomnienie": {
@@ -251,13 +236,11 @@
         "komu": "czlowiek",
         "powody": [
           "kosztuje pieniądze albo dotyczy cen i umów (słowo: „sms”)",
-          "priorytet produktowy",
-          "nowy klient: karta do potwierdzenia"
+          "priorytet produktowy"
         ],
         "reguly": [
           "pieniadze",
-          "produkt",
-          "flaga_nowy_klient"
+          "produkt"
         ]
       }
     },
@@ -323,5 +306,10 @@
         "cytat": "Trzy osoby przyjechały pod zamknięty salon."
       }
     ]
+  },
+  "potwierdzenie_karty": {
+    "identifier": "RIN-176",
+    "linear_id": "3fa59173-3517-4226-9766-0fd8ddb657f6",
+    "url": "https://linear.app/rinvo-demo/issue/RIN-176/motor-lux-potwierdz-karte-klienta-motor-lux"
   }
 }

@@ -454,7 +454,8 @@ def uruchom(s, max_n=None):
     A = s.Z["agent_wykonawczy"]
     limit = max_n if max_n is not None else A["max_na_przebieg"]
     wyniki, przejete = [], 0
-    kandydaci = wybierz_kandydatow(s.linear.kandydaci(), s.Z)
+    kandydaci = [z for z in wybierz_kandydatow(s.linear.kandydaci(), s.Z)
+                 if s.Z["etykiety"]["wstrzymane"] not in z.get("labels", [])]      # sprawy nowego klienta czekają na potwierdzenie karty
     zajete = pliki_otwartych_pr(s) if kandydaci else {}
     for zg in kandydaci:
         if przejete >= limit:

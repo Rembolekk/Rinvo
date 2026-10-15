@@ -53,7 +53,7 @@ REQUIRED_LABELS = [
     "Decyzja człowieka",
     "repo: rinvo-app", "repo: rinvo", "repo: rinvo-ops",
     "Szkic gotowy", "Wyślij", "Wysłano", "Regresja",
-    "Odrzuć", "Buduj", "Później",
+    "Odrzuć", "Buduj", "Później", "Wstrzymane do potwierdzenia karty", "Karta do potwierdzenia",
 ]
 
 LABEL_COLORS = {
@@ -73,6 +73,8 @@ LABEL_COLORS = {
     "Odrzuć": "#64748b",
     "Buduj": "#16a34a",
     "Później": "#a3a3a3",
+    "Wstrzymane do potwierdzenia karty": "#94a3b8",
+    "Karta do potwierdzenia": "#0ea5e9",
     "Regresja": "#dc2626",
     "Szkic gotowy": "#eab308",
     "Wyślij": "#16a34a",
@@ -1355,6 +1357,21 @@ def main():
             klient, najnowsze, Z, label_map, todo_id, state_ids, source, meeting_date, date.today(),
             dry_run=args.dry_run):
         print(f"  [notatki] {zdarzenie}" if args.dry_run else f"  {zdarzenie}")
+
+    # nowy klient: JEDNO zgłoszenie „Potwierdź kartę klienta …”; reszta spraw jest wstrzymana (etykieta), nie „Wymaga Ciebie”
+    if karta.get("nowy_klient") is True and not karta.get("potwierdzenie_karty"):
+        if args.dry_run:
+            print(f"  [utwórz] Potwierdź kartę klienta {karta.get('nazwa') or klient} (jedno zgłoszenie dla człowieka; sprawy klienta wstrzymane)")
+        else:
+            import karta_klienta
+            wynik_zg = gql(api_key, M_CREATE_ISSUE, {"input": {
+                "teamId": team_id, "title": karta_klienta.tytul_potwierdzenia(klient, karta, Z),
+                "description": karta_klienta.opis_potwierdzenia(klient, karta, Z), "stateId": todo_id, "priority": Z["nowy_klient"].get("priorytet", 2),
+                "labelIds": [label_map[n] for n in (Z["etykiety"]["weryfikacja"], Z["etykiety"]["karta"]) if n in label_map]}})
+            nowe = (wynik_zg.get("issueCreate") or {}).get("issue")
+            if nowe:
+                karta["potwierdzenie_karty"] = {"identifier": nowe["identifier"], "linear_id": nowe["id"], "url": nowe["url"]}
+                print(f"  ✓ {nowe['identifier']}: potwierdź kartę klienta (sprawy klienta wstrzymane do potwierdzenia)")
 
     if not args.dry_run:
         save_karta(klient, karta)

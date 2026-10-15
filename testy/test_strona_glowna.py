@@ -52,23 +52,24 @@ class TestIndex(unittest.TestCase):
         self.t = tekst(self.h)
 
     def test_jedno_duze_zdanie_i_linijka_o_agentach(self):
-        self.assertIn("Dziś potrzebujemy Cię w 3 sprawach", self.t)
+        self.assertIn("Dziś potrzebujemy Cię w 2 sprawach", self.t)
         self.assertIn("Agenci w tym tygodniu:", self.t)
         self.assertEqual(self.h.count('class="glowne"'), 1)
 
     def test_zdanie_linkuje_do_widoku_dla_mnie_dzis(self):
         self.r.zapisz("ops/widok_dla_mnie.json", {"url": "https://linear.app/ws/view/abc"})
         h = gs.strona_index(self.r.dane())
-        self.assertIn('<a href="https://linear.app/ws/view/abc">3 sprawach</a>', h)
+        self.assertIn('<a href="https://linear.app/ws/view/abc">2 sprawach</a>', h)
         self.assertNotIn("<a href=\"https://linear.app/ws/view/abc\"", self.h, "bez pliku widoku bez linku")
 
     def test_liczba_zgadza_sie_z_wymaga_ciebie_i_z_filtrem_widoku(self):
         liczby = [int(x) for x in re.findall(r'<td class="n[^"]*">(\d+)</td>', self.h)]
         wymaga = liczby[0::3]                              # kolumna „Wymaga Ciebie” (Wymaga, Agenci, Czeka)
         self.assertEqual(sum(wymaga), len(gs.sprawy_dla_czlowieka(self.dane)))
-        self.assertEqual(sum(wymaga), 3, "Decyzja i Szkic u hoteli oraz Do weryfikacji w backlogu u alfy; Done i Canceled nie liczą się")
+        self.assertEqual(sum(wymaga), 2, "Decyzja i Szkic u hoteli; Done, Canceled i produkt (RIN-7) nie liczą się")
         f = widok.filtr(Z)
-        self.assertEqual(set(f["labels"]["name"]["in"]), gs.wymaga_ciebie_etykiety(self.dane), "te same etykiety co w widoku Linear")
+        self.assertEqual(set(f["and"][0]["labels"]["name"]["in"]), gs.wymaga_ciebie_etykiety(self.dane), "te same etykiety co w widoku Linear")
+        self.assertEqual(set(f["and"][1]["labels"]["every"]["name"]["nin"]), {Z["etykiety"]["produkt"], Z["etykiety"]["wstrzymane"]}, "te same wyłączenia")
         self.assertEqual(f["state"]["type"]["nin"], ["completed", "canceled"], "tylko otwarte")
 
     def test_zdanie_pasuje_do_sumy_w_tabeli(self):
@@ -122,10 +123,19 @@ class TestIndex(unittest.TestCase):
         self.assertIn("Dziś potrzebujemy Cię w 1 sprawie", tekst(gs.strona_index(r.dane())))
         self.assertEqual([gs.forma_liczby(n, "sprawa", "sprawy", "spraw") for n in (1, 2, 5, 12, 22)], ["sprawa", "sprawy", "spraw", "spraw", "sprawy"])
 
-    def test_pozycje_produktowe_maja_wlasny_wiersz_z_linkiem_do_glosu_klientow(self):
-        r = Repo(stan={"RIN-1": zg("[produkt] Zdecyduj: propozycja – CRM", etykiety=["Decyzja człowieka", "Produkt"])})
+    def test_produkt_to_osobna_linijka_a_nie_wiersz_tabeli_i_nie_dzis(self):
+        r = Repo(stan={"RIN-1": zg("[produkt] Zdecyduj: propozycja – CRM", etykiety=["Decyzja człowieka", "Produkt"]),
+                       "RIN-2": zg("[alfa] Pomysł", stan="Backlog", etykiety=["Decyzja człowieka", "Produkt"]),
+                       "RIN-3": zg("[alfa] Nowa funkcja", stan="Backlog", etykiety=["Do weryfikacji", "Produkt"]),
+                       "RIN-4": zg("[alfa] Pomysł zamknięty", stan="Done", etykiety=["Decyzja człowieka", "Produkt"])})
         h = gs.strona_index(r.dane())
-        self.assertIn('<a href="glos-klientow.html">Produkt</a>', h)
+        t = tekst(h)
+        self.assertIn("Dziś nic nie wymaga Ciebie", t, "decyzje o priorytetach produktu nie wchodzą do „dziś”")
+        self.assertRegex(h, r'<p class="produkt">Produkt: <a href="glos-klientow\.html">3 pomysły do przeglądu</a> \(raz w tygodniu\)</p>')
+        self.assertNotIn('<a href="glos-klientow.html">Produkt</a></td>', h, "bez wiersza Produkt w tabeli klientów")
+        self.assertEqual(h.count("<tr><td><span class=\"dot"), 2, "tylko alfa i beta")
+        self.assertEqual(gs.pomysly_produktowe(r.dane()), ["RIN-1", "RIN-2", "RIN-3"])
+        self.assertEqual(len(gs.sprawy_dla_czlowieka(r.dane())), 0)
 
     def test_strony_klientow_i_glos_maja_ten_sam_uklad(self):
         for h in (self.r.strony()["klienci/hotele-baltyk.html"], self.r.strony()["glos-klientow.html"]):

@@ -123,7 +123,8 @@ class TestSprawy(unittest.TestCase):
         self.assertEqual([z["id"] for z in s["agent"]], ["RIN-1"])
         # ZMIANA ŚWIADOMA: „wymaga Ciebie” to te same sprawy, które pokazuje widok „Dla mnie dziś” w Linearze (etykiety Decyzja człowieka,
         # Do weryfikacji, Szkic gotowy, także w backlogu), więc RIN-4 (prośba produktowa z Decyzją człowieka) nie ginie w „backlogu”
-        self.assertEqual([z["id"] for z in s["czlowiek"]], ["RIN-2", "RIN-4"])
+        self.assertEqual([z["id"] for z in s["czlowiek"]], ["RIN-2"])
+        self.assertEqual([z["id"] for z in s["produkt"]], ["RIN-4"], "decyzje o priorytetach produktu: przegląd raz w tygodniu, nie „dziś”")
         self.assertEqual([z["id"] for z in s["czeka"]], ["RIN-3", "RIN-7"], "czekanie na klienta liczy się także w backlogu")
         self.assertEqual(s["backlog"], [])
         self.assertEqual([z["id"] for z in s["zamkniete"]], ["RIN-5"])
@@ -559,7 +560,8 @@ class TestAgenciTydzien(unittest.TestCase):
         h = gs.strona_index(r.dane())
         t = tekst(h)
         self.assertIn("Agenci w tym tygodniu: 2 sprawy zamknięte, poprawka średnio w 14 h 30 min od wpłynięcia rozmowy", t, "średnia z 3 h i 26 h")
-        self.assertIn("od wpłynięcia rozmowy do wdrożonej poprawki", t, "podpis")
+        self.assertEqual(t.lower().count("od wpłynięcia rozmowy"), 2, "w zdaniu o agentach i w nagłówku zwiniętej listy; bez zdublowanego podpisu pod zdaniem")
+        self.assertNotIn("do wdrożonej poprawki", t)
         self.assertIn('href="https://github.com/x/y/pull/1"', h, "szczegóły w zwiniętej liście poprawek")
 
     def test_brak_scalonych_poprawek_to_czytelne_zdanie(self):

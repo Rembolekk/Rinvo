@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
-"""widok.py – widok „Dla mnie dziś” w Linearze: tylko sprawy dla człowieka.
+"""widok.py – widok „Dla mnie dziś” w Linearze: tylko sprawy NA DZIŚ dla człowieka (bez produktu i bez spraw wstrzymanych do potwierdzenia karty).
 
-Filtr: zespół RIN, stan nieskończony, etykieta Decyzja człowieka, Do weryfikacji albo Szkic gotowy (ops/zasady.json → dla_czlowieka.widok).
+Filtr: zespół RIN, stan nieskończony, etykieta Decyzja człowieka, Do weryfikacji albo Szkic gotowy, BEZ etykiet Produkt i Wstrzymane do potwierdzenia karty (ops/zasady.json → dla_czlowieka.widok).
 Widok grupuje zgłoszenia po terminie (po terminie, dziś, później) i sortuje w grupie według priorytetu. Dokładną kolejność
 „po terminie, termin dziś, reszta według priorytetu” liczy kod (dla_czlowieka.kolejnosc_dla_mnie) dla porannego podsumowania.
 Idempotentne: jeśli widok o tej nazwie istnieje, zostaje (filtr jest aktualizowany); link zapisuje ops/widok_dla_mnie.json.
@@ -37,9 +37,11 @@ PREFERENCJE = {"layout": "list", "issueGrouping": "dueDate", "viewOrdering": "pr
 
 def filtr(Z):
     """filterData widoku (IssueFilter)."""
+    W = Z["dla_czlowieka"]["widok"]
     return {"team": {"key": {"eq": linear_sync.TEAM_KEY}},
             "state": {"type": {"nin": ["completed", "canceled"]}},
-            "labels": {"name": {"in": list(Z["dla_czlowieka"]["widok"]["etykiety"])}}}
+            "and": [{"labels": {"name": {"in": list(W["etykiety"])}}},                          # szkice do wysłania, decyzje, weryfikacje, potwierdzenia kart
+                    {"labels": {"every": {"name": {"nin": list(W.get("wyklucz_etykiety") or [])}}}}]}   # bez produktu (raz w tygodniu) i spraw wstrzymanych
 
 
 def adres(url_key, slug_id, nazwa):

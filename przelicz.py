@@ -29,7 +29,7 @@ import linear_sync
 import notatki
 import zasady
 
-ROUTING = ("agent", "czlowiek", "weryfikacja", "zablokowane", "wielu_klientow")
+ROUTING = ("agent", "czlowiek", "weryfikacja", "zablokowane", "wielu_klientow", "wstrzymane")
 
 
 najnowsze_pozycje = notatki.najnowsze_pozycje
@@ -207,8 +207,14 @@ def main():
             linear_sync.save_karta(klient, karta)
             linear_sync.write_karta_md(klient, karta)
     if args.zastosuj:                                  # zgłoszenia dla człowieka: tytuł od czynności i blok na górze opisu
+        import karta_klienta
         import wyslij
-        zmiany_ukladu = dla_czlowieka.przelicz(wyslij.zbuduj_srodowisko(), zastosuj=True)
+        srodowisko = wyslij.zbuduj_srodowisko()
+        for klient in klienci:                         # nowy klient: JEDNO zgłoszenie „Potwierdź kartę klienta …”, reszta wstrzymana
+            zg_karty = karta_klienta.zapewnij_zgloszenie(srodowisko, klient, srodowisko.wczytaj_karte(klient))
+            if zg_karty:
+                print(f"  ✓ {zg_karty['identifier']}: Potwierdź kartę klienta ({klient})")
+        zmiany_ukladu = dla_czlowieka.przelicz(srodowisko, zastosuj=True)
         print(f"\nZgłoszenia dla człowieka przeliczone do nowego układu: {len(zmiany_ukladu)}")
     print(f"\nRAZEM zmieniło przypisanie: {len(wszystkie)}" + ("" if args.zastosuj else "  (raport; nic nie zmieniono)"))
 

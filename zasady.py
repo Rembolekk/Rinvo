@@ -141,7 +141,8 @@ def _powody_czlowieka(item, zasady, karta, sekcja, wielu):
 def powody_flag(item, zasady):
     """Powody wynikające ze znaczników kontroli pozycji (niepełna transkrypcja, pomyłka mówcy, inny klient…)."""
     mapa = zasady.get("flagi_powody", {})
-    return [{"regula": f"flaga_{f}", "powod": mapa[f]} for f in item.get("flagi", []) if f in mapa]
+    # „nowy_klient” nie przenosi pozycji do człowieka: sprawy nowego klienta mają normalny podział, tylko są wstrzymane do potwierdzenia karty
+    return [{"regula": f"flaga_{f}", "powod": mapa[f]} for f in item.get("flagi", []) if f in mapa and f != "nowy_klient"]
 
 
 def przypisz(item, zasady, karta=None, wielu_klientow=False, sekcja=None):
@@ -209,6 +210,8 @@ def etykiety_pozycji(item, zasady, karta=None, wielu=False):
         labels.append(E["ryzyko"])
         if niska:
             labels.append(E["weryfikacja"])
+    if labels and (karta or {}).get("nowy_klient") is True and "wstrzymane" in E:
+        labels.append(E["wstrzymane"])                    # karta nowego klienta niepotwierdzona: sprawa czeka na potwierdzenie karty
     return labels
 
 

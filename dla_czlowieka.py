@@ -26,7 +26,7 @@ START = "**Co masz zrobić:**"
 RUCHY_LINIA = "**Twoje ruchy:**"
 POWOD_ODRZUCENIA = "odrzucone przez człowieka"
 STANY_ZAMKNIETE = ("Done", "Canceled", "Cancelled")
-_CZYNNOSC_RE = re.compile(r"^(?:Wyślij|Zdecyduj|Sprawdź|Uzupełnij):\s*")
+_CZYNNOSC_RE = re.compile(r"^(?:Wyślij|Zdecyduj|Sprawdź|Uzupełnij):\s*|^Potwierdź kartę klienta\s*")
 _CZASOWNIK_RE = re.compile(r"^(?:wyślij|wysłać|zdecyduj|sprawdź|uzupełnij)\s+", re.IGNORECASE)
 _DNI = ["poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota", "niedziela"]
 
@@ -77,6 +77,8 @@ def czynnosc_dla(etykiety, opis, Z, reguly=None):
     """„Wyślij” (Szkic gotowy), „Zdecyduj” (Decyzja człowieka), „Uzupełnij” albo „Sprawdź” (Do weryfikacji); None, gdy to nie
     zgłoszenie dla człowieka."""
     E, et = Z["etykiety"], set(etykiety or [])
+    if E["karta"] in et:
+        return "Potwierdź"
     if E["szkic"] in et or E["wyslij"] in et:
         return "Wyślij"
     if E["czlowiek"] in et:
@@ -210,8 +212,8 @@ def przebuduj(zg, Z, teraz, komentarze=(), przypisanie=None, mail=None, kontekst
     import wyslij as wy
     W = W or Z["wysylka"]
     opis_stary = zg.get("description") or ""
-    if prefiks_klienta(zg.get("title")) == "[produkt]":              # propozycje produktowe mają własny układ (propozycje.py)
-        return None
+    if prefiks_klienta(zg.get("title")) == "[produkt]" or Z["etykiety"]["karta"] in (zg.get("labels") or []):
+        return None                                                  # propozycje produktowe i „Potwierdź kartę klienta” mają własny układ
     # „Uzupełnij” rozpoznajemy po kontekście i powodzie, nie po samym bloku (jego treść powstaje z tytułu: inaczej czynność by migała)
     czynnosc = czynnosc_dla(zg.get("labels"), kontekst_opisu(opis_stary) + " " + (powod or ""), Z, (przypisanie or {}).get("reguly"))
     if czynnosc is None:

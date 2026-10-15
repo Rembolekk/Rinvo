@@ -210,6 +210,10 @@ def kategoria(z, dzis, Z, nowe_ids=()):
     decyzje człowieka, do weryfikacji, czeka na klienta, u agentów, nowe (albo None)."""
     E, et = Z["etykiety"], _etykiety(z)
     termin = _data(z.get("dueDate"))
+    if E["wstrzymane"] in et:                          # sprawy nowego klienta czekają na potwierdzenie karty: nic z nich nie jest „na dziś”
+        return None
+    if E["produkt"] in et and et & {E["czlowiek"], E["weryfikacja"], E["szkic"]}:
+        return None                                    # decyzje o priorytetach produktu: przegląd raz w tygodniu, nie „dziś”
     if "Powtarzające się ryzyko" in et:
         return "ryzyko"
     if termin and termin < dzis:

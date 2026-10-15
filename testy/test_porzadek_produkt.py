@@ -314,9 +314,11 @@ class FGql:
 
 class A5Widok(Tmp):
 
-    def test_a05_filtr_tylko_sprawy_dla_czlowieka_i_nieskonczone(self):
+    def test_a05_filtr_tylko_sprawy_na_dzis_i_nieskonczone(self):
+        """ZMIANA ŚWIADOMA: widok „Dla mnie dziś” wyklucza produkt (przegląd raz w tygodniu) i sprawy wstrzymane do potwierdzenia karty."""
         f = widok.filtr(Z)
-        self.assertEqual(set(f["labels"]["name"]["in"]), {"Decyzja człowieka", "Do weryfikacji", "Szkic gotowy"})
+        self.assertEqual(set(f["and"][0]["labels"]["name"]["in"]), {"Decyzja człowieka", "Do weryfikacji", "Szkic gotowy"})
+        self.assertEqual(set(f["and"][1]["labels"]["every"]["name"]["nin"]), {"Produkt", "Wstrzymane do potwierdzenia karty"})
         self.assertEqual(f["state"]["type"]["nin"], ["completed", "canceled"])
         self.assertEqual(f["team"]["key"]["eq"], "RIN")
 
