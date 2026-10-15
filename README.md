@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_potwierdzenie_pora.py` | potwierdzenie karty i zwolnienie spraw o każdej porze i w każdy dzień (po 18:00, niedziela, święto); okno 8–18 blokuje tylko maile: 7 testów |
 | `testy/test_nowy_klient.py` | nowy klient (jedno zgłoszenie do potwierdzenia karty, wstrzymanie, zwolnienie), „dziś” bez produktu i wstrzymanych, zgodność strony z widokiem: 21 testów |
 | `testy/test_strona_glowna.py` | układ index.html i Głosu klientów, liczba zgodna z widokiem „Dla mnie dziś”, czas od wpłynięcia, nazwy klientów z karty: 21 testów |
 | `testy/test_poprawki_proby.py` | poprawki po próbie generalnej (maskowanie, kotwice, kolejność agenta, minione spotkania, limit sesji): 39 testów |
@@ -419,7 +420,7 @@ Karta nowego klienta powstaje z rozmowy (kontakty i decydenci „do potwierdzeni
 - pozostałe sprawy mają normalny podział (agent, czeka na klienta, produkt, ryzyko, decyzja), ale też etykietę **Wstrzymane do potwierdzenia karty**: agent ich nie
   bierze, nie liczą się jako „Wymaga Ciebie”, strona klienta pokazuje je w zwiniętej liście, a w tabeli klientów w „Uwadze” stoi „N spraw wstrzymanych do potwierdzenia karty”;
 - po potwierdzeniu karty (zamknij zgłoszenie jako Done albo zdejmij znacznik `nowy_klient` w `ops/klienci/<klient>/karta.json`) etykieta wstrzymania znika, decydenci z wniosku
-  stają się decydentami, kontakty z adresem są potwierdzone, a Slack dostaje jedną linijkę. Robi to `karta_klienta.zwolnij_potwierdzone` w jobie wysyłki (co kilka minut).
+  stają się decydentami, kontakty z adresem są potwierdzone, a Slack dostaje jedną linijkę. Robi to `karta_klienta.zwolnij_potwierdzone` jako OSOBNY krok jobu wysyłki (`python3 karta_klienta.py`, cron co 15 minut) o każdej porze i w każdy dzień: okno wysyłki 8–18 dotyczy wyłącznie maili do klienta, a błąd poczty nie blokuje zwolnienia (log pokazuje stan każdego zgłoszenia karty). Test: `python3 testy/test_potwierdzenie_pora.py`.
 Testy: `python3 testy/test_nowy_klient.py`.
 
 ## Strony: układ i liczby

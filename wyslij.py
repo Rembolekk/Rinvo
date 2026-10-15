@@ -606,8 +606,11 @@ def main():
     wyniki = uruchom(s)
     if not args.sucho:
         import karta_klienta
-        for w in karta_klienta.zwolnij_potwierdzone(s):            # potwierdzona karta nowego klienta: wstrzymane sprawy wracają do obiegu
-            print(f"{w['klient']}: karta potwierdzona, wróciło {len(w['zwolnione'])} spraw")
+        try:                                                        # też osobny krok workflow (karta_klienta.py); tu bezpiecznik, który nie blokuje reszty
+            for w in karta_klienta.zwolnij_potwierdzone(s):
+                print(f"{w['klient']}: karta potwierdzona, wróciło {len(w['zwolnione'])} spraw")
+        except Exception as exc:  # noqa: BLE001
+            print(f"Uwaga: zwolnienie spraw nowego klienta nie powiodło się ({type(exc).__name__})")
         import propozycje
         for w in propozycje.uruchom_ruchy(s):                       # ruchy człowieka na propozycjach produktowych: Buduj, Później
             print(f"{w['klucz']}: {w['status']}")

@@ -88,8 +88,10 @@ def potwierdz_karte(karta):
     return karta
 
 
-def zwolnij_potwierdzone(s):
-    """Dla każdego zgłoszenia „Karta do potwierdzenia”: gdy jest Done albo karta nie ma już znacznika nowy_klient, karta jest potwierdzona,
+def zwolnij_potwierdzone(s, log=None):
+    """Potwierdzenie karty i zwolnienie spraw NIE zależy od pory ani dnia: okno wysyłki 8–18 (wyslij.okno_wysylki) dotyczy wyłącznie maili do klienta,
+    a ten kod nie czyta czasu w ogóle (testy: o każdej porze, także po 18:00 i w niedzielę). log(tekst): diagnostyka do logu przebiegu.
+    Dla każdego zgłoszenia „Karta do potwierdzenia”: gdy jest Done albo karta nie ma już znacznika nowy_klient, karta jest potwierdzona,
     sprawy klienta tracą etykietę wstrzymania, Slack dostaje jedną linijkę. Zwraca [{"klient", "zwolnione": [...]}]."""
     E = s.Z["etykiety"]
     wynik = []
@@ -100,7 +102,11 @@ def zwolnij_potwierdzone(s):
         klient = m.group(1)
         karta = s.wczytaj_karte(klient)
         zamkniete = zg.get("state") in ("Done",)
+        if log:
+            log(f"{zg['identifier']} ({klient}): stan {zg.get('state')}, karta nowy_klient={karta.get('nowy_klient')}")
         if not (zamkniete or karta.get("nowy_klient") is not True):
+            if log:
+                log(f"  czeka: zamknij {zg['identifier']} jako Done (albo zdejmij nowy_klient w ops/klienci/{klient}/karta.json)")
             continue
         if karta.get("nowy_klient") is True:
             potwierdz_karte(karta)
@@ -120,3 +126,26 @@ def zwolnij_potwierdzone(s):
             s.slack.wyslij(sw.tekst_zapasowy(linia), sw.bloki(linia))
         wynik.append({"klient": klient, "zwolnione": zwolnione})
     return wynik
+
+
+def main():
+    """Samodzielny krok workflow: potwierdzenie kart i zwolnienie wstrzymanych spraw, o każdej porze, niezależnie od wysyłki maili."""
+    import sys
+    for stream in (sys.stdout, sys.stderr):
+        try:
+            stream.reconfigure(encoding="utf-8")
+        except AttributeError:
+            pass
+    import stan_linear
+    import wyslij
+    s = wyslij.zbuduj_srodowisko()
+    wyniki = zwolnij_potwierdzone(s, log=print)
+    for w in wyniki:
+        print(f"{w['klient']}: karta potwierdzona, wróciło {len(w['zwolnione'])} spraw: {', '.join(w['zwolnione']) or '-'}")
+    if not wyniki:
+        print("Brak kart do potwierdzenia, które zostały potwierdzone.")
+    stan_linear.po_przebiegu()
+
+
+if __name__ == "__main__":
+    main()

@@ -264,6 +264,15 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
+      # Potwierdzenie karty nowego klienta i zwolnienie jego spraw: OSOBNY krok, o każdej porze i w każdy dzień (okno 8–18 dotyczy tylko wysyłki maili).
+      # Działa, nawet gdy wysyłka maili się nie powiedzie albo czeka na okno.
+      - name: Potwierdzenia kart i zwolnienie wstrzymanych spraw
+        if: ${{ !cancelled() }}
+        env:
+          LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: python3 karta_klienta.py
+
       - name: Wyślij zatwierdzone maile
         env:
           LINEAR_API_KEY: ${{ secrets.LINEAR_API_KEY }}
