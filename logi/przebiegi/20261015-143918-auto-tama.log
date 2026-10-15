@@ -1,0 +1,75 @@
+=== przetworz.py ===
+Transkrypcja: ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md
+Klient: auto-tama
+Start: 2026-10-15T14:39:18.338497
+
+============================================================
+=== claude --print ===
+============================================================
+
+Zapisałem analizę w `wyniki/auto-tama/2026-10-15-plik-ze-swiezymi-leadami/wynik.json`. Niczego nie uruchamiałem i nie wysłałem. Skrypty `render.py` i `daty.py` uruchomi automat.
+
+- **Plik od Kasi:** Sprawa `swieze-leady-plik` (RIN-124) dostała aktualizację `zrob_teraz`. Treść maila mówi, czego dotyczy załącznik: świeże leady z ostatniego miesiąca, strona i Facebook. Pewność jest wysoka. Samego CSV nie otwierałem, więc zapis „numer i salon przy każdym” opiera się tylko na słowach Kasi.
+- **„Możecie puszczać”:** Dodałem pozycję K1 (`start-swiezych-leadow`, sekcja 2, status czeka). Zakaz Z18 mówi, że nic nowego nie startuje w tygodniu urlopu Kasi (19–23.10), „nawet jak plik ze świeżymi leadami już będzie”, a Z27 to potwierdza. Mail tego zakazu nie uchyla, więc start czeka na jej powrót albo na wyraźną zgodę na wcześniejszy start. Opel (Z1) i stara baza (Z2) nadal obowiązują.
+- **Nadawca:** W nagłówku jest „Mateusz Rembecki”, a mail podpisała „Kasia”. Adres zgadza się z potwierdzonym kontaktem Kasi w karcie, więc uprawnienia zostawiam kodowi.
+- **Szkic odpowiedzi:** Szkic maila do Kasi mówi, że plik mamy, a kampanię puścimy po jej urlopie, chyba że napisze inaczej.
+
+Nie dodałem zakazów, ryzyk ani dat względnych, bo mail ich nie zawiera. Pozostałe otwarte sprawy zostają bez zmian.
+
+Utwardzanie: {"maskowanie": {"liczba": 0, "rodzaje": {}}}
+
+============================================================
+=== render.py ===
+============================================================
+Komenda: python3 -I render.py wyniki/auto-tama/2026-10-15-plik-ze-swiezymi-leadami/wynik.json --transkrypcja ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md
+
+OK: /home/runner/work/Rinvo/Rinvo/wyniki/auto-tama/2026-10-15-plik-ze-swiezymi-leadami/raport.html
+Cytaty sprawdzone z transkrypcją: tak
+  Do zrobienia teraz: 0
+  Czeka na klienta: 1
+  Backlog produktowy: 0
+  Zakazy i ograniczenia: 0
+  Ryzyka handlowe: 0
+
+============================================================
+=== daty.py ===
+============================================================
+Komenda: python3 -I daty.py wyniki/auto-tama/2026-10-15-plik-ze-swiezymi-leadami/wynik.json
+
+OK: okna_czasowe dla 0 spraw → wyniki/auto-tama/2026-10-15-plik-ze-swiezymi-leadami/wynik.json
+
+============================================================
+=== linear_sync.py ===
+============================================================
+
+============================================================
+SYNCHRONIZACJA: wyniki/auto-tama/2026-10-15-plik-ze-swiezymi-leadami/wynik.json  →  Linear [RIN]  (klient: auto-tama)
+============================================================
+
+Zespół: Rinvo demo (RIN)
+
+Etykiety:
+
+Stany: Todo / Backlog / Done / Cancelled gotowe
+
+  ✓ RIN-124 (swieze-leady-plik) → zrob_teraz
+
+  ✓ RIN-149 (start-swiezych-leadow): [auto-tama] Start kampanii na świeżych leadach (pl
+  ↻ RIN-144 (notatka-spotkanie-z-pawlem): odświeżony opis notatki
+  ✓ karta.md: ops/klienci/auto-tama/karta.md
+
+────────────────────────────────────────────────────────────
+Podsumowanie:
+  Utworzono zgłoszeń:            1
+  Zaktualizowano (komentarz):    0
+  Pominięto (ta sama rozmowa):   0
+  Zakazy → karta.json:           0
+  Aktualizacje otwartych spraw:  1
+────────────────────────────────────────────────────────────
+
+Stan Lineara zapisany do ops/.stan_linear.json (36 zgłoszeń).
+
+============================================================
+=== Slack ===
+============================================================
+Slack: wysłano (HTTP 200)

@@ -1,14 +1,12 @@
 {
-  "przetworzone": {},
-  "nieznani": {},
-  "oczekujace": {
+  "przetworzone": {
     "<CAJ5+zcMjYfqXXLu=HshaCeYoTmWfLt79n+TD8Z_7Vm5321W2Hg@mail.gmail.com>": {
       "klient": "auto-tama",
       "plik": "ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md",
-      "data": "2026-10-15",
-      "proby": 1,
-      "status": "oczekuje"
+      "data": "2026-10-15"
     }
   },
+  "nieznani": {},
+  "oczekujace": {},
   "wlaczono": "2026-10-15"
 }

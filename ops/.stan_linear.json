@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T14:37:19+00:00",
+ "zapisano": "2026-10-15T14:40:40+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -172,20 +172,20 @@
   },
   "RIN-124": {
    "etykiety": [
-    "Czeka na klienta",
+    "Decyzja człowieka",
     "Do weryfikacji",
     "repo: rinvo-app"
    ],
    "id": "6498fc18-769c-4450-9d79-3df291e7e225",
    "priorytet": 0,
-   "stan": "Backlog",
+   "stan": "Todo",
    "termin": "2026-10-15",
-   "typ_stanu": "backlog",
+   "typ_stanu": "unstarted",
    "tytul": "[auto-tama] Sprawdź: Plik ze świeżymi leadami (ostatni miesiąc, strona i…",
    "url": "https://linear.app/rinvo-demo/issue/RIN-124/auto-tama-sprawdz-plik-ze-swiezymi-leadami-ostatni-miesiac-strona-i",
    "utworzono": "2026-10-15T09:40:55.302Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:47.870Z"
+   "zmieniono": "2026-10-15T14:40:39.133Z"
   },
   "RIN-125": {
    "etykiety": [
@@ -512,7 +512,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-144/auto-tama-notatka-przed-spotkaniem-spotkanie-z-pawlem-pol-godziny",
    "utworzono": "2026-10-15T09:41:04.138Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:35:53.919Z"
+   "zmieniono": "2026-10-15T14:40:40.497Z"
   },
   "RIN-145": {
    "etykiety": [
@@ -579,6 +579,21 @@
    "utworzono": "2026-10-15T14:35:53.164Z",
    "zamknieto": null,
    "zmieniono": "2026-10-15T14:35:54.131Z"
+  },
+  "RIN-149": {
+   "etykiety": [
+    "Czeka na klienta"
+   ],
+   "id": "f93275ac-bd9f-41a9-88f5-430507be9289",
+   "priorytet": 0,
+   "stan": "Backlog",
+   "termin": null,
+   "typ_stanu": "backlog",
+   "tytul": "[auto-tama] Start kampanii na świeżych leadach (plik od Kasi jest, ale trwa zakaz startów w tygodniu jej urlopu)",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-149/auto-tama-start-kampanii-na-swiezych-leadach-plik-od-kasi-jest-ale",
+   "utworzono": "2026-10-15T14:40:39.527Z",
+   "zamknieto": null,
+   "zmieniono": "2026-10-15T14:40:39.527Z"
   }
  }
 }

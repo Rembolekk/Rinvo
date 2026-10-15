@@ -494,9 +494,10 @@
       ],
       "data_spotkania": "2026-10-06",
       "przypisanie": {
-        "komu": "czeka",
-        "powody": [],
-        "reguly": []
+        "komu": "czlowiek",
+        "powody": [
+          "pewność niska: nie wiadomo na pewno, czego dotyczy"
+        ]
       },
       "po_wznowieniu": {
         "komu": "czlowiek",
@@ -509,7 +510,10 @@
         "limit": 1,
         "wykorzystane": 0,
         "nie_przypominac": false
-      }
+      },
+      "aktualizacje_zrodla": [
+        "ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md"
+      ]
     },
     "mail-przeglad-zle-zakwalifikowany": {
       "linear_id": "ff425ea0-770e-466c-94f7-f3f317b60538",
@@ -917,7 +921,7 @@
         "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
       ],
       "data_spotkania": "2026-10-06",
-      "opis_hash": "6e1ad8407f95e0ee",
+      "opis_hash": "f9cf2724db67b981",
       "przypisanie": {
         "komu": "agent",
         "powody": [],
@@ -975,6 +979,33 @@
         "komu": "ryzyko",
         "powody": [],
         "reguly": []
+      }
+    },
+    "start-swiezych-leadow": {
+      "linear_id": "f93275ac-bd9f-41a9-88f5-430507be9289",
+      "identifier": "RIN-149",
+      "url": "https://linear.app/rinvo-demo/issue/RIN-149/auto-tama-start-kampanii-na-swiezych-leadach-plik-od-kasi-jest-ale",
+      "tytul": "Start kampanii na świeżych leadach (plik od Kasi jest, ale trwa zakaz startów w tygodniu jej urlopu)",
+      "zrodla": [
+        "ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md"
+      ],
+      "data_spotkania": "2026-10-15",
+      "przypisanie": {
+        "komu": "czeka",
+        "powody": [],
+        "reguly": []
+      },
+      "po_wznowieniu": {
+        "komu": "czlowiek",
+        "powody": [
+          "jest w konflikcie z zakazem klienta (zakaz Z18: Z18 zakazuje startu czegokolwiek nowego w tygodniu urlopu Kasi (19–23.10), „nawet jak plik ze świeżymi leadami już będzie”. Start kampanii po otrzymaniu pliku to dokładnie ten przypadek; Z27 potwierdza to ustalenie.)"
+        ],
+        "wymaga_szkicu": false
+      },
+      "przypomnienie": {
+        "limit": 0,
+        "wykorzystane": 0,
+        "nie_przypominac": true
       }
     }
   },

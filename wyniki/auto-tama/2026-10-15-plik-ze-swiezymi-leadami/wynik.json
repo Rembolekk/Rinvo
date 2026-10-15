@@ -1,0 +1,88 @@
+{
+  "zrodlo": "ops/maile/auto-tama/2026-10-15-plik-ze-swiezymi-leadami.md",
+  "wygenerowano": "2026-10-15",
+  "spotkanie": {
+    "tytul": "Plik ze świeżymi leadami",
+    "data": "2026-10-15",
+    "godziny": "16:38",
+    "uczestnicy": [
+      "Mateusz Rembecki"
+    ],
+    "wspominani": [
+      "Marek",
+      "Kasia"
+    ]
+  },
+  "pozycje": [
+    {
+      "id": "K1",
+      "sekcja": 2,
+      "typ": "czeka_na_klienta",
+      "tytul": "Start kampanii na świeżych leadach (plik od Kasi jest, ale trwa zakaz startów w tygodniu jej urlopu)",
+      "opis": "Kasia przysłała plik ze świeżymi leadami (numer i salon przy każdym kontakcie) i napisała, że można puszczać. Zakaz Z18 (oraz Z27) mówi jednak, że nic nowego nie startuje w tygodniu jej urlopu 19–23.10, nawet gdy plik już będzie. Mail nie uchyla tego zakazu, więc start czeka na koniec urlopu albo na jej wyraźne potwierdzenie, że ma ruszyć wcześniej.",
+      "wlasciciel": "Marek Rewoliński",
+      "termin": "brak",
+      "warunek": "Kasia wróci z urlopu (19–23.10) albo wprost potwierdzi, że start ma nastąpić wcześniej; plik musi mieć numer i salon przy każdym kontakcie.",
+      "status": "czeka",
+      "cytat": [
+        "Możecie puszczać."
+      ],
+      "wnioski": [
+        "Mail nie wspomina o urlopie ani nie uchyla Z18/Z27, więc nie traktuję „Możecie puszczać” jako zgody na start w tygodniu 19–23.10.",
+        "Zakaz Z1 (Opel czeka na wyniki świeżych leadów) i Z2 (starej bazy nie puszczamy drugi raz) obowiązują dalej; mail ich nie dotyczy.",
+        "Treść załącznika nie została sprawdzona w tej analizie; Kasia pisze, że numer i salon są przy każdym kontakcie, ale nie jest to zweryfikowane."
+      ],
+      "przypomnienie": {
+        "data": "brak",
+        "limit": "0",
+        "uwagi": "Kasia na urlopie 19–23.10; bez przypominania, Marek wraca do tematu po jej powrocie"
+      },
+      "klucz_sprawy": "start-swiezych-leadow",
+      "pewnosc": "wysoka",
+      "konflikt_z_zakazem": {
+        "zakaz": "Z18",
+        "uzasadnienie": "Z18 zakazuje startu czegokolwiek nowego w tygodniu urlopu Kasi (19–23.10), „nawet jak plik ze świeżymi leadami już będzie”. Start kampanii po otrzymaniu pliku to dokładnie ten przypadek; Z27 potwierdza to ustalenie."
+      },
+      "cel": "Uruchomić kampanię na świeżych leadach z pliku od Kasi dopiero wtedy, gdy zakaz urlopowy przestanie obowiązywać albo Kasia wyraźnie zgodzi się na wcześniejszy start.",
+      "kryteria_akceptacji": [
+        "Kampania nie startuje w dniach 19–23.10 bez wyraźnej zgody Kasi",
+        "Kampania korzysta wyłącznie z pliku leady-pazdziernik.csv (świeże leady, nie stara baza)",
+        "Każdy kontakt w kampanii ma numer telefonu i informację o salonie (Toruń albo Włocławek)",
+        "Opel nie jest włączony do kampanii"
+      ],
+      "jak_sprawdzic": "Sprawdzić w panelu klienta, że kampania ma datę startu po urlopie Kasi (lub zapisaną jej zgodę), źródło pliku i brak marki Opel.",
+      "repo": "brak"
+    }
+  ],
+  "aktualizacje_spraw": [
+    {
+      "klucz_sprawy": "swieze-leady-plik",
+      "nowy_status": "zrob_teraz",
+      "cytat": "w załączniku plik ze świeżymi leadami",
+      "uzasadnienie": "Kasia przysłała plik, na który czekaliśmy; treść maila wprost wskazuje, czego dotyczy załącznik (świeże leady z ostatniego miesiąca, strona i Facebook, z numerem i salonem przy każdym kontakcie). Plik trzeba sprawdzić, ale nie startować kampanii (zob. start-swiezych-leadow).",
+      "pewnosc": "wysoka"
+    }
+  ],
+  "zmiany_zdania": [],
+  "konflikty_dat": [],
+  "fakty_czasowe": [],
+  "okna_czasowe": [],
+  "weryfikacja": {
+    "usuniete_bez_cytatu": [],
+    "zastapione_lub_scalone": [],
+    "pominiete": [
+      "Nagłówek: nazwa nadawcy (Mateusz Rembecki) różni się od imienia kontaktu w karcie (Kasia Malinowska), a mail jest podpisany „Kasia”. Adres nadawcy zgadza się z potwierdzonym kontaktem z karty; ocenę uprawnień zostawiam kodowi.",
+      "Mail nie zawiera nowych zakazów, ryzyk, próśb produktowych ani dat względnych, więc sekcje 3–5 i fakty_czasowe są puste.",
+      "Pozostałe otwarte sprawy z karty nie zmieniają statusu po tym mailu.",
+      "Uwaga o kolumnach („nie najładniejsze”) jest zgodna z Z4 i nie dodaje nowego zakazu."
+    ]
+  },
+  "szkic_maila": "Cześć Kasiu,\n\ndziękuję za plik ze świeżymi leadami, mamy go. Przejrzymy go pod kątem numeru i salonu przy każdym kontakcie.\n\nPamiętamy, że od 19 do 23 października masz urlop i że w tym czasie nic nowego nie startuje, nawet gdy plik już jest. Dlatego nie puszczamy kampanii, dopóki nie wrócisz, chyba że napiszesz, że mamy ruszyć wcześniej. Opla nie włączamy.\n\nPozdrawiam\nMarek",
+  "kontrola": {
+    "maskowanie": {
+      "liczba": 0,
+      "rodzaje": {}
+    }
+  },
+  "ostrzezenia_dat": []
+}

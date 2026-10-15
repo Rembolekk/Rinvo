@@ -277,6 +277,7 @@ Kasia przypomina, że od 19.10 jej nie ma. Marek potwierdza, że nic nowego nie 
 - [RIN-146](https://linear.app/rinvo-demo/issue/RIN-146/auto-tama-wyslij-kasi-zestawienie-wynikow-testu-wstepu-ilu-rozmow) – Wysłać Kasi zestawienie wyników testu wstępu: ilu rozmów doszło do końca przy każdej wersji
 - [RIN-147](https://linear.app/rinvo-demo/issue/RIN-147/auto-tama-zdecyduj-eksport-listy-kontaktow-do-excela-np-samych) – Eksport listy kontaktów do Excela (np. samych zainteresowanych, do rozdziału między handlowców)
 - [RIN-148](https://linear.app/rinvo-demo/issue/RIN-148/auto-tama-sprawdz-pawel-chce-puscic-opla-na-starej-bazie-wbrew) – Paweł chce puścić Opla na starej bazie wbrew ustaleniom z Kasią
+- [RIN-149](https://linear.app/rinvo-demo/issue/RIN-149/auto-tama-start-kampanii-na-swiezych-leadach-plik-od-kasi-jest-ale) – Start kampanii na świeżych leadach (plik od Kasi jest, ale trwa zakaz startów w tygodniu jej urlopu)
 
 ## Ryzyka powtarzające się
 
