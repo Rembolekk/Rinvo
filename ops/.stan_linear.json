@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T17:30:39+00:00",
+ "zapisano": "2026-10-15T17:41:11+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -117,7 +117,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-120/auto-tama-zdecyduj-sprawdzic-jak-liczymy-krotkie-polaczenia-i-podac",
    "utworzono": "2026-10-15T09:40:53.213Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:08.308Z"
+   "zmieniono": "2026-10-15T17:40:55.718Z"
   },
   "RIN-121": {
    "etykiety": [
@@ -134,7 +134,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-121/auto-tama-wyslij-przeslac-kasi-cene-sms-ow-wysylanych-po-dwoch",
    "utworzono": "2026-10-15T09:40:53.744Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:08.665Z"
+   "zmieniono": "2026-10-15T17:40:56.010Z"
   },
   "RIN-122": {
    "etykiety": [
@@ -152,7 +152,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-122/auto-tama-wyslij-przygotowac-jednostronicowa-sciage-ze-statusami-i",
    "utworzono": "2026-10-15T09:40:54.234Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:08.903Z"
+   "zmieniono": "2026-10-15T17:40:57.808Z"
   },
   "RIN-123": {
    "etykiety": [
@@ -185,7 +185,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-124/auto-tama-zdecyduj-plik-ze-swiezymi-leadami-ostatni-miesiac-strona-i",
    "utworzono": "2026-10-15T09:40:55.302Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:09.172Z"
+   "zmieniono": "2026-10-15T17:40:58.165Z"
   },
   "RIN-125": {
    "etykiety": [
@@ -201,7 +201,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-125/auto-tama-sprawdz-mail-do-handlowca-po-walidacji-przeglad-zapisany",
    "utworzono": "2026-10-15T09:40:55.625Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:09.631Z"
+   "zmieniono": "2026-10-15T17:40:58.742Z"
   },
   "RIN-126": {
    "etykiety": [
@@ -217,7 +217,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-126/auto-tama-sprawdz-nagranie-rozmowy-w-ktorej-asystentka-dwa-razy",
    "utworzono": "2026-10-15T09:40:55.914Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:09.914Z"
+   "zmieniono": "2026-10-15T17:40:59.033Z"
   },
   "RIN-127": {
    "etykiety": [
@@ -249,7 +249,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-128/auto-tama-wyslij-spotkanie-z-pawlem-pol-godziny-czwartek-1510-o-1000",
    "utworzono": "2026-10-15T09:40:56.540Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:10.181Z"
+   "zmieniono": "2026-10-15T17:40:59.514Z"
   },
   "RIN-129": {
    "etykiety": [
@@ -298,7 +298,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-131/auto-tama-zdecyduj-klikanie-w-kafelek-zainteresowani-przenosi-do-listy",
    "utworzono": "2026-10-15T09:40:57.402Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:10.463Z"
+   "zmieniono": "2026-10-15T17:40:59.834Z"
   },
   "RIN-132": {
    "etykiety": [
@@ -315,7 +315,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-132/auto-tama-zdecyduj-testy-ab-wbudowane-w-panel-klient-sam-ustawia",
    "utworzono": "2026-10-15T09:40:57.925Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:10.714Z"
+   "zmieniono": "2026-10-15T17:41:00.253Z"
   },
   "RIN-133": {
    "etykiety": [
@@ -332,7 +332,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-133/auto-tama-zdecyduj-tygodniowy-raport-mailowy-z-liczbami-dla-pawla",
    "utworzono": "2026-10-15T09:40:58.438Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:10.961Z"
+   "zmieniono": "2026-10-15T17:41:00.612Z"
   },
   "RIN-134": {
    "etykiety": [
@@ -350,7 +350,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-134/auto-tama-zdecyduj-sms-do-osoby-do-ktorej-agent-dwa-razy-sie-nie",
    "utworzono": "2026-10-15T09:40:58.927Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:11.237Z"
+   "zmieniono": "2026-10-15T17:41:00.909Z"
   },
   "RIN-135": {
    "etykiety": [
@@ -367,7 +367,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-135/auto-tama-zdecyduj-jeden-agent-odbierajacy-po-godzinach-wszystkie",
    "utworzono": "2026-10-15T09:40:59.417Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:11.488Z"
+   "zmieniono": "2026-10-15T17:41:01.205Z"
   },
   "RIN-136": {
    "etykiety": [
@@ -384,7 +384,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-136/auto-tama-wyslij-mail-do-handlowca-po-walidacji-model-i-salon-na-gorze",
    "utworzono": "2026-10-15T09:40:59.882Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:11.945Z"
+   "zmieniono": "2026-10-15T17:41:01.512Z"
   },
   "RIN-137": {
    "etykiety": [
@@ -418,7 +418,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-138/auto-tama-zdecyduj-integracja-z-systemem-crm-dealera-zeby-leady-same",
    "utworzono": "2026-10-15T09:41:01.062Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:12.198Z"
+   "zmieniono": "2026-10-15T17:41:01.803Z"
   },
   "RIN-139": {
    "etykiety": [
@@ -435,7 +435,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-139/auto-tama-zdecyduj-pierwsza-proba-dzwonienia-w-przerwie-obiadowej-po",
    "utworzono": "2026-10-15T09:41:01.605Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:12.451Z"
+   "zmieniono": "2026-10-15T17:41:02.055Z"
   },
   "RIN-140": {
    "etykiety": [
@@ -545,7 +545,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-146/auto-tama-wyslij-kasi-zestawienie-wynikow-testu-wstepu-ilu-rozmow",
    "utworzono": "2026-10-15T14:35:43.365Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:12.984Z"
+   "zmieniono": "2026-10-15T17:41:02.437Z"
   },
   "RIN-147": {
    "etykiety": [
@@ -562,7 +562,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-147/auto-tama-zdecyduj-eksport-listy-kontaktow-do-excela-np-samych",
    "utworzono": "2026-10-15T14:35:48.164Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:13.260Z"
+   "zmieniono": "2026-10-15T17:41:03.496Z"
   },
   "RIN-148": {
    "etykiety": [
@@ -578,7 +578,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-148/auto-tama-sprawdz-pawel-chce-puscic-opla-na-starej-bazie-wbrew",
    "utworzono": "2026-10-15T14:35:53.164Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:13.548Z"
+   "zmieniono": "2026-10-15T17:41:03.893Z"
   },
   "RIN-149": {
    "etykiety": [
@@ -611,7 +611,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-150/hotele-baltyk-zdecyduj-poprawic-w-bazie-wiedzy-informacje-o-sniadaniu",
    "utworzono": "2026-10-15T14:48:22.343Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:20.939Z"
+   "zmieniono": "2026-10-15T17:41:04.183Z"
   },
   "RIN-151": {
    "etykiety": [
@@ -625,11 +625,11 @@
    "stan": "Todo",
    "termin": null,
    "typ_stanu": "unstarted",
-   "tytul": "[hotele-baltyk] Uzupełnij: Ustawić godziny dzwonienia: od 9:00, ale nie wcześniej niż…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-151/hotele-baltyk-uzupelnij-ustawic-godziny-dzwonienia-od-900-ale-nie",
+   "tytul": "[hotele-baltyk] Ustawić godziny dzwonienia: od 9:00, ale nie wcześniej niż 8 godzin po przerwaniu rezerwacji",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-151/hotele-baltyk-ustawic-godziny-dzwonienia-od-900-ale-nie-wczesniej-niz",
    "utworzono": "2026-10-15T14:48:22.795Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:27:35.358Z"
+   "zmieniono": "2026-10-15T17:41:04.758Z"
   },
   "RIN-152": {
    "etykiety": [
@@ -648,7 +648,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-152/hotele-baltyk-zdecyduj-poprawic-instrukcje-agenta-nie-proponuje-znizek",
    "utworzono": "2026-10-15T14:48:23.281Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:21.748Z"
+   "zmieniono": "2026-10-15T17:41:05.547Z"
   },
   "RIN-153": {
    "etykiety": [
@@ -666,7 +666,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-153/hotele-baltyk-zdecyduj-sprawdzic-nagranie-rozmowy-z-wczoraj-w-ktorej",
    "utworzono": "2026-10-15T14:48:23.901Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:22.493Z"
+   "zmieniono": "2026-10-15T17:41:05.842Z"
   },
   "RIN-154": {
    "etykiety": [
@@ -680,11 +680,11 @@
    "stan": "Todo",
    "termin": "2026-10-26",
    "typ_stanu": "unstarted",
-   "tytul": "[hotele-baltyk] Uzupełnij: Wstrzymać dzwonienie do porzuconych rezerwacji w Sopocie w…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-154/hotele-baltyk-uzupelnij-wstrzymac-dzwonienie-do-porzuconych-rezerwacji",
+   "tytul": "[hotele-baltyk] Wstrzymać dzwonienie do porzuconych rezerwacji w Sopocie w dniach 26–31.10 (zjazd firmowy, hotel pełny)",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-154/hotele-baltyk-wstrzymac-dzwonienie-do-porzuconych-rezerwacji-w-sopocie",
    "utworzono": "2026-10-15T14:48:24.340Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:27:37.131Z"
+   "zmieniono": "2026-10-15T17:41:06.112Z"
   },
   "RIN-155": {
    "etykiety": [
@@ -702,7 +702,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-155/hotele-baltyk-zdecyduj-przygotowac-wycene-podpiecia-kolobrzegu-i",
    "utworzono": "2026-10-15T14:48:24.763Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:23.349Z"
+   "zmieniono": "2026-10-15T17:41:06.782Z"
   },
   "RIN-156": {
    "etykiety": [
@@ -719,7 +719,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-156/hotele-baltyk-zdecyduj-poprawic-adres-na-fakturze-ma-byc-sopot-tam",
    "utworzono": "2026-10-15T14:48:25.355Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:24.002Z"
+   "zmieniono": "2026-10-15T17:41:07.058Z"
   },
   "RIN-157": {
    "etykiety": [
@@ -736,7 +736,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-157/hotele-baltyk-uzupelnij-numer-rezerwacji-w-ktorej-agent-dwa-razy",
    "utworzono": "2026-10-15T14:48:25.832Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:24.332Z"
+   "zmieniono": "2026-10-15T17:41:07.523Z"
   },
   "RIN-158": {
    "etykiety": [
@@ -748,11 +748,11 @@
    "stan": "Backlog",
    "termin": null,
    "typ_stanu": "backlog",
-   "tytul": "[hotele-baltyk] Uzupełnij: Rozmowa z panem Robertem o ofercie ReceptAI: dopiero po…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-uzupelnij-rozmowa-z-panem-robertem-o-ofercie-receptai",
+   "tytul": "[hotele-baltyk] Rozmowa z panem Robertem o ofercie ReceptAI: dopiero po wynikach z całego miesiąca, gdy Joanna da znać",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-158/hotele-baltyk-rozmowa-z-panem-robertem-o-ofercie-receptai-dopiero-po",
    "utworzono": "2026-10-15T14:48:26.299Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:27:39.096Z"
+   "zmieniono": "2026-10-15T17:41:07.853Z"
   },
   "RIN-159": {
    "etykiety": [
@@ -764,11 +764,11 @@
    "stan": "Backlog",
    "termin": null,
    "typ_stanu": "backlog",
-   "tytul": "[hotele-baltyk] Uzupełnij: Decyzja pana Roberta o podpięciu Kołobrzegu: czekamy…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-uzupelnij-decyzja-pana-roberta-o-podpieciu-kolobrzegu",
+   "tytul": "[hotele-baltyk] Decyzja pana Roberta o podpięciu Kołobrzegu: czekamy, aż napisze",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-159/hotele-baltyk-decyzja-pana-roberta-o-podpieciu-kolobrzegu-czekamy-az",
    "utworzono": "2026-10-15T14:48:26.592Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:27:39.563Z"
+   "zmieniono": "2026-10-15T17:41:08.053Z"
   },
   "RIN-160": {
    "etykiety": [
@@ -786,7 +786,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-160/hotele-baltyk-zdecyduj-panel-oznaczenie-ktore-rezerwacje-dokonczono",
    "utworzono": "2026-10-15T14:48:26.939Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:24.643Z"
+   "zmieniono": "2026-10-15T17:41:08.314Z"
   },
   "RIN-161": {
    "etykiety": [
@@ -798,11 +798,11 @@
    "stan": "Todo",
    "termin": null,
    "typ_stanu": "unstarted",
-   "tytul": "[hotele-baltyk] Uzupełnij: Konkurent ReceptAI: według Joanny robi to samo taniej i od…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-161/hotele-baltyk-uzupelnij-konkurent-receptai-wedlug-joanny-robi-to-samo",
+   "tytul": "[hotele-baltyk] Konkurent ReceptAI: według Joanny robi to samo taniej i od razu z obu hoteli, pan Robert dostał od nich maila",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-161/hotele-baltyk-konkurent-receptai-wedlug-joanny-robi-to-samo-taniej-i",
    "utworzono": "2026-10-15T14:48:27.413Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:27:41.437Z"
+   "zmieniono": "2026-10-15T17:41:09.188Z"
   },
   "RIN-162": {
    "etykiety": [
@@ -814,11 +814,11 @@
    "stan": "Todo",
    "termin": null,
    "typ_stanu": "unstarted",
-   "tytul": "[hotele-baltyk] Uzupełnij: Jakość agenta w pierwszym tygodniu: błędna informacja o…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-162/hotele-baltyk-uzupelnij-jakosc-agenta-w-pierwszym-tygodniu-bledna",
+   "tytul": "[hotele-baltyk] Jakość agenta w pierwszym tygodniu: błędna informacja o śniadaniu, telefon rano po nocnej rezerwacji, propozycja utargowania ceny",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-162/hotele-baltyk-jakosc-agenta-w-pierwszym-tygodniu-bledna-informacja-o",
    "utworzono": "2026-10-15T14:48:27.666Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:27:42.091Z"
+   "zmieniono": "2026-10-15T17:41:09.381Z"
   },
   "RIN-163": {
    "etykiety": [
@@ -848,11 +848,11 @@
    "stan": "Todo",
    "termin": "2026-10-15",
    "typ_stanu": "unstarted",
-   "tytul": "[motor-lux] Uzupełnij: Błąd: agent proponuje jazdy próbne w niedzielę; poprawić…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-164/motor-lux-uzupelnij-blad-agent-proponuje-jazdy-probne-w-niedziele",
+   "tytul": "[motor-lux] Błąd: agent proponuje jazdy próbne w niedzielę; poprawić godziny jazd próbnych w Łodzi",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-164/motor-lux-blad-agent-proponuje-jazdy-probne-w-niedziele-poprawic",
    "utworzono": "2026-10-15T17:20:54.407Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:01.269Z"
+   "zmieniono": "2026-10-15T17:41:09.534Z"
   },
   "RIN-165": {
    "etykiety": [
@@ -870,7 +870,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-165/motor-lux-zdecyduj-instrukcja-agenta-nie-podawac-cen-aut-ani-rabatow",
    "utworzono": "2026-10-15T17:20:55.107Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:24.921Z"
+   "zmieniono": "2026-10-15T17:41:09.826Z"
   },
   "RIN-166": {
    "etykiety": [
@@ -887,7 +887,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-166/motor-lux-zdecyduj-faktura-z-blednym-nip-em-michal-wystawia-korekte",
    "utworzono": "2026-10-15T17:20:55.646Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:25.220Z"
+   "zmieniono": "2026-10-15T17:41:10.108Z"
   },
   "RIN-167": {
    "etykiety": [
@@ -904,7 +904,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-167/motor-lux-uzupelnij-czekamy-na-numer-rozmowy-w-ktorej-agent-przerwal",
    "utworzono": "2026-10-15T17:20:56.262Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:25.486Z"
+   "zmieniono": "2026-10-15T17:41:10.399Z"
   },
   "RIN-168": {
    "etykiety": [
@@ -917,11 +917,11 @@
    "stan": "Backlog",
    "termin": "2026-10-16",
    "typ_stanu": "backlog",
-   "tytul": "[motor-lux] Uzupełnij: Czekamy na listę modeli na jazdy próbne w Łodzi (agent…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-168/motor-lux-uzupelnij-czekamy-na-liste-modeli-na-jazdy-probne-w-lodzi",
+   "tytul": "[motor-lux] Czekamy na listę modeli na jazdy próbne w Łodzi (agent proponuje Hyundaia Ioniq 6, którego salon nie ma)",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-168/motor-lux-czekamy-na-liste-modeli-na-jazdy-probne-w-lodzi-agent",
    "utworzono": "2026-10-15T17:20:56.573Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:03.896Z"
+   "zmieniono": "2026-10-15T17:41:10.547Z"
   },
   "RIN-169": {
    "etykiety": [
@@ -934,11 +934,11 @@
    "stan": "Backlog",
    "termin": null,
    "typ_stanu": "backlog",
-   "tytul": "[motor-lux] Uzupełnij: Spotkanie Marka z panem Adamem: Agnieszka umówi po…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-169/motor-lux-uzupelnij-spotkanie-marka-z-panem-adamem-agnieszka-umowi-po",
+   "tytul": "[motor-lux] Spotkanie Marka z panem Adamem: Agnieszka umówi po wynikach z Łodzi za miesiąc",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-169/motor-lux-spotkanie-marka-z-panem-adamem-agnieszka-umowi-po-wynikach-z",
    "utworzono": "2026-10-15T17:20:56.921Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:04.449Z"
+   "zmieniono": "2026-10-15T17:41:10.703Z"
   },
   "RIN-170": {
    "etykiety": [
@@ -951,11 +951,11 @@
    "stan": "Backlog",
    "termin": null,
    "typ_stanu": "backlog",
-   "tytul": "[motor-lux] Uzupełnij: Podpięcie Piotrkowa (Hyundai) czeka na decyzję pana Adama…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-170/motor-lux-uzupelnij-podpiecie-piotrkowa-hyundai-czeka-na-decyzje-pana",
+   "tytul": "[motor-lux] Podpięcie Piotrkowa (Hyundai) czeka na decyzję pana Adama, nie wcześniej niż od listopada",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-170/motor-lux-podpiecie-piotrkowa-hyundai-czeka-na-decyzje-pana-adama-nie",
    "utworzono": "2026-10-15T17:20:57.260Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:05.137Z"
+   "zmieniono": "2026-10-15T17:41:11.010Z"
   },
   "RIN-171": {
    "etykiety": [
@@ -973,7 +973,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-171/motor-lux-zdecyduj-sms-do-handlowca-od-razu-po-potwierdzeniu-jazdy",
    "utworzono": "2026-10-15T17:20:57.594Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:25.731Z"
+   "zmieniono": "2026-10-15T17:41:11.281Z"
   },
   "RIN-172": {
    "etykiety": [
@@ -985,11 +985,11 @@
    "stan": "Todo",
    "termin": null,
    "typ_stanu": "unstarted",
-   "tytul": "[motor-lux] Uzupełnij: Konkurent AutoVoice: tańsza oferta od razu z obu salonów…",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-172/motor-lux-uzupelnij-konkurent-autovoice-tansza-oferta-od-razu-z-obu",
+   "tytul": "[motor-lux] Konkurent AutoVoice: tańsza oferta od razu z obu salonów; pan Adam pyta",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-172/motor-lux-konkurent-autovoice-tansza-oferta-od-razu-z-obu-salonow-pan",
    "utworzono": "2026-10-15T17:20:58.088Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:06.420Z"
+   "zmieniono": "2026-10-15T17:41:11.418Z"
   },
   "RIN-173": {
    "etykiety": [
@@ -1001,11 +1001,11 @@
    "stan": "Todo",
    "termin": null,
    "typ_stanu": "unstarted",
-   "tytul": "[motor-lux] Uzupełnij: Jakość bota: niedziela, stara cena, rozłączenie w pół zdania",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-173/motor-lux-uzupelnij-jakosc-bota-niedziela-stara-cena-rozlaczenie-w-pol",
+   "tytul": "[motor-lux] Jakość bota: niedziela, stara cena, rozłączenie w pół zdania",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-173/motor-lux-jakosc-bota-niedziela-stara-cena-rozlaczenie-w-pol-zdania",
    "utworzono": "2026-10-15T17:20:58.379Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:06.954Z"
+   "zmieniono": "2026-10-15T17:41:11.572Z"
   },
   "RIN-174": {
    "etykiety": [

@@ -31,6 +31,11 @@ _CZASOWNIK_RE = re.compile(r"^(?:wyślij|wysłać|zdecyduj|sprawdź|uzupełnij)\
 _DNI = ["poniedziałek", "wtorek", "środa", "czwartek", "piątek", "sobota", "niedziela"]
 
 
+def _n(opis):
+    """Opis do porównań: Linear normalizuje puste linie i końcowy newline, więc porównujemy bez tych różnic."""
+    return re.sub(r"\n{3,}", "\n\n", (opis or "").replace("\r\n", "\n")).strip()
+
+
 # ── tytuł ─────────────────────────────────────────────────────────────────────
 
 def tytul_merytoryczny(tytul):
@@ -240,15 +245,16 @@ def zastosuj_uklad(s, zg, komentarze=None, przypisanie=None, mail=None, powod=No
     if wynik is None:
         return None
     tytul, opis, czynnosc = wynik
-    if tytul != zg.get("title") or opis != zg.get("description"):
+    if tytul != zg.get("title") or _n(opis) != _n(zg.get("description")):
         s.linear.ustaw_uklad(zg, tytul, opis)
     return czynnosc
 
 
-def zdejmij_uklad(zg):
-    """(tytuł bez czynności, opis bez bloku): zgłoszenie przestaje być zgłoszeniem dla człowieka (np. wycofany szkic)."""
+def zdejmij_uklad(zg, tytul_oryginalny=None):
+    """(tytuł bez czynności, opis bez bloku): zgłoszenie przestaje być zgłoszeniem dla człowieka (np. wycofany szkic, sprawa wróciła do agenta).
+    tytul_oryginalny: pełny tytuł z karty klienta (tytuł w układzie jest skrócony do 60 znaków)."""
     pref = prefiks_klienta(zg.get("title"))
-    tytul = f"{pref} {tytul_merytoryczny(zg.get('title'))}".strip()
+    tytul = f"{pref} {tytul_oryginalny or tytul_merytoryczny(zg.get('title'))}".strip()
     blok, kontekst = rozdziel(zg.get("description"))
     return tytul, (kontekst.strip() + "\n") if blok else (zg.get("description") or "")
 
@@ -344,6 +350,19 @@ def przelicz(s, zastosuj=False):
     wynik = []
     for zg in sorted(s.linear.otwarte(["Backlog", "Todo", "In Progress"]), key=lambda z: z["identifier"]):
         if not czy_dla_czlowieka(zg.get("labels"), s.Z):
+            # sprawa przestała być dla człowieka (np. etykiety po przeliczeniu), a ma jeszcze tytuł od czynności i blok: zdejmujemy układ
+            klient = _klient(zg.get("title"))
+            if (ma_uklad(zg.get("title")) or rozdziel(zg.get("description"))[0]) and klient != "produkt" and s.Z["etykiety"]["karta"] not in (zg.get("labels") or []):
+                oryg = None
+                if klient:
+                    for wpis in (s.wczytaj_karte(klient).get("otwarte_sprawy") or {}).values():
+                        if isinstance(wpis, dict) and wpis.get("identifier") == zg["identifier"]:
+                            oryg = wpis.get("tytul")
+                tytul, opis = zdejmij_uklad(zg, oryg)
+                if (tytul, _n(opis)) != (zg.get("title"), _n(zg.get("description"))):
+                    wynik.append((zg["identifier"], zg.get("title"), tytul, "bez układu"))
+                    if zastosuj:
+                        s.linear.ustaw_uklad(zg, tytul, opis)
             continue
         klient = _klient(zg.get("title"))
         przyp = None
@@ -357,7 +376,7 @@ def przelicz(s, zastosuj=False):
         if nowy is None:
             continue
         tytul, opis, czynnosc = nowy
-        if tytul == zg.get("title") and opis == zg.get("description"):
+        if tytul == zg.get("title") and _n(opis) == _n(zg.get("description")):
             continue
         wynik.append((zg["identifier"], zg.get("title"), tytul, czynnosc))
         if zastosuj:
