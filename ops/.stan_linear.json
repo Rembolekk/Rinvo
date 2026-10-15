@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T11:15:23+00:00",
+ "zapisano": "2026-10-15T12:06:57+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -61,14 +61,14 @@
    ],
    "id": "6fe49edc-e3c0-40e5-9fa1-25ca4d185fa7",
    "priorytet": 0,
-   "stan": "Todo",
+   "stan": "In Progress",
    "termin": "2026-10-06",
-   "typ_stanu": "unstarted",
+   "typ_stanu": "started",
    "tytul": "[auto-tama] Skrócić godziny dzwonienia agenta: tydzień 9–19, sobota 9–15",
    "url": "https://linear.app/rinvo-demo/issue/RIN-117/auto-tama-skrocic-godziny-dzwonienia-agenta-tydzien-9-19-sobota-9-15",
    "utworzono": "2026-10-15T09:40:52.043Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:41:04.590Z"
+   "zmieniono": "2026-10-15T12:06:54.191Z"
   },
   "RIN-118": {
    "etykiety": [

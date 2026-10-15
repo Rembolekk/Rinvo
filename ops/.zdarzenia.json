@@ -30,5 +30,13 @@
   "zgloszenie": "RIN-116",
   "tytul": "Zmienić godziny salonów podawane klientom: sobota do 15:00",
   "url": "https://github.com/Rembolekk/rinvo-app/pull/5"
+ },
+ {
+  "data": "2026-10-15T12:06:50+00:00",
+  "typ": "pr_otwarty",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-117",
+  "tytul": "Skrócić godziny dzwonienia agenta: tydzień 9–19, sobota 9–15",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/6"
  }
 ]
