@@ -171,7 +171,7 @@ class TestPliki(Tmp):
         strony = gs.buduj(gs.wczytaj_dane(".", date(2026, 10, 15)))
         self.assertIn("klienci/auto-tama.html", strony)
         self.assertNotIn("klienci/klinika-usmiech.html", strony)
-        self.assertIn("Sygnały (0)", strony["glos-klientow.html"])
+        self.assertIn("Brak sygnałów wartych decyzji", strony["glos-klientow.html"])
 
 
 class TestApp(Tmp):
