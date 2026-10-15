@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T17:54:53+00:00",
+ "zapisano": "2026-10-15T17:58:53+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -841,7 +841,6 @@
    "etykiety": [
     "Dla agenta",
     "Konfiguracja",
-    "Wstrzymane do potwierdzenia karty",
     "repo: rinvo-app"
    ],
    "id": "bc013298-4b35-492c-943f-1b0baacda880",
@@ -853,13 +852,12 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-164/motor-lux-blad-agent-proponuje-jazdy-probne-w-niedziele-poprawic",
    "utworzono": "2026-10-15T17:20:54.407Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:09.534Z"
+   "zmieniono": "2026-10-15T17:58:50.615Z"
   },
   "RIN-165": {
    "etykiety": [
     "Decyzja człowieka",
     "Konfiguracja",
-    "Wstrzymane do potwierdzenia karty",
     "repo: rinvo-app"
    ],
    "id": "2f8e2ef4-944d-4c97-b00f-46e63ffecf91",
@@ -871,13 +869,12 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-165/motor-lux-zdecyduj-instrukcja-agenta-nie-podawac-cen-aut-ani-rabatow",
    "utworzono": "2026-10-15T17:20:55.107Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:09.826Z"
+   "zmieniono": "2026-10-15T17:58:50.202Z"
   },
   "RIN-166": {
    "etykiety": [
     "Decyzja człowieka",
-    "Finanse",
-    "Wstrzymane do potwierdzenia karty"
+    "Finanse"
    ],
    "id": "ae1aa1cb-1550-48e5-8a8a-a642c10fd2a5",
    "priorytet": 0,
@@ -888,13 +885,12 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-166/motor-lux-zdecyduj-faktura-z-blednym-nip-em-michal-wystawia-korekte",
    "utworzono": "2026-10-15T17:20:55.646Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:10.108Z"
+   "zmieniono": "2026-10-15T17:58:49.465Z"
   },
   "RIN-167": {
    "etykiety": [
     "Czeka na klienta",
-    "Do weryfikacji",
-    "Wstrzymane do potwierdzenia karty"
+    "Do weryfikacji"
    ],
    "id": "2198b517-22e1-4d62-a222-92987a638e2d",
    "priorytet": 0,
@@ -905,12 +901,11 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-167/motor-lux-uzupelnij-czekamy-na-numer-rozmowy-w-ktorej-agent-przerwal",
    "utworzono": "2026-10-15T17:20:56.262Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:10.399Z"
+   "zmieniono": "2026-10-15T17:58:48.642Z"
   },
   "RIN-168": {
    "etykiety": [
     "Czeka na klienta",
-    "Wstrzymane do potwierdzenia karty",
     "repo: rinvo-app"
    ],
    "id": "3d6e291a-51e5-4c16-bca8-c0c576e0f670",
@@ -922,12 +917,11 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-168/motor-lux-czekamy-na-liste-modeli-na-jazdy-probne-w-lodzi-agent",
    "utworzono": "2026-10-15T17:20:56.573Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:10.547Z"
+   "zmieniono": "2026-10-15T17:58:48.277Z"
   },
   "RIN-169": {
    "etykiety": [
     "Czeka na klienta",
-    "Wstrzymane do potwierdzenia karty",
     "repo: rinvo-ops"
    ],
    "id": "0b328bc1-5d5b-4b9c-a37c-ddb23cb079f9",
@@ -939,12 +933,11 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-169/motor-lux-spotkanie-marka-z-panem-adamem-agnieszka-umowi-po-wynikach-z",
    "utworzono": "2026-10-15T17:20:56.921Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:10.703Z"
+   "zmieniono": "2026-10-15T17:58:47.855Z"
   },
   "RIN-170": {
    "etykiety": [
     "Czeka na klienta",
-    "Wstrzymane do potwierdzenia karty",
     "repo: rinvo-app"
    ],
    "id": "831595ba-9d97-4353-9e9c-a829e05f51b5",
@@ -956,13 +949,12 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-170/motor-lux-podpiecie-piotrkowa-hyundai-czeka-na-decyzje-pana-adama-nie",
    "utworzono": "2026-10-15T17:20:57.260Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:11.010Z"
+   "zmieniono": "2026-10-15T17:58:47.374Z"
   },
   "RIN-171": {
    "etykiety": [
     "Decyzja człowieka",
     "Produkt",
-    "Wstrzymane do potwierdzenia karty",
     "repo: rinvo"
    ],
    "id": "fd83a1fe-f0fe-4061-9899-82c6f979a28d",
@@ -974,12 +966,11 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-171/motor-lux-zdecyduj-sms-do-handlowca-od-razu-po-potwierdzeniu-jazdy",
    "utworzono": "2026-10-15T17:20:57.594Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:11.281Z"
+   "zmieniono": "2026-10-15T17:58:46.968Z"
   },
   "RIN-172": {
    "etykiety": [
-    "Ryzyko",
-    "Wstrzymane do potwierdzenia karty"
+    "Ryzyko"
    ],
    "id": "8c984922-3ebb-4fce-87d8-ef4b641e40ce",
    "priorytet": 2,
@@ -990,12 +981,11 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-172/motor-lux-konkurent-autovoice-tansza-oferta-od-razu-z-obu-salonow-pan",
    "utworzono": "2026-10-15T17:20:58.088Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:11.418Z"
+   "zmieniono": "2026-10-15T17:58:46.539Z"
   },
   "RIN-173": {
    "etykiety": [
-    "Ryzyko",
-    "Wstrzymane do potwierdzenia karty"
+    "Ryzyko"
    ],
    "id": "7ca5d1b9-e87f-45ee-983a-87f6fc747d53",
    "priorytet": 2,
@@ -1006,7 +996,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-173/motor-lux-jakosc-bota-niedziela-stara-cena-rozlaczenie-w-pol-zdania",
    "utworzono": "2026-10-15T17:20:58.379Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:41:11.572Z"
+   "zmieniono": "2026-10-15T17:58:46.145Z"
   },
   "RIN-174": {
    "etykiety": [
@@ -1042,19 +1032,18 @@
   },
   "RIN-176": {
    "etykiety": [
-    "Do weryfikacji",
-    "Karta do potwierdzenia"
+    "Do weryfikacji"
    ],
    "id": "3fa59173-3517-4226-9766-0fd8ddb657f6",
    "priorytet": 2,
-   "stan": "Todo",
+   "stan": "Done",
    "termin": null,
-   "typ_stanu": "unstarted",
+   "typ_stanu": "completed",
    "tytul": "[motor-lux] Potwierdź kartę klienta Motor-Lux",
    "url": "https://linear.app/rinvo-demo/issue/RIN-176/motor-lux-potwierdz-karte-klienta-motor-lux",
    "utworzono": "2026-10-15T17:28:07.548Z",
-   "zamknieto": null,
-   "zmieniono": "2026-10-15T17:28:58.314Z"
+   "zamknieto": "2026-10-15T17:57:49.726Z",
+   "zmieniono": "2026-10-15T17:58:50.995Z"
   }
  }
 }

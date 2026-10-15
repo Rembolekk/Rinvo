@@ -1,12 +1,10 @@
 {
   "klient": "motor-lux",
   "nazwa": "Motor-Lux",
-  "nowy_klient": true,
-  "decydenci": [],
-  "decydenci_wniosek": [
+  "decydenci": [
     {
       "imie": "Agnieszka Wróbel",
-      "rola": "wniosek z rozmowy, do potwierdzenia"
+      "rola": "decydent"
     }
   ],
   "kontakty": [
@@ -306,10 +304,5 @@
         "cytat": "Trzy osoby przyjechały pod zamknięty salon."
       }
     ]
-  },
-  "potwierdzenie_karty": {
-    "identifier": "RIN-176",
-    "linear_id": "3fa59173-3517-4226-9766-0fd8ddb657f6",
-    "url": "https://linear.app/rinvo-demo/issue/RIN-176/motor-lux-potwierdz-karte-klienta-motor-lux"
   }
 }
