@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T09:13:25+00:00",
+ "zapisano": "2026-10-15T09:20:23+00:00",
  "zgloszenia": {
   "RIN-100": {
    "etykiety": [
@@ -15,7 +15,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-100/auto-tama-zdecyduj-testy-ab-wstepu-rozmowy-i-kolejnosci-pytan",
    "utworzono": "2026-10-15T09:13:17.354Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:17.354Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-101": {
    "etykiety": [
@@ -31,7 +31,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-101/auto-tama-zdecyduj-klikniecie-w-kafelek-zainteresowani-na-dashboardzie",
    "utworzono": "2026-10-15T09:13:17.966Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:17.966Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-102": {
    "etykiety": [
@@ -48,7 +48,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-102/auto-tama-nazwisko-zaraz-po-statusie-na-liscie-kontaktow-tylko-przy",
    "utworzono": "2026-10-15T09:13:18.578Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:18.578Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-103": {
    "etykiety": [
@@ -64,7 +64,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-103/auto-tama-zdecyduj-tygodniowy-raport-mailowy-dla-pawla-w-poniedzialek",
    "utworzono": "2026-10-15T09:13:18.897Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:18.897Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-104": {
    "etykiety": [
@@ -81,7 +81,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-104/auto-tama-zdecyduj-integracja-z-systemem-crm-dealera-aby-leady-wpadaly",
    "utworzono": "2026-10-15T09:13:19.655Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:19.655Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-105": {
    "etykiety": [
@@ -98,7 +98,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-105/auto-tama-wyslij-mail-do-handlowcow-po-walidacji-model-i-salon-na",
    "utworzono": "2026-10-15T09:13:20.479Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:20.479Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-106": {
    "etykiety": [
@@ -114,7 +114,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-106/auto-tama-zdecyduj-sms-do-osoby-do-ktorej-agent-dwa-razy-sie-nie",
    "utworzono": "2026-10-15T09:13:21.028Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:21.028Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-107": {
    "etykiety": [
@@ -131,7 +131,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-107/auto-tama-zdecyduj-przesunac-pierwsza-probe-dzwonienia-na-przerwe",
    "utworzono": "2026-10-15T09:13:21.567Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:21.567Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-108": {
    "etykiety": [
@@ -147,7 +147,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-108/auto-tama-zdecyduj-agent-po-godzinach-na-wszystkie-numery-salonu",
    "utworzono": "2026-10-15T09:13:22.150Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:22.150Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-109": {
    "etykiety": [
@@ -162,7 +162,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-109/auto-tama-konkurent-voicedesk-u-pawla-taniej-i-z-integracja-z-systemem",
    "utworzono": "2026-10-15T09:13:23.482Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:23.482Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-110": {
    "etykiety": [
@@ -177,7 +177,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-110/auto-tama-pawel-po-statystyce-9-na-70-chcial-wylaczyc-wszystko",
    "utworzono": "2026-10-15T09:13:23.814Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:23.814Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-111": {
    "etykiety": [
@@ -192,7 +192,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-111/auto-tama-jakosc-rozmow-ludzie-orientuja-sie-ze-to-robot-bledny-adres",
    "utworzono": "2026-10-15T09:13:24.188Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:24.188Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-112": {
    "etykiety": [
@@ -207,7 +207,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-112/auto-tama-rozliczenia-faktura-na-zly-podmiot-i-platnosc-za-podwojne",
    "utworzono": "2026-10-15T09:13:24.488Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:24.488Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-113": {
    "etykiety": [
@@ -228,6 +228,7 @@
   "RIN-84": {
    "etykiety": [
     "Dla agenta",
+    "Do weryfikacji",
     "Konfiguracja",
     "repo: rinvo-app"
    ],
@@ -240,7 +241,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-84/auto-tama-poprawic-adres-salonu-we-wloclawku-na-torunska-120",
    "utworzono": "2026-10-15T09:13:09.967Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:09.967Z"
+   "zmieniono": "2026-10-15T09:19:40.478Z"
   },
   "RIN-85": {
    "etykiety": [
@@ -250,14 +251,14 @@
    ],
    "id": "7db212f9-1516-4606-972e-669ac0b5e43c",
    "priorytet": 0,
-   "stan": "Todo",
+   "stan": "In Progress",
    "termin": "2026-10-06",
-   "typ_stanu": "unstarted",
+   "typ_stanu": "started",
    "tytul": "[auto-tama] Zmienić godziny salonów w wiedzy agenta: sobota 9–15 w obu salonach",
    "url": "https://linear.app/rinvo-demo/issue/RIN-85/auto-tama-zmienic-godziny-salonow-w-wiedzy-agenta-sobota-9-15-w-obu",
    "utworzono": "2026-10-15T09:13:10.316Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:10.316Z"
+   "zmieniono": "2026-10-15T09:19:59.014Z"
   },
   "RIN-86": {
    "etykiety": [
@@ -274,7 +275,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-86/auto-tama-skrocic-godziny-dzwonienia-agenta-pn-pt-9-19-sobota-9-15",
    "utworzono": "2026-10-15T09:13:10.819Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:10.819Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-87": {
    "etykiety": [
@@ -291,7 +292,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-87/auto-tama-blad-agent-dzwoni-drugi-raz-po-rozlaczeniu-w-ciagu-3-sekund",
    "utworzono": "2026-10-15T09:13:11.140Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:11.140Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-88": {
    "etykiety": [
@@ -308,7 +309,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-88/auto-tama-blad-filtr-statusu-zainteresowany-nie-zaweza-listy-kontaktow",
    "utworzono": "2026-10-15T09:13:11.424Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:11.424Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-89": {
    "etykiety": [
@@ -324,7 +325,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-89/auto-tama-zdecyduj-sprawdzic-naliczanie-minut-przy-krotkich",
    "utworzono": "2026-10-15T09:13:11.895Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:11.895Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-90": {
    "etykiety": [
@@ -340,7 +341,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-90/auto-tama-zdecyduj-przekazac-michalowi-korekte-faktury-za-wrzesien-na",
    "utworzono": "2026-10-15T09:13:12.755Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:12.755Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-91": {
    "etykiety": [
@@ -356,11 +357,12 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-91/auto-tama-zdecyduj-ustalic-cene-sms-ow-po-dwoch-nieudanych-probach-i",
    "utworzono": "2026-10-15T09:13:13.440Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:13.440Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-92": {
    "etykiety": [
     "Dla agenta",
+    "Do weryfikacji",
     "Zadanie",
     "repo: rinvo-ops"
    ],
@@ -369,11 +371,11 @@
    "stan": "Todo",
    "termin": null,
    "typ_stanu": "unstarted",
-   "tytul": "[auto-tama] Przygotować jednostronicową ściągę ze znaczeniem statusów dla handlowców",
-   "url": "https://linear.app/rinvo-demo/issue/RIN-92/auto-tama-przygotowac-jednostronicowa-sciage-ze-znaczeniem-statusow",
+   "tytul": "[auto-tama] Uzupełnij: Przygotować jednostronicową ściągę ze znaczeniem statusów…",
+   "url": "https://linear.app/rinvo-demo/issue/RIN-92/auto-tama-uzupelnij-przygotowac-jednostronicowa-sciage-ze-znaczeniem",
    "utworzono": "2026-10-15T09:13:14.107Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:14.107Z"
+   "zmieniono": "2026-10-15T09:20:22.312Z"
   },
   "RIN-93": {
    "etykiety": [
@@ -389,7 +391,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-93/auto-tama-dwie-wersje-wstepu-rozmowy-od-kasi-wybor-wygra-kasia-po",
    "utworzono": "2026-10-15T09:13:14.408Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:14.408Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-94": {
    "etykiety": [
@@ -404,7 +406,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-94/auto-tama-plik-ze-swiezymi-leadami-ostatni-miesiac-strona-i-facebook",
    "utworzono": "2026-10-15T09:13:14.830Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:14.830Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-95": {
    "etykiety": [
@@ -419,7 +421,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-95/auto-tama-numer-lub-nagranie-rozmowy-w-ktorej-agent-drugi-raz-zapytal",
    "utworzono": "2026-10-15T09:13:15.549Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:15.549Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-96": {
    "etykiety": [
@@ -434,7 +436,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-96/auto-tama-numer-sprawy-przegladu-ktory-trafil-do-oli-jako-lead",
    "utworzono": "2026-10-15T09:13:16.060Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:16.060Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-97": {
    "etykiety": [
@@ -450,7 +452,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-97/auto-tama-potwierdzenie-od-kasi-spotkanie-z-pawlem-w-czwartek-15",
    "utworzono": "2026-10-15T09:13:16.383Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:16.383Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-98": {
    "etykiety": [
@@ -465,7 +467,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-98/auto-tama-termin-szkolenia-dla-handlowcow-kwadrans-online-ustala-kasia",
    "utworzono": "2026-10-15T09:13:16.664Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:16.664Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   },
   "RIN-99": {
    "etykiety": [
@@ -481,7 +483,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-99/auto-tama-numery-assistance-i-lista-pol-do-agenta-po-godzinach-tylko",
    "utworzono": "2026-10-15T09:13:16.974Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T09:13:16.974Z"
+   "zmieniono": "2026-10-15T09:13:25.286Z"
   }
  }
 }
