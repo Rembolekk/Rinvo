@@ -22,5 +22,13 @@
   "zgloszenie": "RIN-144",
   "tytul": "Notatka przed spotkaniem: Spotkanie z Pawłem (pół godziny, czwartek 15.10 o 10:00): czekamy na potwierdzenie Kasi",
   "url": "ops/materialy/auto-tama/notatka-2026-10-15.pdf"
+ },
+ {
+  "data": "2026-10-15T11:15:22+00:00",
+  "typ": "pr_scalony",
+  "klient": "auto-tama",
+  "zgloszenie": "RIN-116",
+  "tytul": "Zmienić godziny salonów podawane klientom: sobota do 15:00",
+  "url": "https://github.com/Rembolekk/rinvo-app/pull/5"
  }
 ]
