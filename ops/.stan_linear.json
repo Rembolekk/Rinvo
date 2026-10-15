@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-15T17:58:53+00:00",
+ "zapisano": "2026-10-15T17:59:56+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -845,14 +845,14 @@
    ],
    "id": "bc013298-4b35-492c-943f-1b0baacda880",
    "priorytet": 0,
-   "stan": "Todo",
+   "stan": "In Progress",
    "termin": "2026-10-15",
-   "typ_stanu": "unstarted",
+   "typ_stanu": "started",
    "tytul": "[motor-lux] Błąd: agent proponuje jazdy próbne w niedzielę; poprawić godziny jazd próbnych w Łodzi",
    "url": "https://linear.app/rinvo-demo/issue/RIN-164/motor-lux-blad-agent-proponuje-jazdy-probne-w-niedziele-poprawic",
    "utworzono": "2026-10-15T17:20:54.407Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T17:58:50.615Z"
+   "zmieniono": "2026-10-15T17:59:43.315Z"
   },
   "RIN-165": {
    "etykiety": [
