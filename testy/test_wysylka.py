@@ -500,7 +500,7 @@ class TestUrlop(unittest.TestCase):
 
     def test_karta_auto_tama_ma_urlop_kasi_ze_zrodlem(self):
         import json
-        k = json.loads((Path(__file__).parent.parent / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        k = json.loads(((Path(__file__).parent / "migawka_demo") / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
         kasia = next(c for c in k["kontakty"] if c["imie"] == "Kasia Malinowska")
         self.assertEqual(kasia["nieobecnosci"][0]["od"], "2026-10-19")
         self.assertEqual(kasia["nieobecnosci"][0]["do"], "2026-10-23")
@@ -726,7 +726,7 @@ class TestProsbaOInformacje(unittest.TestCase):
         self.assertEqual(szkice.powod_szkicu(z, Z, ["Nie, nie trzeba. Napisz tylko, jak będzie zrobione."]), "prosba")
 
     def test_cytaty_z_prawdziwego_wyniku_kliniki_dla_rin_65(self):
-        root = Path(__file__).parent.parent
+        root = Path(__file__).parent / "migawka_demo"          # dane demo sprzed resetu
         import os
         cwd = os.getcwd()
         os.chdir(root)
@@ -1096,7 +1096,7 @@ class TestMaterialy(unittest.TestCase):
         self.assertEqual(sum("Przygotuj dla klienta materiał" in p for p in s.claude.prompty), 2, "inne fakty = nowy materiał")
 
     def test_karta_auto_tama_ma_zalozenie_niezweryfikowany_oznaczone_jako_demo(self):
-        k = _json.loads((Path(__file__).parent.parent / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        k = _json.loads(((Path(__file__).parent / "migawka_demo") / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
         z = next(x for x in k["zalozenia_demo"] if "niezweryfikowany" in x["temat"])
         self.assertEqual(z["tresc"], "agent nie dodzwonił się albo rozmowa nie potwierdziła danych kontaktowych")
         self.assertEqual(z["dotyczy"], "sciga-statusow")
@@ -1209,7 +1209,7 @@ class TestPotwierdzoneUKlienta(unittest.TestCase):
 
     def test_potwierdzone_przez_klienta_na_prawdziwych_wynikach_rin_39(self):
         import os
-        root = Path(__file__).parent.parent
+        root = Path(__file__).parent / "migawka_demo"          # dane demo sprzed resetu (testy/migawka_demo)
         k = _json.loads((root / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
         cwd = os.getcwd()
         os.chdir(root)

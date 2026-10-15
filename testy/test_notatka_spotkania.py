@@ -13,6 +13,7 @@ from datetime import date
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
+MIGAWKA = ROOT / "testy/migawka_demo"
 sys.path.insert(0, str(ROOT))
 sys.path.insert(0, str(Path(__file__).parent))
 
@@ -52,7 +53,7 @@ def odpowiedz(ryzyka=3, pytania=4, tematy=2, **nadpisz):
 class Sro(tw.Srodowisko):
     def __init__(self, odp=None, **kw):
         super().__init__(ZG_STATUSY, karta=linear_sync.load_karta("auto-tama"), claude=tw.AtrapaClaude(odp or odpowiedz()), **kw)
-        self.katalog_wynikow = ROOT / "wyniki"
+        self.katalog_wynikow = MIGAWKA / "wyniki"
         self.odswiez = False
         self.linear.zgloszenia["RIN-78"] = ZG_STATUSY[-1]
 
@@ -63,7 +64,7 @@ class Sro(tw.Srodowisko):
 class Baza(unittest.TestCase):
     def setUp(self):
         self._cwd = os.getcwd()
-        os.chdir(ROOT)
+        os.chdir(MIGAWKA)          # karty i wyniki z migawki demo sprzed resetu
 
     def tearDown(self):
         os.chdir(self._cwd)

@@ -827,12 +827,13 @@ class B5Integracje(BBaza):
             self.assertIn("ops/produkt", (ROOT / f".github/workflows/{wf}.yml").read_text(encoding="utf-8"), wf)
 
     def test_b05_prawdziwe_propozycje_w_repo(self):
-        stan = json.loads((ROOT / "ops/produkt/propozycje.json").read_text(encoding="utf-8")) if (ROOT / "ops/produkt/propozycje.json").exists() else {}
+        MIG = ROOT / "testy/migawka_demo"          # propozycje z migawki demo sprzed resetu
+        stan = json.loads((MIG / "ops/produkt/propozycje.json").read_text(encoding="utf-8"))
         for klucz in ("integracja-crm", "eksport-excel-potwierdzenia"):
             self.assertIn(klucz, stan)
-            self.assertTrue((ROOT / stan[klucz]["material"]["md"]).exists())
-            self.assertTrue((ROOT / stan[klucz]["material"]["pdf"]).exists())
-            tekst = (ROOT / stan[klucz]["material"]["md"]).read_text(encoding="utf-8")
+            self.assertTrue((MIG / stan[klucz]["material"]["md"]).exists())
+            self.assertTrue((MIG / stan[klucz]["material"]["pdf"]).exists())
+            tekst = (MIG / stan[klucz]["material"]["md"]).read_text(encoding="utf-8")
             self.assertEqual([l[3:] for l in tekst.splitlines() if l.startswith("## ")][:7], list(Z["propozycje"]["sekcje"]))
             self.assertEqual(pr.sprawdz_tekst(pr.parsuj(json.dumps({"problem": "x", "najmniejsza_wersja": ["a", "b"], "pytania_otwarte": ["p"], "ryzyka": ["r"],
                                                                     "nastepny_krok": "k"})), Z), [])

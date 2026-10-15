@@ -14,6 +14,7 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 
 ROOT = Path(__file__).parent.parent
+MIGAWKA = ROOT / "testy/migawka_demo"          # dane demo sprzed resetu
 sys.path.insert(0, str(ROOT))
 
 import generuj_strony as gs
@@ -458,10 +459,10 @@ class TestZakazyCzasowe(unittest.TestCase):
 
     def test_prawdziwa_karta_auto_tama_z11_wygasl_z5_i_z18_jeszcze_nie(self):
         import zakazy_czas as zc
-        k = json.loads((ROOT / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        k = json.loads((MIGAWKA / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
         # karta w repo ma już Z11 w wygasłych; sprawdzamy stan na 14.10 i po 16.10
         ids = lambda lista: {z["id"] for z in lista}      # noqa: E731
-        a, w = zc.stan_zakazow(k, date(2026, 10, 14), "auto-tama", ROOT)
+        a, w = zc.stan_zakazow(k, date(2026, 10, 14), "auto-tama", MIGAWKA)
         self.assertIn("Z11", ids(w))
         self.assertTrue({"Z5", "Z18", "Z1"} <= ids(a))
         a, w = zc.stan_zakazow(k, date(2026, 10, 17), "auto-tama", ROOT)
@@ -489,18 +490,18 @@ class TestDatyZrodlaRyzyk(unittest.TestCase):
         self.assertEqual(karta_["ryzyka"]["inne"][0]["data"], "2026-10-13")
 
     def test_dane_w_repozytorium_maja_daty_zrodel_voicedesk_0610_i_1310(self):
-        k = json.loads((ROOT / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        k = json.loads((MIGAWKA / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
         wpisy = k["ryzyka"]["konkurencja"]
         self.assertEqual(sorted({w["data"] for w in wpisy}), ["2026-10-06", "2026-10-13"])
         for temat, w in k["ryzyka"].items():
             for x in w:
                 self.assertIn(x["data"], x["zrodlo"], f"{temat}: data wpisu = data źródła")
-        for klucz, p in json.loads((ROOT / "ops/produkt/prosby.json").read_text(encoding="utf-8")).items():
+        for klucz, p in json.loads((MIGAWKA / "ops/produkt/prosby.json").read_text(encoding="utf-8")).items():
             for x in p["prosby"]:
                 self.assertIn(x["data"], x["zrodlo"], klucz)
 
     def test_na_stronie_ryzyko_ma_daty_zrodel(self):
-        t = tekst(gs.strona_klienta(gs.wczytaj_dane(ROOT, DZIS), gs.wczytaj_dane(ROOT, DZIS)["klienci"]["auto-tama"]))
+        t = tekst(gs.strona_klienta(gs.wczytaj_dane(MIGAWKA, DZIS), gs.wczytaj_dane(MIGAWKA, DZIS)["klienci"]["auto-tama"]))
         self.assertIn("2026-10-06, 2026-10-13", t)
         self.assertNotIn("2026-10-13, 2026-10-14", t)
 
@@ -604,7 +605,7 @@ class TestStanIDziennik(unittest.TestCase):
 class TestPrawdziweDane(unittest.TestCase):
 
     def test_generowanie_z_danych_repozytorium(self):
-        d = gs.wczytaj_dane(ROOT, DZIS)
+        d = gs.wczytaj_dane(MIGAWKA, DZIS)
         s = gs.buduj(d)
         self.assertIn("klienci/auto-tama.html", s)
         self.assertIn("klienci/klinika-usmiech.html", s)

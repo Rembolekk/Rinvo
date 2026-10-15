@@ -464,8 +464,8 @@ class C05Blokady(unittest.TestCase):
         self.assertIn("kampani", Z["blokady"]["blokowane_slowa"])
 
     def test_c05_prawdziwa_karta_auto_tama_z5_blokuje_19_23_10(self):
-        k = json.loads((ROOT / "ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
-        self.assertIn("Z5", [z["id"] for z in zakazy_czas.aktywne_blokady(k, date(2026, 10, 21), "auto-tama", Z, ROOT)])
+        k = json.loads((ROOT / "testy/migawka_demo/ops/klienci/auto-tama/karta.json").read_text(encoding="utf-8"))
+        self.assertIn("Z5", [z["id"] for z in zakazy_czas.aktywne_blokady(k, date(2026, 10, 21), "auto-tama", Z, ROOT / "testy/migawka_demo")])
 
 
 # ── c06. wygasające klucze ────────────────────────────────────────────────────

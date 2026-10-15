@@ -81,6 +81,7 @@ Wykonaj instrukcje z .claude/commands/analizuj.md na pliku X.md
 | `testy/test_wysylka.py` | szkice maili i wysyłka: wszystkie bezpieczniki (duplikat, odbiorca, zakazy, filtr treści, limit, okno czasowe, urlop), mail zbiorczy, prośba o informację w starszych cytatach, szkice od razu dla zgłoszeń „do klienta” (133 testy, bez poczty) |
 | `testy/test_notatka_spotkania.py` | notatka przed spotkaniem: wybór spotkań, statusy z Lineara, walidacja (ryzyka, pytania, obietnice, kwoty), jedna strona PDF, powiadomienia, idempotencja (25 testów) |
 | `testy/test_strony.py` | strony dla ludzi: światło, liczby, oś czasu, zakazy, ryzyka, głos klientów, brak adresów e-mail, escapowanie HTML, stan Lineara i dziennik zdarzeń (58 testów) |
+| `testy/test_reset_demo.py` | reset do próby generalnej (plan bez flagi, archiwizacja Lineara, karty, transkrypcje poza wyzwalaczem workflow, stan, Rinvo-app na tymczasowym repo git, PR-y): 13 testów |
 | `testy/test_porzadek_produkt.py` | porządek w zgłoszeniach dla człowieka (tytuł od czynności, blok, wysyłka z bloku, Odrzuć, widok, przeliczenie) i agent produktowy (propozycje, aktualizacja bez duplikatu, ruchy Buduj/Później/Odrzuć, Głos klientów, limit): 60 testów |
 | `testy/test_utwardzanie2.py` | utwardzanie cz. 2 (regresje, pierwszeństwo człowieka, rozmiar zmiany i konflikty agenta, blokady a naprawy, klucze, limity i kredyty, bezpiecznik kosztów, eskalacja): 74 testy |
 | `testy/test_utwardzanie.py` | 17 przypadków brzegowych rozmów i maili (duplikat, starsza rozmowa, niepełna, pomyłka mówcy, maskowanie, polecenia, uwierzytelnienie, autoodpowiedzi, załączniki, Fwd, odpowiedzi): 88 testów |
@@ -404,6 +405,17 @@ Gdy sygnał z **Głosu klientów** pojawia się pierwszy raz albo się wzmacnia 
 - Uruchamia ją codzienne podsumowanie (`podsumowanie.yml`); ruchy Buduj/Później obsługuje job wysyłki (`wyslij.py`).
 
 Testy: `python3 testy/test_porzadek_produkt.py` (testy `test_b01_…` … `test_b05_…`).
+
+## Próba generalna od czystego stanu (`reset_demo.py`, `proba/`)
+
+`python3 reset_demo.py --tak` (bez flagi tylko wypisuje plan) przygotowuje demo do próby od zera: archiwizuje wszystkie zgłoszenia zespołu RIN
+(etykiety i widok „Dla mnie dziś” zostają), usuwa wygenerowany stan (wyniki, materiały, rejestry rozmów i maili, prosby, propozycje, sygnały, zdarzenia,
+stan Lineara, liczniki, logi przebiegów, strony), przenosi transkrypcje auto-tama do `proba/transkrypcje/` (poza ścieżką `ops/transkrypcje/**`, która
+uruchamia workflow), a transkrypcję kliniki do `proba/archiwum/`. Karta auto-tama zostaje tylko z konfiguracją spoza rozmów (nazwa, domena, kontakt Kasi
+i zakres jej decyzji), karta kliniki jest usuwana, rejestr maili dostaje datę włączenia = dziś. W Rinvo-app `config/` i `wiedza/` wracają do stanu sprzed
+poprawek agenta (commit na main, usunięte gałęzie agenta, otwarte PR-y zamykane przy `AGENT_GITHUB_TOKEN`). Tagi `przed-proba` w obu repozytoriach pozwalają wrócić.
+Instrukcja próby krok po kroku: [`proba/INSTRUKCJA.md`](proba/INSTRUKCJA.md). Dane demo sprzed resetu, z których korzystają testy offline: `testy/migawka_demo/`.
+Testy: `python3 testy/test_reset_demo.py`.
 
 ## Przypadki brzegowe (utwardzanie)
 
