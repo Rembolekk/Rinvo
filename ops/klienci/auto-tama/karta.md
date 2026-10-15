@@ -208,14 +208,47 @@ Szkolenie dopiero po starcie świeżych leadów, żeby handlowcy nie zapomnieli.
 > Szkolenie dopiero, jak pójdą świeże, nie wcześniej, bo zapomną.
 
 
+### Z24: Nie przypominać Kasi o pliku ze świeżymi leadami (drugi raz)
+
+Kasia prosi, żeby po wcześniejszym mailu nie przypominać jej drugi raz o pliku ze świeżymi leadami: sama pamięta. Marek się zgodził.
+
+> Drugi raz nie przypominaj, sama pamiętam.
+
+> Dobra, nie przypominam.
+
+
+### Z25: Nie puszczać Opla na starej bazie, dopóki Kasia, Paweł i Marek nie porozmawiają w czwartek 15.10
+
+Paweł chce, żeby Rinvo od przyszłego tygodnia puściło Opla na starej bazie. Kasia nie jest przekonana i prosi, żeby tego nie robić do czwartkowej rozmowy we trzech. Marek się zgodził. Zakazy Z1 (Opel czeka na wyniki świeżych leadów) i Z2 (starej bazy drugi raz nie puszczamy) obowiązują dalej.
+
+> Opel miał czekać na wyniki świeżych leadów, a starej bazy drugi raz mieliśmy nie puszczać. Nie róbcie tego, dopóki nie pogadamy we trzech w czwartek.
+
+> Jasne. Opla nie ruszam, wracamy do tego w czwartek.
+
+
+### Z26: Nie wierzyć relacji Oli, że Kasia zgodziła się na proponowanie aut używanych przy odmowie
+
+Kasia ostrzega, że Ola twierdzi, jakoby Kasia zgodziła się, żeby agent przy odmowie proponował używane auta. Kasia się nie zgodziła. Agent dalej nie sprzedaje i nie proponuje aut używanych (Z16).
+
+> A, i Ola mówiła, że ja się zgodziłam, żeby agent przy odmowie proponował używane auta. Nie zgodziłam się. Gdyby ktoś wam tak napisał, nie wierzcie.
+
+> Jasne, zostaje tak, jak było. Agent nie sprzedaje.
+
+
+### Z27: Nic nowego nie startuje w tygodniu urlopu Kasi (od 19.10)
+
+Kasia przypomina, że od 19.10 jej nie ma. Marek potwierdza, że nic nowego nie startuje poza testem wstępu. Ustalenie z 6.10 (Z18): urlop trwa 19–23.10 i w tym czasie nic nowego nie odpalamy, nawet jeśli plik ze świeżymi leadami już będzie.
+
+> I od dziewiętnastego mnie nie ma, pamiętasz.
+
+> Pamiętam, w tym tygodniu nic nowego poza testem wstępu.
+
+
 ## Otwarte sprawy w Linearze
 
 - [RIN-114](https://linear.app/rinvo-demo/issue/RIN-114/auto-tama-blad-agent-dzwoni-drugi-raz-po-rozlaczeniu-w-ciagu-3-sekund) – Błąd: agent dzwoni drugi raz po rozłączeniu w ciągu 3 sekund
-- [RIN-115](https://linear.app/rinvo-demo/issue/RIN-115/auto-tama-poprawic-adres-salonu-we-wloclawku-na-torunska-120) – Poprawić adres salonu we Włocławku na Toruńska 120
 - [RIN-116](https://linear.app/rinvo-demo/issue/RIN-116/auto-tama-zmienic-godziny-salonow-podawane-klientom-sobota-do-1500) – Zmienić godziny salonów podawane klientom: sobota do 15:00
 - [RIN-117](https://linear.app/rinvo-demo/issue/RIN-117/auto-tama-skrocic-godziny-dzwonienia-agenta-tydzien-9-19-sobota-9-15) – Skrócić godziny dzwonienia agenta: tydzień 9–19, sobota 9–15
-- [RIN-118](https://linear.app/rinvo-demo/issue/RIN-118/auto-tama-blad-filtr-statusu-zainteresowany-nie-zaweza-listy-kontaktow) – Błąd: filtr statusu „zainteresowany” nie zawęża listy kontaktów
-- [RIN-119](https://linear.app/rinvo-demo/issue/RIN-119/auto-tama-zdecyduj-korekta-faktury-za-wrzesien-nabywca-auto-tama-torun) – Korekta faktury za wrzesień: nabywca „Auto Tama Toruń sp. z o.o.”
 - [RIN-120](https://linear.app/rinvo-demo/issue/RIN-120/auto-tama-zdecyduj-sprawdzic-jak-liczymy-krotkie-polaczenia-i-podac) – Sprawdzić, jak liczymy krótkie połączenia, i podać Kasi liczbę podwójnych telefonów
 - [RIN-121](https://linear.app/rinvo-demo/issue/RIN-121/auto-tama-zdecyduj-przeslac-kasi-cene-sms-ow-wysylanych-po-dwoch) – Przesłać Kasi cenę SMS-ów wysyłanych po dwóch nieudanych próbach
 - [RIN-122](https://linear.app/rinvo-demo/issue/RIN-122/auto-tama-wyslij-przygotowac-jednostronicowa-sciage-ze-statusami-i) – Przygotować jednostronicową ściągę ze statusami i przesłać Kasi
@@ -241,10 +274,14 @@ Szkolenie dopiero po starcie świeżych leadów, żeby handlowcy nie zapomnieli.
 - [RIN-142](https://linear.app/rinvo-demo/issue/RIN-142/auto-tama-jakosc-bota-rozmowcy-orientuja-sie-ze-to-robot-i-slysza) – Jakość bota: rozmówcy orientują się, że to robot, i słyszą błędne informacje
 - [RIN-143](https://linear.app/rinvo-demo/issue/RIN-143/auto-tama-rozliczenia-faktura-na-zly-podmiot-i-platnosc-za-podwojne) – Rozliczenia: faktura na zły podmiot i płatność za podwójne telefony
 - [RIN-144](https://linear.app/rinvo-demo/issue/RIN-144/auto-tama-notatka-przed-spotkaniem-spotkanie-z-pawlem-pol-godziny) – Notatka przed spotkaniem: Spotkanie z Pawłem (pół godziny, czwartek 15.10 o 10:00): czekamy na potwierdzenie Kasi
+- [RIN-146](https://linear.app/rinvo-demo/issue/RIN-146/auto-tama-wyslij-kasi-zestawienie-wynikow-testu-wstepu-ilu-rozmow) – Wysłać Kasi zestawienie wyników testu wstępu: ilu rozmów doszło do końca przy każdej wersji
+- [RIN-147](https://linear.app/rinvo-demo/issue/RIN-147/auto-tama-zdecyduj-eksport-listy-kontaktow-do-excela-np-samych) – Eksport listy kontaktów do Excela (np. samych zainteresowanych, do rozdziału między handlowców)
+- [RIN-148](https://linear.app/rinvo-demo/issue/RIN-148/auto-tama-sprawdz-pawel-chce-puscic-opla-na-starej-bazie-wbrew) – Paweł chce puścić Opla na starej bazie wbrew ustaleniom z Kasią
 
 ## Ryzyka powtarzające się
 
-- **konkurencja** (1 rozmów, 1 wzmianek)
+- **konkurencja** (2 rozmów, 2 wzmianek)
 - **grozba_rezygnacji** (1 rozmów, 1 wzmianek)
 - **jakosc_bota** (1 rozmów, 1 wzmianek)
 - **rozliczenia** (1 rozmów, 1 wzmianek)
+- **inne** (1 rozmów, 1 wzmianek)

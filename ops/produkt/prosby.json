@@ -97,5 +97,16 @@
         "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
       }
     ]
+  },
+  "eksport-kontaktow-do-excela": {
+    "tytul": "Eksport listy kontaktów do Excela (np. samych zainteresowanych, do rozdziału między handlowców)",
+    "prosby": [
+      {
+        "klient": "auto-tama",
+        "cytat": "Dziewczyny chcą eksportu listy kontaktów do Excela. Żeby wyciągnąć tych zainteresowanych i rozdzielić między handlowców. Teraz przepisują ręcznie.",
+        "data": "2026-10-13",
+        "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
+      }
+    ]
   }
 }

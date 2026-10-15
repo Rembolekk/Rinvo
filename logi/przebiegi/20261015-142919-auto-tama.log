@@ -1,0 +1,188 @@
+=== przetworz.py ===
+Transkrypcja: ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md
+Klient: auto-tama
+Start: 2026-10-15T14:29:19.203697
+
+============================================================
+=== claude --print ===
+============================================================
+
+Analiza gotowa. Wyniki są w `wyniki/auto-tama/2026-10-13-call-statusowy/` (`wynik.json` i `raport.html`). `render.py` i `daty.py` przeszły bez błędów, a wszystkie cytaty zgadzają się z transkrypcją.
+
+- **Do zrobienia teraz (T1–T6):**
+  - Test dwóch wersji wstępu 14–15.10: Toruń jedna wersja, Włocławek druga.
+  - Zestawienie wyników dla Kasi w piątek 16.10.
+  - Poprawka sobotnich godzin w Toruniu (do 15:00).
+  - Szkolenie dla handlowców 27.10 o 10:00.
+  - Ściąga ze statusami przed urlopem Kasi.
+  - Zaproszenie na spotkanie z Pawłem 15.10 o 10:00.
+- **Czeka na klienta (K1):** plik ze świeżymi leadami, Kasia wyśle do czwartku. Przypomnienie ma limit 0, bo prosiła, żeby nie przypominać.
+- **Backlog (B1):** eksport listy kontaktów do Excela.
+- **Zakazy (Z24–Z27):**
+  - nie przypominać o pliku,
+  - nie puszczać Opla na starej bazie do czwartkowej rozmowy,
+  - nie wierzyć relacji Oli o autach używanych,
+  - nic nowego w tygodniu urlopu Kasi.
+- **Ryzyka (R1–R2):**
+  - VoiceDesk: oferta z cennikiem u Pawła, w listopadzie test, jeśli w czwartek zabraknie konkretu o integracji.
+  - Prośba Pawła o Opla na starej bazie.
+- **Aktualizacje spraw:**
+  - zamknięte: adres we Włocławku, filtr „zainteresowany” i korekta faktury;
+  - wznowione: wstęp w dwóch wersjach, szkolenie i spotkanie z Pawłem.
+
+Do wyjaśnienia z Kasią:
+- Marek powiedział „w tym tygodniu nic nowego poza testem wstępu”. Nie wiadomo, czy chodzi o tydzień bieżący, czy o tydzień urlopu 19–23.10, więc nie wiadomo, czy świeże leady mogą ruszyć w piątek 16.10.
+- Nie wiadomo, która wersja wstępu idzie do którego miasta. To jest w jej mailu z 12.10, którego nie ma w transkrypcji.
+
+Dziś jest 15.10, więc część terminów (start testu, zaproszenie na czwartek) już minęła albo wypada dziś. Szkic maila w `wynik.json` czeka na zatwierdzenie i niczego nie wysłałem.
+
+Utwardzanie: {"maskowanie": {"liczba": 0, "rodzaje": {}}}
+
+============================================================
+=== render.py ===
+============================================================
+Komenda: python3 -I render.py wyniki/auto-tama/2026-10-13-call-statusowy/wynik.json --transkrypcja ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md
+
+OK: /home/runner/work/Rinvo/Rinvo/wyniki/auto-tama/2026-10-13-call-statusowy/raport.html
+Cytaty sprawdzone z transkrypcją: tak
+  Do zrobienia teraz: 6
+  Czeka na klienta: 1
+  Backlog produktowy: 1
+  Zakazy i ograniczenia: 4
+  Ryzyka handlowe: 2
+
+============================================================
+=== daty.py ===
+============================================================
+Komenda: python3 -I daty.py wyniki/auto-tama/2026-10-13-call-statusowy/wynik.json
+
+OK: okna_czasowe dla 8 spraw → wyniki/auto-tama/2026-10-13-call-statusowy/wynik.json
+  ryzyko-voicedesk: 2026-10-14 – 2026-10-15
+  sciaga-statusow: 2026-10-14 – 2026-10-16
+  spotkanie-z-pawlem: 2026-10-14 – 2026-10-15
+  swieze-leady-plik: 2026-10-14 – 2026-10-15
+  szkolenie-handlowcow: 2026-10-14 – 2026-10-16; 2026-10-26 – 2026-10-27
+  wstep-dwie-wersje: 2026-10-14 – 2026-10-16; 2026-10-26 – →
+  zakaz-opel-stara-baza-do-czwartku: 2026-10-16 – 2026-10-16; 2026-10-26 – →
+  zestawienie-wyniki-wstepu: 2026-10-14 – 2026-10-16
+
+============================================================
+=== linear_sync.py ===
+============================================================
+
+============================================================
+SYNCHRONIZACJA: wyniki/auto-tama/2026-10-13-call-statusowy/wynik.json  →  Linear [RIN]  (klient: auto-tama)
+============================================================
+
+Zespół: Rinvo demo (RIN)
+
+Etykiety:
+
+Stany: Todo / Backlog / Done / Cancelled gotowe
+
+  ✓ RIN-115 (adres-salonu-wloclawek) → zamknieta
+  ✓ RIN-118 (filtr-statusow) → zamknieta
+  ✓ RIN-119 (korekta-faktury) → zamknieta
+  ✓ RIN-123 (wstep-dwie-wersje) → zrob_teraz
+  ✓ RIN-127 (szkolenie-handlowcow) → zrob_teraz
+  ✓ RIN-128 (spotkanie-z-pawlem) → zrob_teraz
+
+  ✓ Komentarz → RIN-123 (wstep-dwie-wersje)
+  ✓ Termin → RIN-123 (wstep-dwie-wersje): 2026-10-14
+  ✓ RIN-146 (zestawienie-wyniki-wstepu): [auto-tama] Wyślij: Kasi zestawienie wyników testu
+  ↩ Wróciło: RIN-116 (godziny-salonow-w-bazie) otwarte ponownie
+  ✓ Komentarz → RIN-127 (szkolenie-handlowcow)
+  ✓ Termin → RIN-127 (szkolenie-handlowcow): 2026-10-27
+  ✓ Komentarz → RIN-122 (sciaga-statusow)
+  ✓ Termin → RIN-122 (sciaga-statusow): 2026-10-16
+  ✓ Komentarz → RIN-128 (spotkanie-z-pawlem)
+  ✓ Termin → RIN-128 (spotkanie-z-pawlem): 2026-10-15
+  ✓ Komentarz → RIN-124 (swieze-leady-plik)
+  ✓ Termin → RIN-124 (swieze-leady-plik): 2026-10-15
+  ✓ RIN-147 (eksport-kontaktow-do-excela): [auto-tama] Zdecyduj: Eksport listy kontaktów do E
+  ✓ Komentarz → RIN-140 (ryzyko-voicedesk)
+  ↑ Powtarzające się ryzyko: RIN-140 (ryzyko-voicedesk) | Konkurent VoiceDesk: tańszy i z integracją z systemem dealera
+  ✓ Termin → RIN-140 (ryzyko-voicedesk): 2026-10-15
+  ✓ RIN-148 (ryzyko-opel-stara-baza-pawel): [auto-tama] Sprawdź: Paweł chce puścić Opla na sta
+  ↻ RIN-144 (notatka-spotkanie-z-pawlem): odświeżony opis notatki
+  ✓ karta.md: ops/klienci/auto-tama/karta.md
+
+────────────────────────────────────────────────────────────
+Podsumowanie:
+  Utworzono zgłoszeń:            3
+  Zaktualizowano (komentarz):    7
+  Pominięto (ta sama rozmowa):   0
+  Zakazy → karta.json:           4
+  Aktualizacje otwartych spraw:  6
+────────────────────────────────────────────────────────────
+
+Stan Lineara zapisany do ops/.stan_linear.json (35 zgłoszeń).
+
+============================================================
+=== uruchom.py ===
+============================================================
+  FAIL  Adres Włocławek działa: aktualizacja → zamknięta
+        brak aktualizacji_spraw dla 'adres-wloclawek'
+  FAIL  Adres Włocławek: sprawa zamknięta w karcie klienta
+        'adres-wloclawek' nie ma w zamkniete_sprawy karty
+  SKIP  Adres Włocławek: zgłoszenie w Linearze jest Done  (wymaga --online)
+  FAIL  Filtr „zainteresowany” zawęża: aktualizacja → zamknięta
+        brak aktualizacji_spraw dla 'filtr-statusu'
+  FAIL  Filtr „zainteresowany”: sprawa zamknięta w karcie klienta
+        'filtr-statusu' nie ma w zamkniete_sprawy karty
+  SKIP  Filtr „zainteresowany”: zgłoszenie w Linearze jest Done  (wymaga --online)
+  PASS  Korekta faktury dotarła: aktualizacja → zamknięta
+  PASS  Korekta faktury: sprawa zamknięta w karcie klienta
+  SKIP  Korekta faktury: zgłoszenie w Linearze jest Done  (wymaga --online)
+  FAIL  Teksty wstępu dostarczone: aktualizacja → wznowiona (zrob_teraz)
+        brak aktualizacji_spraw dla 'tekst-wstepu-dwie-wersje'
+  PASS  Test wstępu rusza w środę i czwartek: pozycja w sekcji 1
+  FAIL  Test wstępu rusza w środę 14.10 i obejmuje czwartek 15.10
+        brak okien czasowych dla 'tekst-wstepu-dwie-wersje'
+  FAIL  Test wstępu mieści się w oknie 12–16.10 (przed urlopem Kasi)
+        brak okien czasowych dla 'tekst-wstepu-dwie-wersje'
+  SKIP  Teksty wstępu: zgłoszenie w Linearze wznowione (Todo)  (wymaga --online)
+  PASS  Zaproszenie dla Pawła: aktualizacja → wznowiona (zrob_teraz)
+  PASS  Zaproszenie dla Pawła: sprawa otwarta w karcie klienta
+  SKIP  Zaproszenie dla Pawła: zgłoszenie w Linearze wznowione (Todo)  (wymaga --online)
+  PASS  Plik świeżych leadów: dalej czeka, termin czwartek 15.10, zero przypomnień
+  PASS  Szkic maila nie obiecuje kolejnego przypomnienia o pliku
+  PASS  Zakaz „nie przypominaj o pliku” zapisany w karcie klienta
+  SKIP  Plik świeżych leadów: po rozmowie 13.10 czekał (termin 15.10); od maila z 14.10 plik dotarł → w Linearze wznowione (Todo), bez „Czeka na klienta”  (wymaga --online)
+  PASS  VoiceDesk drugi raz: pozycja w sekcji 5 (ryzyko)
+  PASS  VoiceDesk: karta klienta liczy temat „konkurencja” z ≥ 2 różnych rozmów
+  SKIP  VoiceDesk: w Linearze „Powtarzające się ryzyko” i priorytet Urgent  (wymaga --online)
+  PASS  Opel na starej bazie: żadna pozycja nie dostaje „Dla agenta” (zakaz albo czeka)
+  PASS  Opel na starej bazie: zakaz zapisany w karcie klienta
+  SKIP  Opel na starej bazie: w Linearze bez „Dla agenta”  (wymaga --online)
+  PASS  Toruń podaje sobotę do 14: błąd z „Dla agenta” (sekcja 1)
+  SKIP  Toruń sobota: zgłoszenie w Linearze ma „Dla agenta” i nie jest Done  (wymaga --online)
+  FAIL  Eksport do Excela: sekcja 3; AI-first: ta sama prośba u 2 klientów (Wielu klientów) → Dla agenta, nie Decyzja człowieka
+        brakuje etykiety 'Wielu klientów' (jest: ['Produkt', 'Decyzja człowieka'], typ=pomysl_produktowy, rodzaj=nowa_funkcja, pewnosc=wysoka, zakaz=False, id=B1)
+  FAIL  Eksport do Excela: ta sama funkcja u klinika-usmiech i auto-tama w prosby.json
+        prosby.json['eksport-kontaktow-do-excela']: klienci ['auto-tama'], oczekiwano ≥ 2
+  SKIP  Eksport do Excela: w Linearze „Wielu klientów” i „Dla agenta” (AI-first)  (wymaga --online)
+  PASS  Auta używane: zakaz sprzedaży, relacja Oli odrzucona (sekcja 4)
+  PASS  Auta używane: dotychczasowy zakaz zostaje w karcie klienta
+  PASS  Auta używane: żadna aktualizacja nie uchyla zakazu sprzedaży
+  PASS  Szkolenie 27.10 o 10:00: sprawa wznowiona (aktualizacja → zrob_teraz)
+  PASS  Szkolenie: termin 27.10 w pozycji
+  SKIP  Szkolenie: w Linearze wznowione (Todo) z terminem 27.10  (wymaga --online)
+
+Niepowodzenia (9):
+  - Adres Włocławek działa: aktualizacja → zamknięta: brak aktualizacji_spraw dla 'adres-wloclawek'
+  - Adres Włocławek: sprawa zamknięta w karcie klienta: 'adres-wloclawek' nie ma w zamkniete_sprawy karty
+  - Filtr „zainteresowany” zawęża: aktualizacja → zamknięta: brak aktualizacji_spraw dla 'filtr-statusu'
+  - Filtr „zainteresowany”: sprawa zamknięta w karcie klienta: 'filtr-statusu' nie ma w zamkniete_sprawy karty
+  - Teksty wstępu dostarczone: aktualizacja → wznowiona (zrob_teraz): brak aktualizacji_spraw dla 'tekst-wstepu-dwie-wersje'
+  - Test wstępu rusza w środę 14.10 i obejmuje czwartek 15.10: brak okien czasowych dla 'tekst-wstepu-dwie-wersje'
+  - Test wstępu mieści się w oknie 12–16.10 (przed urlopem Kasi): brak okien czasowych dla 'tekst-wstepu-dwie-wersje'
+  - Eksport do Excela: sekcja 3; AI-first: ta sama prośba u 2 klientów (Wielu klientów) → Dla agenta, nie Decyzja człowieka: brakuje etykiety 'Wielu klientów' (jest: ['Produkt', 'Decyzja człowieka'], typ=pomysl_produktowy, rodzaj=nowa_funkcja, pewnosc=wysoka, zakaz=False, id=B1)
+  - Eksport do Excela: ta sama funkcja u klinika-usmiech i auto-tama w prosby.json: prosby.json['eksport-kontaktow-do-excela']: klienci ['auto-tama'], oczekiwano ≥ 2
+
+FAIL 18/27 (pominięto offline: 11)
+
+============================================================
+=== Slack ===
+============================================================
+Slack: wysłano (HTTP 200)
