@@ -1,5 +1,5 @@
 {
- "zapisano": "2026-10-16T21:47:39+00:00",
+ "zapisano": "2026-10-16T22:14:52+00:00",
  "zgloszenia": {
   "RIN-114": {
    "etykiety": [
@@ -157,6 +157,7 @@
   "RIN-123": {
    "etykiety": [
     "Dla agenta",
+    "Do weryfikacji",
     "repo: rinvo-app"
    ],
    "id": "5acef094-ab49-45d7-abbe-5457e6ccfaa3",
@@ -168,7 +169,7 @@
    "url": "https://linear.app/rinvo-demo/issue/RIN-123/auto-tama-wstep-rozmowy-w-dwoch-wersjach-czekamy-na-teksty-od-kasi",
    "utworzono": "2026-10-15T09:40:54.928Z",
    "zamknieto": null,
-   "zmieniono": "2026-10-15T14:55:04.279Z"
+   "zmieniono": "2026-10-16T22:14:41.683Z"
   },
   "RIN-124": {
    "etykiety": [
