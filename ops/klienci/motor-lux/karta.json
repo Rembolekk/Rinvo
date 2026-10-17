@@ -40,7 +40,12 @@
         "Od drugiego do szóstego listopada żadnych nowych kampanii."
       ],
       "wlasciciel": "Agnieszka Wróbel",
-      "zrodlo": "ops/transkrypcje/motor-lux/2026-10-15-call-statusowy-motorlux.md"
+      "zrodlo": "ops/transkrypcje/motor-lux/2026-10-15-call-statusowy-motorlux.md",
+      "okres": {
+        "od": "2026-11-02",
+        "do": "2026-11-06",
+        "skad": "od 2 do 6 listopada "
+      }
     },
     {
       "id": "Z3",
@@ -167,8 +172,9 @@
       },
       "przypomnienie": {
         "limit": 1,
-        "wykorzystane": 0,
-        "nie_przypominac": false
+        "wykorzystane": 1,
+        "nie_przypominac": false,
+        "ostatni_szkic": "2026-10-17"
       }
     },
     "spotkanie-z-panem-adamem": {

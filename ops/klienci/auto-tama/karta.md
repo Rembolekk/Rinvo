@@ -47,15 +47,6 @@ Eksport z panelu klienta ma nieczytelne kolumny („field 1”, „field 2”), 
 > I nie przysyłaj mi wzoru pliku. Eksport z panelu jest brzydki, kolumny „field 1”, „field 2”, model czasem siedzi w treści wiadomości.
 
 
-### Z5: Nie puszczać testu wstępu w tym tygodniu (6–9.10)
-
-Kasia odsłuchuje starą bazę i test wstępu zlałby się jej z tymi nagraniami.
-
-> W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje.
-
-> W tym tygodniu nie puszczamy, skoro słuchasz starej bazy.
-
-
 ### Z6: Nie pisać za Kasię tekstów wstępu ani SMS-ów
 
 Teksty wstępu rozmowy i treść SMS-ów pisze Kasia; Rinvo ich nie pisze ani nie proponuje własnej wersji.
@@ -185,15 +176,6 @@ Każdą nową rzecz, która kosztuje, musi zatwierdzić Paweł.
 > Wszystko, co kosztuje, i tak musi zatwierdzić Paweł.
 
 
-### Z21: Nie robić osobnej roboty pod kolumnę nazwiska, jeśli lista nie jest ruszana w tym tygodniu (6–9.10)
-
-Zmiana kolejności kolumn tylko przy okazji prac nad listą kontaktów (filtr). Gdy problem z filtrem leży gdzie indziej, kolumn osobno nie ruszamy.
-
-> Jak w tym tygodniu listy nie ruszacie, nie róbcie osobnej roboty pod kolumnę.
-
-> Jak się okaże, że problem z filtrem siedzi gdzie indziej, to kolumn osobno nie ruszam.
-
-
 ### Z22: Nie pisać do Oli: wszystko ustalać z Kasią
 
 Marek zadeklarował, że nie kontaktuje się z handlowcem Olą, tylko z Kasią.
@@ -235,9 +217,23 @@ Kasia ostrzega, że Ola twierdzi, jakoby Kasia zgodziła się, żeby agent przy 
 > Jasne, zostaje tak, jak było. Agent nie sprzedaje.
 
 
-### Z27: Nic nowego nie startuje w tygodniu urlopu Kasi (od 19.10)
+## Wygasłe zakazy (minął okres)
 
-Kasia przypomina, że od 19.10 jej nie ma. Marek potwierdza, że nic nowego nie startuje poza testem wstępu. Ustalenie z 6.10 (Z18): urlop trwa 19–23.10 i w tym czasie nic nowego nie odpalamy, nawet jeśli plik ze świeżymi leadami już będzie.
+### Z5: Nie puszczać testu wstępu w tym tygodniu (6–9.10) (wygasł 2026-10-09)
+
+> W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje.
+
+> W tym tygodniu nie puszczamy, skoro słuchasz starej bazy.
+
+
+### Z21: Nie robić osobnej roboty pod kolumnę nazwiska, jeśli lista nie jest ruszana w tym tygodniu (6–9.10) (wygasł 2026-10-09)
+
+> Jak w tym tygodniu listy nie ruszacie, nie róbcie osobnej roboty pod kolumnę.
+
+> Jak się okaże, że problem z filtrem siedzi gdzie indziej, to kolumn osobno nie ruszam.
+
+
+### Z27: Nic nowego nie startuje w tygodniu urlopu Kasi (od 19.10) (wygasł 2026-10-16)
 
 > I od dziewiętnastego mnie nie ma, pamiętasz.
 

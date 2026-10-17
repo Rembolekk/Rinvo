@@ -1,5 +1,9 @@
 # Karta klienta: motor-lux
 
+## Decydenci
+
+- **Agnieszka Wróbel** – decydent
+
 ## Kontakty (maile)
 
 - **Agnieszka Wróbel** <> — agnieszka.wrobel@motorlux.pl; decyzje: brak — **z rozmowy, do potwierdzenia**

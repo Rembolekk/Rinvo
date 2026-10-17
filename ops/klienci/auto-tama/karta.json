@@ -70,18 +70,6 @@
       "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
     },
     {
-      "id": "Z5",
-      "klucz_sprawy": "zakaz-test-wstepu-ten-tydzien",
-      "tytul": "Nie puszczać testu wstępu w tym tygodniu (6–9.10)",
-      "opis": "Kasia odsłuchuje starą bazę i test wstępu zlałby się jej z tymi nagraniami.",
-      "cytat": [
-        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje.",
-        "W tym tygodniu nie puszczamy, skoro słuchasz starej bazy."
-      ],
-      "wlasciciel": "Kasia Malinowska",
-      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-    },
-    {
       "id": "Z6",
       "klucz_sprawy": "zakaz-pisanie-tekstow",
       "tytul": "Nie pisać za Kasię tekstów wstępu ani SMS-ów",
@@ -233,7 +221,12 @@
         "Tydzień od dziewiętnastego nic nowego nie startuje. Jak się pali, dzwonię do Pawła, ale Opel i wstęp czekają na ciebie."
       ],
       "wlasciciel": "Kasia Malinowska",
-      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+      "okres": {
+        "od": "2026-10-19",
+        "do": "2026-10-23",
+        "skad": "19–23.10"
+      }
     },
     {
       "id": "Z19",
@@ -254,18 +247,6 @@
       "opis": "Każdą nową rzecz, która kosztuje, musi zatwierdzić Paweł.",
       "cytat": [
         "Wszystko, co kosztuje, i tak musi zatwierdzić Paweł."
-      ],
-      "wlasciciel": "Kasia Malinowska",
-      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
-    },
-    {
-      "id": "Z21",
-      "klucz_sprawy": "zakaz-osobna-praca-kolumna",
-      "tytul": "Nie robić osobnej roboty pod kolumnę nazwiska, jeśli lista nie jest ruszana w tym tygodniu (6–9.10)",
-      "opis": "Zmiana kolejności kolumn tylko przy okazji prac nad listą kontaktów (filtr). Gdy problem z filtrem leży gdzie indziej, kolumn osobno nie ruszamy.",
-      "cytat": [
-        "Jak w tym tygodniu listy nie ruszacie, nie róbcie osobnej roboty pod kolumnę.",
-        "Jak się okaże, że problem z filtrem siedzi gdzie indziej, to kolumn osobno nie ruszam."
       ],
       "wlasciciel": "Kasia Malinowska",
       "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md"
@@ -324,18 +305,6 @@
       "cytat": [
         "A, i Ola mówiła, że ja się zgodziłam, żeby agent przy odmowie proponował używane auta. Nie zgodziłam się. Gdyby ktoś wam tak napisał, nie wierzcie.",
         "Jasne, zostaje tak, jak było. Agent nie sprzedaje."
-      ],
-      "wlasciciel": "Marek Rewoliński",
-      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
-    },
-    {
-      "id": "Z27",
-      "klucz_sprawy": "zakaz-nic-nowego-w-tygodniu-urlopu",
-      "tytul": "Nic nowego nie startuje w tygodniu urlopu Kasi (od 19.10)",
-      "opis": "Kasia przypomina, że od 19.10 jej nie ma. Marek potwierdza, że nic nowego nie startuje poza testem wstępu. Ustalenie z 6.10 (Z18): urlop trwa 19–23.10 i w tym czasie nic nowego nie odpalamy, nawet jeśli plik ze świeżymi leadami już będzie.",
-      "cytat": [
-        "I od dziewiętnastego mnie nie ma, pamiętasz.",
-        "Pamiętam, w tym tygodniu nic nowego poza testem wstępu."
       ],
       "wlasciciel": "Marek Rewoliński",
       "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md"
@@ -1113,5 +1082,61 @@
       ],
       "status_koncowy": "zamknieta"
     }
-  }
+  },
+  "zakazy_wygasle": [
+    {
+      "id": "Z5",
+      "klucz_sprawy": "zakaz-test-wstepu-ten-tydzien",
+      "tytul": "Nie puszczać testu wstępu w tym tygodniu (6–9.10)",
+      "opis": "Kasia odsłuchuje starą bazę i test wstępu zlałby się jej z tymi nagraniami.",
+      "cytat": [
+        "W tym tygodniu tego nie puszczajcie, bo odsłuchuję starą bazę i wszystko mi się zleje.",
+        "W tym tygodniu nie puszczamy, skoro słuchasz starej bazy."
+      ],
+      "wlasciciel": "Kasia Malinowska",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+      "okres": {
+        "od": "2026-10-06",
+        "do": "2026-10-09",
+        "skad": "6–9.10"
+      },
+      "wygasl": "2026-10-09"
+    },
+    {
+      "id": "Z21",
+      "klucz_sprawy": "zakaz-osobna-praca-kolumna",
+      "tytul": "Nie robić osobnej roboty pod kolumnę nazwiska, jeśli lista nie jest ruszana w tym tygodniu (6–9.10)",
+      "opis": "Zmiana kolejności kolumn tylko przy okazji prac nad listą kontaktów (filtr). Gdy problem z filtrem leży gdzie indziej, kolumn osobno nie ruszamy.",
+      "cytat": [
+        "Jak w tym tygodniu listy nie ruszacie, nie róbcie osobnej roboty pod kolumnę.",
+        "Jak się okaże, że problem z filtrem siedzi gdzie indziej, to kolumn osobno nie ruszam."
+      ],
+      "wlasciciel": "Kasia Malinowska",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-06-call-statusowy.md",
+      "okres": {
+        "od": "2026-10-06",
+        "do": "2026-10-09",
+        "skad": "6–9.10"
+      },
+      "wygasl": "2026-10-09"
+    },
+    {
+      "id": "Z27",
+      "klucz_sprawy": "zakaz-nic-nowego-w-tygodniu-urlopu",
+      "tytul": "Nic nowego nie startuje w tygodniu urlopu Kasi (od 19.10)",
+      "opis": "Kasia przypomina, że od 19.10 jej nie ma. Marek potwierdza, że nic nowego nie startuje poza testem wstępu. Ustalenie z 6.10 (Z18): urlop trwa 19–23.10 i w tym czasie nic nowego nie odpalamy, nawet jeśli plik ze świeżymi leadami już będzie.",
+      "cytat": [
+        "I od dziewiętnastego mnie nie ma, pamiętasz.",
+        "Pamiętam, w tym tygodniu nic nowego poza testem wstępu."
+      ],
+      "wlasciciel": "Marek Rewoliński",
+      "zrodlo": "ops/transkrypcje/auto-tama/2026-10-13-call-statusowy.md",
+      "okres": {
+        "od": "2026-10-13",
+        "do": "2026-10-16",
+        "skad": "w tym tygodniu"
+      },
+      "wygasl": "2026-10-16"
+    }
+  ]
 }
